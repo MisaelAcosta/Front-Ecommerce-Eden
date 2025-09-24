@@ -15,22 +15,6 @@ import {
 } from "@/components/ui/navigation-menu"
 
 
-const components: { title: string; href: string; description: string }[] = [
-  {
-    title: "Nuestra Historia",
-    href: "/docs/primitives/alert-dialog",
-    description:
-      "A modal dialog that interrupts the user with important content and expects a response.",
-  },
-  {
-    title: "Que hacemos?",
-    href: "/docs/primitives/hover-card",
-    description:
-      "For sighted users to preview content available behind a link.",
-    },
-]
-
-
 const MenuList = () => {
   return (
     <NavigationMenu viewport={false}>
@@ -44,27 +28,8 @@ const MenuList = () => {
 
         <NavigationMenuItem>
           <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-            <Link href="/Information">Servicios</Link>
+            <Link href="/Servicios">Servicios</Link>
           </NavigationMenuLink>
-        </NavigationMenuItem>
-
-        <NavigationMenuItem>
-          <NavigationMenuTrigger>
-            <Link href="/Information">Quienes somos?</Link>
-          </NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid w-[400px] gap-2 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-              {components.map((component) => (
-                <ListItem
-                  key={component.title}
-                  title={component.title}
-                  href={component.href}
-
-                >{component.description}
-                </ListItem>
-              ))}
-            </ul>
-          </NavigationMenuContent>
         </NavigationMenuItem>
 
       </NavigationMenuList>

@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Urbanist } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/ui/navbar";
 import Footer from "@/components/footer";
 import { ThemeProvider } from "@/components/theme.provider";
-const urbanist = Urbanist({subsets: ["latin"],});
+const inter = Inter({subsets: ["latin"],});
 
 
 export const metadata: Metadata = {
@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={urbanist.className}>
+      <body className={inter.className}>
           <ThemeProvider
             attribute="class"
             defaultTheme="light"
