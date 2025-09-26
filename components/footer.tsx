@@ -14,7 +14,7 @@ const Footer = () => {
             
             {/* Texto grande */}
             <div className="md:col-span-2 lg:col-span-2">
-              <h1 className={`${inter.className} text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-tight`}>
+              <h1 className={`${inter.className} text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl  font-black leading-25`}>
                 EL FUTURO <br />
                 ESTA <br />
                 IMPRESO
