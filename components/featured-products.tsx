@@ -3,29 +3,47 @@
 import { useGetFeaturedProducts } from "@/api/useGetFeaturedProducts";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "./ui/carousel";
 import SkeletonSchema from "./skeletonSchema";
-import { ResponseType } from "@/types/response";
-import { ProductType } from "@/types/product";
+import type { ResponseType } from "@/types/response";
+import type { ProductType } from "@/types/product";
 import { Card, CardContent } from "./ui/card";
-import { Expand, ShoppingCart } from "lucide-react";
-import IconButton from "./icon-button";
+import { Button } from "./ui/button";
+import { CirclePlus, } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+
+// helper para convertir category a string
+function toText(v: any): string | undefined {
+  if (v == null) return undefined;
+  if (typeof v === "string" || typeof v === "number") return String(v);
+  if (typeof v === "object") {
+    if (v.name) return String(v.name);
+    if (v.categoryName) return String(v.categoryName);
+    if (v.title) return String(v.title);
+    if (v.data?.attributes?.name) return String(v.data.attributes.name);
+  }
+  return undefined;
+}
 
 const FeaturedProducts = () => {
   const { result, loading }: ResponseType = useGetFeaturedProducts();
   const router = useRouter();
 
   return (
-    <div className="w max-w-6xl py-4 mx-auto sm:py-16 sm:px-24">
-      <h3 className="px-6 text-3xl sm:pb-8">Productos destacados</h3>
+    <section className="w-full max-w-6xl mx-auto py-6 sm:py-12 px-4 sm:px-6">
+      <h3 className="px-1 sm:px-2 text-2xl sm:text-3xl font-semibold sm:pb-6">
+        Productos destacados
+      </h3>
+
       <Carousel>
-        <CarouselContent className="ml-2 md:-ml-4">
+        <CarouselContent className="ml-1 md:-ml-4">
           {loading && <SkeletonSchema grid={3} />}
 
-          {result != null &&
+          {Array.isArray(result) &&
             result.map((product: ProductType) => {
-              const { id, productName, slug, images, price } = product;
+              const { id, productName, slug, images, price } = product as any;
 
-              // Manejo seguro de imágenes
+              const category = toText((product as any).category ?? (product as any).categoryName);
+              const productName2 = toText((product as any).productName2 ?? (product as any).variant ?? (product as any).subCategory);
               const imageUrl =
                 images?.[0]?.url &&
                 `${process.env.NEXT_PUBLIC_BACKEND_URL}${images[0].url}`;
@@ -33,59 +51,78 @@ const FeaturedProducts = () => {
               return (
                 <CarouselItem
                   key={id}
-                  className="md:basis-1/2 lg:basis-1/3 group"
+                  className="basis-[85%] sm:basis-1/2 lg:basis-1/3 px-1 md:px-4"
                 >
-                  <div className="p-1">
+                  <Card className="group relative rounded-2xl border pt-1 border-gray-200 shadow-none hover:shadow-sm transition-shadow">
+                    {/* Header (categoría + icono) */}
+                    <div className="flex items-start justify-between px-5 pt-4">
+                      <span className="text-sm text-muted-foreground">{category ?? "—"}</span>
 
-                    <Card className="py-4 border border-gray-200 shadow-none">
-                      <CardContent className="relative flex flex-col items-center justify-center px-6 py-2">
+                      <button
+                        className="h-9 w-9 shrink-0  backdrop-blur hover:bg-white flex items-center justify-center"
+                        type="button"
+                        aria-label="Detalles"
+                      >
+                        <Image
+                          src="/icons/CirculoPlaneta.svg"
+                          alt="icono"
+                          width={56}
+                          height={56}
+                          className="opacity-100"
+                        />
+                      </button>
+                    </div>
+
+                    <CardContent className="px-8 pb-0 pt-none">
+                      {/* Imagen */}
+                      <div className="rounded-xl bg-muted/10 aspect-square w-full overflow-hidden mb-4 flex items-center justify-center">
                         {imageUrl ? (
                           <img
                             src={imageUrl}
                             alt={productName}
-                            className="rounded-md"
+                            className="max-h-full max-w-full object-contain"
                           />
                         ) : (
-                          <span className="text-gray-400">No image</span>
+                          <span className="text-sm text-muted-foreground">Sin imagen</span>
                         )}
-
-                        <div className="absolute w-full px-6 background:white transition duration-200 opacity-0 group-hover:opacity-100 botton-5">
-                        <div className="flex justify-center gap-x-10 mt-35">
-                          <IconButton
-                            onClick={() => router.push(`/product/${slug}`)}
-                            icon={<Expand size={20} />}
-                            className="text-gray-600"
-                          />
-                          <IconButton
-                            onClick={() => console.log("Add item")}
-                            icon={<ShoppingCart size={20} />}
-                            className="text-gray-600"
-                          />
-                        </div>
-                        </div>
-                      </CardContent>
-
-                      <div className="flex justify-between gap-4 px-8">
-                        <h3 className="text-lg font-bold">{productName}</h3>
-                        <div className="flex item-center justify-between gap-3">
-                            <p className="px-2 py-1 text-white bg-black rounded-full dark:bg-white dark:text-black w-fit ">${price}</p>
-                        </div>
                       </div>
 
-                    </Card>
-                  </div>
+                      {/* Nombre + subtítulo */}
+                      <div className="mb-2">
+                        <h3 className="text-base font-semibold leading-tight">
+                          {productName}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">{productName2 ?? ""}</p>
+                      </div>
+
+                      {/* Precio + CTA */}
+                      <div className="flex items-center  justify-between">
+                        <p className="text-base font-medium">${price}</p>
+
+                        <Button
+                          onClick={() => router.push(`/product/${slug}`)}
+                          size="sm"
+                          className="font-regular bg-[#191919] rounded-lg "
+                        >
+                          Agregar <CirclePlus className="ml-1 h-7 w-7" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </CarouselItem>
               );
             })}
         </CarouselContent>
-        <CarouselPrevious/>
+
+        <CarouselPrevious />
         <CarouselNext className="hidden sm:flex" />
       </Carousel>
-    </div>
+    </section>
   );
 };
 
 export default FeaturedProducts;
+
 
 
 

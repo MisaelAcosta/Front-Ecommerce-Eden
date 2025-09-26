@@ -7,16 +7,18 @@ import Block3 from "@/components/bloque-3";
 
 const Header = () => {
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-12">
+    <section className="w-full max-w-9xl lg:mx-0 px-4 sm:px-2 py-6 md:py-12">
       <div
         className="
-          grid grid-cols-1 gap-4 sm:gap-6
-          md:grid-cols-3 md:grid-rows-2 md:gap-6
-          md:h-[690px]
+          grid grid-cols-1 gap-1 sm:gap-1
+          md:grid-cols-3 md:grid-rows-2 md:gap-1
+          md:h-[745px] 
+          md:w-full
+          md:p-none
         "
       >
         {/* Bloque grande (carrusel). En mobile ocupa todo el ancho, sin altura fija */}
-        <div className="md:col-span-2 md:row-span-2 rounded-2xl overflow-hidden min-h-[520px] sm:min-h-[380px] md:min-h-0 md:h-full">
+        <div className="md:col-span-2 md:row-span-2 rounded-lg overflow-hidden min-h-[520px] sm:min-h-[380px] md:min-h-0 md:h-full">
           <Block1 />
         </div>
 

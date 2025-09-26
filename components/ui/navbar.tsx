@@ -9,7 +9,7 @@ import ToggleTheme from "../toggle-theme";
 const Navbar = () => {
   const router = useRouter()  
   return (
-    <div className="cursor-pointer border-b flex items-center justify-between p-5 w-full">
+    <div className=" flex items-center justify-between p-8 pb-1 w-full">
          {/*Logo*/}
          <div className="
         MÓVIL (0-639px): centrado 
@@ -19,7 +19,7 @@ const Navbar = () => {
         md:mx-25 md:gap-8
         
         DESKTOP (1024px+): mantiene configuración tablet 
-        lg:mx-35 ">
+        lg:mx-5 ">
 
         <h1 className="
         MÓVIL: texto mediano 
@@ -29,7 +29,7 @@ const Navbar = () => {
           md:text-3xl
           
         DESKTOP: texto máximo 
-          lg:text-4xl
+          lg:text-5xl
         " onClick={() => router.push("/")}>
           Eden
         </h1>

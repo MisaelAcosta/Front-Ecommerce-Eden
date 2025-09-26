@@ -5,6 +5,7 @@ export type ProductType = {
 
     attributes: {
         productName: string;
+        productName2: string;
         slug: string;
         description: string;
         active: boolean;

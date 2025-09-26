@@ -105,7 +105,7 @@ export default function Footer() {
 
       {/* Parte inferior */}
       <div className="border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 md:px-10 py-4">
+        <div className="max-w-2xl mx-auto px-6 md:px-10 py-2">
           <div className="flex flex-col sm:flex-row items-center justify-between text-xs md:text-sm text-gray-500 gap-2">
             <p>© 2025 Eden.</p>
             <p>Todos los derechos reservados</p>

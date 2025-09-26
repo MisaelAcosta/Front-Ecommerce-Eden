@@ -49,13 +49,13 @@ const Block1 = () => {
     <div className="w-full h-full bg-black text-white rounded-2xl relative overflow-hidden">
       {/* Slides wrapper */}
       <div
-        className="flex h-full transition-transform duration-800 ease-in-out"
+        className="flex h-full transition-transform duration-1500 ease-in-out"
         style={{ transform: `translateX(-${index * 100}%)` }}
       >
         {slides.map((slide) => (
           <div
             key={slide.id}
-            className="min-w-full flex items-center justify-center px-8"
+            className="min-w-full flex pt-15 px-1"
           >
             <h1 className="text-3xl md:text-5xl font-bold text-center">
               {slide.title}
@@ -64,11 +64,13 @@ const Block1 = () => {
         ))}
       </div>
 
+
+      {/*Icons y fonto de slide arrow */}
       {/* Prev / Next (inside tarjeta) */}
       <button
         onClick={prev}
         aria-label="Anterior"
-        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 p-2 md:p-3 rounded-full shadow-md backdrop-blur"
+        className="absolute left-4 top-1/2 -translate-y-1/2  hover: p-2 md:p-3 rounded-full shadow-md "
       >
         {/* Chevron left */}
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -79,7 +81,7 @@ const Block1 = () => {
       <button
         onClick={next}
         aria-label="Siguiente"
-        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 p-2 md:p-3 rounded-full shadow-md backdrop-blur"
+        className="absolute right-4 top-1/2 -translate-y-1/2  hover:bg-white/20 p-2 md:p-3 rounded-full shadow-md "
       >
         {/* Chevron right */}
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -87,7 +89,9 @@ const Block1 = () => {
         </svg>
       </button>
 
-      {/* Indicators (dots) — dentro de la tarjeta */}
+
+
+      {/* Indicators Circulos inferiores (dots) — dentro de la tarjeta */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
         {slides.map((s, i) => (
           <button
