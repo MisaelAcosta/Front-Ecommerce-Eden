@@ -46,10 +46,10 @@ const Block1 = () => {
   };
 
   return (
-    <div className="w-full h-full bg-[#0f1724] text-white rounded-2xl relative overflow-hidden">
+    <div className="w-full h-full bg-black text-white rounded-2xl relative overflow-hidden">
       {/* Slides wrapper */}
       <div
-        className="flex h-full transition-transform duration-500 ease-in-out"
+        className="flex h-full transition-transform duration-800 ease-in-out"
         style={{ transform: `translateX(-${index * 100}%)` }}
       >
         {slides.map((slide) => (

@@ -13,7 +13,7 @@ const Navbar = () => {
          {/*Logo*/}
          <div className="
         MÓVIL (0-639px): centrado 
-        mx-5 flex items-center gap-4
+        mx-3 flex items-center gap-4
         
         TABLET (768px+): margen específico + más gap 
         md:mx-25 md:gap-8
@@ -44,7 +44,7 @@ const Navbar = () => {
         {/* Sección derecha: Iconos */}
         <div className="
         MÓVIL: gap pequeño 
-        flex items-center gap-6
+        flex items-center gap-6 mx-2
         
         TABLET: gap más grande + margen 
         md:gap-4 md:mx-35">
@@ -62,11 +62,14 @@ const Navbar = () => {
             TABLET: visible como flex 
             md:flex" onClick={() => router.push("/user")}></User>
 
-            <ToggleTheme></ToggleTheme>
+            <div className="hidden md:flex">
+              <ToggleTheme />
+
+            </div>
 
 
             {/* Menu móvil */}
-        <div className="flex sm:hidden">
+        <div className="flex sm:hidden  ">
             <ItemsMenuMobile></ItemsMenuMobile>
         </div>
         </div>
