@@ -23,4 +23,4 @@ const BannerDiscount: React.FC<BannerDiscountProps> = ({
     );
 };
 
-export default BannerDiscount;
+export default BannerDiscount; 

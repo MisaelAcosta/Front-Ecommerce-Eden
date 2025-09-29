@@ -34,7 +34,7 @@ const Navbar = () => {
           Eden
         </h1>
 
-        <div className="hidden md:flex">
+        <div className="hidden md:flex ">
             <MenuList></MenuList>
         </div>
 
