@@ -8,7 +8,7 @@ export default function Home() {
   return (
   <main>
     <Header />
-    <CarouselTextBanner />
+    {/*<CarouselTextBanner />*/}
     <FeaturedProducts />
     {/*<BannerDiscount />*/}
     <ChooseCategory/>

@@ -34,7 +34,7 @@ const Navbar = () => {
           Eden
         </h1>
 
-        <div className="hidden md:flex ">
+        <div className="hidden md:flex lg:text-5xl">
             <MenuList></MenuList>
         </div>
 
@@ -47,7 +47,7 @@ const Navbar = () => {
         flex items-center gap-6 mx-2
         
         TABLET: gap más grande + margen 
-        md:gap-4 md:mx-35">
+        md:gap-4 md:mx-5">
             <ShoppingCart
                  strokeWidth="1" 
                 className="cursor-pointer " onClick={() => router.push("/cart")}></ShoppingCart>
