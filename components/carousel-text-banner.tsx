@@ -9,15 +9,21 @@ import  Autoplay  from "embla-carousel-autoplay";
 export const dataCarouselTop = [
     {
         id: 1,
-        title: "Envios en 24/horas",
-        description: "Revisa nuestra ofertas del dia",
+        title: "Envíos en 24 hrs",
+        description: "Enviamos tu pedido en 24 hrs, rápido y seguro.",
         link: "#",
     },
 
     {
         id: 2,
-        title: "La mejor calidad",
-        description: "Bienvenido a Eden",
+        title: "Personalización 3D",
+        description: "Pede diseños únicos hechos a tu medida.",
+        link: "#",
+    },
+    {
+        id: 3,
+        title: "Compra seguro",
+        description: "Pagá con total seguridad y garantía de calidad.",
         link: "#",
     }
 ]
@@ -28,7 +34,7 @@ export const dataCarouselTop = [
 const CarouselTextBanner = () => {
     const router = useRouter()
     return (
-        <div className="bg-gray-200 dark:bg-primary">
+        <div className="bg-[#f3f3f3] dark:bg-primary">
             <Carousel
                 className="w-full max-w-4x1 mx-auto"
                 plugins={[
@@ -37,12 +43,12 @@ const CarouselTextBanner = () => {
                     })
                 ]}>
             <CarouselContent>
-                {dataCarouselTop.map(({id, title, link, description}) => (
-                <CarouselItem key={id} onClick={() => router.push(link)} className="cursor-pointer">
+                {dataCarouselTop.map(({id, title, description}) => (
+                <CarouselItem key={id} onClick={() => {}} className="">
                     <div>
                         <Card className="shadow-none border-none bg-transparent">
                             <CardContent className="flex flex-col items-center justify-center  ">
-                                <p className="sm:text-lg text-wrap dark:text-secondary">{title}</p>
+                                <p className="sm:text-lg font-bold text-wrap dark:text-secondary">{title}</p>
                                 <p className="text-xs text-sm dark:text-secondary ">{description}</p>
                             </CardContent>
                         </Card>

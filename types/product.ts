@@ -10,6 +10,7 @@ export type ProductType = {
         description: string;
         active: boolean;
         isFeatured: boolean;
+        newProduct: boolean;
         price: number;
         images: {
             data: {

@@ -1,4 +1,170 @@
-"use client"
+
+"use client";
+
+import Link from "next/link";
+import { Gamepad2 } from "lucide-react"; // Ícono fallback
+import { useGetCategories } from "@/api/getProducts";
+import { ResponseType } from "@/types/response";
+import { CategoryType } from "@/types/category"; // 👈 este es tu tipo actual
+
+const ChooseCategory = () => {
+  // Llamado al hook que trae categorías desde Strapi
+  const { result, loading, error }: ResponseType = useGetCategories();
+
+  // Filtramos solo las categorías destacadas
+  const categories = Array.isArray(result)
+    ? result.filter((c: CategoryType) => c.isFeatured) // 👈 usamos el boolean
+    : [];
+
+  return (
+    <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-10 sm:py-14">
+      {/* Título */}
+      <h3 className="text-2xl sm:text-3xl font-semibold mb-6">
+        CATEGORÍAS DESTACADAS
+      </h3>
+
+      {/* Estado de error */}
+      {error && (
+        <p className="text-sm text-red-600 mb-6">
+          Ocurrió un problema cargando las categorías.
+        </p>
+      )}
+
+      {/* Grid responsive: 
+          - 1 columna en móvil
+          - 2 en tablet
+          - 4 en desktop */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
+        {/* Loading con skeletons */}
+        {loading &&
+          Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={`skeleton-${i}`}
+              className="animate-pulse rounded-2xl border border-zinc-200/70 p-5"
+            >
+              <div className="h-10 w-10 rounded-xl bg-zinc-200 mb-4" />
+              <div className="h-4 w-2/3 bg-zinc-200 rounded mb-2" />
+              <div className="h-3 w-full bg-zinc-200 rounded mb-1" />
+              <div className="h-3 w-5/6 bg-zinc-200 rounded" />
+            </div>
+          ))}
+
+        {/* Render categorías reales */}
+        {!loading &&
+          categories.map((category: CategoryType) => {
+            const name = category.categoryName;
+            const slug = category.slug;
+            const mainImageUrl = category.mainImage?.url; // 👈 directo al campo que ya tenés
+
+            return (
+              <Link
+                key={category.id}
+                href={`/category/${slug}`}
+                className="
+                  group relative rounded-2xl border border-[#515151]
+                  hover: bg-white p-6
+                  transition-all duration-200 ease-out
+                  focus:outline-none focus-visible:ring-2 focus-visible:ring-black/10
+                  flex flex-col items-center justify-start
+                  min-h-[200px] sm:min-h-[220px] 
+                "
+              >
+                <div className="flex flex-col">
+                    {/* Imagen principal dentro de un cuadro negro */}
+                <div className="h-12 w-12 rounded-xl bg-black flex items-center justify-center mb-4">
+                  {mainImageUrl && (
+                    <img src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${mainImageUrl}`}
+                      alt={name}
+                      width={28}
+                      height={28}
+                      className="h-7 w-7 object-contain">
+                     
+                    </img>
+                  )}
+                </div>
+
+
+                  {/* Texto */}
+                  <div>
+                    <h4 className="text-base sm:text-lg font-semibold">
+                      {name}
+                    </h4>
+                    {category.description && (
+                      <p className="mt-2 text-sm text-zinc-600 leading-snug line-clamp-3">
+                        {category.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+
+        {/* Si no hay destacadas */}
+        {!loading && categories.length === 0 && (
+          <p className="col-span-full text-sm text-zinc-600">
+            No hay categorías destacadas por ahora.
+          </p>
+        )}
+      </div>
+    </section>
+  );
+};
+
+export default ChooseCategory;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*"use client"
 import { useGetCategories } from "@/api/getProducts";
 import Link from "next/link";
 import { ResponseType } from "@/types/response";
@@ -44,7 +210,7 @@ const ChooseCategory = () => {
   );
 };
 
-export default ChooseCategory;
+export default ChooseCategory; */
 
 
 /*"use client"

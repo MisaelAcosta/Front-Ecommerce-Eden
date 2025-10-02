@@ -27,7 +27,6 @@ export type CategoryStrapi = {
 
 
 
-
 /*export type CategoryType = {
     id: number;
     attributes: {
