@@ -12,14 +12,6 @@ import { CirclePlus, Box } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-/**
- * NewProducts
- * Layout:
- *  - Izquierda (lg): hero card negra con título + copy + CTA "Ver todos".
- *  - Derecha (lg): espacio vacío para que PEGUES tu carrusel y tus peticiones (newProduct === true).
- *
- * En mobile se apilan: primero la hero, luego el carrusel.
- */
 
 function toText(v: any): string | undefined {
   if (v == null) return undefined;
@@ -35,25 +27,32 @@ function toText(v: any): string | undefined {
 
 
 const NewProducts = () => {
-    const { result, loading, error } = useGetNewProducts();
+
+    const { result, loading, error }: ResponseType = useGetNewProducts();
     const router = useRouter();
+
   return (
-    <section className="w-full max-w-6xl mx-auto py-6 sm:py-12 px-4 sm:px-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <section className="w-full max-w-6xl mx-auto
+    py-6 sm:py-12 px-4 sm:px-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* IZQUIERDA: HERO CARD NEGRA */}
         <div className="lg:col-span-1">
-          <div className="relative h-full min-h-[220px] rounded-2xl bg-black text-white p-6 sm:p-8 flex flex-col justify-between">
+          <div className="relative 
+          h-full min-h-[220px] rounded-2xl bg-black 
+          transition-all duration-300 ease-out
+          transform hover:scale-103 
+          text-white p-6 sm:p-8 flex flex-col justify-between">
             <div>
               <div className="mb-6 flex items-center justify-between">
                 <h3 className="text-3xl sm:text-4xl font-extrabold leading-[1.05]">
                   Nuevos
                   <br /> Productos
                 </h3>
-                <Box className="h-8 w-8 opacity-80" aria-hidden="true" />
+                <Box className="h-23 w-23 sm:pb-8 sm:pt-0 opacity-100" aria-hidden="true" />
               </div>
 
               <p className="text-sm sm:text-base text-zinc-200/90">
-                Descubrí las últimas creaciones en impresión 3D, recién salidas del horno.
+                Descubre las últimas creaciones en impresión 3D, recién salidas del horno.
               </p>
             </div>
 
@@ -69,10 +68,10 @@ const NewProducts = () => {
         </div>
 
         {/* DERECHA: CONTENEDOR PARA TU CARRUSEL */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 md:pl-8 ">
           
-<Carousel>
-        <CarouselContent className="ml-1 md:-ml-4">
+<Carousel className="">
+        <CarouselContent className="ml-1 p md:-ml-4 md:pl-2">
           {loading && <SkeletonSchema grid={3} />}
 
           {Array.isArray(result) &&
@@ -88,15 +87,17 @@ const NewProducts = () => {
               return (
                 <CarouselItem
                   key={id}
-                  className="basis-[85%] sm:basis-1/2 lg:basis-1/1 px-1 md:px-4"
+                  className="basis-[85%] sm:basis-1/2 lg:basis-1/2 px-3 md:px-4"
                 >
-                  <Card className="group relative rounded-2xl border pt-1 border-gray-200 shadow-none hover:shadow-sm transition-shadow">
+                  <Card className="group relative rounded-2xl border
+                  pt-1 border-[#515151] shadow-none hover:shadow-sm
+                  transition-shadow">
                     {/* Header (categoría + icono) */}
-                    <div className="flex items-start justify-between px-5 pt-4">
+                    <div className="flex items-start  justify-between px-5 pt-4">
                       <span className="text-sm text-muted-foreground">{category ?? "—"}</span>
 
                       <button
-                        className="h-9 w-9 shrink-0  backdrop-blur hover:bg-white flex items-center justify-center"
+                        className="h-9 w-9 shrink-0  backdrop-blur hover:bg-white flex items-center justify-center "
                         type="button"
                         aria-label="Detalles"
                       >
@@ -117,7 +118,9 @@ const NewProducts = () => {
                           <img
                             src={imageUrl}
                             alt={productName}
-                            className="max-h-full max-w-full object-contain"
+                            className="max-h-full max-w-full object-contain
+                            transition-all duration-300 ease-out
+                            transform hover:scale-113"
                           />
                         ) : (
                           <span className="text-sm text-muted-foreground">Sin imagen</span>
@@ -139,7 +142,8 @@ const NewProducts = () => {
                         <Button
                           onClick={() => router.push(`/product/${slug}`)}
                           size="sm"
-                          className="font-regular bg-[#191919] rounded-lg "
+                          className="font-regular bg-[#191919] cursor-pointer rounded-lg transition-all duration-300 ease-out
+                            transform hover:scale-102 "
                         >
                           Agregar <CirclePlus className="ml-1 h-7 w-7" />
                         </Button>

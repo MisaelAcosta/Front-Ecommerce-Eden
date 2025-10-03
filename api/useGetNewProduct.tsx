@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+
 export function useGetNewProducts() {
   // Podés ordenar por fecha si querés ver lo más nuevo primero
   const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?filters[newProduct][$eq]=true&populate=*&sort=createdAt:desc`;
@@ -7,6 +8,8 @@ export function useGetNewProducts() {
   const [result, setResult] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
+
+
 
   useEffect(() => {
     (async () => {

@@ -1,20 +1,12 @@
 
-export type CategoryStrapi = {
+// types/category.ts (versión aplanada)
+export type CategoryType = {
   id: number;
-  attributes: {
-    categoryName: string;
-    slug: string;
-    description?: string | null;
-    isFeatured?: boolean | null;
-    mainImage?: {
-      data: {
-        attributes: {
-          url: string;
-          alternativeText?: string | null;
-        };
-      } | null;
-    };
-  };
+  categoryName: string;
+  slug: string;
+  description: string | null;
+  isFeatured: boolean | null;
+  mainImage?: { url: string; alternativeText?: string | null } | null;
 };
 
 

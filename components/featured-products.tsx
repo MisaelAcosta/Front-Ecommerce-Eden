@@ -29,9 +29,10 @@ const FeaturedProducts = () => {
   const router = useRouter();
 
   return (
-    <section className="w-full max-w-6xl mx-auto py-6 sm:py-12 px-4 sm:px-6">
-      <h3 className="px-1 sm:px-2 text-2xl sm:text-3xl font-semibold sm:pb-6">
-        Productos destacados
+    <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-15 sm:py-14">
+      {/* Título */}
+      <h3 className="text-4xl text-center sm:text-6xl font-extrabold mb-5 sm:mb-8">
+        PRODUCTOS DESTACADOS 
       </h3>
 
       <Carousel>
@@ -51,9 +52,14 @@ const FeaturedProducts = () => {
               return (
                 <CarouselItem
                   key={id}
-                  className="basis-[85%] sm:basis-1/2 lg:basis-1/3 px-1 md:px-4"
+                  className="basis-[85%] sm:basis-1/2
+                   lg:basis-1/3 px-4 md:px-4
+                    "
                 >
-                  <Card className="group relative rounded-2xl border pt-1 border-gray-200 shadow-none hover:shadow-sm transition-shadow">
+                  <Card className="group relative rounded-2xl
+                  border pt-1 border-[#515151]
+                  shadow-none hover:shadow-sm
+                  transition-shadow">
                     {/* Header (categoría + icono) */}
                     <div className="flex items-start justify-between px-5 pt-4">
                       <span className="text-sm text-muted-foreground">{category ?? "—"}</span>
@@ -80,7 +86,10 @@ const FeaturedProducts = () => {
                           <img
                             src={imageUrl}
                             alt={productName}
-                            className="max-h-full max-w-full object-contain"
+                            className="max-h-full max-w-full object-contain
+                            transition-all duration-300 ease-out
+                            transform hover:scale-113
+                            "
                           />
                         ) : (
                           <span className="text-sm text-muted-foreground">Sin imagen</span>
@@ -102,9 +111,11 @@ const FeaturedProducts = () => {
                         <Button
                           onClick={() => router.push(`/product/${slug}`)}
                           size="sm"
-                          className="font-regular bg-[#191919] rounded-lg "
+                          className="font-regular bg-[#191919] rounded-lg cursor-pointer
+                          transition-all duration-300 ease-out
+                            transform hover:scale-103 "
                         >
-                          Agregar <CirclePlus className="ml-1 h-7 w-7" />
+                          Agregar <CirclePlus className="ml-1 h-7 w-7 " />
                         </Button>
                       </div>
                     </CardContent>

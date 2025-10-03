@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Gamepad2 } from "lucide-react"; // Ícono fallback
 import { useGetCategories } from "@/api/getProducts";
 import { ResponseType } from "@/types/response";
+import Image from "next/image";
 import { CategoryType } from "@/types/category"; // 👈 este es tu tipo actual
 
 const ChooseCategory = () => {
@@ -19,7 +20,7 @@ const ChooseCategory = () => {
   return (
     <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-10 sm:py-14">
       {/* Título */}
-      <h3 className="text-2xl sm:text-3xl font-semibold mb-6">
+      <h3 className="text-4xl text-center sm:text-6xl font-extrabold mb-5 sm:mb-8">
         CATEGORÍAS DESTACADAS
       </h3>
 
@@ -34,10 +35,10 @@ const ChooseCategory = () => {
           - 1 columna en móvil
           - 2 en tablet
           - 4 en desktop */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-8">
         {/* Loading con skeletons */}
         {loading &&
-          Array.from({ length: 4 }).map((_, i) => (
+          Array.from({ length: 3 }).map((_, i) => (
             <div
               key={`skeleton-${i}`}
               className="animate-pulse rounded-2xl border border-zinc-200/70 p-5"
@@ -61,36 +62,40 @@ const ChooseCategory = () => {
                 key={category.id}
                 href={`/category/${slug}`}
                 className="
-                  group relative rounded-2xl border border-[#515151]
-                  hover: bg-white p-6
-                  transition-all duration-200 ease-out
-                  focus:outline-none focus-visible:ring-2 focus-visible:ring-black/10
-                  flex flex-col items-center justify-start
-                  min-h-[200px] sm:min-h-[220px] 
+                  group relative rounded-2xl border 
+                  bg-black hover:bg-red-600
+                  p-6 flex flex-col justify-start
+                  min-h-[200px] sm:min-h-[380px]
+                  transition-all duration-300 ease-out
+                  transform hover:scale-104 
                 "
               >
-                <div className="flex flex-col">
-                    {/* Imagen principal dentro de un cuadro negro */}
-                <div className="h-12 w-12 rounded-xl bg-black flex items-center justify-center mb-4">
-                  {mainImageUrl && (
-                    <img src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${mainImageUrl}`}
-                      alt={name}
-                      width={28}
-                      height={28}
-                      className="h-7 w-7 object-contain">
-                     
-                    </img>
-                  )}
-                </div>
+                {/* Icono superior derecha */}
+                
 
+                <div className="flex flex-col flex-1 order-1 sm:order-2">
+                  {/* Imagen principal dentro de un cuadro negro */}
+                  <div className="h-12 w-15 sm:h-15 sm:w-18  flex items-center justify-center mb-4 sm:mb-10">
+                    {mainImageUrl && (
+                      <img
+                        src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${mainImageUrl}`}
+                        alt={name}
+                        width={48}
+                        height={48}
+                        className="h-17 w-17 pt-object-contain"
+                      />
+                    )}
+                    
+
+                  </div>
 
                   {/* Texto */}
                   <div>
-                    <h4 className="text-base sm:text-lg font-semibold">
+                    <h4 className="text-2xl sm:text-4xl text-white font-extrabold">
                       {name}
                     </h4>
                     {category.description && (
-                      <p className="mt-2 text-sm text-zinc-600 leading-snug line-clamp-3">
+                      <p className="mt-3 sm:mt-8 font-light text-sm sm:text-xl text-zinc-200 leading-snug line-clamp-3">
                         {category.description}
                       </p>
                     )}

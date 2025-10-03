@@ -1,34 +1,31 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 
+export function useGetCategoryProduct(slugParam: string | string[]) {
+  // 1) Normalizá el slug
+  const slug = Array.isArray(slugParam) ? slugParam[0] : slugParam;
 
-export function useGetCategoryProduct(slug: string | string[]) {
+  // 2) Pedí solo lo necesario; al menos asegurá populate=category
+  const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?populate=category&filters[category][slug][$eq]=${encodeURIComponent(slug)}`;
 
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?populate=*&filters[category][slug][$eq]=${slug}`;
-        const [result, setResult] = useState(null)
-        const [loading, setLoading] = useState(true)
-        const [error, setError] = useState(``)
-    
-    useEffect(() => {
-        (async () => {
-            try {
-                const res = await fetch(url)
-                const json = await res.json()
-                setResult(json.data)
-                setLoading(false)
-    
-            }
-            catch (error: any) {
-                setError(error)
-                setLoading(false)
-            }
-    
-        })()
-    
-    },[url])
-    
-    return { result, loading, error }
-    
+  const [result, setResult] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(url);
+        const json = await res.json();
+        setResult(json?.data ?? []);
+      } catch (e: any) {
+        setError(e?.message ?? "Error");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [url]);
+
+  return { result, loading, error };
 }
-
 
