@@ -1,4 +1,3 @@
-
 // types/category.ts (versión aplanada)
 export type CategoryType = {
   id: number;
@@ -17,19 +16,3 @@ export type CategoryType = {
 
 
 
-
-
-/*export type CategoryType = {
-    id: number;
-    attributes: {
-        categoryName: string;
-        slug: string;
-        mainImage: {
-            data: {
-                attributes: {
-                    url: string;
-            }
-                 }   
-                } | null;
-            }
-    }; */

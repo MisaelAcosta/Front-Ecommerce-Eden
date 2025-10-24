@@ -5,6 +5,7 @@ import ChooseCategory from "@/components/choose-category";
 import Header from "@/components/header";
 import NewProduct from "@/components/newProduct";
 import Cta from "@/components/cta";
+import TempProducts from "@/components/temp-products"
 
 
 export default function Home() {
@@ -12,9 +13,9 @@ export default function Home() {
   <main>
     <Header />
     <FeaturedProducts />
-    {/*<BannerDiscount />*/}
-    <ChooseCategory />
     <CarouselTextBanner />
+    <TempProducts/>
+    <ChooseCategory />
     <NewProduct />
     <Cta />
   </main>

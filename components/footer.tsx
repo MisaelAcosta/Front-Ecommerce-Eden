@@ -19,7 +19,7 @@ export default function Footer() {
           <div className="md:col-span-2 lg:col-span-2">
             {/* 📱 MÓVIL */}
             <h1
-              className={`${inter.className} text-white font-black md:border-r-1 tracking-tight 
+              className={`${inter.className} text-white sm:text-start text-center font-black md:border-r-1 tracking-tight 
               text-4xl leading-tight 
               /* 💻 DESKTOP */ lg:text-7xl lg:leading-[1.15] `}
             >
@@ -31,8 +31,8 @@ export default function Footer() {
 
           {/* Columna redes */}
           <div className="col-span-1 ">
-            <h3 className="font-semibold mb-3 text-base text-white md:text-lg">Síguenos</h3>
-            <ul className="space-y-3">
+            <h3 className="font-semibold mb-3 sm:text-start text-center text-base text-white md:text-lg">Síguenos</h3>
+            <ul className="space-y-3 text-center sm:text-start ">
               <li>
                 <Link
                   href="https://www.instagram.com/eden.3d_/"
@@ -50,12 +50,12 @@ export default function Footer() {
 
           {/* Columna explorar */}
           <div className="col-span-1 ">
-            <h3 className="font-semibold mb-3 text-base text-white md:text-lg">Explora</h3>
-            <ul className="space-y-3">
+            <h3 className="font-semibold mb-3  sm:text-start text-center text-base text-white md:text-lg">Explora</h3>
+            <ul className="space-y-3 text-center sm:text-start">
               <li>
                 <Link
                   href="#"
-                  className="text-gray-400 hover:text-white hover:underline transition-colors "
+                  className="text-gray-400  text-center hover:underline transition-colors "
                 >
                   Políticas de privacidad
                 </Link>
@@ -80,9 +80,9 @@ export default function Footer() {
           </div>
 
           {/* Columna contacto */}
-          <div className="col-span-1 text-white">
+          <div className="col-span-1 text-white text-center sm:text-starttext-center sm:text-start">
             <h3 className="font-semibold mb-3 text-base md:text-lg">Contáctanos</h3>
-            <ul className="space-y-3">
+            <ul className="space-y-3 text-center sm:text-start">
               <li>
                 <a
                   href="mailto:EdenCorreos@gmail.com"
@@ -105,7 +105,7 @@ export default function Footer() {
       </div>
 
       {/* Parte inferior */}
-      <div className="border-gray-200">
+      <div className="border-gray-200 ">
         <div className="max-w-2xl ml-auto px-10 pt-0 md:pt-0 md:px-25 py-2">
           <div className="flex sm:flex-row items-center justify-between text-xs md:text-sm text-gray-500 gap-2">
             <p>© 2025 Eden.</p>

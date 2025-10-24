@@ -1,17 +1,16 @@
 
 "use client";
 
-import Block1 from "@/components/bloque-1";
-import Block2 from "@/components/bloque-2";
-import Block3 from "@/components/bloque-3";
+import Block1 from "@/components/block1";
+import Block2 from "@/components/block2";
 
 const Header = () => {
   return (
-    <section className="w-full max-w-9xl lg:mx-0 px-4 sm:px-2 py-6 md:py-12">
+    <section className="w-full max-w-9xl lg:mx-0 px-4 sm:px-10 py-8 md:py-12">
       <div
         className="
           grid grid-cols-1 gap-1 sm:gap-1
-          md:grid-cols-3 md:grid-rows-2 md:gap-1
+          md:grid-cols-3 md:grid-rows-2 md:gap-5
           md:h-[745px] 
           md:w-full
           md:p-none
@@ -23,14 +22,10 @@ const Header = () => {
         </div>
 
         {/* Botón/rectángulo 1 */}
-        <div className="rounded-2xl overflow-hidden h-60 md:h-auto">
+        <div className="rounded-2xl overflow-hidden  md:h-186">
           <Block2 />
         </div>
 
-        {/* Botón/rectángulo 2 */}
-        <div className="rounded-2xl overflow-hidden h-60 md:h-full">
-          <Block3 />
-        </div>
       </div>
     </section>
   );

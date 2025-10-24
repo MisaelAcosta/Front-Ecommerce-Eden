@@ -8,6 +8,7 @@ import { ResponseType } from "@/types/response";
 import Image from "next/image";
 import { CategoryType } from "@/types/category"; // 👈 este es tu tipo actual
 
+
 const ChooseCategory = () => {
   // Llamado al hook que trae categorías desde Strapi
   const { result, loading, error }: ResponseType = useGetCategories();
@@ -18,9 +19,10 @@ const ChooseCategory = () => {
     : [];
 
   return (
-    <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-10 sm:py-14">
+    <section className="bg-neutral-950 w-full py-10 sm:py-14">
+    <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0">
       {/* Título */}
-      <h3 className="text-4xl text-center sm:text-6xl font-extrabold mb-5 sm:mb-8">
+      <h3 className="text-4xl text-white text-center sm:text-6xl font-extrabold mb-5 sm:mb-8">
         CATEGORÍAS DESTACADAS
       </h3>
 
@@ -35,7 +37,7 @@ const ChooseCategory = () => {
           - 1 columna en móvil
           - 2 en tablet
           - 4 en desktop */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-8">
+      <div className="grid grid-cols-1 divide-y text-center sm:text-left sm:divide-y-0 sm:divide-x divide-zinc-200 sm:grid-cols-3 gap-4 lg:gap-8">
         {/* Loading con skeletons */}
         {loading &&
           Array.from({ length: 3 }).map((_, i) => (
@@ -55,27 +57,25 @@ const ChooseCategory = () => {
           categories.map((category: CategoryType) => {
             const name = category.categoryName;
             const slug = category.slug;
-            const mainImageUrl = category.mainImage?.url; // 👈 directo al campo que ya tenés
+            const mainImageUrl = category.mainImage?.url; 
 
             return (
               <Link
                 key={category.id}
                 href={`/category/${slug}`}
                 className="
-                  group relative rounded-2xl border 
-                  bg-black hover:bg-red-600
+                  group relative  
+                  bg-neutral-950 
                   p-6 flex flex-col justify-start
                   min-h-[200px] sm:min-h-[380px]
                   transition-all duration-300 ease-out
-                  transform hover:scale-104 
+                  
                 "
               >
-                {/* Icono superior derecha */}
                 
-
-                <div className="flex flex-col flex-1 order-1 sm:order-2">
+                <div className="flex flex-col flex-1 order-1 sm:order-2 justify-center items-center sm:items-start">
                   {/* Imagen principal dentro de un cuadro negro */}
-                  <div className="h-12 w-15 sm:h-15 sm:w-18  flex items-center justify-center mb-4 sm:mb-10">
+                  <div className="h-12 w-17 sm:h-15 sm:w-18   flex items-center justify-center mb-4 sm:mb-8">
                     {mainImageUrl && (
                       <img
                         src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${mainImageUrl}`}
@@ -85,8 +85,6 @@ const ChooseCategory = () => {
                         className="h-17 w-17 pt-object-contain"
                       />
                     )}
-                    
-
                   </div>
 
                   {/* Texto */}
@@ -95,13 +93,15 @@ const ChooseCategory = () => {
                       {name}
                     </h4>
                     {category.description && (
-                      <p className="mt-3 sm:mt-8 font-light text-sm sm:text-xl text-zinc-200 leading-snug line-clamp-3">
+                      <p className="mt-3 sm:mt-5 font-light text-sm sm:text-xl text-zinc-200 leading-snug line-clamp-3">
                         {category.description}
                       </p>
                     )}
                   </div>
+                  
                 </div>
               </Link>
+              
             );
           })}
 
@@ -112,6 +112,7 @@ const ChooseCategory = () => {
           </p>
         )}
       </div>
+    </div>
     </section>
   );
 };

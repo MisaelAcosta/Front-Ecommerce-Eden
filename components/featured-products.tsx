@@ -29,9 +29,9 @@ const FeaturedProducts = () => {
   const router = useRouter();
 
   return (
-    <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-15 sm:py-14">
+    <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-8 sm:py-14">
       {/* Título */}
-      <h3 className="text-4xl text-center sm:text-6xl font-extrabold mb-5 sm:mb-8">
+      <h3 className="text-4xl text-center sm:text-6xl font-black mb-6 sm:mb-8">
         PRODUCTOS DESTACADOS 
       </h3>
 

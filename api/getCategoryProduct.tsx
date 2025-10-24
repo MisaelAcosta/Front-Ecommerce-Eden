@@ -5,7 +5,7 @@ export function useGetCategoryProduct(slugParam: string | string[]) {
   // 1) Normalizá el slug
   const slug = Array.isArray(slugParam) ? slugParam[0] : slugParam;
 
-  // 2) Pedí solo lo necesario; al menos asegurá populate=category
+  // 2) Pedí solo lo necesario; al menos asegurá populate=TempCategory
   const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?populate=category&filters[category][slug][$eq]=${encodeURIComponent(slug)}`;
 
   const [result, setResult] = useState<any[]>([]);
