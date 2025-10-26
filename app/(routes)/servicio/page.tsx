@@ -1,9 +1,18 @@
+import  Header  from "@/app/(routes)/servicio/components/header"
+import TipoServicios from "./components/tipoServicios"
+import ModoTrabajo from "./modoTrabajo"
+import Contacto from "@/app/(routes)/servicio/contacto"
+ 
 
 
 export default function Home () {
     return(
         <main>
-            <h1>Eden</h1>
+            <Header></Header>
+            <TipoServicios></TipoServicios>
+            <ModoTrabajo></ModoTrabajo>
+            <Contacto></Contacto>
         </main>
     )
 }
+

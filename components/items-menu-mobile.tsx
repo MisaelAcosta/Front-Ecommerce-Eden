@@ -127,7 +127,7 @@ export default function ItemsMenuMobile() {
                   </motion.div>
 
                   <motion.div variants={itemVariants}>
-                    <Link href="/services" className="block text-black text-3xl font-semibold hover:text-gray-300 transform hover:translate-x-2" onClick={() => setIsOpen(false)}>
+                    <Link href="/servicio" className="block text-black text-3xl font-semibold hover:text-gray-300 transform hover:translate-x-2" onClick={() => setIsOpen(false)}>
                       Servicios
                     </Link>
                   </motion.div>
