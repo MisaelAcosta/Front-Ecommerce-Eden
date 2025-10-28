@@ -62,10 +62,7 @@ const Navbar = () => {
             TABLET: visible como flex 
             md:flex" onClick={() => router.push("/user")}></User>
 
-            <div className="hidden md:flex">
-              <ToggleTheme />
-
-            </div>
+           
 
 
             {/* Menu móvil */}

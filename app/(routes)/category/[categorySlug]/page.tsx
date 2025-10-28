@@ -2,6 +2,9 @@
 import { useGetCategoryProduct } from "@/api/getCategoryProduct";
 import { useParams, useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
+import { ResponseType } from "@/types/response";
+import FiltersControlsCategory from "./filters-controls-category";
+
 
 export default function Page() {
   const params = useParams();
@@ -10,7 +13,7 @@ export default function Page() {
   // puede ser string | string[], pasalo tal cual al hook
   const { categorySlug } = params as { categorySlug: string | string[] };
 
-  const { result, loading } = useGetCategoryProduct(categorySlug);
+  const { result, loading }: ResponseType = useGetCategoryProduct(categorySlug);
 
   // Título seguro (cae al slug si no hay data)
   const title =
@@ -24,8 +27,9 @@ export default function Page() {
       )}
       <Separator />
       <div className="sm:flex sm:justify-between">
-        {/* <FiltersControlsCategory/> */}
+         <FiltersControlsCategory/> 
       </div>
     </div>
+    
   );
 }
