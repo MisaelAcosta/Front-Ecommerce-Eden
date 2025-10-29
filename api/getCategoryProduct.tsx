@@ -6,7 +6,10 @@ export function useGetCategoryProduct(slugParam: string | string[]) {
   const slug = Array.isArray(slugParam) ? slugParam[0] : slugParam;
 
   // 2) Pedí solo lo necesario; al menos asegurá populate=TempCategory
-  const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?populate=category&filters[category][slug][$eq]=${encodeURIComponent(slug)}`;
+  const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?filters[category][slug][$eq]=${encodeURIComponent(
+  slug
+)}&populate[images]=true&populate[category]=true&populate[sub_category]=true&populate[temp_category]=true`;
+
 
   const [result, setResult] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
