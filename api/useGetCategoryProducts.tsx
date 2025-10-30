@@ -1,4 +1,4 @@
-// api/useGetCategoryProduct.tsx
+// api/useGetCategoryProducts.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,6 +11,8 @@ type UseGetCategoryProductProps = {
   subSlug?: string | null;
   page?: number;
   pageSize?: number;
+  /** 🔎 término de búsqueda (opcional) */
+  searchTerm?: string;
 };
 
 export const useGetCategoryProduct = ({
@@ -18,6 +20,7 @@ export const useGetCategoryProduct = ({
   subSlug,
   page = 1,
   pageSize = 12,
+  searchTerm = "",
 }: UseGetCategoryProductProps) => {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,74 +33,78 @@ export const useGetCategoryProduct = ({
         setLoading(true);
         setError(null);
 
-        // 1. Armamos URL base
+        if (!base) throw new Error("Falta NEXT_PUBLIC_BACKEND_URL");
+
+        // base
         let url = `${base}/api/products`;
 
-        // 2. Filtros por categoría/subcategoría
+        // filtros categoría/sub
         if (categorySlug !== "todos-los-productos") {
-          url += `?filters[category][slug][$eq]=${categorySlug}`;
+          url += `?filters[category][slug][$eq]=${encodeURIComponent(categorySlug)}`;
+
           if (subSlug) {
-            url += `&filters[sub_category][slug][$eq]=${subSlug}`;
+            url += `&filters[sub_category][slug][$eq]=${encodeURIComponent(subSlug)}`;
           }
         } else {
           url += `?`;
         }
 
-        // 3. paginación + populate
+        // 🔎 búsqueda (server-side) — plano, sin 'attributes'
+        const term = (searchTerm ?? "").trim();
+        if (term !== "") {
+          const enc = encodeURIComponent(term);
+          url += `&filters[$or][0][productName][$containsi]=${enc}`;
+          url += `&filters[$or][1][productName2][$containsi]=${enc}`;
+          // si quieres incluir descripción:
+          // url += `&filters[$or][2][description][$containsi]=${enc}`;
+        }
+
+        // paginación + populate
         url += `&pagination[page]=${page}&pagination[pageSize]=${pageSize}&populate=*`;
 
         console.log("📡 Fetch URL =>", url);
 
         const res = await fetch(url, { cache: "no-store" });
         if (!res.ok) {
-          throw new Error("Error fetching products");
+          throw new Error(`Error fetching products: ${res.status}`);
         }
 
         const json = await res.json();
         console.log("🐉 RAW item 0 de Strapi:", json.data?.[0]);
 
-        
-
-        console.log("🔄 raw Strapi data:", json.data?.[0]);
-
-        // ⛳ ATENCIÓN ACÁ:
-        // json.data[i] viene PLANO (sin attributes)
-        // Nosotros lo envolvemos para matchear ProductType
+        // ✅ normalizamos conservando tu shape { id, attributes: {...rest} }
         const normalized: ProductType[] = (json.data || []).map((item: any) => {
-          // sacamos id y el resto lo empacamos en attributes
-          const { id, ...rest } = item;
+          const { id, ...rest } = item; // v5: todo viene plano (incluye imágenes/relaciones dentro de 'rest')
           return {
-            id: id,
+            id,
             attributes: {
               ...rest,
             },
           };
         });
-        console.log("🧪 NORMALIZED item 0:", normalized[0]);
-
-        
 
         setProducts(normalized);
 
-        // paginación total
-        if (json.meta?.pagination?.pageCount) {
-          setTotalPages(json.meta.pagination.pageCount);
-        } else {
-          setTotalPages(1);
-        }
+        // pageCount de Strapi = total de páginas
+        const pageCount = json?.meta?.pagination?.pageCount ?? 1;
+        setTotalPages(pageCount > 0 ? pageCount : 1);
       } catch (err: any) {
         console.error("❌ useGetCategoryProduct error:", err);
         setError(err.message || "Unknown error");
+        setProducts([]);
+        setTotalPages(1);
       } finally {
         setLoading(false);
       }
     };
 
     fetchProducts();
-  }, [categorySlug, subSlug, page, pageSize]);
+  }, [categorySlug, subSlug, page, pageSize, searchTerm]);
 
   return { products, loading, error, totalPages };
 };
+
+
 
 
 

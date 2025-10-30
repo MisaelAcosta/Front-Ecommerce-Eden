@@ -23,8 +23,7 @@ const MenuList = () => {
         <NavigationMenuItem>
            <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
             <Link
-            className=""
-            href="/Products">
+            href="/category/todos-los-productos">
             Productos</Link>
            </NavigationMenuLink>
         </NavigationMenuItem>

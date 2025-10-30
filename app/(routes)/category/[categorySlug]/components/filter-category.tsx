@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useGetCategories } from "@/api/useGetCategories";
 import { Label } from "@/components/ui/label";
 import {
@@ -17,100 +18,109 @@ type FilterCategoryProps = {
 
 const FilterCategory = ({ onSelectSubcategory }: FilterCategoryProps) => {
   const router = useRouter();
+  const pathname = usePathname();
   const { categories, loading, error } = useGetCategories();
 
-  // 👉 Navegar a categoría y limpiar subSlug activo
+  // slug de la categoría actual tomado desde la URL: /category/[cat]/[sub]?
+  const currentCatSlug = useMemo(() => {
+    const parts = pathname.split("/").filter(Boolean);
+    const catIdx = parts.indexOf("category");
+    return catIdx >= 0 ? parts[catIdx + 1] ?? null : null;
+  }, [pathname]);
+
+  // Estado controlado del acordeón (qué item está abierto)
+  const [openSlug, setOpenSlug] = useState<string | undefined>(undefined);
+
+  // Mantener abierto el acordeón de la categoría actual tras navegar
+  useEffect(() => {
+    setOpenSlug(currentCatSlug ?? undefined);
+  }, [currentCatSlug]);
+
+  // Navegar a categoría y limpiar subSlug activo (optimista: abrimos antes de push)
   const goCategory = (slugCat: string) => {
-    router.push(`/category/${slugCat}`);
+    setOpenSlug(slugCat);
     onSelectSubcategory(null);
+    router.push(`/category/${slugCat}`);
   };
 
-  // 👉 Seleccionar subcategoría SIN navegar
+  // Seleccionar subcategoría SIN navegar
   const goSubcategory = (slugSub: string) => {
     onSelectSubcategory(slugSub);
   };
 
-  // 🧩 Inyectar la categoría virtual "Todos los productos" al inicio
+  // Categoría virtual al inicio
   const allProductsCategory = {
     id: "virtual-all",
     categoryName: "Todos los productos",
     slug: "todos-los-productos",
-    subcategories: [] as {
-      id: string | number;
-      categoryName: string;
-      slug: string;
-    }[],
+    subcategories: [] as { id: string | number; categoryName: string; slug: string }[],
   };
 
-  const allCategories = [allProductsCategory, ...(categories || [])];
+  const allCategories = useMemo(
+    () => [allProductsCategory, ...(categories || [])],
+    [categories]
+  );
 
   if (loading) return <p>Cargando...</p>;
   if (error) return <p>Error cargando categorías</p>;
 
   return (
-    <aside className="my-5 text-black text-sm space-y-4">
-      {allCategories.map((cat) => {
-        const hasSubs = cat.subcategories && cat.subcategories.length > 0;
+    <aside className="my-5 text-black text-lg space-y-4 font-light">
+      {/* Un SOLO Accordion que contiene TODOS los items */}
+      <Accordion
+        type="single"
+        collapsible
+        value={openSlug}
+        onValueChange={(val) => setOpenSlug(val || undefined)}
+        className="space-y-2"
+      >
+        {allCategories.map((cat) => {
+          const hasSubs = cat.subcategories && cat.subcategories.length > 0;
 
-        // CASO 1: categoría SIN subcategorías -> item simple, sin acordeón
-        if (!hasSubs) {
+          // SIN subcategorías → botón simple
+          if (!hasSubs) {
+            const isActive = pathname === `/category/${cat.slug}`;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => goCategory(cat.slug)}
+                className={`
+                  w-full text-left px-2 py-2 rounded-md transition cursor-pointer
+                  border border-transparent hover:border-gray-800
+                  ${isActive ? "bg-black text-white" : "hover:bg-muted"}
+                `}
+              >
+                {cat.categoryName}
+              </button>
+            );
+          }
+
+          // CON subcategorías → item dentro del único Accordion
           return (
-            <button
+            <AccordionItem
               key={cat.id}
-              onClick={() => goCategory(cat.slug)}
-              className="
-                w-full text-left
-                px-2 py-2
-                rounded-md
-                hover:bg-gray-100
-                border border-transparent
-                hover:border-gray-300
-                transition
-              "
+              value={cat.slug}
+              className="border border-gray-200 rounded-md overflow-hidden"
             >
-              {cat.categoryName}
-            </button>
-          );
-        }
-
-        // CASO 2: categoría CON subcategorías -> acordeón
-        return (
-          <Accordion
-            // type single = solo se abre uno a la vez
-            type="single"
-            collapsible
-            key={cat.id}
-            className="border border-gray-200 rounded-md"
-          >
-            <AccordionItem value={cat.slug} className="border-b-0">
-              {/* 🔻 el trigger ahora SOLO sirve para abrir/cerrar subcats
-                  y NO hace navigate directamente */}
-              <AccordionTrigger className="px-2 py-2 text-left">
+              {/* El trigger abre/cierra y también navega a la categoría padre */}
+              <AccordionTrigger
+                onClick={() => goCategory(cat.slug)}
+                className="px-2 py-2 text-left cursor-pointer text-lg font-light"
+              >
                 {cat.categoryName}
               </AccordionTrigger>
 
               <AccordionContent className="px-2 pb-2">
-                {/* Lista de subcategorías como radios */}
-                <RadioGroup className="flex flex-col space-y-2">
+                <RadioGroup className="flex flex-col space-y-2 cursor-pointer">
                   {cat.subcategories?.map((sub) => (
                     <Label
                       key={sub.id}
-                      className="
-                        cursor-pointer flex items-center gap-2
-                        rounded-md px-2 py-1
-                        hover:bg-gray-100
-                      "
-                      // hacemos click también en el label
-                      onClick={() => {
-                        // no navegamos a otra página
-                        goSubcategory(sub.slug);
-                      }}
+                      className="cursor-pointer flex items-center gap-2 rounded-md px-2 py-1 hover:bg-gray-100"
+                      onClick={() => goSubcategory(sub.slug)}
                     >
                       <RadioGroupItem
                         value={sub.slug}
                         id={`sub-${sub.slug}`}
-                        // evitamos que cambie ruta al click en el circulito,
-                        // solo dispara el filtrado local
                         onClick={(e) => {
                           e.stopPropagation();
                           goSubcategory(sub.slug);
@@ -119,28 +129,15 @@ const FilterCategory = ({ onSelectSubcategory }: FilterCategoryProps) => {
                       {sub.categoryName}
                     </Label>
                   ))}
-
-                  {/* EXTRA OPCIONAL:
-                      Si querés un botón "Ver todo {cat.categoryName}"
-                      que navegue a la categoría padre, lo agregamos aquí.
-                      Si NO lo querés, borra todo este bloque. */}
-                  <button
-                    onClick={() => goCategory(cat.slug)}
-                    className="
-                      text-left ml-6 mt-2 text-xs text-gray-500
-                      hover:underline
-                    "
-                  >
-                    Ver todo {cat.categoryName}
-                  </button>
                 </RadioGroup>
               </AccordionContent>
             </AccordionItem>
-          </Accordion>
-        );
-      })}
+          );
+        })}
+      </Accordion>
     </aside>
   );
 };
 
 export default FilterCategory;
+

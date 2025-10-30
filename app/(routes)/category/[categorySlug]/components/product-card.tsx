@@ -85,100 +85,96 @@ const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <Card
       className="
-        group relative rounded-2xl
-        border pt-8 border-[#515151]
-        shadow-none hover:shadow-sm
-        transition-shadow
-        bg-background
+    group relative rounded-none  md:rounded-xl 
+    md:border-[#515151] shadow-none bg-white
+    flex flex-col justify-between pb-3 pt-0 md:pb-4
+    w-full max-w-[360px] sm:max-w-none   /* se expande en tablet/pc */
       "
     >
-      {/* HEADER: categoría + iconito */}
-      <div className="flex items-start justify-between px-5 pt-4">
-        <span className="text-sm text-muted-foreground">
-          {categoryLabel}
-        </span>
+    
 
-        <button
-          className="
-            h-9 w-9 shrink-0
-            backdrop-blur hover:bg-white
-            flex items-center justify-center
-            rounded-full
-          "
-          type="button"
-          aria-label="Detalles"
-        >
-          <Image
-            src="/icons/CirculoPlaneta.svg"
-            alt="icono"
-            width={56}
-            height={56}
-            className="opacity-100"
-          />
-        </button>
-      </div>
 
-      <CardContent className="px-8 pb-0 pt-none">
-        {/* IMAGEN */}
-        <div
-          className="
-            rounded-xl bg-muted/10
-            aspect-square w-full overflow-hidden
-            mb-4 flex items-center justify-center
-          "
-        >
-          {imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={imageUrl}
-              alt={displayName}
-              className="
-                max-h-full max-w-full object-contain
-                transition-all duration-300 ease-out
-                transform group-hover:scale-110
-              "
-            />
-          ) : (
-            <span className="text-sm text-muted-foreground">
-              Sin imagen
-            </span>
-          )}
-        </div>
+
+      <CardContent className="px-4 sm:px-6 md:px-8 pb-0 pt-0">
+     {/* IMAGEN */}
+    <div
+      className="
+       bg-muted/10 overflow-hidden mb-2
+      relative h-56 sm:h-52 md:h-86      /* altura responsiva */
+      flex items-center justify-center
+     "
+   >
+    {imageUrl ? (
+      <img
+        src={imageUrl}
+        alt={displayName}
+        className="
+          max-h-full max-w-full object-contain
+          transition-transform duration-300 ease-out
+          group-hover:scale-105
+        "
+      />
+      ) : (
+      <span className="text-sm text-muted-foreground">Sin imagen</span>
+      )}
+     </div>
 
         {/* NOMBRE + SUBTÍTULO */}
-        <div className="mb-2">
-          <h3 className="text-base font-semibold leading-tight line-clamp-2">
-            {displayName}
-          </h3>
+<div className="mb-2">
+  <h3 className="text-[15px] sm:text-base font-semibold leading-tight line-clamp-2">
+    {displayName}
+  </h3>
 
-          {subtitle && (
-            <p className="text-sm text-muted-foreground line-clamp-1">
-              {subtitle}
-            </p>
-          )}
-        </div>
+  {subtitle && (
+    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
+      {subtitle}
+    </p>
+  )}
+</div>
 
-        {/* PRECIO + CTA */}
-        <div className="flex items-center justify-between pb-4">
-          <p className="text-base font-medium">
-            ${displayPrice}
-          </p>
+{/* PRECIO + CTA para moviles */}
 
-          <Button
-            onClick={() => {
-              if (!productSlug) return;
-              router.push(`/product/${productSlug}`);
-            }}
-            size="sm"
-            className="
-              font-regular bg-[#191919] rounded-lg cursor-pointer
-              transition-all duration-300 ease-out
-              transform hover:scale-105
-            "
-          >
-            Agregar <CirclePlus className="ml-1 h-5 w-5" />
-          </Button>
-        </div>
+<div className="mt-auto flex flex-col md:hidden ">
+  <Button
+
+  onClick={() => {
+      if (!productSlug) return;
+      router.push(`/product/${productSlug}`);
+    }}
+  className="text-[15px] sm:text-base font-medium cursor-pointer">
+    ${displayPrice}
+
+    <CirclePlus className="ml-3 h-5 w-5" />
+
+  </Button>
+</div>
+
+
+{/* PRECIO + CTA  para pc y tablet*/}
+
+<div className="mt-auto flex hidden md:flex  flex-col sm:flex-row sm:items-center sm:justify-between ">
+  <p
+  className="text-[15px] sm:text-base font-medium">
+    ${displayPrice}
+  </p>
+
+  <Button
+    onClick={() => {
+      if (!productSlug) return;
+      router.push(`/product/${productSlug}`);
+    }}
+    size="sm"
+    className="
+      bg-black rounded-lg cursor-pointer
+      px-3 sm:px-4
+      w-full sm:w-auto justify-center
+      transition-all duration-300 ease-out
+    "
+  >
+    Agregar <CirclePlus className="ml-1 h-5 w-5" />
+  </Button>
+</div>
+
       </CardContent>
     </Card>
   );

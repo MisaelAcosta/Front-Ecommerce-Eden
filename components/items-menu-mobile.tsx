@@ -121,11 +121,11 @@ export default function ItemsMenuMobile() {
                 <motion.div className="space-y-8">
 
                   <motion.div variants={itemVariants}>
-                    <Link href="/products" className="block text-black text-3xl font-semibold hover:text-gray-300 transform hover:translate-x-2" onClick={() => setIsOpen(false)}>
+                    <Link href="/category/todos-los-productos" className="block text-black text-3xl font-semibold hover:text-gray-300 transform hover:translate-x-2" onClick={() => setIsOpen(false)}>
                       Productos
                     </Link>
                   </motion.div>
-
+ 
                   <motion.div variants={itemVariants}>
                     <Link href="/servicio" className="block text-black text-3xl font-semibold hover:text-gray-300 transform hover:translate-x-2" onClick={() => setIsOpen(false)}>
                       Servicios
