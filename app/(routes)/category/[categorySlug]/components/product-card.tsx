@@ -101,13 +101,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
       className="
        bg-muted/10 overflow-hidden mb-2
       relative h-56 sm:h-52 md:h-86      /* altura responsiva */
-      flex items-center justify-center
+      flex items-center justify-center cursor-pointer
      "
    >
     {imageUrl ? (
       <img
         src={imageUrl}
         alt={displayName}
+       
+         onClick={() => router.push(`/product/${product.attributes.slug}`)}
         className="
           max-h-full max-w-full object-contain
           transition-transform duration-300 ease-out
