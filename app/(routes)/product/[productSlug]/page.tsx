@@ -27,7 +27,7 @@ export default function page() {
                 </div>
 
                 <div className="sm:px-12">
-                    <InfoProduct/>
+                    <InfoProduct product={result[0]}/>
                 </div>
             </div>
         </div>

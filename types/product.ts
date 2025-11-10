@@ -1,67 +1,47 @@
-//propiedades del producto 
-
 export type ProductType = {
   id: number;
-  attributes: {
-    productName: string;
-    productName2?: string;
+  documentId?: string; // Strapi v5 usa documentId
+  productName: string;
+  productName2?: string;
+  slug: string;
+  description?: string;
+  specs?: string;
+  active: boolean;
+  isFeatured: boolean;
+  newProduct: boolean;
+  price: number;
+
+  images: {
+    id: number;
+    url: string;
+    alternativeText?: string | null;
+  }[];
+
+  category?: {
+    id: number;
+    categoryName: string;
     slug: string;
-    description?: string;
-    active: boolean;
-    isFeatured: boolean;
-    newProduct: boolean;
-    price: number;
+  } | null;
 
-    images: {
-      data: {
-        id: number;
-        attributes: {
-          url: string;
-          alternativeText?: string | null;
-        };
-      }[];
-    };
+  sub_category?: {
+    id: number;
+    categoryName: string; // o "name" según tu modelo
+    slug: string;
+  } | null;
 
-    category?: {
-      data: {
-        id: number;
-        attributes: {
-          categoryName: string;
-          slug: string;
-        };
-      } | null;
-    };
+  temp_category?: {
+    id: number;
+    tempCategoryName: string;
+    slug: string;
+  } | null;
 
-    sub_category?: {
-      data: {
-        id: number;
-        attributes: {
-          categoryName: string;   // o "name" si así lo definiste
-          slug: string;
-        };
-      } | null;
-    };
+  block_1?: {
+    id: number;
+    tituloBlock1: string;
+    slug: string;
+  } | null;
 
-    temp_category?: {
-      data: {
-        id: number;
-        attributes: {
-          tempCategoryName: string;
-          slug: string;
-        };
-      } | null;
-    };
-
-    // Relación oneWay al Block1
-    block_1?: {
-      data: {
-        id: number;
-        attributes?: {
-          tituloBlock1: string;
-          slug: string;
-          // imageBlock1, description... si quisieras usarlos
-        };
-      } | null;
-    };
-  };
+  createdAt?: string;
+  updatedAt?: string;
+  publishedAt?: string | null;
 };

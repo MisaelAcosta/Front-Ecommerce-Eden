@@ -10,6 +10,7 @@ import { Button } from "./ui/button";
 import { CirclePlus, } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useCart } from "@/hooks/use-cart";
 
 // helper para convertir category a string
 function toText(v: any): string | undefined {
@@ -27,6 +28,9 @@ function toText(v: any): string | undefined {
 const FeaturedProducts = () => {
   const { result, loading }: ResponseType = useGetFeaturedProducts();
   const router = useRouter();
+  const {addItem, items} = useCart()
+  console.log(items)
+
 
   return (
     <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-8 sm:py-14">
@@ -109,7 +113,7 @@ const FeaturedProducts = () => {
                         <p className="text-base font-medium">${price}</p>
 
                         <Button
-                          onClick={() => router.push(`/product/${slug}`)}
+                          onClick={() => addItem(product)}
                           size="sm"
                           className="font-regular bg-[#191919] rounded-lg cursor-pointer
                           transition-all duration-300 ease-out
@@ -135,64 +139,3 @@ const FeaturedProducts = () => {
 export default FeaturedProducts;
 
 
-
-
-
-
-
-
-/*"use client"
-
-import { useGetFeaturedProducts } from "@/api/useGetFeaturedProducts";
-import { Carousel, CarouselContent, CarouselItem } from "./ui/carousel";
-import SkeletonSchema from "./skeletonSchema";
-import { ResponseType } from "@/types/response";
-import { ProductType } from "@/types/product";
-import { Card, CardContent } from "./ui/card";
-
-
-
-
-const FeaturedProducts = () => {
-    const {result, loading}: ResponseType = useGetFeaturedProducts()
-    console.log(result);
-
-    return (
-        <div className="w max-w-6xl py-4 mx-auto sm:py-16 sm:px-24">
-            <h3 className="px-6 text-3xl sm:pb-8">Productos destacados</h3>
-            <Carousel>
-                <CarouselContent className="ml-2 md:-ml-4">
-                    {loading && (
-                        <SkeletonSchema grid={3} />
-                    )}
-                    
-                    {result != null &&(
-                        result.map((Product: ProductType) =>{
-                            const { id, attributes } = Product;
-                             if (!attributes) return null; // 🔒 Evita romper si no existe
-                            const {slug, productName, images} = attributes;
-
-
-                            return (
-                                <CarouselItem key={id} className="md:basis-1/2 lg:basis-1/3 group">
-                                    <div className="p-1">
-                                        <Card className ="py-4 border border-gray-200 shadow-none">
-                                            <CardContent className="realtive flex items-center justify-center px-6 py-2">
-                                                <img 
-                                                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${images.data[0].attributes.url}`} 
-                                                alt="Image featured"></img>
-                                            </CardContent>
-                                        </Card>
-                                    </div>
-                                </CarouselItem>
-                            )
-                        })
-                    )}
-
-                </CarouselContent>
-            </Carousel>
-        </div>
-    );
-};
-
-export default FeaturedProducts; */

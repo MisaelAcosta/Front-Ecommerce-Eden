@@ -6,6 +6,7 @@ import { CirclePlus } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ProductType } from "@/types/product";
+import { formatPrice } from "@/lib/formatPrice";
 
 type ProductCardProps = {
   product: ProductType; // ahora sí tipado correcto
@@ -144,7 +145,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
       router.push(`/product/${productSlug}`);
     }}
   className="text-[15px] sm:text-base font-medium cursor-pointer">
-    ${displayPrice}
+    {formatPrice(displayPrice)}
 
     <CirclePlus className="ml-3 h-5 w-5" />
 
@@ -157,7 +158,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 <div className="mt-auto flex hidden md:flex  flex-col sm:flex-row sm:items-center sm:justify-between ">
   <p
   className="text-[15px] sm:text-base font-medium">
-    ${displayPrice}
+    {formatPrice(displayPrice)}
   </p>
 
   <Button
