@@ -206,10 +206,13 @@ useEffect(() => {
           />
         </aside>
 
+
+
         {/* LISTA DE PRODUCTOS */}
-        <main className="min-h-[400px] sm:p-1 md:p-1">
+        <main className="w-auto px-0 md:p-8 ">
           {loading && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-4 gap-6 md:gap-1 ">
               <SkeletonSchema grid={3} />
               
             </div>
@@ -222,7 +225,18 @@ useEffect(() => {
           {!loading && !error && (
             <>
               {/* resultados */}
-              <div className="grid grid-cols-2 min-[380px] sm:grid-cols-2 xl:grid-cols-3 gap-0 sm:gap-6 flex-1">
+              <div className="
+              grid
+              grid-cols-2
+              sm:grid-cols-2
+              xl:grid-cols-3     /* a 1280px -> 2 columnas */
+              2xl:grid-cols-3
+              min-[1600px]:grid-cols-4   /* 4 columnas solo en pantallas grandes */
+              gap-0
+              sm:gap-6
+              
+              flex-wrap
+              ">
                 {filteredProducts && filteredProducts.length > 0 ? (
                   filteredProducts.map((p: ProductType | any) => (
                     <ProductCard key={p.id} product={p} />
@@ -233,6 +247,12 @@ useEffect(() => {
                   </p>
                 )}
               </div>
+
+
+
+
+
+
 
               {/* PAGINATION */}
               {totalPages > 1 && (

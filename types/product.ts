@@ -1,3 +1,5 @@
+import { VariantType } from "./variant";
+import { PromotionType } from "./promotion";
 export type ProductType = {
   id: number;
   documentId?: string; // Strapi v5 usa documentId
@@ -11,37 +13,45 @@ export type ProductType = {
   newProduct: boolean;
   price: number;
 
+  // Medios
   images: {
     id: number;
     url: string;
     alternativeText?: string | null;
   }[];
 
+  // Relaciones base
   category?: {
     id: number;
+    documentId?: string;
     categoryName: string;
     slug: string;
   } | null;
 
   sub_category?: {
     id: number;
-    categoryName: string; // o "name" según tu modelo
-    slug: string;
+    documentId?: string;
+    categoryName: string;
   } | null;
 
   temp_category?: {
     id: number;
+    documentId?: string;
     tempCategoryName: string;
     slug: string;
   } | null;
 
   block_1?: {
     id: number;
+    documentId?: string;
     tituloBlock1: string;
     slug: string;
   } | null;
 
-  createdAt?: string;
-  updatedAt?: string;
-  publishedAt?: string | null;
+  // Variantes y promocion
+  variants?: VariantType[] | null;
+
+  promotions?: PromotionType[] | null;
+
+ 
 };

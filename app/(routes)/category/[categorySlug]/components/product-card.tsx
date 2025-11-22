@@ -2,23 +2,23 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CirclePlus } from "lucide-react";
-import Image from "next/image";
+import { CirclePlus, Heart, ShoppingCart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ProductType } from "@/types/product";
 import { formatPrice } from "@/lib/formatPrice";
+import { useState } from "react";
 
 type ProductCardProps = {
-  product: ProductType; // ahora sí tipado correcto
+  product: ProductType;
 };
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const router = useRouter();
-
-  // atajo para no repetir tanto
   const attrs = product?.attributes || {};
 
-  // helper: arma URL absoluta con el backend
+  const [hover, setHover] = useState(false);
+
+  // Helper URL absoluta
   const toAbsUrl = (url?: string | null) => {
     if (!url) return null;
     if (url.startsWith("http")) return url;
@@ -28,155 +28,180 @@ const ProductCard = ({ product }: ProductCardProps) => {
     return `${base}/${clean}`;
   };
 
-  // --- IMAGEN PRINCIPAL ---
-  // tu Strapi devuelve imágenes a veces como array simple, a veces como { data: [...] }
-  let rawImageUrl: string | null = null;
+  // -------------------------
+  //   OBTENER IMÁGENES
+  // -------------------------
+  const imagesArray =
+    Array.isArray(attrs?.images)
+      ? attrs.images
+      : attrs?.images?.data?.map((i: any) => i.attributes) || [];
 
-  // mainImage (si algún día la usas)
-  if (attrs?.mainImage?.url) {
-    rawImageUrl = attrs.mainImage.url;
-  } else if (attrs?.mainImage?.data?.attributes?.url) {
-    rawImageUrl = attrs.mainImage.data.attributes.url;
-  }
+  const firstImage = imagesArray?.[0]?.url ?? null;
+  const secondImage = imagesArray?.[1]?.url ?? null;
 
-  // images como array plano
-  if (!rawImageUrl && Array.isArray(attrs?.images) && attrs.images[0]) {
-    rawImageUrl =
-      attrs.images[0]?.url ??
-      attrs.images[0]?.formats?.medium?.url ??
-      attrs.images[0]?.formats?.thumbnail?.url ??
-      null;
-  }
-  // images como { data: [...] }
-  else if (
-    !rawImageUrl &&
-    attrs?.images?.data?.[0]?.attributes?.url
-  ) {
-    rawImageUrl = attrs.images.data[0].attributes.url;
-  }
+  const image1 = toAbsUrl(firstImage);
+  const image2 = toAbsUrl(secondImage);
 
-  const imageUrl = toAbsUrl(rawImageUrl);
+  // -------------------------
 
-  // --- CATEGORÍA PRINCIPAL ---
-  // ojo: en tu RAW log, category venía PLANO (id, slug, categoryName, etc.)
-  // no venía con { data: { attributes: ... } }, pero dejamos fallback igual
-  const categoryLabel =
-    attrs?.category?.categoryName ??
-    attrs?.category?.attributes?.categoryName ??
-    attrs?.category?.data?.attributes?.categoryName ??
-    "—";
-
-  // --- SUBTÍTULO ---
-  const subtitle =
-    attrs?.productName2 ??
-    attrs?.variant ??
-    attrs?.subCategory ??
-    "";
-
-  // --- DATOS BASE ---
   const displayName = attrs?.productName ?? "Producto sin nombre";
-
+  const secondaryName =
+    attrs?.productName2 ?? attrs?.variant ?? attrs?.subCategory ?? "";
   const displayPrice =
-    attrs?.price !== undefined && attrs?.price !== null
-      ? attrs.price
-      : "—";
-
+    attrs?.price !== undefined && attrs?.price !== null ? attrs.price : "—";
+  const isActive = attrs?.active ?? true;
   const productSlug = attrs?.slug ?? "";
 
   return (
     <Card
       className="
-    group relative rounded-none  md:rounded-xl 
-    md:border-[#515151] shadow-none bg-white
-    flex flex-col justify-between pb-3 pt-0 md:pb-4
-    w-full max-w-[360px] sm:max-w-none   /* se expande en tablet/pc */
+        group relative 
+        w-full
+        h-auto
+        pt-4
+        pb-4
+        overflow-hidden 
+        rounded-none
+        sm:rounded-[15px] sm:border-[0.5px] border-[#b9b9b9]
+        bg-[#f0f0f0]
+        flex flex-col 
+        justify-between
       "
     >
-    
+      <CardContent className="flex flex-col justify-around px-3 md:px-3 pt-0 pb-0">
+
+        {/* IMAGEN */}
+        <div
+          className="
+            relative mb-3 sm:mb-4 
+            mt-0 w-full 
+            rounded-[14px] sm:rounded-[24px]
+          bg-white
+            flex items-center justify-center overflow-hidden
+            pt-1 pb-1 cursor-pointer
+          "
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+          onClick={() => router.push(`/product/${product.attributes.slug}`)}
+        >
+          {/* Imagen por defecto */}
+          {image1 && (
+            <img
+              src={image1}
+              alt={displayName}
+              className={`
+                sm:max-h-[310px] w-auto object-contain
+                transition-all duration-300 ease-out
+                ${hover && image2 ? "opacity-0" : "opacity-100"}
+              `}
+            />
+          )}
+
+          {/* 2da imagen al hover */}
+          {image2 && (
+            <img
+              src={image2}
+              alt={displayName}
+              className={`
+                absolute max-h-[210px] sm:max-h-[410px] max-w-[320px] object-contain
+                transition-all duration-600 ease-out
+                ${hover ? "opacity-100" : "opacity-0"}
+              `}
+            />
+          )}
+
+          {!image1 && (
+            <span className="text-sm text-muted-foreground">Sin imagen</span>
+          )}
+        </div>
+
+        {/* NOMBRE */}
+        <h3
+          className="
+            text-lg
+            leading-none
+            text-center sm:text-2xl 
+            font-black  uppercase
+            mb-1
+          "
+        >
+          {displayName}
+        </h3>
+
+
+        {/* SEPARATOR 1 */}
+        <div className="h-px w-full bg-[#c0c0c0] mb-1" />
 
 
 
-      <CardContent className="px-4 sm:px-6 md:px-8 pb-0 pt-0">
-     {/* IMAGEN */}
-    <div
-      className="
-       bg-muted/10 overflow-hidden mb-2
-      relative h-56 sm:h-52 md:h-86      /* altura responsiva */
-      flex items-center justify-center cursor-pointer
-     "
-   >
-    {imageUrl ? (
-      <img
-        src={imageUrl}
-        alt={displayName}
-       
-         onClick={() => router.push(`/product/${product.attributes.slug}`)}
-        className="
-          max-h-full max-w-full object-contain
-          transition-transform duration-300 ease-out
-          group-hover:scale-105
-        "
-      />
-      ) : (
-      <span className="text-sm text-muted-foreground">Sin imagen</span>
-      )}
-     </div>
+        {/* SUB + PRECIO */}
+        <div className="flex items-center justify-between gap-2 mb-1">
+          <p className="text-l font-semibold text-black ">
+            {secondaryName}
+          </p>
 
-        {/* NOMBRE + SUBTÍTULO */}
-<div className="mb-2">
-  <h3 className="text-[15px] sm:text-base font-semibold leading-tight line-clamp-2">
-    {displayName}
-  </h3>
-
-  {subtitle && (
-    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
-      {subtitle}
-    </p>
-  )}
-</div>
-
-{/* PRECIO + CTA para moviles */}
-
-<div className="mt-auto flex flex-col md:hidden ">
-  <Button
-
-  onClick={() => {
-      if (!productSlug) return;
-      router.push(`/product/${productSlug}`);
-    }}
-  className="text-[15px] sm:text-base font-medium cursor-pointer">
-    {formatPrice(displayPrice)}
-
-    <CirclePlus className="ml-3 h-5 w-5" />
-
-  </Button>
-</div>
+          <p className="text-[15px] font-semibold">
+            {formatPrice(displayPrice)}
+          </p>
+        </div>
 
 
-{/* PRECIO + CTA  para pc y tablet*/}
 
-<div className="mt-auto flex hidden md:flex  flex-col sm:flex-row sm:items-center sm:justify-between ">
-  <p
-  className="text-[15px] sm:text-base font-medium">
-    {formatPrice(displayPrice)}
-  </p>
+        {/* SEPARATOR 2 */}
+        <div className="h-px w-full bg-[#c0c0c0] mb-1" />
 
-  <Button
-    onClick={() => {
-      if (!productSlug) return;
-      router.push(`/product/${productSlug}`);
-    }}
-    size="sm"
-    className="
-      bg-black rounded-lg cursor-pointer
-      px-3 sm:px-4
-      w-full sm:w-auto justify-center
-      transition-all duration-300 ease-out
-    "
-  >
-    Agregar <CirclePlus className="ml-1 h-5 w-5" />
-  </Button>
-</div>
+
+
+        {/* ESTADO + CTA */}
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          {/* Badge */}
+          <span
+            className={`
+              sm:inline-flex items-center hidden ustify-center
+              rounded-[10px] h-9 px-4 py-1
+              text-[11px] sm:text-xs font-extrabold uppercase
+              ${isActive ? "bg-[#62DF70] text-white" : "bg-[#E5E5E5] text-[#777777]"}
+            `}
+          >
+            {isActive ? "Disponible" : "No disponible"}
+          </span>
+
+          {/* Botón + favorito */}
+          <div className="flex w-full sm:w-auto items-center justify-between sm:justify-end gap-2">
+            <Button
+              onClick={() => router.push(`/product/${productSlug}`)}
+              className="
+                h-9 px-4 text-[12px] sm:text-[13px] font-medium
+                rounded-[10px] bg-black text-white hover:bg-black/90 
+                flex items-center gap-2
+                flex-1 sm:flex-none
+              "
+            >
+              <ShoppingCart
+              width={15}
+              strokeWidth={3}>
+
+              </ShoppingCart>
+            </Button>
+
+            <button
+              className="
+                inline-flex h-9 w-9 
+                sm:
+                items-center justify-center cursor-pointer
+                rounded-[10px] border border-[#E3E3E3]
+                bg-white text-black/70 
+                transition-colors
+                flex-shrink-0
+              "
+            >
+              <Heart 
+              width={20}
+              strokeWidth={1.5}
+              className="hover:fill-red-500" />
+            </button>
+          </div>
+        </div>
 
       </CardContent>
     </Card>
@@ -184,5 +209,3 @@ const ProductCard = ({ product }: ProductCardProps) => {
 };
 
 export default ProductCard;
-
-
