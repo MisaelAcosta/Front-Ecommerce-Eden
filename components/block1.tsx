@@ -2,17 +2,22 @@
 
 import { useGetFeaturedBlock1 } from "@/api/useGetFeaturedBlock1";
 import SkeletonSchema from "./skeletonSchema";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "./ui/carousel";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "./ui/carousel";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import type { ResponseType } from "@/types/response";
-import  Autoplay  from "embla-carousel-autoplay";
+import Autoplay from "embla-carousel-autoplay";
 
 const Block1 = () => {
-  const { result, loading, error }: ResponseType = useGetFeaturedBlock1();
+  const { result, loading, error } = useGetFeaturedBlock1();
   const router = useRouter();
 
-  // Normaliza la base y la ruta (evita // o falta de /)
+  // Convertir URL relativa -> absoluta
   const toAbsUrl = (url?: string | null) => {
     if (!url) return null;
     if (url.startsWith("http")) return url;
@@ -21,145 +26,140 @@ const Block1 = () => {
     return `${base}${path}`;
   };
 
-  // Lee campos plano o con attributes
-  const getField = (item: any, key: string) => item?.[key] ?? item?.attributes?.[key];
-
-  // Escanea posibles ubicaciones de la URL de media (single/multiple/formats/flat)
+  // Manejo de imágenes Strapi v5
   const getMediaUrl = (item: any, key: string): string | null => {
-    const media = getField(item, key);
+    const media = item?.[key];
     if (!media) return null;
 
-    // 0) plano directo
-    if (typeof media?.url === "string") return media.url;
-
-    // 1) single: data.attributes.url
-    const single = media?.data?.attributes?.url;
-    if (typeof single === "string") return single;
-
-    // 2) multiple: data[0].attributes.url
-    const multi = Array.isArray(media?.data) ? media.data[0]?.attributes?.url : null;
-    if (typeof multi === "string") return multi;
-
-    // 3) plano con array: media[0].url
-    const flatArr = Array.isArray(media) ? media[0]?.url : null;
-    if (typeof flatArr === "string") return flatArr;
-
-    // 4) formatos (Strapi < v5 o custom upload): formats.large/url/medium/small/thumbnail
-    const formats =
-      media?.formats ||
-      media?.data?.attributes?.formats ||
-      (Array.isArray(media?.data) ? media.data[0]?.attributes?.formats : null);
-
-    if (formats) {
-      const cand =
-        formats.large?.url ||
-        formats.medium?.url ||
-        formats.small?.url ||
-        formats.thumbnail?.url;
-      if (typeof cand === "string") return cand;
+    // Multiple Media = array
+    if (Array.isArray(media)) {
+      return typeof media[0]?.url === "string" ? media[0].url : null;
     }
+
+    // Single Media = objeto
+    if (typeof media?.url === "string") return media.url;
 
     return null;
   };
 
-  const getMediaAlt = (item: any, key: string): string | null => {
-    const media = getField(item, key);
+  const getMediaAlt = (item: any, key: string) => {
+    const media = item?.[key];
+
     if (!media) return null;
-    if (typeof media?.alternativeText === "string") return media.alternativeText;
 
-    const altSingle = media?.data?.attributes?.alternativeText;
-    if (typeof altSingle === "string") return altSingle;
+    if (Array.isArray(media)) {
+      return media[0]?.alternativeText ?? null;
+    }
 
-    const altMulti = Array.isArray(media?.data)
-      ? media.data[0]?.attributes?.alternativeText
-      : null;
-    if (typeof altMulti === "string") return altMulti;
-
-    return null;
+    return media?.alternativeText ?? null;
   };
 
   if (loading) return <SkeletonSchema grid={1} />;
-  if (error) return <p className="text-red-500 text-sm">Error: {String(error)}</p>;
+  if (error) return <p className="text-red-500">{String(error)}</p>;
   if (!Array.isArray(result) || result.length === 0) return null;
 
   return (
     <section className="relative">
-      <Carousel 
-       className="w-full justify-between overflow-hidden " 
-       plugins={[
-         Autoplay({
-         delay: 3500 //ms
-        })
-        ]}>
-        
-        <CarouselContent className=" ">
-          {(result as any[]).map((item) => {
-            const id = item?.id ?? item?.documentId ?? crypto.randomUUID();
-            const titulo = getField(item, "tituloBlock1") ?? "Destacado";
-            const description = getField(item, "description") ?? "";
-            const slug = getField(item, "slug") ?? "";
-            const category = getField(item, "category") ?? "";
+      <Carousel
+        className="w-full overflow-hidden"
+        plugins={[
+          Autoplay({
+            delay: 3500,
+          }),
+        ]}
+      >
+        <CarouselContent>
+          {result.map((item: any) => {
+            console.log("🧱 Block1 item:", item);
 
-            const urlRel = getMediaUrl(item, "imageBlock1");
-            const imgUrl = toAbsUrl(urlRel);
+            // Campos directos (Strapi v5)
+            const id = item.id ?? item.documentId;
+            const titulo = item.tituloBlock1 ?? "Destacado";
+            const description = item.description ?? "";
+            const blockSlug = item.slug ?? "";
+
+            // Relaciones (sin attributes y sin .data)
+            const categorySlug = item.category?.slug ?? null;
+            const productSlug = item.product?.slug ?? null;
+
+            // Imagen
+            const img = getMediaUrl(item, "imageBlock1");
+            const imgUrl = toAbsUrl(img);
             const altTxt = getMediaAlt(item, "imageBlock1") || titulo;
 
-            // Debug
-            const isDev = process.env.NODE_ENV !== "production";
+            // A dónde navegar según lo que mandó Strapi
+            const handleClick = () => {
+              if (productSlug) {
+                router.push(`/product/${productSlug}`);
+              } else if (categorySlug) {
+                router.push(`/category/${categorySlug}`);
+              } else if (blockSlug) {
+                router.push(`/${blockSlug}`);
+              }
+            };
+
+            const hasLink = Boolean(productSlug || categorySlug || blockSlug);
 
             return (
-              <CarouselItem key={id} className="">
-                <div className="relative w-full h-[510px] md:h-[750px] saturate-150  rounded-3xl overflow-hidden">
+              <CarouselItem key={id}>
+                <div
+                  className={`relative w-full h-[510px] md:h-[750px] rounded-3xl overflow-hidden ${
+                    hasLink ? "cursor-pointer" : ""
+                  }`}
+                  onClick={hasLink ? handleClick : undefined}
+                >
+                  {/* Imagen */}
                   {imgUrl ? (
                     <Image
                       src={imgUrl}
                       alt={altTxt}
                       fill
                       className="object-cover"
-                      // quitar esto cuando agregue el dominio del backend a next.config.js
                       unoptimized
                       priority
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-b from-neutral-200 to-neutral-700" />
+                    <div className="w-full h-full bg-neutral-300" />
                   )}
 
-                  <div className="absolute bg-gradient-to-t from-black/20  " />
+                  {/* Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10" />
 
-                  {/* Caption */}
+                  {/* Etiqueta */}
                   <div className="absolute left-4 top-4 md:left-6 md:top-6">
                     <span className="text-white/90 text-sm md:text-base font-medium drop-shadow">
                       Destacado
                     </span>
                   </div>
-                  
-                  
-                  {/* Texto principal */}
-                  <div className="absolute left-5 right-4 bottom-8 md:bottom-14 md:left-15 md:right-6 md:bottom-6">
-                    <h2 className="text-3xl md:text-7xl font-black text-white ">
-                      {String(titulo).toUpperCase()}
+
+                  {/* Texto */}
+                  <div className="absolute left-5 right-4 bottom-8 md:bottom-14">
+                    <h2 className="text-3xl md:text-7xl font-black text-white">
+                      {titulo.toUpperCase()}
                     </h2>
+
                     {description && (
-                      <p className="mt-2 md:mt-3 text-white/90 md:text-base lg:text-2xl font-medium max-w-2xl">
+                      <p className="mt-2 text-white/90 md:text-lg lg:text-2xl max-w-2xl">
                         {description}
                       </p>
                     )}
-                    {slug && (
 
+                    {/* Botón Ver más */}
+                    {hasLink && (
                       <button
-                        onClick={() => router.push(`/categoria/${category}`)}
-                        className="mt-3 group relative cursor-pointer inline-flex md:h-13 h-10 items-center justify-center bg-white overflow-hidden rounded-md bg-neutral-950 px-6 lg:px-10 font-semibold text-neutral-200 duration-900"
+                        className="mt-3 relative inline-flex h-10 md:h-13 items-center justify-center px-6 lg:px-10 font-semibold rounded-md bg-white text-black overflow-hidden group"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleClick();
+                        }}
                       >
-                        <div className="translate-x-0 opacity-100 transition group-hover:-translate-x-[150%] group-hover:opacity-0 text-black">Ver mas</div>
-                        <div className="absolute translate-x-[150%] opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100">
-                        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-black">
-                        <path d="M8.14645 3.14645C8.34171 2.95118 8.65829 2.95118 8.85355 3.14645L12.8536 7.14645C13.0488 7.34171 13.0488 7.65829 12.8536 7.85355L8.85355 11.8536C8.65829 12.0488 8.34171 12.0488 8.14645 11.8536C7.95118 11.6583 7.95118 11.3417 8.14645 11.1464L11.2929 8H2.5C2.22386 8 2 7.77614 2 7.5C2 7.22386 2.22386 7 2.5 7H11.2929L8.14645 3.85355C7.95118 3.65829 7.95118 3.34171 8.14645 3.14645Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path>
-                        </svg>
-                        </div>
-                        
+                        <span className="transition group-hover:-translate-x-[150%]">
+                          Ver más
+                        </span>
+                        <span className="absolute opacity-0 translate-x-[150%] group-hover:opacity-100 group-hover:translate-x-0 transition">
+                          ➜
+                        </span>
                       </button>
-
-                      
                     )}
                   </div>
                 </div>
@@ -168,13 +168,16 @@ const Block1 = () => {
           })}
         </CarouselContent>
 
-        <CarouselPrevious className="lg:hidden md:left-6 " />
-        <CarouselNext className="hidden md:right-9 transition-all duration-300 ease-out" />
+        <CarouselPrevious className="lg:hidden md:left-6" />
+        <CarouselNext className="hidden md:right-9" />
       </Carousel>
     </section>
   );
 };
 
 export default Block1;
+
+
+
 
                   
