@@ -5,6 +5,7 @@ import { Menu, X, Instagram } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { LoginDialog } from "@/components/auth/login-dialog";
 
 
 
@@ -132,11 +133,23 @@ export default function ItemsMenuMobile() {
                     </Link>
                   </motion.div>
 
-                  <motion.div variants={itemVariants}>
-                    <Link href="/about" className="block text-black text-3xl font-semibold hover:text-gray-300 transform hover:translate-x-2" onClick={() => setIsOpen(false)}>
-                      Perfil
-                    </Link>
-                  </motion.div>
+                  
+                  <LoginDialog>
+                  <button
+                    className="
+                      text-center
+                      text-black text-3xl font-semibold
+                      hover:text-gray-300
+                      transform hover:translate-x-2
+                      
+                      
+                    "
+                    
+                  >
+                    Perfil
+                  </button>
+                </LoginDialog>
+                  
 
                 </motion.div>
 
