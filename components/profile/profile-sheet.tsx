@@ -1,28 +1,47 @@
+// components/profile/profile-sheet.tsx
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import {
   Sheet,
   SheetTrigger,
   SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
 } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-
-export type CurrentUser = {
-  id: number;
-  username: string;
-  email: string;
-};
+import { CurrentUser, ProfileView } from "./profile-types";
+import { ProfileMenu } from "./profile-menu";
+import { ProfileOrdersView } from "./profile-orders-view";
+import { ProfileInfoForm } from "./profile-info-form";
 
 type ProfileSheetProps = {
   user: CurrentUser;
 };
 
 export function ProfileSheet({ user }: ProfileSheetProps) {
+  const [view, setView] = useState<ProfileView>("menu");
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (err) {
+      console.error("Error al cerrar sesión:", err);
+    } finally {
+      router.refresh();
+    }
+  };
+
+  const handleBackToMenu = () => setView("menu");
+
   return (
-    <Sheet>
+    <Sheet
+      onOpenChange={(open) => {
+        if (!open) setView("menu");
+      }}
+    >
       <SheetTrigger asChild>
         <button
           className="
@@ -46,39 +65,22 @@ export function ProfileSheet({ user }: ProfileSheetProps) {
         </button>
       </SheetTrigger>
 
-      <SheetContent side="right" className="w-full sm:w-[380px]">
-        <SheetHeader>
-          <SheetTitle>Tu perfil</SheetTitle>
-          <SheetDescription>
-            Más adelante aquí vamos a poner tu dirección y otros datos.
-          </SheetDescription>
-        </SheetHeader>
+      <SheetContent side="right" className="w-full sm:w-[380px] p-0">
+        {view === "menu" && (
+          <ProfileMenu onChangeView={setView} onLogout={handleLogout} />
+        )}
 
-        <div className="mt-6 space-y-4 text-sm">
-          <div>
-            <p className="font-semibold">Usuario</p>
-            <p className="text-neutral-600 break-words">{user.username}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Correo</p>
-            <p className="text-neutral-600 break-words">{user.email}</p>
-          </div>
+        {view === "compras" && (
+          <ProfileOrdersView onBack={handleBackToMenu} />
+        )}
 
-          <div className="border-t border-neutral-200 pt-6">
-            <Button
-              variant="outline"
-              className="w-full"
-              type="button"
-              onClick={() => {
-                alert("Luego aquí hacemos Cerrar sesión 🤝");
-              }}
-            >
-              Cerrar sesión
-            </Button>
-          </div>
-        </div>
+        {view === "info" && (
+          <ProfileInfoForm onBack={handleBackToMenu} userId={user.id} />
+        )}
       </SheetContent>
     </Sheet>
   );
 }
+
+
 
