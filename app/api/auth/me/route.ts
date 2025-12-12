@@ -1,36 +1,35 @@
-// src/app/api/auth/me/route.ts
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-
-const STRAPI_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL ??
-  process.env.NEXT_PUBLIC_STRAPI_URL ??
-  "http://localhost:1338";
+import { getCurrentUserWithProfile } from "@/lib/auth";
 
 export async function GET() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("jwt")?.value;
-
-  if (!token) {
-    return NextResponse.json({ user: null }, { status: 401 });
-  }
-
   try {
-    const res = await fetch(`${STRAPI_URL}/api/users/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      cache: "no-store",
-    });
+    // Usa la función que ya creamos en lib/auth.ts
+    const auth = await getCurrentUserWithProfile();
 
-    if (!res.ok) {
-      return NextResponse.json({ user: null }, { status: res.status });
+    if (!auth) {
+      return NextResponse.json(
+        { user: null, profile: null },
+        { status: 401 }
+      );
     }
 
-    const user = await res.json();
-    return NextResponse.json({ user }, { status: 200 });
-  } catch (error) {
-    console.error("Error en /api/auth/me:", error);
-    return NextResponse.json({ user: null }, { status: 500 });
+    // Devolvemos por separado:
+    // - user básico para la UI
+    // - profile con todos los campos extra
+    return NextResponse.json({
+      user: {
+        id: auth.id,
+        username: auth.username,
+        email: auth.email,
+      },
+      profile: auth.profile,
+    });
+  } catch (err) {
+    console.error("🔥 Error en /api/auth/me:", err);
+    return NextResponse.json(
+      { user: null, profile: null },
+      { status: 500 }
+    );
   }
 }
+

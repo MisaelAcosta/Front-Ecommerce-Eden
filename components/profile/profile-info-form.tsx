@@ -1,3 +1,4 @@
+// components/profile/profile-info-form.tsx
 "use client";
 
 import { useState } from "react";
@@ -16,31 +17,90 @@ import {
 } from "@/components/ui/input-otp";
 
 import { RegionCombobox, CommuneCombobox } from "./region-commune-select";
+import type { ProfileData } from "./profile-types";
 
 type ProfileInfoFormProps = {
   onBack: () => void;
-    userId?: number;
-  // más adelante aquí puedes recibir initialProfile con datos desde Strapi
+  userId: number;
+  initialProfile?: ProfileData | null;
 };
 
+export function ProfileInfoForm({
+  onBack,
+  userId,
+  initialProfile,
+}: ProfileInfoFormProps) {
+  // 🔹 Modo edición
+  const [isEditing, setIsEditing] = useState(() => !initialProfile);
 
-export function ProfileInfoForm({ onBack, userId }: ProfileInfoFormProps) {
   const [saving, setSaving] = useState(false);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const [notifyWhatsapp, setNotifyWhatsapp] = useState(false);
-  const [notifyEmail, setNotifyEmail] = useState(true);
+  // Preferencias
+  const [notifyWhatsapp, setNotifyWhatsapp] = useState(
+    () => initialProfile?.notifyWhatsapp ?? false
+  );
+  const [notifyEmail, setNotifyEmail] = useState(
+    () => initialProfile?.notifyEmail ?? true
+  );
 
-  const [rutBody, setRutBody] = useState("");
-  const [rutDv, setRutDv] = useState("");
-  const [phoneRest, setPhoneRest] = useState("");
+  // RUT: partimos el "cuerpo-dv"
+  const [rutBody, setRutBody] = useState(() => {
+    if (!initialProfile?.rut) return "";
+    const [body] = initialProfile.rut.split("-");
+    return body ?? "";
+  });
 
-  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
-  const [selectedComuna, setSelectedComuna] = useState<string | null>(null);
+  const [rutDv, setRutDv] = useState(() => {
+    if (!initialProfile?.rut) return "";
+    const [, dv] = initialProfile.rut.split("-");
+    return dv ?? "";
+  });
+
+  // Teléfono: quitar +569
+  const [phoneRest, setPhoneRest] = useState(() => {
+    if (!initialProfile?.telefono) return "";
+    const match = initialProfile.telefono.match(/^\+569(\d{8})$/);
+    return match ? match[1] : "";
+  });
+
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(
+    () => initialProfile?.region ?? null
+  );
+  const [selectedComuna, setSelectedComuna] = useState<string | null>(
+    () => initialProfile?.comuna ?? null
+  );
+
+  // 🧹 Reset a los valores originales cuando el usuario cancela edición
+  const resetFromInitial = () => {
+    setNotifyWhatsapp(initialProfile?.notifyWhatsapp ?? false);
+    setNotifyEmail(initialProfile?.notifyEmail ?? true);
+
+    if (initialProfile?.rut) {
+      const [body, dv] = initialProfile.rut.split("-");
+      setRutBody(body ?? "");
+      setRutDv(dv ?? "");
+    } else {
+      setRutBody("");
+      setRutDv("");
+    }
+
+    if (initialProfile?.telefono) {
+      const match = initialProfile.telefono.match(/^\+569(\d{8})$/);
+      setPhoneRest(match ? match[1] : "");
+    } else {
+      setPhoneRest("");
+    }
+
+    setSelectedRegion(initialProfile?.region ?? null);
+    setSelectedComuna(initialProfile?.comuna ?? null);
+  };
 
   const handleSubmitInfo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!isEditing) return; // seguridad
+
     setSaving(true);
     setSavedMessage(null);
     setErrorMessage(null);
@@ -57,7 +117,7 @@ export function ProfileInfoForm({ onBack, userId }: ProfileInfoFormProps) {
       : "";
 
     const payload = {
-      userId, // 👈 importante
+      userId,
       notifyWhatsapp,
       notifyEmail,
       nombre: (formData.get("nombre") || "").toString(),
@@ -86,6 +146,8 @@ export function ProfileInfoForm({ onBack, userId }: ProfileInfoFormProps) {
         setErrorMessage("Hubo un problema al guardar tu información.");
       } else {
         setSavedMessage("Información guardada correctamente ✅");
+        // Opcional: salir de modo edición al guardar
+        setIsEditing(false);
       }
     } catch (err) {
       console.error("Error inesperado:", err);
@@ -98,15 +160,45 @@ export function ProfileInfoForm({ onBack, userId }: ProfileInfoFormProps) {
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <div className="flex items-center gap-2 border-b border-neutral-200 px-4 py-4">
-        <button
-          type="button"
-          onClick={onBack}
-          className="inline-flex items-center justify-center rounded-full p-1 hover:bg-neutral-100"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-        <h2 className="text-2xl font-black tracking-tight">INFO</h2>
+      <div className="flex items-center justify-between border-b border-neutral-200 px-4 py-4">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onBack}
+            className="inline-flex items-center justify-center rounded-full p-1 hover:bg-neutral-100"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <h2 className="text-2xl font-black tracking-tight">INFO</h2>
+        </div>
+
+        {/* Botón editar / cancelar */}
+        {initialProfile && (
+          <div className="flex items-center gap-2">
+            {isEditing ? (
+              <button
+                type="button"
+                onClick={() => {
+                  resetFromInitial();
+                  setIsEditing(false);
+                  setSavedMessage(null);
+                  setErrorMessage(null);
+                }}
+                className="text-[11px] font-medium text-neutral-500 hover:underline"
+              >
+                Cancelar
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsEditing(true)}
+                className="text-[11px] font-medium text-black hover:underline"
+              >
+                Editar información
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Formulario */}
@@ -125,7 +217,11 @@ export function ProfileInfoForm({ onBack, userId }: ProfileInfoFormProps) {
               <Checkbox
                 id="notifyWhatsapp"
                 checked={notifyWhatsapp}
-                onCheckedChange={(v) => setNotifyWhatsapp(!!v)}
+                onCheckedChange={(v) => {
+                  if (!isEditing) return;
+                  setNotifyWhatsapp(!!v);
+                }}
+                disabled={!isEditing}
               />
               <span className="text-xs">Whatsapp</span>
             </label>
@@ -134,7 +230,11 @@ export function ProfileInfoForm({ onBack, userId }: ProfileInfoFormProps) {
               <Checkbox
                 id="notifyEmail"
                 checked={notifyEmail}
-                onCheckedChange={(v) => setNotifyEmail(!!v)}
+                onCheckedChange={(v) => {
+                  if (!isEditing) return;
+                  setNotifyEmail(!!v);
+                }}
+                disabled={!isEditing}
               />
               <span className="text-xs">Correo</span>
             </label>
@@ -157,6 +257,8 @@ export function ProfileInfoForm({ onBack, userId }: ProfileInfoFormProps) {
                 id="nombre"
                 name="nombre"
                 className="h-9 bg-neutral-100 text-xs"
+                defaultValue={initialProfile?.nombre ?? ""}
+                disabled={!isEditing}
               />
             </div>
 
@@ -168,6 +270,7 @@ export function ProfileInfoForm({ onBack, userId }: ProfileInfoFormProps) {
                   maxLength={8}
                   value={rutBody}
                   onChange={(val) => {
+                    if (!isEditing) return;
                     if (/^\d*$/.test(val)) {
                       setRutBody(val);
                     }
@@ -190,6 +293,7 @@ export function ProfileInfoForm({ onBack, userId }: ProfileInfoFormProps) {
                   maxLength={1}
                   value={rutDv}
                   onChange={(val) => {
+                    if (!isEditing) return;
                     if (/^[0-9kK]?$/.test(val)) {
                       setRutDv(val.toUpperCase());
                     }
@@ -217,6 +321,7 @@ export function ProfileInfoForm({ onBack, userId }: ProfileInfoFormProps) {
                 maxLength={8}
                 value={phoneRest}
                 onChange={(val) => {
+                  if (!isEditing) return;
                   if (/^\d*$/.test(val)) {
                     setPhoneRest(val);
                   }
@@ -245,22 +350,26 @@ export function ProfileInfoForm({ onBack, userId }: ProfileInfoFormProps) {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label className="text-[11px]">Región</Label>
-              <RegionCombobox
-                value={selectedRegion}
-                onChange={(val) => {
-                  setSelectedRegion(val);
-                  setSelectedComuna(null); // reset comuna si cambia región
-                }}
-              />
+              <div className={!isEditing ? "opacity-60 pointer-events-none" : ""}>
+                <RegionCombobox
+                  value={selectedRegion}
+                  onChange={(val) => {
+                    setSelectedRegion(val);
+                    setSelectedComuna(null);
+                  }}
+                />
+              </div>
             </div>
 
             <div className="space-y-1">
               <Label className="text-[11px]">Comuna</Label>
-              <CommuneCombobox
-                region={selectedRegion}
-                value={selectedComuna}
-                onChange={setSelectedComuna}
-              />
+              <div className={!isEditing ? "opacity-60 pointer-events-none" : ""}>
+                <CommuneCombobox
+                  region={selectedRegion}
+                  value={selectedComuna}
+                  onChange={setSelectedComuna}
+                />
+              </div>
             </div>
           </div>
 
@@ -272,6 +381,8 @@ export function ProfileInfoForm({ onBack, userId }: ProfileInfoFormProps) {
               id="calle"
               name="calle"
               className="h-9 rounded-md bg-neutral-100 text-xs"
+              defaultValue={initialProfile?.calle ?? ""}
+              disabled={!isEditing}
             />
           </div>
 
@@ -284,6 +395,8 @@ export function ProfileInfoForm({ onBack, userId }: ProfileInfoFormProps) {
                 id="numero"
                 name="numero"
                 className="h-9 rounded-md bg-neutral-100 text-xs"
+                defaultValue={initialProfile?.numero ?? ""}
+                disabled={!isEditing}
               />
             </div>
 
@@ -295,6 +408,8 @@ export function ProfileInfoForm({ onBack, userId }: ProfileInfoFormProps) {
                 id="depto"
                 name="depto"
                 className="h-9 rounded-md bg-neutral-100 text-xs"
+                defaultValue={initialProfile?.depto ?? ""}
+                disabled={!isEditing}
               />
             </div>
           </div>
@@ -307,6 +422,8 @@ export function ProfileInfoForm({ onBack, userId }: ProfileInfoFormProps) {
               id="nota"
               name="nota"
               className="min-h-[70px] rounded-md bg-neutral-100 text-xs"
+              defaultValue={initialProfile?.nota ?? ""}
+              disabled={!isEditing}
             />
           </div>
         </div>
@@ -319,16 +436,20 @@ export function ProfileInfoForm({ onBack, userId }: ProfileInfoFormProps) {
           <p className="text-[11px] text-red-600">{errorMessage}</p>
         )}
 
-        <Button
-          type="submit"
-          className="mt-2 w-full rounded-xl bg-black text-xs font-semibold tracking-wide text-white hover:bg-black/90"
-          disabled={saving}
-        >
-          {saving ? "Guardando..." : "Guardar información"}
-        </Button>
+        {/* Botón guardar solo si se está editando */}
+        {isEditing && (
+          <Button
+            type="submit"
+            className="mt-2 w-full rounded-xl bg-black text-xs font-semibold tracking-wide text-white hover:bg-black/90"
+            disabled={saving}
+          >
+            {saving ? "Guardando..." : "Guardar información"}
+          </Button>
+        )}
       </form>
     </div>
   );
 }
+
 
 

@@ -1,18 +1,19 @@
 // components/auth/login-form.tsx
 "use client";
 
+import { useActionState, useEffect } from "react";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
-import { loginUserAction } from "@/components/data/actions/auth-actions";
-
+  loginUserAction,
+} from "@/components/data/actions/auth-actions";
+import {
+  initialLoginState,
+  type LoginState,
+} from "@/components/data/actions/auth-state";
 type LoginFormProps = {
   onSwitchToRegister: () => void;
   onSwitchToForgot: () => void;
@@ -22,6 +23,24 @@ export function LoginForm({
   onSwitchToRegister,
   onSwitchToForgot,
 }: LoginFormProps) {
+  const [state, formAction, isPending] = useActionState<LoginState, FormData>(
+    loginUserAction,
+    initialLoginState
+  );
+
+  const safeState: LoginState = state ?? initialLoginState;
+
+  // Cuando el login sea OK → recargamos la página para que Navbar lea /api/auth/me
+  useEffect(() => {
+    if (safeState.ok) {
+      const t = setTimeout(() => {
+        // recarga completa → Navbar monta de nuevo y ve que ya hay jwt
+        window.location.reload();
+      }, 800); // un pelín de delay para ver el mensaje si quieres
+      return () => clearTimeout(t);
+    }
+  }, [safeState.ok]);
+
   return (
     <div className="relative w-full max-w-md rounded-3xl bg-white p-8 sm:p-10">
       {/* X de cierre */}
@@ -29,11 +48,9 @@ export function LoginForm({
         <button
           className="
             absolute right-5 top-4 sm:right-8 sm:top-8
-            cursor-pointer
-            inline-flex items-center justify-center
-            rounded-full p-1.5
+            inline-flex cursor-pointer items-center justify-center
+            rounded-full border border-neutral-300 p-1.5
             text-black
-            border border-neutral-300
             hover:bg-black hover:text-white
           "
         >
@@ -59,7 +76,7 @@ export function LoginForm({
       </h1>
 
       {/* FORM login */}
-      <form action={loginUserAction}>
+      <form action={formAction}>
         {/* Inputs principales */}
         <div className="space-y-3">
           <Input
@@ -74,16 +91,28 @@ export function LoginForm({
             placeholder="Contraseña"
             className="h-11 rounded-xl bg-neutral-100 text-sm placeholder:text-neutral-400"
             id="password"
-            name="password" // 👈
+            name="password"
           />
         </div>
+
+        {/* Mensaje de estado (error / éxito) */}
+        {safeState.message && (
+          <p
+            className={`mt-4 text-center text-[11px] ${
+              safeState.ok ? "text-emerald-600" : "text-red-600"
+            }`}
+          >
+            {safeState.message}
+          </p>
+        )}
 
         {/* Botón INICIAR */}
         <Button
           type="submit"
           className="mt-6 h-11 w-full cursor-pointer rounded-xl bg-black text-sm font-semibold tracking-wide text-white hover:bg-black/90"
+          disabled={isPending}
         >
-          INICIAR
+          {isPending ? "Iniciando..." : "INICIAR"}
         </Button>
       </form>
 
@@ -118,5 +147,6 @@ export function LoginForm({
     </div>
   );
 }
+
 
 

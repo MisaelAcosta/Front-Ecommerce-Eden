@@ -8,18 +8,28 @@ import {
   SheetTrigger,
   SheetContent,
 } from "@/components/ui/sheet";
-import { CurrentUser, ProfileView } from "./profile-types";
+import { ChevronRight, ChevronLeft } from "lucide-react";
+
 import { ProfileMenu } from "./profile-menu";
 import { ProfileOrdersView } from "./profile-orders-view";
 import { ProfileInfoForm } from "./profile-info-form";
+import type {
+  CurrentUser,
+  ProfileView,
+  ProfileData,
+} from "./profile-types";
 
 type ProfileSheetProps = {
   user: CurrentUser;
+  profile?: ProfileData | null;
+  onLogout?: () => void; // 👈 IMPORTANTE
 };
 
-export function ProfileSheet({ user }: ProfileSheetProps) {
+export function ProfileSheet({ user, profile, onLogout }: ProfileSheetProps) {
   const [view, setView] = useState<ProfileView>("menu");
   const router = useRouter();
+
+  const handleBackToMenu = () => setView("menu");
 
   const handleLogout = async () => {
     try {
@@ -30,11 +40,12 @@ export function ProfileSheet({ user }: ProfileSheetProps) {
     } catch (err) {
       console.error("Error al cerrar sesión:", err);
     } finally {
+      // avisamos al Navbar que ya no hay usuario
+      onLogout?.();
+      // por si tienes otros datos server-side
       router.refresh();
     }
   };
-
-  const handleBackToMenu = () => setView("menu");
 
   return (
     <Sheet
@@ -42,6 +53,7 @@ export function ProfileSheet({ user }: ProfileSheetProps) {
         if (!open) setView("menu");
       }}
     >
+      {/* Botón PERFIL en navbar */}
       <SheetTrigger asChild>
         <button
           className="
@@ -65,9 +77,12 @@ export function ProfileSheet({ user }: ProfileSheetProps) {
         </button>
       </SheetTrigger>
 
-      <SheetContent side="right" className="w-full sm:w-[380px] p-0">
+      <SheetContent side="right" className="w-full p-0 sm:w-[380px]">
         {view === "menu" && (
-          <ProfileMenu onChangeView={setView} onLogout={handleLogout} />
+          <ProfileMenu
+            onChangeView={setView}
+            onLogout={handleLogout} // 👈 usamos nuestra función
+          />
         )}
 
         {view === "compras" && (
@@ -75,12 +90,14 @@ export function ProfileSheet({ user }: ProfileSheetProps) {
         )}
 
         {view === "info" && (
-          <ProfileInfoForm onBack={handleBackToMenu} userId={user.id} />
+          <ProfileInfoForm
+            onBack={handleBackToMenu}
+            userId={user.id}
+            initialProfile={profile}
+          />
         )}
       </SheetContent>
     </Sheet>
   );
 }
-
-
 

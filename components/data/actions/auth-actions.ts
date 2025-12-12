@@ -2,16 +2,19 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import type {
+  RegisterState,
+  LoginState,
+} from "@/components/data/actions/auth-state";
 
 // 👇 Usamos el mismo BACKEND_URL que ya tienes configurado
 const STRAPI_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ??
   process.env.NEXT_PUBLIC_STRAPI_URL ??
-  "http://localhost:1338"; // puerto por defecto como el de tu .env
-  
+  "http://localhost:1338"; // ajusta si cambia el puerto
+
 type StrapiAuthOk = {
-  jwt: string;
+  jwt?: string;
   user: unknown;
 };
 
@@ -26,8 +29,14 @@ type StrapiAuthError = {
 
 type StrapiAuthResponse = StrapiAuthOk | StrapiAuthError;
 
-// 🔹 REGISTRO
-export async function registerUserAction(formData: FormData) {
+/* ------------------------------------------------------------------
+   REGISTRO CON ESTADO (useActionState en RegisterForm)
+-------------------------------------------------------------------*/
+
+export async function registerUserAction(
+  prevState: RegisterState,
+  formData: FormData
+): Promise<RegisterState> {
   console.log("▶ registerUserAction");
 
   const email = formData.get("email")?.toString().trim();
@@ -36,12 +45,18 @@ export async function registerUserAction(formData: FormData) {
 
   if (!email || !password || !confirmPassword) {
     console.log("❌ Faltan campos en el registro");
-    return;
+    return {
+      ok: false,
+      message: "Completa todos los campos.",
+    };
   }
 
   if (password !== confirmPassword) {
     console.log("❌ Las contraseñas no coinciden");
-    return;
+    return {
+      ok: false,
+      message: "Las contraseñas no coinciden.",
+    };
   }
 
   const username = email.split("@")[0] || email;
@@ -55,48 +70,53 @@ export async function registerUserAction(formData: FormData) {
       body: JSON.stringify({ username, email, password }),
     });
 
-    const raw = await res.text(); // 👈 leemos como texto SIEMPRE
+    const raw = await res.text();
     console.log("🔍 Raw response registro Strapi:", res.status, raw);
 
-    if (!res.ok) {
-      console.log("❌ Strapi respondió error en registro:", res.status);
-      // Aquí más adelante podemos mapear mensajes bonitos
-      return;
-    }
-
-    let data: StrapiAuthResponse;
+    let data: StrapiAuthResponse | null = null;
     try {
-      data = JSON.parse(raw);
+      data = raw ? (JSON.parse(raw) as StrapiAuthResponse) : null;
     } catch (e) {
       console.error("❌ No se pudo parsear JSON en registro:", e);
-      return;
     }
 
-    console.log("🔁 Respuesta registro Strapi (JSON):", data);
-
-    if (!("jwt" in data)) {
-      console.log("❌ No vino jwt en la respuesta de registro");
-      return;
+    if (!res.ok) {
+      console.log("❌ Strapi respondió error en registro:", res.status, data);
+      const msg =
+        (data as StrapiAuthError)?.error?.message ??
+        "No se pudo crear la cuenta. Intenta nuevamente.";
+      return {
+        ok: false,
+        message: msg,
+      };
     }
 
-    const cookieStore = await cookies(); // 👈 con await
-    cookieStore.set("jwt", data.jwt, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7,
-    });
+    console.log("✅ Usuario registrado correctamente en Strapi");
 
-    console.log("✅ Usuario registrado y cookie seteada");
-    redirect("/");
+    // 🔥 Nuevo mensaje pensado para confirmación por correo:
+    return {
+      ok: true,
+      message:
+        "Cuenta creada correctamente. Te enviamos un correo para confirmar tu cuenta. Revisa tu bandeja de entrada. ✅",
+    };
   } catch (error) {
     console.error("🔥 Error inesperado en registerUserAction:", error);
-    return;
+    return {
+      ok: false,
+      message: "Error inesperado. Intenta nuevamente.",
+    };
   }
 }
 
-// 🔹 LOGIN
-export async function loginUserAction(formData: FormData) {
+
+/* ------------------------------------------------------------------
+   LOGIN CON ESTADO (useActionState en LoginForm)
+-------------------------------------------------------------------*/
+
+export async function loginUserAction(
+  prevState: LoginState,
+  formData: FormData
+): Promise<LoginState> {
   console.log("▶ loginUserAction");
 
   const identifier = formData.get("identifier")?.toString().trim();
@@ -104,7 +124,10 @@ export async function loginUserAction(formData: FormData) {
 
   if (!identifier || !password) {
     console.log("❌ Faltan campos en el login");
-    return;
+    return {
+      ok: false,
+      message: "Completa correo y contraseña.",
+    };
   }
 
   try {
@@ -119,24 +142,37 @@ export async function loginUserAction(formData: FormData) {
     const raw = await res.text();
     console.log("🔍 Raw response login Strapi:", res.status, raw);
 
-    if (!res.ok) {
-      console.log("❌ Strapi respondió error en login:", res.status);
-      return;
-    }
-
-    let data: StrapiAuthResponse;
+    let data: StrapiAuthResponse | null = null;
     try {
-      data = JSON.parse(raw);
+      data = raw ? (JSON.parse(raw) as StrapiAuthResponse) : null;
     } catch (e) {
       console.error("❌ No se pudo parsear JSON en login:", e);
-      return;
     }
 
-    console.log("🔁 Respuesta login Strapi (JSON):", data);
+    if (!res.ok) {
+      console.log("❌ Strapi respondió error en login:", res.status, data);
 
-    if (!("jwt" in data)) {
+      const rawMsg = (data as StrapiAuthError)?.error?.message ?? "";
+      let msg = "Credenciales inválidas. Intenta nuevamente.";
+
+      // 🔥 Si Strapi se queja de email no confirmado, mensaje especial
+      if (rawMsg.toLowerCase().includes("confirm")) {
+        msg =
+          "Debes confirmar tu correo antes de iniciar sesión. Revisa tu bandeja de entrada.";
+      }
+
+      return {
+        ok: false,
+        message: msg,
+      };
+    }
+
+    if (!data || !("jwt" in data) || !data.jwt) {
       console.log("❌ No vino jwt en la respuesta de login");
-      return;
+      return {
+        ok: false,
+        message: "No se pudo iniciar sesión. Intenta nuevamente.",
+      };
     }
 
     const cookieStore = await cookies();
@@ -148,10 +184,17 @@ export async function loginUserAction(formData: FormData) {
     });
 
     console.log("✅ Login correcto y cookie seteada");
-    redirect("/");
+
+    return {
+      ok: true,
+      message: "Sesión iniciada correctamente. ✅",
+    };
   } catch (error) {
     console.error("🔥 Error inesperado en loginUserAction:", error);
-    return;
+    return {
+      ok: false,
+      message: "Error inesperado. Intenta nuevamente.",
+    };
   }
 }
 

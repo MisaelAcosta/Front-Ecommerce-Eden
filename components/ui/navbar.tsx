@@ -1,3 +1,4 @@
+// components/navbar/navbar.tsx (tu archivo)
 "use client";
 
 import { useEffect, useState } from "react";
@@ -8,13 +9,18 @@ import ItemsMenuMobile from "../items-menu-mobile";
 import ToggleTheme from "../toggle-theme";
 import { useCart } from "@/hooks/use-cart";
 import { LoginDialog } from "@/components/auth/login-dialog";
-import { ProfileSheet, type CurrentUser } from "@/components/profile/profile-sheet";
+import { ProfileSheet } from "@/components/profile/profile-sheet";
+import type {
+  CurrentUser,
+  ProfileData,
+} from "@/components/profile/profile-types";
 
 const Navbar = () => {
   const router = useRouter();
   const cart = useCart();
 
   const [user, setUser] = useState<CurrentUser | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
 
   useEffect(() => {
@@ -27,15 +33,20 @@ const Navbar = () => {
 
         if (!res.ok) {
           setUser(null);
+          setProfile(null);
           setLoadingUser(false);
           return;
         }
 
         const data = await res.json();
+        console.log("🟦 /api/auth/me →", data);
+
         setUser(data.user ?? null);
+        setProfile(data.profile ?? null);
       } catch (error) {
         console.error("🔥 Error obteniendo usuario actual:", error);
         setUser(null);
+        setProfile(null);
       } finally {
         setLoadingUser(false);
       }
@@ -45,8 +56,8 @@ const Navbar = () => {
   }, []);
 
   return (
-    <div className=" flex items-center justify-between p-8 pb-1 w-full">
-      {/*Logo*/}
+    <div className="flex w-full items-center justify-between p-8 pb-1">
+      {/* Logo */}
       <div
         className="
         mx-3 flex items-center gap-4
@@ -56,7 +67,9 @@ const Navbar = () => {
       >
         <h1
           className="
-          font-black text-3xl cursor-pointer
+          cursor-pointer
+          text-3xl
+          font-black
           md:text-3xl
           lg:text-5xl
         "
@@ -73,8 +86,8 @@ const Navbar = () => {
       {/* Sección derecha: Iconos */}
       <div
         className="
-        flex items-center gap-6 mx-2
-        md:gap-4 md:mx-5
+        mx-2 flex items-center gap-6
+        md:mx-5 md:gap-4
       "
       >
         {cart.items.length === 0 ? (
@@ -85,7 +98,7 @@ const Navbar = () => {
           />
         ) : (
           <div
-            className="flex gap-1 cursor-pointer"
+            className="flex cursor-pointer gap-1"
             onClick={() => router.push("/cart")}
           >
             <BaggageClaim strokeWidth={1} className="cursor-pointer" />
@@ -99,19 +112,24 @@ const Navbar = () => {
           onClick={() => router.push("/loved-products")}
         />
 
-        {/* Aquí cambiamos INICIAR ↔ PERFIL */}
+        {/* INICIAR ↔ PERFIL */}
         {!loadingUser && (
           <>
             {user ? (
-              // Si hay usuario → Perfil con sheet lateral
-              <ProfileSheet user={user} />
+              <ProfileSheet
+                user={user}
+                profile={profile ?? undefined}
+                onLogout={() => {
+                  // 👇 esto hace que la UI cambie INMEDIATAMENTE
+                  setUser(null);
+                  setProfile(null);
+                }}
+              />
             ) : (
-              // Si NO hay usuario → LoginDialog con botón Iniciar
               <LoginDialog>
                 <span
                   className="
                     hidden
-                    md:flex
                     cursor-pointer
                     rounded-2xl
                     border
@@ -124,6 +142,7 @@ const Navbar = () => {
                     transition
                     duration-200
                     ease-in-out
+                    md:flex
                   "
                 >
                   Iniciar
@@ -143,4 +162,5 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
 
