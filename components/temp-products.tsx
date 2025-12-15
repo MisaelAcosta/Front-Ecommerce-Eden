@@ -97,7 +97,7 @@ const TempProducts = () => {
                       overflow-hidden 
                       rounded-[15px]
                       sm:rounded-[15px] sm:border-[0.5px] border-[#b9b9b9]
-                      bg-[#f0f0f0]
+                      bg-[#ffffff]
                       flex flex-col 
                       justify-between
                     "
@@ -156,66 +156,50 @@ const TempProducts = () => {
                           text-lg
                           leading-none
                           text-center sm:text-2xl 
-                          font-black  uppercase
-                          mb-1
+                          font-black  uppercase pt-0
+                          mb-2
                         "
                       >
                         {displayName}
                       </h3>
 
-                      {/* SEPARATOR 1 */}
-                      <div className="h-px w-full bg-[#c0c0c0] mb-1" />
+                       {/* SEPARATOR 1 */}
+                      <div className="h-px w-full bg-[#c0c0c0]" />
 
-                      {/* SUB + PRECIO */}
-                      <div className="flex items-center justify-between gap-2 mb-1">
-                        <p className="text-l font-semibold text-black ">
-                          {secondaryName}
-                        </p>
-
-                        <p className="text-[15px] font-semibold">
-                          {typeof displayPrice === "number"
-                            ? formatPrice(displayPrice)
-                            : displayPrice}
-                        </p>
-                      </div>
+                      {/* SUB*/}
+                  <div className="flex justify-center py-1 gap-2">
+                    <div className="flex items-center gap-2 text-center">
+                      <p className="text-lg font-semibold text-black">
+                        {secondaryName}
+                      </p>
+                    </div>
+                  </div>
 
                       {/* SEPARATOR 2 */}
-                      <div className="h-px w-full bg-[#c0c0c0] mb-1" />
+                      <div className="h-px w-full bg-[#c0c0c0] " />
 
-                      {/* ESTADO + CTA */}
-                      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      {/* PRECIO + CTA */}
+                      <div className="mt-3 flex items-center justify-between gap-2">
                         {/* Badge Disponible / No disponible */}
-                        <span
-                          className={`
-                            sm:inline-flex items-center hidden justify-center
-                            rounded-[10px] h-9 px-4 py-1
-                            text-[11px] sm:text-xs font-extrabold uppercase
-                            ${
-                              isActive
-                                ? "bg-[#62DF70] text-white"
-                                : "bg-[#E5E5E5] text-[#777777]"
-                            }
-                          `}
-                        >
-                          {isActive ? "Disponible" : "No disponible"}
-                        </span>
+                        <p className="text-[15px] pl-2 sm:inline-flex items-center justify-center font-semibold">
+                        {formatPrice(displayPrice)}
+                      </p>
 
-                        {/* Botón ver producto + corazón (misma vibe que ProductCard/Featured) */}
-                        <div className="flex w-full sm:w-auto items-center justify-between sm:justify-end gap-2">
+
+                        {/* Botón de compra + corazón visual */}
+                        <div className="flex w-full sm:w-auto items-center justify-end sm:justify-end gap-2">
                           <Button
-                            onClick={() =>
-                              productSlug &&
-                              router.push(`/product/${productSlug}`)
-                            }
+                            onClick={() => router.push(`/product/${productSlug}`)}
                             className="
-                              h-9 px-4 text-[12px] sm:text-[13px] font-medium
+                              h-8 px-5 sm:h-9 sm:px-4 text-[12px] sm:text-[13px] font-medium
                               rounded-[10px] bg-black text-white hover:bg-black/90 
                               flex items-center gap-2
-                              flex-1 sm:flex-none cursor-pointer
+                              flex-none sm:flex-none cursor-pointer 
                             "
                           >
-                            <ShoppingCart width={15} strokeWidth={3} />
+                            Comprar
                           </Button>
+
 
                           <button
                             className="

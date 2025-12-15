@@ -97,7 +97,7 @@ const FeaturedProducts = () => {
               return (
                 <CarouselItem
                   key={raw.id}
-                  className="basis-[85%] sm:basis-1/2 lg:basis-1/3 px-4 md:px-4"
+                  className="basis-[85%] sm:basis-1/2 lg:basis-1/3 px-3 md:px-4"
                 >
                   <Card
                     className="
@@ -109,7 +109,7 @@ const FeaturedProducts = () => {
                       overflow-hidden 
                       rounded-[15px]
                       sm:rounded-[15px] sm:border-[0.5px] border-[#b9b9b9]
-                      bg-[#f0f0f0]
+                      bg-[#ffffff]
                       flex flex-col 
                       justify-between
                     "
@@ -148,7 +148,7 @@ const FeaturedProducts = () => {
                             src={image2}
                             alt={displayName}
                             className="
-                              absolute max-h-[210px] sm:max-h-[410px] max-w-[320px] object-contain
+                              absolute max-h-[410px] sm:max-h-[410px] max-w-[320px] object-contain
                               transition-all duration-300 ease-out
                               opacity-0 group-hover:opacity-100
                             "
@@ -165,67 +165,50 @@ const FeaturedProducts = () => {
                       {/* NOMBRE */}
                       <h3
                         className="
-                          text-lg
+                          text-xl
                           leading-none
-                          text-center sm:text-2xl 
-                          font-black  uppercase
-                          mb-1
+                          text-center sm:text-3xl 
+                          font-black  uppercase pt-0
+                          pb-2
                         "
                       >
                         {displayName}
                       </h3>
 
                       {/* SEPARATOR 1 */}
-                      <div className="h-px w-full bg-[#c0c0c0] mb-1" />
+                      <div className="h-px w-full bg-[#c0c0c0]" />
 
-                      {/* SUB + PRECIO */}
-                      <div className="flex items-center justify-between gap-2 mb-1">
-                        <p className="text-l font-semibold text-black ">
-                          {secondaryName}
-                        </p>
-
-                        <p className="text-[15px] font-semibold">
-                          {formatPrice(displayPrice)}
-                        </p>
-                      </div>
+                      {/* SUB*/}
+                  <div className="flex justify-center py-1 gap-2">
+                    <div className="flex items-center gap-2 text-center">
+                      <p className="text-lg font-semibold text-black">
+                        {secondaryName}
+                      </p>
+                    </div>
+                  </div>
 
                       {/* SEPARATOR 2 */}
-                      <div className="h-px w-full bg-[#c0c0c0] mb-1" />
+                      <div className="h-px w-full bg-[#c0c0c0] " />
 
-                      {/* ESTADO + CTA */}
-                      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      {/* PRECIO + CTA */}
+                      <div className="mt-3 flex items-center justify-between gap-2">
                         {/* Badge Disponible / No disponible */}
-                        <span
-                          className={`
-                            sm:inline-flex items-center hidden justify-center
-                            rounded-[10px] h-9 px-4 py-1
-                            text-[11px] sm:text-xs font-extrabold uppercase
-                            ${
-                              isActive
-                                ? "bg-[#62DF70] text-white"
-                                : "bg-[#E5E5E5] text-[#777777]"
-                            }
-                          `}
-                        >
-                          {isActive ? "Disponible" : "No disponible"}
-                        </span>
+                        <p className="text-[15px] pl-4 sm:inline-flex items-center justify-center font-semibold">
+                        {formatPrice(displayPrice)}
+                      </p>
 
-                        {/* Botón Agregar (mantiene funcionalidad original) + corazón visual */}
-                        <div className="flex w-full sm:w-auto items-center justify-between sm:justify-end gap-2">
+                        {/* Botón de compra + corazón visual */}
+                        <div className="flex w-full sm:w-auto items-center justify-end sm:justify-end gap-2">
                           <Button
                             onClick={() => router.push(`/product/${productSlug}`)}
                             className="
-                              h-9 px-4 text-[12px] sm:text-[13px] font-medium
+                              h-8 px-5 sm:h-9 sm:px-4 text-[12px] sm:text-[13px] font-medium
                               rounded-[10px] bg-black text-white hover:bg-black/90 
                               flex items-center gap-2
-                              flex-1 sm:flex-none cursor-pointer
+                              flex-none sm:flex-none cursor-pointer 
                             "
                           >
-                            <ShoppingCart
-                              width={15}
-                              strokeWidth={3}>
-
-                             </ShoppingCart>
+                            Comprar
                           </Button>
 
                           <button
@@ -242,7 +225,7 @@ const FeaturedProducts = () => {
                             <Heart
                               width={20}
                               strokeWidth={1.5}
-                              className="hover:fill-red-500"
+                              className="hover:fill-black"
                             />
                           </button>
                         </div>

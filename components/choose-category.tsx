@@ -1,123 +1,203 @@
-
 "use client";
 
 import Link from "next/link";
-import { Gamepad2 } from "lucide-react"; // Ícono fallback
 import { useGetCategories } from "@/api/getProducts";
 import { ResponseType } from "@/types/response";
-import Image from "next/image";
-import { CategoryType } from "@/types/category"; // 👈 este es tu tipo actual
-
+import { CategoryType } from "@/types/category";
 
 const ChooseCategory = () => {
-  // Llamado al hook que trae categorías desde Strapi
   const { result, loading, error }: ResponseType = useGetCategories();
 
-  // Filtramos solo las categorías destacadas
   const categories = Array.isArray(result)
-    ? result.filter((c: CategoryType) => c.isFeatured) // 👈 usamos el boolean
+    ? result.filter((c: CategoryType) => c.isFeatured).slice(0, 4)
     : [];
 
+  const backend = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+
   return (
-    <section className="bg-neutral-950 w-full py-10 sm:py-14">
-    <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0">
-      {/* Título */}
-      <h3 className="text-4xl text-white text-center sm:text-6xl font-extrabold mb-5 sm:mb-8">
-        CATEGORÍAS DESTACADAS
-      </h3>
+    <section className="bg-white w-full py-10 sm:py-14">
+      <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0">
+        <h3 className="text-4xl text-black tracking-tight text-center sm:text-6xl font-black mb-6 sm:mb-10">
+          CATEGORÍAS DESTACADAS
+        </h3>
 
-      {/* Estado de error */}
-      {error && (
-        <p className="text-sm text-red-600 mb-6">
-          Ocurrió un problema cargando las categorías.
-        </p>
-      )}
+        {error && (
+          <p className="text-sm text-red-600 mb-6">
+            Ocurrió un problema cargando las categorías.
+          </p>
+        )}
 
-      {/* Grid responsive: 
-          - 1 columna en móvil
-          - 2 en tablet
-          - 4 en desktop */}
-      <div className="grid grid-cols-1 divide-y text-center sm:text-left sm:divide-y-0 sm:divide-x divide-zinc-200 sm:grid-cols-3 gap-4 lg:gap-8">
-        {/* Loading con skeletons */}
-        {loading &&
-          Array.from({ length: 3 }).map((_, i) => (
-            <div
-              key={`skeleton-${i}`}
-              className="animate-pulse rounded-2xl border border-zinc-200/70 p-5"
-            >
-              <div className="h-10 w-10 rounded-xl bg-zinc-200 mb-4" />
-              <div className="h-4 w-2/3 bg-zinc-200 rounded mb-2" />
-              <div className="h-3 w-full bg-zinc-200 rounded mb-1" />
-              <div className="h-3 w-5/6 bg-zinc-200 rounded" />
-            </div>
-          ))}
-
-        {/* Render categorías reales */}
-        {!loading &&
-          categories.map((category: CategoryType) => {
-            const name = category.categoryName;
-            const slug = category.slug;
-            const mainImageUrl = category.mainImage?.url; 
-
-            return (
-              <Link
-                key={category.id}
-                href={`/category/${slug}`}
-                className="
-                  group relative  
-                  bg-neutral-950 
-                  p-6 flex flex-col justify-start
-                  min-h-[200px] sm:min-h-[380px]
-                  transition-all duration-300 ease-out
-                  
-                "
+        {/* SKELETON */}
+        {loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={`skeleton-${i}`}
+                className="animate-pulse rounded-2xl border border-zinc-200/70 p-5 min-h-[240px]"
               >
-                
-                <div className="flex flex-col flex-1 order-1 sm:order-2 justify-center items-center sm:items-start">
-                  {/* Imagen principal dentro de un cuadro negro */}
-                  <div className="h-12 w-17 sm:h-15 sm:w-18   flex items-center justify-center mb-4 sm:mb-8">
-                    {mainImageUrl && (
-                      <img
-                        src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${mainImageUrl}`}
-                        alt={name}
-                        width={48}
-                        height={48}
-                        className="h-17 w-17 pt-object-contain"
-                      />
-                    )}
-                  </div>
+                <div className="h-10 w-10 rounded-xl bg-zinc-200 mb-4" />
+                <div className="h-4 w-2/3 bg-zinc-200 rounded mb-2" />
+                <div className="h-3 w-full bg-zinc-200 rounded mb-1" />
+                <div className="h-3 w-5/6 bg-zinc-200 rounded" />
+              </div>
+            ))}
+          </div>
+        )}
 
-                  {/* Texto */}
-                  <div>
-                    <h4 className="text-2xl sm:text-4xl text-white font-extrabold">
-                      {name}
-                    </h4>
-                    {category.description && (
-                      <p className="mt-3 sm:mt-5 font-light text-sm sm:text-xl text-zinc-200 leading-snug line-clamp-3">
-                        {category.description}
-                      </p>
-                    )}
-                  </div>
-                  
+        {!loading && categories.length > 0 && (
+          <>
+            {/* ✅ DESKTOP: paneles expandibles */}
+            <div className="hidden sm:block">
+              <div className="rounded-2xl overflow-hidden bg-white">
+                {/* contenedor panel */}
+                <div className="flex h-[460px] w-full">
+                  {categories.map((category, idx) => {
+                    const name = category.categoryName;
+                    const slug = category.slug;
+
+                    const mainImageUrl = category.mainImage?.url
+                      ? `${backend}${category.mainImage.url}`
+                      : "";
+
+                    const secondImageUrl = category.secondImage?.url
+                      ? `${backend}${category.secondImage.url}`
+                      : "";
+
+                    const number = String(idx + 1).padStart(2, "0");
+
+                    return (
+                      <Link
+                        key={category.id}
+                        href={`/category/${slug}`}
+                        className="
+                          group relative flex-1 
+                          transition-[flex] duration-500 ease-out
+                          hover:flex-[2.2]
+                        "
+                      >
+                        {/* fondo mainImage */}
+                        <div className="absolute inset-0">
+                          {mainImageUrl ? (
+                            <img
+                              src={mainImageUrl}
+                              alt={name}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="h-full w-full bg-zinc-200" />
+                          )}
+                          <div className="absolute inset-0 bg-black/25" />
+                        </div>
+
+                        {/* número */}
+                        <div className="absolute bottom-4 right-5 z-10 pointer-events-none">
+                          <span className="text-white/85 font-extrabold text-6xl leading-none drop-shadow">
+                            {number}
+                          </span>
+                        </div>
+
+                        {/* ✅ overlay hover: secondImage + desc + link */}
+                        <div
+                          className="
+                            absolute inset-0 z-10 flex items-end
+                            opacity-0 translate-y-2
+                            transition-all duration-300 ease-out
+                            group-hover:opacity-100 group-hover:translate-y-0
+                          "
+                        >
+                          <div className="w-full p-5">
+                            <div className="rounded-xl bg-black/55 backdrop-blur-md p-4 border border-white/10">
+                              <div className="flex items-start gap-4">
+                                
+                                <div className="min-w-0">
+                                  {category.description && (
+                                    <p className="text-white/90 text-sm leading-snug line-clamp-3">
+                                      {category.description}
+                                    </p>
+                                  )}
+
+                                  <div className="mt-3 inline-flex items-center gap-2 text-white font-semibold text-sm">
+                                    Ver categoría <span className="opacity-80">→</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* ✅ nombre abajo (como tu 1era imagen) */}
+                        <div className="absolute -bottom-[56px] left-0 right-0 z-20 bg-white">
+                          <div className="py-4 text-center text-black font-extrabold tracking-tight">
+                            {(name || "").toUpperCase()}
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
                 </div>
-              </Link>
-              
-            );
-          })}
 
-        {/* Si no hay destacadas */}
+                {/* espacio para el nombre de abajo */}
+                <div className="h-[56px]" />
+              </div>
+            </div>
+
+            {/* ✅ MOBILE: tu estilo “cards” */}
+            <div className="sm:hidden grid grid-cols-2 gap-2">
+              {categories.map((category) => {
+                const name = category.categoryName;
+                const slug = category.slug;
+
+                const mainImageUrl = category.mainImage?.url
+                  ? `${backend}${category.mainImage.url}`
+                  : "";
+
+                return (
+                  <Link
+                    key={category.id}
+                    href={`/category/${slug}`}
+                    className="rounded-2xl overflow-hidden border "
+                  >
+                    <div className="relative h-[240px] ">
+                      {mainImageUrl ? (
+                        <img
+                          src={mainImageUrl}
+                          alt={name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full " />
+                      )}
+                      <div className="absolute inset-0 bg-black/35" />
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <h4 className="text-white text-xl font-medium tracking-tight">
+                          {name}
+                        </h4>
+                        {category.description && (
+                          <p className="mt-2 text-white/90 hidden text-sm line-clamp-2">
+                            {category.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </>
+        )}
+
         {!loading && categories.length === 0 && (
-          <p className="col-span-full text-sm text-zinc-600">
+          <p className="text-sm text-zinc-600 text-center">
             No hay categorías destacadas por ahora.
           </p>
         )}
       </div>
-    </div>
     </section>
   );
 };
 
 export default ChooseCategory;
+
 
 
 

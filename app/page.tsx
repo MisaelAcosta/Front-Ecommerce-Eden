@@ -4,7 +4,7 @@ import FeaturedProducts from "@/components/featured-products";
 import ChooseCategory from "@/components/choose-category";
 import Header from "@/components/header";
 import NewProduct from "@/components/newProduct";
-import Cta from "@/components/cta";
+import Step from "@/components/step";
 import TempProducts from "@/components/temp-products"
 
 
@@ -16,8 +16,9 @@ export default function Home() {
     <CarouselTextBanner />
     <TempProducts/>
     <ChooseCategory />
+    <Step />
     <NewProduct />
-    <Cta />
+    
   </main>
   );
 }

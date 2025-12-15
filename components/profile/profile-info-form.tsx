@@ -192,7 +192,7 @@ export function ProfileInfoForm({
               <button
                 type="button"
                 onClick={() => setIsEditing(true)}
-                className="text-[11px] font-medium text-black hover:underline"
+                className="text-[11px] pt-10  cursor-pointer font-medium text-black hover:underline"
               >
                 Editar información
               </button>
@@ -209,7 +209,7 @@ export function ProfileInfoForm({
         {/* Preferencia de contacto */}
         <div className="space-y-1">
           <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-neutral-500">
-            RECIBE INFORMACIÓN DE MIS ENVÍOS POR
+            RECIBIR INFORMACIÓN DE MIS ENVÍOS POR
           </p>
 
           <div className="mt-2 flex gap-4">

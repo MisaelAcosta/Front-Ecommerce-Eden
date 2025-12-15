@@ -24,13 +24,13 @@ const MenuList = () => {
            <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
             <Link
             href="/category/todos-los-productos">
-            Productos</Link>
+            CATALOGO</Link>
            </NavigationMenuLink>
         </NavigationMenuItem>
 
         <NavigationMenuItem>
           <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-            <Link href="/servicio">Servicios</Link>
+            <Link href="/servicio">SERVICIOS</Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
 
@@ -52,7 +52,7 @@ function ListItem({
     <li {...props}>
       <NavigationMenuLink asChild>
         <Link href={href}>
-          <div className="text-sm leading-none font-medium">{title}</div>
+          <div className="text-sm leading-none font-bold">{title}</div>
           <p className="text-muted-foreground line-clamp-2 text-sm leading-snug">
             {children}
           </p>

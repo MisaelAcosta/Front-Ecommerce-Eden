@@ -41,6 +41,9 @@ export function LoginForm({
     }
   }, [safeState.ok]);
 
+
+  const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1338";
+
   return (
     <div className="relative w-full max-w-md rounded-3xl bg-white p-8 sm:p-10">
       {/* X de cierre */}
@@ -62,11 +65,11 @@ export function LoginForm({
       {/* Icono peace */}
       <div className="mb-6 flex justify-center">
         <Image
-          src="/icons/hand.png"
+          src="/icons/login1.png"
           alt="Login icon"
-          width={86}
-          height={86}
-          className="h-24 w-24"
+          width={256}
+          height={136}
+          className=""
         />
       </div>
 
@@ -116,11 +119,14 @@ export function LoginForm({
         </Button>
       </form>
 
-      {/* Google (no debe enviar el form) */}
+      {/* Google */}
       <Button
         type="button"
         variant="outline"
         className="mt-3 flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white text-sm font-medium"
+        onClick={() => {
+        window.location.href = `${STRAPI_URL}/api/connect/google`;
+       }}
       >
         <Image src="/icons/google.png" alt="Google" width={18} height={18} />
         <span>Continuar con Google</span>

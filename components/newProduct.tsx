@@ -45,50 +45,14 @@ const NewProducts = () => {
   const router = useRouter();
 
   return (
-    <section className="w-full max-w-6xl mx-auto py-6 sm:py-12 px-4 sm:px-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {/* IZQUIERDA: HERO CARD NEGRA */}
-        <div className="lg:col-span-1">
-          <div
-            className="
-              relative 
-              h-full min-h-[220px] rounded-2xl bg-black 
-              transition-all duration-300 ease-out
-              transform hover:scale-103 
-              text-white p-6 sm:p-8 flex flex-col justify-between
-            "
-          >
-            <div>
-              <div className="mb-6 flex items-center justify-between">
-                <h3 className="text-3xl sm:text-4xl font-extrabold leading-[1.05]">
-                  Nuevos
-                  <br /> Productos
-                </h3>
-                <Box
-                  className="h-23 w-23 sm:pb-8 sm:pt-0 opacity-100"
-                  aria-hidden="true"
-                />
-              </div>
-
-              <p className="text-sm sm:text-base text-zinc-200/90">
-                Descubre las últimas creaciones en impresión 3D, recién salidas
-                del horno.
-              </p>
-            </div>
-
-            <div className="pt-6">
-              <Link
-                href="/products?tab=new"
-                className="inline-flex items-center rounded-lg bg-white text-black px-4 py-2 text-sm font-medium hover:bg-zinc-100 transition"
-              >
-                Ver todos
-              </Link>
-            </div>
-          </div>
-        </div>
+    <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-8 sm:py-14">
+      {/* Título */}
+      <h3 className="text-4xl text-center sm:text-6xl font-black leading-none mb-6 sm:mb-8 ">
+        PRODUCTOS NUEVOS
+      </h3>
 
         {/* DERECHA: CONTENEDOR PARA TU CARRUSEL */}
-        <div className="lg:col-span-2 md:pl-8">
+        <div className="lg:col-span-3 md:pl-8">
           <Carousel>
             <CarouselContent className="ml-1 md:-ml-4 md:pl-2">
               {loading && <SkeletonSchema grid={3} />}
@@ -132,10 +96,13 @@ const NewProducts = () => {
                   const image2 = toAbsUrl(secondImage);
 
                   return (
+                    
                     <CarouselItem
+
                       key={id}
-                      className="basis-[85%] sm:basis-1/2 lg:basis-1/2 px-3 md:px-4"
+                      className="basis-[85%] sm:basis-1/2 lg:basis-1/3 px-3 md:px-4"
                     >
+                    
                       <Card
                         className="
                           group relative 
@@ -146,7 +113,7 @@ const NewProducts = () => {
                           overflow-hidden 
                           rounded-[15px]
                           sm:rounded-[15px] sm:border-[0.5px] border-[#b9b9b9]
-                          bg-[#f0f0f0]
+                          bg-[#ffffff]
                           flex flex-col 
                           justify-between
                         "
@@ -184,7 +151,7 @@ const NewProducts = () => {
                                 src={image2}
                                 alt={displayName}
                                 className="
-                                  absolute max-h-[210px] sm:max-h-[410px] max-w-[320px] object-contain
+                                  absolute max-h-[410px] sm:max-h-[410px] max-w-[320px] object-contain
                                   transition-all duration-300 ease-out
                                   opacity-0 group-hover:opacity-100
                                 "
@@ -201,69 +168,52 @@ const NewProducts = () => {
                           {/* NOMBRE */}
                           <h3
                             className="
-                              text-lg
+                              text-xl
                               leading-none
                               text-center sm:text-2xl 
                               font-black  uppercase
-                              mb-1
+                              pb-2
                             "
                           >
                             {displayName}
                           </h3>
 
                           {/* SEPARATOR 1 */}
-                          <div className="h-px w-full bg-[#c0c0c0] mb-1" />
+                          <div className="h-px w-full bg-[#c0c0c0] " />
 
-                          {/* SUB + PRECIO */}
-                          <div className="flex items-center justify-between gap-2 mb-1">
-                            <p className="text-l font-semibold text-black ">
-                              {secondaryName}
-                            </p>
-
-                            <p className="text-[15px] font-semibold">
-                              {typeof displayPrice === "number"
-                                ? formatPrice(displayPrice)
-                                : displayPrice}
-                            </p>
+                              {/* SUB*/}
+                          <div className="flex justify-center py-1 gap-2">
+                            <div className="flex items-center gap-2 text-center">
+                              <p className="text-lg font-semibold text-black">
+                                {secondaryName}
+                              </p>
+                            </div>
                           </div>
 
                           {/* SEPARATOR 2 */}
-                          <div className="h-px w-full bg-[#c0c0c0] mb-1" />
+                          <div className="h-px w-full bg-[#c0c0c0]" />
 
-                          {/* ESTADO + CTA */}
-                          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                            {/* Badge Disponible / No disponible */}
-                            <span
-                              className={`
-                                sm:inline-flex items-center hidden justify-center
-                                rounded-[10px] h-9 px-4 py-1
-                                text-[11px] sm:text-xs font-extrabold uppercase
-                                ${
-                                  isActive
-                                    ? "bg-[#62DF70] text-white"
-                                    : "bg-[#E5E5E5] text-[#777777]"
-                                }
-                              `}
-                            >
-                              {isActive ? "Disponible" : "No disponible"}
-                            </span>
+                          {/* PRECIO + CTA */}
+                      <div className="mt-3 flex items-center justify-between gap-2">
+                        {/* Badge Disponible / No disponible */}
+                        <p className="text-[15px] pl-4 sm:inline-flex items-center justify-center font-semibold">
+                        {formatPrice(displayPrice)}
+                      </p>
 
-                            {/* Botón ir al producto + corazón */}
-                            <div className="flex w-full sm:w-auto items-center justify-between sm:justify-end gap-2">
-                              <Button
-                                onClick={() =>
-                                  productSlug &&
-                                  router.push(`/product/${productSlug}`)
-                                }
-                                className="
-                                  h-9 px-4 text-[12px] sm:text-[13px] font-medium
-                                  rounded-[10px] bg-black text-white hover:bg-black/90 
-                                  flex items-center gap-2
-                                  flex-1 sm:flex-none cursort-pointer
-                                "
-                              >
-                                <ShoppingCart width={15} strokeWidth={3} />
-                              </Button>
+                        {/* Botón de compra + corazón visual */}
+                        <div className="flex w-full sm:w-auto items-center justify-end sm:justify-end gap-2">
+                          <Button
+                            onClick={() => router.push(`/product/${productSlug}`)}
+                            className="
+                              h-8 px-5 sm:h-9 sm:px-4 text-[12px] sm:text-[13px] font-medium
+                              rounded-[10px] bg-black text-white hover:bg-black/90 
+                              flex items-center gap-2
+                              flex-none sm:flex-none cursor-pointer 
+                            "
+                          >
+                            Comprar
+                          </Button>
+
 
                               <button
                                 className="
@@ -295,7 +245,6 @@ const NewProducts = () => {
             <CarouselNext className="hidden sm:flex" />
           </Carousel>
         </div>
-      </div>
     </section>
   );
 };

@@ -1,4 +1,3 @@
-// components/profile/profile-sheet.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -8,7 +7,6 @@ import {
   SheetTrigger,
   SheetContent,
 } from "@/components/ui/sheet";
-import { ChevronRight, ChevronLeft } from "lucide-react";
 
 import { ProfileMenu } from "./profile-menu";
 import { ProfileOrdersView } from "./profile-orders-view";
@@ -22,10 +20,16 @@ import type {
 type ProfileSheetProps = {
   user: CurrentUser;
   profile?: ProfileData | null;
-  onLogout?: () => void; // 👈 IMPORTANTE
+  onLogout?: () => void;
+  children?: React.ReactNode; // ✅ CLAVE
 };
 
-export function ProfileSheet({ user, profile, onLogout }: ProfileSheetProps) {
+export function ProfileSheet({
+  user,
+  profile,
+  onLogout,
+  children,
+}: ProfileSheetProps) {
   const [view, setView] = useState<ProfileView>("menu");
   const router = useRouter();
 
@@ -40,9 +44,7 @@ export function ProfileSheet({ user, profile, onLogout }: ProfileSheetProps) {
     } catch (err) {
       console.error("Error al cerrar sesión:", err);
     } finally {
-      // avisamos al Navbar que ya no hay usuario
       onLogout?.();
-      // por si tienes otros datos server-side
       router.refresh();
     }
   };
@@ -53,35 +55,38 @@ export function ProfileSheet({ user, profile, onLogout }: ProfileSheetProps) {
         if (!open) setView("menu");
       }}
     >
-      {/* Botón PERFIL en navbar */}
+      {/* ✅ TRIGGER UNIVERSAL (desktop texto / mobile icono) */}
       <SheetTrigger asChild>
-        <button
-          className="
-            hidden
-            md:flex
-            cursor-pointer
-            rounded-2xl
-            border
-            border-black
-            px-4
-            py-1
-            font-bold
-            hover:bg-black
-            hover:text-white
-            transition
-            duration-200
-            ease-in-out
-          "
-        >
-          Perfil
-        </button>
+        {children ? (
+          children
+        ) : (
+          <button
+            className="
+              hidden md:flex
+              cursor-pointer
+              rounded-2xl
+              border
+              border-black
+              px-4
+              py-1
+              font-bold
+              hover:bg-black
+              hover:text-white
+              transition
+              duration-200
+              ease-in-out
+            "
+          >
+            Perfil
+          </button>
+        )}
       </SheetTrigger>
 
       <SheetContent side="right" className="w-full p-0 sm:w-[380px]">
         {view === "menu" && (
           <ProfileMenu
             onChangeView={setView}
-            onLogout={handleLogout} // 👈 usamos nuestra función
+            onLogout={handleLogout}
           />
         )}
 
@@ -100,4 +105,5 @@ export function ProfileSheet({ user, profile, onLogout }: ProfileSheetProps) {
     </Sheet>
   );
 }
+
 

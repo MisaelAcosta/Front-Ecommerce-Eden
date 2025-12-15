@@ -55,20 +55,16 @@ const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <Card
       className="
-        group relative 
-        w-full
-        h-auto
-        pt-4
-        pb-4
-        overflow-hidden 
+        group relative w-full
+        overflow-hidden
         rounded-none
-        sm:rounded-[15px] sm:border-[0.5px] border-[#b9b9b9]
-        bg-[#f0f0f0]
-        flex flex-col 
-        justify-between
+        sm:rounded-[15px] sm:border-[0.5px] md:border-[#b9b9b9]
+        bg-[#ffffff]
+        flex flex-col justify-between
+        py-1 sm:py-4
       "
     >
-      <CardContent className="flex flex-col justify-around px-3 md:px-3 pt-0 pb-0">
+      <CardContent className="flex flex-col px-3 pt-0 pb-0">
 
         {/* IMAGEN */}
         <div
@@ -90,7 +86,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
               src={image1}
               alt={displayName}
               className={`
-                sm:max-h-[310px] w-auto object-contain
+                max-h-[380px] sm:max-h-[310px] w-auto object-contain
                 transition-all duration-300 ease-out
                 ${hover && image2 ? "opacity-0" : "opacity-100"}
               `}
@@ -118,11 +114,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
         {/* NOMBRE */}
         <h3
           className="
-            text-lg
-            leading-none
-            text-center sm:text-2xl 
-            font-black  uppercase
+            text-[15px] sm:text-[18px]
+            leading-tight
+            text-center
+            font-black uppercase
             mb-1
+            line-clamp-1
           "
         >
           {displayName}
@@ -130,75 +127,57 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
 
         {/* SEPARATOR 1 */}
-        <div className="h-px w-full bg-[#c0c0c0] mb-1" />
+        <div className="h-px w-full bg-[#c0c0c0] " />
 
 
 
-        {/* SUB + PRECIO */}
-        <div className="flex items-center justify-between gap-2 mb-1">
-          <p className="text-l font-semibold text-black ">
-            {secondaryName}
-          </p>
-
-          <p className="text-[15px] font-semibold">
-            {formatPrice(displayPrice)}
-          </p>
-        </div>
+        {/* SUB*/}
+        <div className="flex justify-center py-1 md:py-3">
+           <div className="flex items-center gap-2 text-center">
+          <p className="text-sm md:text-lg font-medium  text-black leading-none md:leading-3">
+             {secondaryName}
+           </p>
+          </div>
+          </div>            
 
 
 
         {/* SEPARATOR 2 */}
-        <div className="h-px w-full bg-[#c0c0c0] mb-1" />
+        <div className="h-px w-full bg-[#c0c0c0] " />
 
 
+        {/* PRECIO + CTA */}
+        <div className="mt-0 md:mt-3 flex items-center justify-between ">
+          {/* Precio */}
+          <p className="text-[16px] sm:text-[18px] pt-none font-semibold pl-2 sm:pl-4 whitespace-nowrap">
+            {formatPrice(displayPrice)}
+          </p>
 
-        {/* ESTADO + CTA */}
-        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          {/* Badge */}
-          <span
-            className={`
-              sm:inline-flex items-center hidden ustify-center
-              rounded-[10px] h-9 px-4 py-1
-              text-[11px] sm:text-xs font-extrabold uppercase
-              ${isActive ? "bg-[#62DF70] text-white" : "bg-[#E5E5E5] text-[#777777]"}
-            `}
-          >
-            {isActive ? "Disponible" : "No disponible"}
-          </span>
-
-          {/* Botón + favorito */}
-          <div className="flex w-full sm:w-auto items-center justify-between sm:justify-end gap-2">
+          {/* Acciones */}
+          <div className="flex items-center gap-2">
+            {/* Comprar (solo desktop) */}
             <Button
               onClick={() => router.push(`/product/${productSlug}`)}
               className="
+                hidden md:inline-flex
                 h-9 px-4 text-[12px] sm:text-[13px] font-medium
-                rounded-[10px] bg-black text-white hover:bg-black/90 
-                flex items-center gap-2
-                flex-1 sm:flex-none
+                rounded-[10px] bg-black text-white hover:bg-black/90
+                items-center gap-2 cursor-pointer
               "
             >
-              <ShoppingCart
-              width={15}
-              strokeWidth={3}>
-
-              </ShoppingCart>
+              Comprar
             </Button>
 
+            {/* Corazón */}
             <button
               className="
-                inline-flex h-9 w-9 
-                sm:
-                items-center justify-center cursor-pointer
-                rounded-[10px] border border-[#E3E3E3]
-                bg-white text-black/70 
-                transition-colors
+                inline-flex h-9 w-9 items-center justify-center cursor-pointer
+                rounded-[10px] md:border border-[#E3E3E3]
+                bg-white text-black/70 transition-colors
                 flex-shrink-0
               "
             >
-              <Heart 
-              width={20}
-              strokeWidth={1.5}
-              className="hover:fill-red-500" />
+              <Heart width={20} strokeWidth={1.5} className="hover:fill-black" />
             </button>
           </div>
         </div>

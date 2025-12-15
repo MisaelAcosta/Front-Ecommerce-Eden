@@ -1,24 +1,22 @@
 "use client";
 
-import { Separator } from "@/components/ui/separator";
 import { Menu, X, Instagram } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LoginDialog } from "@/components/auth/login-dialog";
-
-
+import { ProfileSheet } from "@/components/profile/profile-sheet";
+import type { CurrentUser, ProfileData } from "@/components/profile/profile-types";
 
 const overlayVariants = (originPx: string) => ({
   initial: { clipPath: `circle(0px at ${originPx})` },
   animate: {
-    // 150vmax asegura cubrir la pantalla sin importar el origen
     clipPath: `circle(150vmax at ${originPx})`,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, ease: "easeInOut" },
   },
   exit: {
     clipPath: `circle(0px at ${originPx})`,
-    transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
+    transition: { duration: 0.4, ease: "easeInOut" },
   },
 });
 
@@ -29,15 +27,19 @@ const listVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 8 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeInOut" } },
 };
 
 export default function ItemsMenuMobile() {
   const [isOpen, setIsOpen] = useState(false);
-  const [originPx, setOriginPx] = useState("100% 0%"); // fallback
+  const [originPx, setOriginPx] = useState("100% 0%");
   const btnRef = useRef<HTMLButtonElement | null>(null);
 
-  // Calcula el centro del botón en px para usarlo como origen del clip-path
+  // ✅ auth
+  const [user, setUser] = useState<CurrentUser | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [loadingUser, setLoadingUser] = useState(false);
+
   const computeOrigin = () => {
     if (!btnRef.current) return;
     const rect = btnRef.current.getBoundingClientRect();
@@ -46,40 +48,80 @@ export default function ItemsMenuMobile() {
     setOriginPx(`${x}px ${y}px`);
   };
 
+  // ✅ fetch reusable
+  const fetchUser = async () => {
+    setLoadingUser(true);
+    try {
+      const res = await fetch("/api/auth/me", {
+        method: "GET",
+        credentials: "include",
+        cache: "no-store",
+      });
+
+      if (!res.ok) {
+        setUser(null);
+        setProfile(null);
+        return;
+      }
+
+      const data = await res.json();
+      setUser(data.user ?? null);
+      setProfile(data.profile ?? null);
+    } catch {
+      setUser(null);
+      setProfile(null);
+    } finally {
+      setLoadingUser(false);
+    }
+  };
+
+  // origin init
   useEffect(() => {
     computeOrigin();
   }, []);
 
+  // recompute origin on open + resize
   useEffect(() => {
-  if (!isOpen) return;
-  computeOrigin();
-  const onResize = () => computeOrigin();
-  window.addEventListener("resize", onResize);
-  return () => {
-    window.removeEventListener("resize", onResize);
-  };
-}, [isOpen]);
+    if (!isOpen) return;
+    computeOrigin();
+    const onResize = () => computeOrigin();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [isOpen]);
 
+  // scroll lock
   useEffect(() => {
-  if (isOpen) {
-    document.documentElement.style.overflow = "hidden"; // bloquea scroll
-    document.body.style.overscrollBehavior = "contain"; // evita bounce en iOS
-  } else {
-    document.documentElement.style.overflow = "";
-    document.body.style.overscrollBehavior = "";
-  }
-  return () => {
-    document.documentElement.style.overflow = "";
-    document.body.style.overscrollBehavior = "";
+    if (isOpen) {
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overscrollBehavior = "contain";
+    } else {
+      document.documentElement.style.overflow = "";
+      document.body.style.overscrollBehavior = "";
+    }
+    return () => {
+      document.documentElement.style.overflow = "";
+      document.body.style.overscrollBehavior = "";
+    };
+  }, [isOpen]);
+
+  // ✅ 1ra carga (por si quieres)
+  useEffect(() => {
+    fetchUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ✅ toggle: cuando ABRES el menú, refetch inmediato
+  const handleToggle = () => {
+    const next = !isOpen;
+    setIsOpen(next);
+    if (next) fetchUser();
   };
-}, [isOpen]);
 
   return (
     <>
-      {/* Botón en la posición que quieras */}
       <button
         ref={btnRef}
-        onClick={() => setIsOpen(v => !v)}
+        onClick={handleToggle}
         aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
         aria-expanded={isOpen}
         className="gap-3 p-2.5 rounded-md border border-black-600 bg-white text-black shadow-none z-50"
@@ -120,44 +162,79 @@ export default function ItemsMenuMobile() {
                 </motion.div>
 
                 <motion.div className="space-y-8">
-
                   <motion.div variants={itemVariants}>
-                    <Link href="/category/todos-los-productos" className="block text-black text-3xl font-semibold hover:text-gray-300 transform hover:translate-x-2" onClick={() => setIsOpen(false)}>
-                      Productos
+                    <Link
+                      href="/category/todos-los-productos"
+                      className="block text-black text-3xl font-semibold hover:text-gray-300 transform hover:translate-x-2"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      CATALOGO
                     </Link>
                   </motion.div>
- 
+
                   <motion.div variants={itemVariants}>
-                    <Link href="/servicio" className="block text-black text-3xl font-semibold hover:text-gray-300 transform hover:translate-x-2" onClick={() => setIsOpen(false)}>
-                      Servicios
+                    <Link
+                      href="/servicio"
+                      className="block text-black text-3xl font-semibold hover:text-gray-300 transform hover:translate-x-2"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      SERVICIOS
+                    </Link>
+                  </motion.div>
+
+                  <motion.div variants={itemVariants}>
+                    <Link
+                      href="/favoritos"
+                      className="block text-black text-3xl font-semibold hover:text-gray-300 transform hover:translate-x-2"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      FAVORITOS
                     </Link>
                   </motion.div>
 
                   
-                  <LoginDialog>
-                  <button
-                    className="
-                      text-center
-                      text-black text-3xl font-semibold
-                      hover:text-gray-300
-                      transform hover:translate-x-2
-                      
-                      
-                    "
-                    
-                  >
-                    Perfil
-                  </button>
-                </LoginDialog>
-                  
 
+                  {/* ✅ LOGIN ↔ PERFIL (SIEMPRE visible; si está cargando muestra texto) */}
+                  <motion.div variants={itemVariants} className="flex justify-center">
+                    {loadingUser ? (
+                      <span className="block text-black text-3xl font-semibold opacity-40">
+                        
+                      </span>
+                    ) : user ? (
+                      <ProfileSheet
+                        user={user}
+                        profile={profile ?? undefined}
+                        onLogout={() => {
+                          setUser(null);
+                          setProfile(null);
+                        }}
+                      >
+                        <button
+                          className="block text-black text-3xl font-semibold hover:text-gray-300 transform hover:translate-x-2"
+                          type="button"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          
+                        </button>
+                      </ProfileSheet>
+                    ) : (
+                      <LoginDialog>
+                        <button
+                          className="block text-black text-3xl font-semibold hover:text-gray-300 transform hover:translate-x-2"
+                          type="button"
+                        >
+                          
+                        </button>
+                      </LoginDialog>
+                    )}
+                  </motion.div>
                 </motion.div>
 
                 <motion.div className="mt-16 pt-8 flex items-center justify-center" variants={itemVariants}>
                   <Link
                     href="https://instagram.com/tuusuario"
                     target="_blank"
-                    className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full text-gray-700 text-sm hover:bg-gray-200 transition-colors"
+                    className="flex items-center gap-2 bg-black px-3 py-1 rounded-full text-white text-sm hover:bg-black transition-colors"
                   >
                     <Instagram className="w-4 h-4" />
                     Instagram
@@ -177,23 +254,3 @@ export default function ItemsMenuMobile() {
 
 
 
-/*import { Menu } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import Link from "next/link";
-
-const ItemsMenuMobile = () => {
-    return (
-        <Popover>
-            <PopoverTrigger>
-                <Menu></Menu>
-            </PopoverTrigger>
-            <PopoverContent>
-                <Link href="/Products" className="block">Productos</Link>
-                <Link href="/Products"className="block">Servicios</Link>
-                <Link href="/Products"className="block">Quienes somos?</Link>
-            </PopoverContent>
-        </Popover>
-    );
-};
-
-export default ItemsMenuMobile;*/
