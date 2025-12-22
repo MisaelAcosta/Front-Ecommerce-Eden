@@ -47,9 +47,15 @@ const NewProducts = () => {
   return (
     <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-8 sm:py-14">
       {/* Título */}
-      <h3 className="text-4xl text-center sm:text-6xl font-black leading-none mb-6 sm:mb-8 ">
-        PRODUCTOS NUEVOS
+      {/* Título */}
+      <div>
+        <h3 className="text-4xl text-center sm:text-left tracking-tight sm:text-5xl  font-black mb-2 sm:mb-4">
+        NOVEDADES.
       </h3>
+      <p className="text-black/35 sm:text-left text-center tracking-normal leading-none  mb-6 text-base sm:text-base ">
+        Recien salidos del horno, descubre los últimos modelos añadidos a nuestro catálogo.
+      </p>
+      </div>
 
         {/* DERECHA: CONTENEDOR PARA TU CARRUSEL */}
         <div className="lg:col-span-3 md:pl-8">
@@ -108,11 +114,12 @@ const NewProducts = () => {
                           group relative 
                           w-full
                           h-auto
+                          shadow-none
                           pt-4
                           pb-4
                           overflow-hidden 
-                          rounded-[15px]
-                          sm:rounded-[15px] sm:border-[0.5px] border-[#b9b9b9]
+                          border-none
+                          
                           bg-[#ffffff]
                           flex flex-col 
                           justify-between
@@ -229,7 +236,7 @@ const NewProducts = () => {
                                 <Heart
                                   width={20}
                                   strokeWidth={1.5}
-                                  className="hover:fill-red-500"
+                                  className="hover:fill-black"
                                 />
                               </button>
                             </div>

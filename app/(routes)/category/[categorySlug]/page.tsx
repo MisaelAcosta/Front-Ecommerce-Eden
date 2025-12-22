@@ -3,12 +3,14 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
+import StepCatalog from "@/components/stepCatalog";
 import SkeletonSchema from "@/components/skeletonSchema";
 import FilterCategory from "./components/filter-category";
 import SearchBar from "./components/searchBar";
 import ProductCard from "./components/product-card";
 import { useGetCategoryProduct } from "@/api/useGetCategoryProducts";
 import { ProductType } from "@/types/product";
+import Step from "@/components/step";
 import { SlidersHorizontal } from "lucide-react"; // ícono filtros
 
 // ⬇ importa los componentes de paginación de shadcn
@@ -68,7 +70,7 @@ useEffect(() => {
     categorySlug: categorySlug,
     subSlug: activeSubSlug,
     page: currentPage,
-    pageSize: 6,
+    pageSize: 8,
     searchTerm, // <-- 6 productos por página
   });
 
@@ -107,18 +109,18 @@ useEffect(() => {
   const handleNext = () => goToPage(currentPage + 1);
 
   return (
-    <section className="w-full px-1 md:px-8 lg:px-12 pb-28 md:pb-0">
-      {/* ENCABEZADO (Desktop) */}
-      <div className="pt-8 hidden md:flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
-        <div>
-          <h1 className="text-xl font-extrabold">Productos</h1>
-          <p className="text-xs text-muted-foreground">
-            {activeSubSlug ? `${categorySlug} / ${activeSubSlug}` : categorySlug}
-          </p>
-        </div>
+    <section className=" pt-15 w-full px-1 md:px-8 lg:px-12 pb-28 md:pb-0">
+      <div className="pt-6">
+        <StepCatalog/>
+      </div>
 
-        {/* barra de búsqueda (desktop) */}
-        <div className="w-full md:max-w-xs">
+      {/* ENCABEZADO (Desktop) */}
+      <div className="pt-2 hidden  md:flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+        <div>
+        </div>
+        
+        
+        <div className="w-full md:max-w-xs text-center item-center">
           <SearchBar
             value={searchTerm}
             onChange={(val) => {
@@ -130,19 +132,19 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* ==== BARRA FLOTANTE  (MOBILE) ==== */}
+      {/* ==== BARRA FLOTANTE y barra de busqueda  (MOBILE) ==== */}
 <div
   className="
     md:hidden
     flex left-0 right-0 z-50
     bg-white/90 
-    px-5 pt-3 pb-3"
+    px-5 pt-10 pb-3"
 >
   <div
     className="
       flex items-center justify-between
       w-full bg-[#f5f5f5]
-      rounded-full px-4 py-3
+      rounded-2xl px-4 py-2 pt-3
     "
   >
     <div className="flex-1">
@@ -171,10 +173,10 @@ useEffect(() => {
     className="
       md:hidden
       flex left-0 right-0
-      bottom-[180px] /* altura aprox de la barra + margen */
+      bottom-[10px] /* altura aprox de la barra + margen */
       max-h-[85vh]
-      mx-4
-      rounded-2xl border border-neutral-200 bg-white 
+      mx-1
+      rounded-2xl bg-white 
       z-50
     "
   >
@@ -194,10 +196,12 @@ useEffect(() => {
 
       <Separator className="my-2" />
 
-      {/* LAYOUT principal */}
-      <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-4">
+      {/* LAYOUT principal  BARRA DE IZQUIERDA*/}
+      <div className="grid grid-cols-1 
+      md:grid-cols-[205px_1fr]  shadow-none
+      gap-4">
         {/* SIDEBAR IZQ: filtros (solo desktop) */}
-        <aside className="border rounded-md p-4 text-sm hidden md:block">
+        <aside className=" rounded-md p-4 text-sm hidden md:block">
           <FilterCategory
             currentCategorySlug={categorySlug}
             activeSubSlug={activeSubSlug}
@@ -206,10 +210,12 @@ useEffect(() => {
           />
         </aside>
 
-
+      
+      
+     
 
         {/* LISTA DE PRODUCTOS */}
-        <main className="w-auto px-0 md:p-8 ">
+        <main className="w-auto px-0 shadow-none md:p-8 ">
           {loading && (
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-4 gap-6 md:gap-1 ">
@@ -230,7 +236,8 @@ useEffect(() => {
               grid-cols-2
               sm:grid-cols-2
               xl:grid-cols-3     /* a 1280px -> 2 columnas */
-              2xl:grid-cols-3
+              md:grid-cols-3
+              2xl:grid-cols-4
               min-[1600px]:grid-cols-4   /* 4 columnas solo en pantallas grandes */
               gap-0
               sm:gap-6
@@ -247,10 +254,6 @@ useEffect(() => {
                   </p>
                 )}
               </div>
-
-
-
-
 
 
 

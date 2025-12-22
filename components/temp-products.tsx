@@ -34,9 +34,14 @@ const TempProducts = () => {
 
   return (
     <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-8 sm:py-14">
-      <h3 className="text-4xl text-center sm:text-6xl font-black mb-6 sm:mb-8">
-        PRODUCTOS EN TEMPORADA
+      <div>
+        <h3 className="text-4xl text-center sm:text-left tracking-tight sm:text-5xl  font-black mb-2 sm:mb-4">
+        PROMOCIONES.
       </h3>
+      <p className="text-black/35 sm:text-left text-center tracking-normal leading-none mb-6 text-base sm:text-base ">
+        Disfruta de las mejores promociones y ofertas exclusivas en nuestros productos seleccionados.
+      </p>
+      </div>
 
       <Carousel>
         <CarouselContent className="ml-1 md:-ml-4">
@@ -90,13 +95,14 @@ const TempProducts = () => {
                   <Card
                     className="
                       group relative 
+                      shadow-none
                       w-full
                       h-auto
                       pt-4
                       pb-4
                       overflow-hidden 
-                      rounded-[15px]
-                      sm:rounded-[15px] sm:border-[0.5px] border-[#b9b9b9]
+                      border-none
+                      
                       bg-[#ffffff]
                       flex flex-col 
                       justify-between
@@ -215,7 +221,7 @@ const TempProducts = () => {
                             <Heart
                               width={20}
                               strokeWidth={1.5}
-                              className="hover:fill-red-500"
+                              className="hover:fill-black"
                             />
                           </button>
                         </div>

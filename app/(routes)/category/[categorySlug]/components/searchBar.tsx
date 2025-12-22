@@ -16,12 +16,16 @@ const SearchBar = ({ value, onChange }: SearchBarProps) => {
     <input
       className="
         w-full
-        bg-transparent
+        bg-neutral-100
+        
+        px-6
+        py-2
+        md:py-3
+        md:rounded-md
         outline-none
-        text-base
+        text-lg
         font-medium
         placeholder:text-neutral-400
-        
         text-black
       "
       placeholder="Buscar producto"

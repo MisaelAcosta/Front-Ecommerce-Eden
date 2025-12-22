@@ -1,112 +1,129 @@
 "use client";
 
+import { useState } from "react";
 import { Mail, Instagram, MessageCircle, ArrowRight } from "lucide-react";
 
 const Contacto = () => {
+  const [openMail, setOpenMail] = useState(false);
+
   return (
-    <section className="w-full max-w-6xl mx-auto px-4 py-12">
-      {/* Título */}
-      <h2 className="text-3xl md:text-4xl text-center font-black tracking-tight text-center mb-10">
-        CONTACTANOS
-      </h2>
+    <section
+      id="contacto"
+      className="w-full border border-black/40"
+    >
+      {/* FONDO CON IMAGEN */}
+      <div
+        className="
+          relative w-full overflow-hidden
+          rounded-[18px]
+          px-6 sm:px-12 py-14 sm:py-20
+          text-white
+        "
+        style={{
+          backgroundImage: "url('/contacto-bg.jpg')", // 👈 TU IMAGEN EXPORTADA
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        {/* overlay extra por si acaso */}
+        <div className="absolute inset-0 bg-black/20 pointer-events-none" />
 
-      {/* Grid principal */}
-      <div className="grid gap-8 md:grid-cols-2 items-start">
-        {/* LADO IZQUIERDO: preview (gif / video / imagen) */}
-        <div className="w-full rounded-xl overflow-hidden  bg-neutral-100 aspect-[4/4] flex items-center justify-center">
-          {/* ACA METES TU VIDEO/GIF */}
-          {/* Ejemplo con imagen temporal: */}
-          <video
-            className="w-full h-full object-cover"
-            autoPlay
-            loop
-            muted
-            playsInline
-          >
-            {/* reemplaza este src cuando tengas tu clip */}
-            <source src="/contact-preview.mp4" type="video/mp4" />
-          </video>
-        </div>
+        <div className="relative z-10 max-w-5xl mx-auto">
+          {/* TITULO */}
+          <h2 className="text-center text-4xl sm:text-5xl font-black tracking-tight mb-14">
+            CONTACTO.
+          </h2>
 
-        {/* LADO DERECHO: links de contacto */}
-        <div className="flex flex-col gap-4">
-          {/* Correo */}
-          <a
-            href="https://mail.google.com/mail/?view=cm&fs=1&to=acostamisael166@gmail.com&su=Consulta%20desde%20la%20tienda%20Eden%203D&body=Hola%20Eden%203D,%20quería%20hacer%20una%20consulta%20sobre..."
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-between w-full rounded-xl bg-neutral-100 px-4 py-5 hover:bg-neutral-200 transition-colors "
-          >
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-lg border  bg-black">
-                <Mail
-                strokeWidth={2} 
-                className="h-5 w-5 text-white" />
-              </span>
-              <div className="flex flex-col">
-                <span className="font-semibold text-lg leading-none">
-                  Correo
-                </span>
-                <span className="text-sm text-neutral-600 leading-none">
-                  Edenbusiness@gmail.com
-                </span>
+          {/* LISTA */}
+          <div className="space-y-6">
+            {/* WHATSAPP */}
+            <a
+              href="https://wa.me/XXXXXXXXXX" // 👈 reemplaza con tu número
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between border-b border-white/20 pb-6 group"
+            >
+              <div className="flex items-center gap-6">
+                <span className="text-white/40">(01)</span>
+                <span className="text-lg sm:text-xl">WhatsApp</span>
               </div>
-            </div>
+              <ArrowRight className="opacity-60 group-hover:translate-x-1 transition-transform" />
+            </a>
 
-            <ArrowRight className="h-5 w-5 shrink-0" />
-          </a>
-
-          {/* Instagram */}
-          <a
-            href="https://www.instagram.com/eden.3d_"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-between w-full rounded-xl  bg-neutral-100 px-4 py-5 hover:bg-neutral-200 transition-colors "
-          >
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center bg-black rounded-lg border bg-black">
-                <Instagram
-                strokeWidth={2} 
-                className="h-5 w-5 text-white" />
-              </span>
-              <div className="flex flex-col text-black">
-                <span className="font-semibold text-lg leading-none">
-                  Instagram
-                </span>
-                <span className="text-sm text-neutral-600 leading-none">
-                  @eden.3d_
-                </span>
+            {/* INSTAGRAM */}
+            <a
+              href="https://instagram.com/TU_USUARIO" // 👈 reemplaza
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between border-b border-white/20 pb-6 group"
+            >
+              <div className="flex items-center gap-6">
+                <span className="text-white/40">(02)</span>
+                <span className="text-lg sm:text-xl">Instagram</span>
               </div>
+              <ArrowRight className="opacity-60 group-hover:translate-x-1 transition-transform" />
+            </a>
+
+            {/* GMAIL */}
+            <div className="border-b border-white/20 pb-6">
+              <button
+                type="button"
+                onClick={() => setOpenMail(!openMail)}
+                className="w-full flex items-center justify-between group"
+              >
+                <div className="flex items-center gap-6">
+                  <span className="text-white/40">(03)</span>
+                  <span className="text-lg sm:text-xl">Gmail</span>
+                </div>
+                <ArrowRight
+                  className={`opacity-60 transition-transform ${
+                    openMail ? "rotate-90" : "group-hover:translate-x-1"
+                  }`}
+                />
+              </button>
+
+              {/* FORMULARIO DESPLEGABLE */}
+              {openMail && (
+                <form
+                  action="mailto:tucorreo@gmail.com" // 👈 reemplaza
+                  method="POST"
+                  encType="text/plain"
+                  className="mt-8 grid gap-4 max-w-xl"
+                >
+                  <input
+                    type="text"
+                    name="Nombre"
+                    placeholder="Tu nombre"
+                    required
+                    className="bg-white/10 border border-white/20 px-4 py-3 rounded-md text-white placeholder:text-white/50 outline-none"
+                  />
+
+                  <input
+                    type="email"
+                    name="Correo"
+                    placeholder="Tu correo"
+                    required
+                    className="bg-white/10 border border-white/20 px-4 py-3 rounded-md text-white placeholder:text-white/50 outline-none"
+                  />
+
+                  <textarea
+                    name="Mensaje"
+                    placeholder="Escribe tu mensaje"
+                    rows={4}
+                    required
+                    className="bg-white/10 border border-white/20 px-4 py-3 rounded-md text-white placeholder:text-white/50 outline-none resize-none"
+                  />
+
+                  <button
+                    type="submit"
+                    className="mt-2 w-fit px-6 py-3 rounded-md bg-white text-black font-medium hover:bg-white/90 transition"
+                  >
+                    Enviar correo
+                  </button>
+                </form>
+              )}
             </div>
-
-            <ArrowRight className="h-5 w-5 shrink-0" />
-          </a>
-
-          {/* WhatsApp */}
-          <a
-            href="https://wa.me/56912345678?text=Hola%20vengo%20de%20la%20tienda%20👋"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-between w-full rounded-xl   bg-neutral-100 px-4 py-5 hover:bg-neutral-200 transition-colors "
-          >
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-lg border  bg-black">
-                <MessageCircle 
-                strokeWidth={2}
-                className="h-5 w-5 text-white" />
-              </span>
-              <div className="flex flex-col">
-                <span className="font-semibold text-lg leading-none">
-                  WhatsApp
-                </span>
-                <span className="text-sm text-neutral-600 leading-none">
-                  +56 9 1234 5678
-                </span>
-              </div>
-            </div>
-
-            <ArrowRight className="h-5 w-5 shrink-0" />
-          </a>
+          </div>
         </div>
       </div>
     </section>

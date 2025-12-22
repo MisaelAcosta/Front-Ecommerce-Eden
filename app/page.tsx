@@ -6,18 +6,21 @@ import Header from "@/components/header";
 import NewProduct from "@/components/newProduct";
 import Step from "@/components/step";
 import TempProducts from "@/components/temp-products"
+import Block2 from "@/components/block2";
 
 
 export default function Home() {
   return (
   <main>
     <Header />
-    <FeaturedProducts />
     <CarouselTextBanner />
+    <FeaturedProducts />
     <TempProducts/>
+    <Block2 />
+    <NewProduct />
     <ChooseCategory />
     <Step />
-    <NewProduct />
+    
     
   </main>
   );

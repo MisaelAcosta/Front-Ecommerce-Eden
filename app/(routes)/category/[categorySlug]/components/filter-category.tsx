@@ -65,14 +65,14 @@ const FilterCategory = ({ onSelectSubcategory }: FilterCategoryProps) => {
   if (error) return <p>Error cargando categorías</p>;
 
   return (
-    <aside className="my-5 text-black text-lg space-y-4 font-light">
+    <aside className="my-5 text-black bg-white text-lg space-y-4 font-light">
       {/* Un SOLO Accordion que contiene TODOS los items */}
       <Accordion
         type="single"
         collapsible
         value={openSlug}
         onValueChange={(val) => setOpenSlug(val || undefined)}
-        className="space-y-2"
+        className="space-y-2 shadow-none"
       >
         {allCategories.map((cat) => {
           const hasSubs = cat.subcategories && cat.subcategories.length > 0;
@@ -85,8 +85,8 @@ const FilterCategory = ({ onSelectSubcategory }: FilterCategoryProps) => {
                 key={cat.id}
                 onClick={() => goCategory(cat.slug)}
                 className={`
-                  w-full text-left px-2 py-2 rounded-md transition cursor-pointer
-                  border border-transparent hover:border-gray-800
+                  w-full shadow-none text-left px-2 py-2 rounded-md transition cursor-pointer
+                  
                   ${isActive ? "bg-black text-white" : "hover:bg-muted"}
                 `}
               >
@@ -100,7 +100,7 @@ const FilterCategory = ({ onSelectSubcategory }: FilterCategoryProps) => {
             <AccordionItem
               key={cat.id}
               value={cat.slug}
-              className="border border-gray-200 rounded-md overflow-hidden"
+              className="rounded-md overflow-hidden"
             >
               {/* El trigger abre/cierra y también navega a la categoría padre */}
               <AccordionTrigger
@@ -111,7 +111,7 @@ const FilterCategory = ({ onSelectSubcategory }: FilterCategoryProps) => {
               </AccordionTrigger>
 
               <AccordionContent className="px-2 pb-2">
-                <RadioGroup className="flex flex-col space-y-2 cursor-pointer">
+                <RadioGroup className="flex flex-col shadow-none space-y-2 cursor-pointer">
                   {cat.subcategories?.map((sub) => (
                     <Label
                       key={sub.id}

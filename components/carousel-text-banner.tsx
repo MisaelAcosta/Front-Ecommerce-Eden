@@ -17,7 +17,7 @@ export const dataCarouselTop = [
     {
         id: 2,
         title: "Personalización 3D",
-        description: "Pede diseños únicos hechos a tu medida.",
+        description: "Pide diseños únicos hechos a tu medida.",
         link: "#",
     },
     {
@@ -49,7 +49,7 @@ const CarouselTextBanner = () => {
                         <Card className="shadow-none border-none bg-transparent">
                             <CardContent className="flex flex-col items-center justify-center  ">
                                 <p className="sm:text-lg font-bold text-wrap dark:text-secondary">{title}</p>
-                                <p className="text-xs text-sm dark:text-secondary ">{description}</p>
+                                <p className="text-xs sm:text-sm dark:text-secondary ">{description}</p>
                             </CardContent>
                         </Card>
                     </div>

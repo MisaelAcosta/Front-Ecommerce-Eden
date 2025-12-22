@@ -1,100 +1,83 @@
 "use client";
 
+import Image from "next/image";
+
 const ModoTrabajo = () => {
   return (
-    <section className="p-4">
-      {/* Wrapper fondo negro */}
-      <div
-        className="
-          w-full
-          sm:max-w-7xl  /* ajusta este valor: 4xl, 5xl, 6xl, etc */
-          mx-auto     /* centra horizontalmente */
-          rounded-xl
-          border border-white/80
-          bg-black
-          text-white
-          overflow-hidden
-          px-6 
-          py-10 sm:py-19 
-          flex flex-col gap-8
-          sm:flex-row sm:justify-between sm:items-start
-          sm:min-h-[320px]
+    <section
+      id="como-trabajamos"
+      className="w-full bg-[#F1F1F1] border border-black/40"
+    >
+      {/* BANNER */}
+      <div className="relative w-full border-b border-black/40 overflow-hidden h-[240px] sm:h-[320px] md:h-[380px]">
+        <Image
+          src="/banner-como-trabajamos.jpg" // 👈 pon tu imagen en /public y cambia el nombre si quieres
+          alt="Banner como trabajamos"
+          fill
+          className="object-cover"
+          priority
+        />
 
-        "
-      >
-        {/* Columna izquierda: titulo grande */}
-        <div className="sm:w-1/3">
-          <h2 className="text-white sm:ml-30 font-black leading-tight uppercase">
-            <span className="block text-3xl sm:text-5xl">
-              ¿COMO
-            </span>
-            <span className="text-3xl sm:text-5xl">
-              TRABAJAMOS?
-            </span>
+        {/* Overlay opcional para que el texto se lea mejor */}
+        <div className="absolute inset-0 bg-black/15" />
+
+        {/* Texto centrado */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <h2 className="text-white font-black tracking-tight text-5xl sm:text-6xl md:text-7xl">
+            EDEN
           </h2>
-          <p className="
-          md:ml-30
-          py-4
-          text-sm
-          font-regular
-          text-[#b4b4b4]
-          text-left
-          md:text-lg
-          ">
-            En Eden 3D transformamos tus ideas en piezas reales.
-            <br/>
-            Te acompañamos en cada paso desde la charla inicial
-            hasta la impresión final 
-            <br/>
-            para que el resultado sea justo como lo imaginaste.</p>
         </div>
-        
+      </div>
 
-        {/* Columna derecha: pasos */}
-        <div className="sm:w-2/3 flex flex-col  
-        gap-8 sm:gap-10 
-        text-left md:ml-50 justify-between">
-          {/* Paso 1 */}
-          <div>
-            <h3 className="font-extrabold uppercase text-2xl  md:text-4xl tracking-tight flex items-start gap-2">
-              <span>01|</span>
-              <span>ASESORIA</span>
-            </h3>
-            <p className="text-[#b4b4b4] font-regular
-            text-sm md:text-lg
-            leading-snug mt-1 max-w-[38ch]">
-              Charlamos contigo para entender tus ideas, necesidades y el
-              propósito de tu impresión.
-            </p>
+      {/* PASO A PASO (3 tarjetas) */}
+      <div className="grid grid-cols-1 md:grid-cols-3">
+        {/* 01 */}
+        <div className="relative min-h-[260px] sm:min-h-[320px] bg-[#F1F1F1] border-b md:border-b-0 md:border-r border-black/40 px-6 sm:px-10 py-10">
+          <div className="absolute top-6 right-6 text-black font-semibold">
+            01
           </div>
 
-          {/* Paso 2 */}
-          <div>
-            <h3 className="font-extrabold uppercase text-2xl md:text-4xl tracking-tight flex items-start gap-2">
-              <span>02|</span>
-              <span>EXPLORACION</span>
-            </h3>
-            <p className="text-[#b4b4b4] font-regular
-            text-sm md:text-lg 
-            mt-1 max-w-[55ch]">
-              Buscamos o desarrollamos el modelo 3D ideal: ya sea encontrando un
-              STL o diseñando uno desde cero.
-            </p>
+          <h3 className="mt-24 text-lg sm:text-xl font-semibold tracking-wide">
+            ASESORIA
+          </h3>
+
+          <p className="mt-4 text-sm sm:text-base text-black/60 max-w-[340px] leading-relaxed">
+            Nos contactamos definimos requerimientos, buscamos modelos existentes o
+            realizamos modelado 3D, y acordamos materiales y tipo de acabado.
+          </p>
+        </div>
+
+        {/* 02 */}
+        <div className="relative min-h-[260px] sm:min-h-[320px] bg-[#F1F1F1] border-b md:border-b-0 md:border-r border-black/40 px-6 sm:px-10 py-10">
+          <div className="absolute top-6 right-6 text-black font-semibold">
+            02
           </div>
 
-          {/* Paso 3 */}
-          <div>
-            <h3 className="font-extrabold uppercase text-2xl md:text-4xl tracking-tight flex items-start gap-2">
-              <span>03|</span>
-              <span>SOLUCION</span>
-            </h3>
-            <p className="text-[#b4b4b4] font-regular 
-            text-sm md:text-lg
-            mt-1 max-w-[55ch]">
-              Adaptamos y optimizamos el modelo para cumplir tus
-              requerimientos, materiales y dimensiones.
-            </p>
+          <h3 className="mt-24 text-lg sm:text-xl font-semibold tracking-wide">
+            PRODUCCION
+          </h3>
+
+          <p className="mt-4 text-sm sm:text-base text-black/60 max-w-[380px] leading-relaxed">
+            Iniciamos el proceso de impresión. Durante el trabajo entregamos
+            avances para que veas el progreso y validemos que todo vaya según lo
+            esperado.
+          </p>
+        </div>
+
+        {/* 03 */}
+        <div className="relative min-h-[260px] sm:min-h-[320px] bg-[#F1F1F1] px-6 sm:px-10 py-10">
+          <div className="absolute top-6 right-6 text-black font-semibold">
+            03
           </div>
+
+          <h3 className="mt-24 text-lg sm:text-xl font-semibold tracking-wide">
+            ENTREGA
+          </h3>
+
+          <p className="mt-4 text-sm sm:text-base text-black/60 max-w-[380px] leading-relaxed">
+            Realizamos los ajustes finales y el postprocesado si corresponde. Una
+            vez listo, coordinamos la entrega de tu pedido.
+          </p>
         </div>
       </div>
     </section>

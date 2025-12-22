@@ -1,16 +1,17 @@
 // components/navbar/navbar.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BaggageClaim, Heart, ShoppingCart, User, UserCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import MenuList from "../menu-list";
 import ItemsMenuMobile from "../items-menu-mobile";
-import ToggleTheme from "../toggle-theme";
 import { useCart } from "@/hooks/use-cart";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { ProfileSheet } from "@/components/profile/profile-sheet";
 import type { CurrentUser, ProfileData } from "@/components/profile/profile-types";
+
+
 
 const Navbar = () => {
   const router = useRouter();
@@ -19,6 +20,29 @@ const Navbar = () => {
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
+
+  // ✅ scroll effects
+  const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const lastY = useRef(0);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+
+      setScrolled(y > 40);
+
+      // hide when scrolling down, show when scrolling up
+      const goingDown = y > lastY.current;
+      if (y > 120 && goingDown) setHidden(true);
+      else setHidden(false);
+
+      lastY.current = y;
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -36,8 +60,6 @@ const Navbar = () => {
         }
 
         const data = await res.json();
-        console.log("🟦 /api/auth/me →", data);
-
         setUser(data.user ?? null);
         setProfile(data.profile ?? null);
       } catch (error) {
@@ -54,133 +76,140 @@ const Navbar = () => {
 
   const AuthIcon = user ? UserCheck : User;
 
+  const fg = scrolled ? "text-black" : "text-white";
+  const border = scrolled ? "border-black" : "border-white";
+  const hoverBtn = scrolled ? "hover:bg-black hover:text-white" : "hover:bg-white hover:text-black";
+
+
+
+
   return (
-    <div className="flex w-full items-center justify-between p-8 pb-1">
-      {/* Logo */}
-      <div
-        className="
-          mx-3 flex items-center gap-4
-          md:mx-25 md:gap-8
-          lg:mx-5
-        "
-      >
-        <h1
-          className="
-            cursor-pointer
-            text-3xl
-            font-black
-            md:text-3xl
-            lg:text-5xl
-          "
-          onClick={() => router.push("/")}
-        >
-          Eden
-        </h1>
+    <header
+      className={`
+        fixed top-0 left-0 z-50 w-full
+        transition-all duration-300
+        border-b
+        ${hidden ? "-translate-y-full" : "translate-y-0"}
+        ${scrolled ? "bg-white/80 backdrop-blur-md shadow-sm" : "bg-transparent"}
+      `}
+    >
+      <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-3">
+        <div className="flex w-full items-center justify-between py-2">
 
-        <div className="hidden md:flex lg:text-5xl">
-          <MenuList />
-        </div>
-      </div>
+          {/* Logo + menú */}
+          <div className="flex items-center gap-4 md:gap-10">
+            <h1
+              className={`
+                cursor-pointer text-3xl font-black md:text-2xl lg:text-4xl
+                transition-colors duration-300
+                ${fg}
+              `}
+              onClick={() => router.push("/")}
+            >
+              EDEN.
+            </h1>
 
-      {/* Sección derecha: Iconos */}
-      <div
-        className="
-          mx-2 flex items-center gap-6
-          md:mx-5 md:gap-4
-        "
-      >
-        {cart.items.length === 0 ? (
-          <ShoppingCart
-            strokeWidth={1.5}
-            className="cursor-pointer h-6 w-6 "
-            onClick={() => router.push("/cart")}
-          />
-        ) : (
-          <div
-            className="flex cursor-pointer gap-1 "
-            onClick={() => router.push("/cart")}
-          >
-            <BaggageClaim strokeWidth={1.5} className="cursor-pointer " />
-            <span>{cart.items.length}</span>
+            <div className={`hidden md:flex  transition-colors duration-300 ${fg}`}>
+              <MenuList />
+            </div>
           </div>
-        )}
 
-        <Heart
-          strokeWidth={1}
-          className="cursor-pointer hidden md:inline"
-          onClick={() => router.push("/loved-products")}
-        />
+          {/* Iconos */}
+          <div className="flex items-center gap-6 md:gap-4">
+            {cart.items.length === 0 ? (
+              <ShoppingCart
+                strokeWidth={1.5}
+                className={`cursor-pointer h-6 w-6 transition-colors duration-300 ${fg}`}
+                onClick={() => router.push("/cart")}
+              />
+            ) : (
+              <div
+                className={`flex cursor-pointer gap-1 items-center transition-colors duration-300 ${fg}`}
+                onClick={() => router.push("/cart")}
+              >
+                <BaggageClaim strokeWidth={1.5} className="h-6 w-6" />
+                <span className="text-sm font-semibold">{cart.items.length}</span>
+              </div>
+            )}
 
-        {/* INICIAR ↔ PERFIL (desktop texto, mobile icono) */}
-        {!loadingUser && (
-          <>
-            {/* Desktop: texto como lo tienes */}
-            <div className="hidden sm:flex">
-              {user ? (
-                <ProfileSheet
-                  user={user}
-                  profile={profile ?? undefined}
-                  onLogout={() => {
-                    setUser(null);
-                    setProfile(null);
-                  }}
-                />
-              ) : (
-                <LoginDialog>
-                  <span
-                    className="
-                      cursor-pointer
-                      rounded-2xl
-                      border
-                      border-black
-                      px-4
-                      py-1
-                      font-bold
-                      hover:bg-black
-                      hover:text-white
-                      transition
-                      duration-200
-                      ease-in-out
-                    "
-                  >
-                    Iniciar
-                  </span>
-                </LoginDialog>
-              )}
-            </div>
+            <Heart
+              strokeWidth={1.2}
+              className={`cursor-pointer hidden md:inline h-6 w-6 transition-colors duration-300 ${fg}`}
+              onClick={() => router.push("/loved-products")}
+            />
 
-            {/* Mobile: icono */}
-            <div className="flex sm:hidden">
-              {user ? (
-                <ProfileSheet
-                  user={user}
-                  profile={profile ?? undefined}
-                  onLogout={() => {
-                    setUser(null);
-                    setProfile(null);
-                  }}
-                >
-                  <AuthIcon strokeWidth={1.5} className="cursor-pointe h-6 w-6" />
-                </ProfileSheet>
-              ) : (
-                <LoginDialog>
-                  <AuthIcon strokeWidth={1.5} className="cursor-pointer h-6 w-6" />
-                </LoginDialog>
-              )}
-            </div>
-          </>
-        )}
+            {/* Desktop: Iniciar / Perfil */}
+            {!loadingUser && (
+              <>
+                <div className="hidden sm:flex">
+                  {user ? (
+                    <ProfileSheet
+                      user={user}
+                      profile={profile ?? undefined}
+                      onLogout={() => {
+                        setUser(null);
+                        setProfile(null);
+                      }}
+                    />
+                  ) : (
+                    <LoginDialog>
+                      <span
+                        className={`
+                          cursor-pointer rounded-2xl border px-4 py-1 font-bold
+                          transition duration-200 ease-in-out
+                          ${fg} ${border} ${hoverBtn}
+                        `}
+                      >
+                        Iniciar
+                      </span>
+                    </LoginDialog>
+                  )}
+                </div>
 
-        {/* Menu móvil */}
-        <div className="flex sm:hidden">
-          <ItemsMenuMobile />
+                {/* Mobile: icono */}
+                <div className="flex sm:hidden">
+                  {user ? (
+                    <ProfileSheet
+                      user={user}
+                      profile={profile ?? undefined}
+                      onLogout={() => {
+                        setUser(null);
+                        setProfile(null);
+                      }}
+                    >
+                      <button aria-label="Perfil" className="cursor-pointer">
+                        <AuthIcon
+                          strokeWidth={1.5}
+                          className={`h-6 w-6 transition-colors duration-300 ${fg}`}
+                        />
+                      </button>
+                    </ProfileSheet>
+                  ) : (
+                    <LoginDialog>
+                      <button aria-label="Iniciar sesión" className="cursor-pointer">
+                        <AuthIcon
+                          strokeWidth={1.5}
+                          className={`h-6 w-6 transition-colors duration-300 ${fg}`}
+                        />
+                      </button>
+                    </LoginDialog>
+                  )}
+                </div>
+              </>
+            )}
+
+            <div className="flex sm:hidden ">
+            <ItemsMenuMobile scrolled={scrolled} />
+          </div>
+          </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 };
 
 export default Navbar;
+
 
 
 

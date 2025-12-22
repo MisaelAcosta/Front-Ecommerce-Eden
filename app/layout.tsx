@@ -21,17 +21,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
+       
           <Navbar></Navbar>
           {children}
           <Toaster></Toaster>
           <Footer></Footer>
-          </ThemeProvider>
+
       </body>
     </html>
   );

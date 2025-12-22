@@ -50,9 +50,15 @@ const FeaturedProducts = () => {
   return (
     <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-8 sm:py-14">
       {/* Título */}
-      <h3 className="text-4xl text-center sm:text-6xl font-black mb-6 sm:mb-8">
-        PRODUCTOS DESTACADOS
+      <div>
+        <h3 className="text-4xl text-center sm:text-left tracking-tight sm:text-5xl  font-black mb-2 sm:mb-4">
+        TOP VENTAS.
       </h3>
+      <p className="text-black/35 sm:text-left text-center leading-none tracking-normal  mb-6 text-base sm:text-base ">
+        Los modelos más pedidos y mejor valorados del taller.
+      </p>
+      </div>
+      
 
       <Carousel>
         <CarouselContent className="ml-1 md:-ml-4">
@@ -101,14 +107,15 @@ const FeaturedProducts = () => {
                 >
                   <Card
                     className="
+                      shadow-none
                       group relative 
                       w-full
                       h-auto
                       pt-4
                       pb-4
                       overflow-hidden 
-                      rounded-[15px]
-                      sm:rounded-[15px] sm:border-[0.5px] border-[#b9b9b9]
+                      border-none
+                      
                       bg-[#ffffff]
                       flex flex-col 
                       justify-between

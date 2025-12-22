@@ -9,6 +9,7 @@ import { ArrowLeft } from "lucide-react";
 import Recommmended from "./components/recommended";
 
 
+
 export default function Page() {
   const router = useRouter();
   const params = useParams();
@@ -29,7 +30,7 @@ export default function Page() {
 
   return (
     <div className="mx-auto max-w-7xl py-4 sm:py-22 sm:px-14 md:pr-0">
-
+        
         {/* Flecha para volver */}
             <button
                 onClick={() => router.back()}

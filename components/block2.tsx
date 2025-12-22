@@ -57,16 +57,15 @@ const Block2 = () => {
   };
 
   if (loading) return <SkeletonSchema grid={1} />;
-  if (error) return <p className="text-red-500 text-sm">Error: {String(error)}</p>;
+  if (error)
+    return <p className="text-red-500 text-sm">Error: {String(error)}</p>;
   if (!Array.isArray(result) || result.length === 0) return null;
 
   return (
-    <section className="relative">
+    <section className="relative w-full">
       <Carousel>
         <CarouselContent>
           {(result as any[]).map((item) => {
-            console.log("🧱 Block2 item:", item);
-
             // Campos directos en Strapi v5
             const id = item?.id ?? item?.documentId ?? crypto.randomUUID();
             const titulo = item?.tituloBlock2 ?? "";
@@ -80,10 +79,9 @@ const Block2 = () => {
             // Imagen
             const urlRel = getMediaUrl(item, "imageBlock2");
             const imgUrl = toAbsUrl(urlRel);
-            const altTxt =
-              getMediaAlt(item, "imageBlock2") || titulo || "Banner";
+            const altTxt = getMediaAlt(item, "imageBlock2") || titulo || "Banner";
 
-            // Lógica de navegación igual que Block1
+            // Lógica de navegación
             const handleClick = () => {
               if (productSlug) {
                 router.push(`/product/${productSlug}`);
@@ -110,14 +108,32 @@ const Block2 = () => {
                         }
                       : undefined
                   }
-                  className="relative w-full h-[510px] md:h-[746px] rounded-2xl overflow-hidden cursor-pointer"
+                  className="
+                    group
+                    relative 
+                    mx-auto max-w-7xl px-4 sm:px-6 lg:px-8
+                    h-[280px]
+                    sm:h-[220px]
+                    md:h-[300px]
+                    lg:h-[460px]
+                    overflow-hidden
+                    
+                    cursor-pointer
+
+                  "
                 >
                   {imgUrl ? (
                     <Image
                       src={imgUrl}
                       alt={altTxt}
                       fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                      className="
+                        object-cover
+                        transition-transform
+                        duration-500
+                        ease-out
+                        group-hover:scale-[1.03]
+                      "
                       // quita esto cuando agregues el dominio del backend en next.config.js
                       unoptimized
                       priority
@@ -126,67 +142,60 @@ const Block2 = () => {
                     <div className="w-full h-full bg-gradient-to-b from-neutral-200 to-neutral-700" />
                   )}
 
-                  {/* Título y descripción (si los quieres visibles, quita "hidden") */}
-                  <div className="hidden absolute left-4 right-4 bottom-4 md:left-6 md:right-6 md:bottom-6">
-                    {titulo && (
-                      <h3 className="text-2xl md:text-4xl font-extrabold tracking-tight text-white drop-shadow">
-                        {titulo}
-                      </h3>
-                    )}
-                    {description && (
-                      <p className="mt-2 text-white/90 text-sm md:text-base max-w-2xl">
-                        {description}
-                      </p>
-                    )}
-                  </div>
+                  {/* Overlay degradado + texto + CTA */}
+                  <div
+                    className="
+                      absolute inset-0
+                      flex items-end
+                      bg-gradient-to-t
+                      from-black/60
+                      via-black/20
+                      to-transparent
+                      p-4
+                      sm:p-6
+                    "
+                  >
+                    <div className="max-w-xl">
+                      {titulo && (
+                        <h3 className="text-white text-xl sm:text-2xl md:text-3xl font-bold leading-tight">
+                          {titulo}
+                        </h3>
+                      )}
 
-                  {/* Botón Ver más (usa la misma lógica de navegación) */}
-                  {hasLink && (
-                    <div className="absolute left-5 right-4 bottom-8 md:bottom-14 md:right-6 md:bottom-6">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleClick();
-                        }}
-                        className="mt-3 group relative cursor-pointer inline-flex md:h-13 h-10 items-center justify-center bg-white overflow-hidden rounded-md bg-neutral-950 px-6 lg:px-10 font-semibold text-neutral-200 duration-900"
-                      >
-                        <div className="translate-x-0 opacity-100 transition group-hover:-translate-x-[150%] group-hover:opacity-0 text-black">
-                          Ver más
-                        </div>
-                        <div className="absolute translate-x-[150%] opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100">
-                          <svg
-                            width="15"
-                            height="15"
-                            viewBox="0 0 15 15"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-6 w-6 text-black"
-                          >
-                            <path
-                              d="M8.14645 3.14645C8.34171 2.95118 8.65829 2.95118 8.85355 3.14645L12.8536 7.14645C13.0488 7.34171 13.0488 7.65829 12.8536 7.85355L8.85355 11.8536C8.65829 12.0488 8.34171 12.0488 8.14645 11.8536C7.95118 11.6583 7.95118 11.3417 8.14645 11.1464L11.2929 8H2.5C2.22386 8 2 7.77614 2 7.5C2 7.22386 2.22386 7 2.5 7H11.2929L8.14645 3.85355C7.95118 3.65829 7.95118 3.34171 8.14645 3.14645Z"
-                              fill="currentColor"
-                              fillRule="evenodd"
-                              clipRule="evenodd"
-                            ></path>
-                          </svg>
-                        </div>
-                      </button>
+                      {description && (
+                        <p className="mt-1 sm:mt-2 text-white/90 text-sm sm:text-base line-clamp-2">
+                          {description}
+                        </p>
+                      )}
+
+                      {hasLink && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleClick();
+                          }}
+                          className="mt-3 text-sm font-medium text-white underline underline-offset-4"
+                        >
+                          
+                        </button>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
               </CarouselItem>
             );
           })}
         </CarouselContent>
 
-        <CarouselPrevious className="hidden md:left-4" />
-        <CarouselNext className="hidden md:right-4" />
+        <CarouselPrevious className="hidden " />
+        <CarouselNext className="hidden " />
       </Carousel>
     </section>
   );
 };
 
 export default Block2;
+
 
 

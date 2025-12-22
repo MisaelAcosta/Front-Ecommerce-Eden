@@ -56,12 +56,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
     <Card
       className="
         group relative w-full
-        overflow-hidden
+        sm:overflow-hidden
         rounded-none
-        sm:rounded-[15px] sm:border-[0.5px] md:border-[#b9b9b9]
+        border-none
+        
         bg-[#ffffff]
         flex flex-col justify-between
-        py-1 sm:py-4
+        pb-6 sm:py-4
+        shadow-none
+        
       "
     >
       <CardContent className="flex flex-col px-3 pt-0 pb-0">
@@ -86,7 +89,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
               src={image1}
               alt={displayName}
               className={`
-                max-h-[380px] sm:max-h-[310px] w-auto object-contain
+                max-h-[280px] sm:max-h-[310px] w-auto object-contain
                 transition-all duration-300 ease-out
                 ${hover && image2 ? "opacity-0" : "opacity-100"}
               `}
@@ -127,7 +130,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
 
         {/* SEPARATOR 1 */}
-        <div className="h-px w-full bg-[#c0c0c0] " />
+        <div className=" w-full sm:border-[0.3px] sm:border-[#e9e9e9] " />
 
 
 
@@ -143,11 +146,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
 
         {/* SEPARATOR 2 */}
-        <div className="h-px w-full bg-[#c0c0c0] " />
+        <div className="h-px w-full sm:border sm:border-[#e9e9e9] " />
 
 
         {/* PRECIO + CTA */}
-        <div className="mt-0 md:mt-3 flex items-center justify-between ">
+        <div className="mt-0 md:mt-1 pl-13 sm:pl-0 sm:text-center flex items-center text-center sm:justify-center ">
           {/* Precio */}
           <p className="text-[16px] sm:text-[18px] pt-none font-semibold pl-2 sm:pl-4 whitespace-nowrap">
             {formatPrice(displayPrice)}
@@ -156,23 +159,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
           {/* Acciones */}
           <div className="flex items-center gap-2">
             {/* Comprar (solo desktop) */}
-            <Button
-              onClick={() => router.push(`/product/${productSlug}`)}
-              className="
-                hidden md:inline-flex
-                h-9 px-4 text-[12px] sm:text-[13px] font-medium
-                rounded-[10px] bg-black text-white hover:bg-black/90
-                items-center gap-2 cursor-pointer
-              "
-            >
-              Comprar
-            </Button>
+            
 
             {/* Corazón */}
             <button
               className="
                 inline-flex h-9 w-9 items-center justify-center cursor-pointer
-                rounded-[10px] md:border border-[#E3E3E3]
+                rounded-[10px] 
                 bg-white text-black/70 transition-colors
                 flex-shrink-0
               "

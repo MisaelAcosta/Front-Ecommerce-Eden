@@ -59,12 +59,12 @@ const Block1 = () => {
   if (!Array.isArray(result) || result.length === 0) return null;
 
   return (
-    <section className="relative">
+    <section className="relative ">
       <Carousel
         className="w-full overflow-hidden"
         plugins={[
           Autoplay({
-            delay: 3500,
+            delay: 4500,
           }),
         ]}
       >
@@ -103,7 +103,7 @@ const Block1 = () => {
             return (
               <CarouselItem key={id}>
                 <div
-                  className={`relative w-full h-[510px] md:h-[750px] rounded-3xl overflow-hidden ${
+                  className={`relative w-full h-[950px] md:h-[975px]  overflow-hidden ${
                     hasLink ? "cursor-pointer" : ""
                   }`}
                   onClick={hasLink ? handleClick : undefined}
@@ -125,21 +125,16 @@ const Block1 = () => {
                   {/* Gradient */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10" />
 
-                  {/* Etiqueta */}
-                  <div className="absolute left-4 top-4 md:left-6 md:top-6">
-                    <span className="text-white/90 text-sm md:text-base font-medium drop-shadow">
-                      Destacado
-                    </span>
-                  </div>
+                  
 
                   {/* Texto */}
-                  <div className="absolute left-5 right-4 bottom-8 md:bottom-14">
-                    <h2 className="text-3xl md:text-7xl font-black text-white">
+                  <div className="absolute left-5 right-4 md:px-15 bottom-20 md:bottom-20">
+                    <h2 className="text-3xl md:text-5xl leading-none font-black text-white">
                       {titulo.toUpperCase()}
                     </h2>
 
                     {description && (
-                      <p className="mt-2 text-white/90 md:text-lg lg:text-2xl max-w-2xl">
+                      <p className="mt-2 text-white/90 md:text-lg leading-none lg:text-xl max-w-2xl">
                         {description}
                       </p>
                     )}
@@ -147,18 +142,14 @@ const Block1 = () => {
                     {/* Botón Ver más */}
                     {hasLink && (
                       <button
-                        className="mt-3 relative inline-flex h-10 md:h-13 items-center justify-center px-6 lg:px-10 font-semibold rounded-md bg-white text-black overflow-hidden group"
+                        className="mt-4 md:mt-4 px-1 md:px-1 cursor-pointer font-normal text-white"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleClick();
                         }}
                       >
-                        <span className="transition group-hover:-translate-x-[150%]">
-                          Ver más
-                        </span>
-                        <span className="absolute opacity-0 translate-x-[150%] group-hover:opacity-100 group-hover:translate-x-0 transition">
-                          ➜
-                        </span>
+                            Ver más
+
                       </button>
                     )}
                   </div>
