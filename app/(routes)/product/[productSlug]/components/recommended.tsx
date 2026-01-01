@@ -13,26 +13,12 @@ import SkeletonSchema from "@/components/skeletonSchema";
 import type { ResponseType } from "@/types/response";
 import type { ProductType } from "@/types/product";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Heart, ShoppingCart } from "lucide-react";
-import { useCart } from "@/hooks/use-cart";
+import { Heart, ChevronRight } from "lucide-react";
 import { formatPrice } from "@/lib/formatPrice";
+import type { PromotionType } from "@/types/promotion";
 import { useRouter } from "next/navigation";
 
-// helper igual que FeaturedProducts
-function toText(v: any): string | undefined {
-  if (v == null) return undefined;
-  if (typeof v === "string" || typeof v === "number") return String(v);
-  if (typeof v === "object") {
-    if (v.name) return String(v.name);
-    if (v.categoryName) return String(v.categoryName);
-    if (v.title) return String(v.title);
-    if (v.data?.attributes?.name) return String(v.data.attributes.name);
-  }
-  return undefined;
-}
-
-// Helper URL absoluta (igual que en ProductCard)
+/** Helper URL absoluta (igual que en ProductCard) */
 const toAbsUrl = (url?: string | null) => {
   if (!url) return null;
   if (url.startsWith("http")) return url;
@@ -42,22 +28,89 @@ const toAbsUrl = (url?: string | null) => {
   return `${base}/${clean}`;
 };
 
+/* ----------------------- helpers de promociones ----------------------- */
+
+function isPromoActive(p: PromotionType, now = new Date()) {
+  if (!p?.active) return false;
+  const start = p.startAt ? new Date(p.startAt) : null;
+  const end = p.endAt ? new Date(p.endAt) : null;
+  if (start && now < start) return false;
+  if (end && now > end) return false;
+  return true;
+}
+
+function applyPromo(basePrice: number, promo: PromotionType | null) {
+  if (!promo) return basePrice;
+
+  const val = Number((promo as any).value || 0);
+  let discount = 0;
+
+  // 0.2 => 20%
+  if (val <= 1) discount = basePrice * val;
+  // 20 => 20%
+  else if (val <= 100) discount = basePrice * (val / 100);
+  // 1500 => $1500 off
+  else discount = val;
+
+  return Math.max(0, Math.round(basePrice - discount));
+}
+
+function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
+  if (!promos || promos.length === 0) return null;
+
+  const actives = promos.filter((p) => isPromoActive(p));
+  if (actives.length === 0) return null;
+
+  let best: { promo: PromotionType; finalPrice: number } | null = null;
+
+  for (const p of actives) {
+    const fp = applyPromo(basePrice, p);
+    if (!best || fp < best.finalPrice) best = { promo: p, finalPrice: fp };
+  }
+
+  return best ? best.promo : null;
+}
+
+/* -------------------- normalizar promos (strapi) -------------------- */
+function normalizePromotions(input: any): PromotionType[] {
+  if (!input) return [];
+  if (Array.isArray(input)) return input as PromotionType[];
+
+  if (Array.isArray(input?.data)) {
+    return input.data.map((x: any) => ({
+      id: x?.id ?? x?.attributes?.id,
+      ...(x?.attributes ?? x),
+    })) as PromotionType[];
+  }
+
+  if (input?.data && typeof input.data === "object") {
+    const x = input.data;
+    return [
+      {
+        id: x?.id ?? x?.attributes?.id,
+        ...(x?.attributes ?? x),
+      } as PromotionType,
+    ];
+  }
+
+  return [];
+}
+
 type RecommendedProps = {
   currentProductId: number;
   categorySlug: string;
 };
 
 const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
-  const { addItem } = useCart();
   const router = useRouter();
 
-  // Featured
+  // Featured (según tu hook)
   const {
     result: featuredResult,
     loading: loadingFeatured,
   }: ResponseType = useGetFeaturedProducts(categorySlug);
 
-  // Category → usando tu hook EXACTO
+  // Category (según tu hook exacto)
   const {
     result: categoryResult,
     loading: loadingCategory,
@@ -67,28 +120,22 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
 
   let products: ProductType[] = [];
 
-  // 1. productos de la categoría (sin el producto actual)
+  // 1) categoría (sin el producto actual)
   if (Array.isArray(categoryResult)) {
     products = categoryResult.filter((p) => p.id !== currentProductId);
   }
 
-  // 2. agregamos los destacados sin duplicar
+  // 2) agregamos destacados sin duplicar
   if (Array.isArray(featuredResult)) {
     const featuredClean = featuredResult.filter(
       (p) =>
         p.id !== currentProductId &&
         !products.some((existing) => existing.id === p.id)
     );
-
     products = [...products, ...featuredClean];
   }
 
-  // debug
-  console.log("[Recommended] categoryResult:", categoryResult);
-  console.log("[Recommended] featuredResult:", featuredResult);
-  console.log("[Recommended] final products:", products);
-
-  // 3. max 6 items
+  // 3) max 6
   products = products.slice(0, 6);
 
   if (loading) {
@@ -104,22 +151,26 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
 
   return (
     <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-10">
-      <h3 className="
-      text-3xl
-      sm:text-4xl 
-      text-center sm:text-left
-      font-black 
-      mb-8">TE PUEDE INTERESAR</h3>
+      <h3
+        className="
+          text-3xl
+          sm:text-4xl
+          text-center sm:text-left
+          font-black
+          mb-8
+        "
+      >
+        TE PUEDE INTERESAR
+      </h3>
 
       <Carousel>
         <CarouselContent className="ml-1 md:-ml-4">
           {products.map((product: ProductType) => {
-            // Soportar tanto product.attributes como objeto plano
             const raw: any = product;
             const attrs = raw.attributes ?? raw;
 
             // -------------------------
-            //   OBTENER IMÁGENES
+            //   IMÁGENES
             // -------------------------
             const imagesArray =
               Array.isArray(attrs?.images)
@@ -133,6 +184,8 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
             const image2 = toAbsUrl(secondImage);
 
             // -------------------------
+            //   TEXTO
+            // -------------------------
             const displayName = attrs?.productName ?? "Producto sin nombre";
             const secondaryName =
               attrs?.productName2 ??
@@ -141,40 +194,80 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
               attrs?.sub_category ??
               "";
 
-            const displayPrice =
-              attrs?.price !== undefined && attrs?.price !== null
-                ? attrs.price
-                : "—";
-
-            const isActive = attrs?.active ?? true;
             const productSlug = attrs?.slug ?? "";
+
+            // -------------------------
+            //   PRECIO + PROMO
+            // -------------------------
+            const basePrice = Number(attrs?.price ?? 0);
+
+            const promos = normalizePromotions(attrs?.promotions);
+            const appliedPromo = pickBestPromo(basePrice, promos);
+
+            const finalPrice = appliedPromo
+              ? applyPromo(basePrice, appliedPromo)
+              : basePrice;
+
+            const hasDiscount =
+              appliedPromo !== null && finalPrice < basePrice;
 
             return (
               <CarouselItem
-                key={raw.id}
+                key={raw.id ?? productSlug}
                 className="basis-[85%] sm:basis-1/2 lg:basis-1/3 px-4 md:px-4"
               >
+                {/* Corazón */}
+                <button
+                  className="
+                    flex w-full items-center justify-end sm:justify-end gap-2
+                    rounded-[10px]
+                    bg-white text-black/70 transition-colors
+                    flex-shrink-0
+                  "
+                  type="button"
+                >
+                  <Heart
+                    width={20}
+                    strokeWidth={1.5}
+                    className="hover:fill-black"
+                  />
+                </button>
+
                 <Card
                   className="
-                    group relative 
+                    group relative
                     w-full
                     h-auto
                     pt-4
                     pb-4
-                    overflow-hidden 
-                    rounded-[15px]
-                    sm:rounded-[15px] sm:border-[0.5px] border-[#b9b9b9]
-                    bg-[#f0f0f0]
-                    flex flex-col 
+                    overflow-hidden
+                    border-none
+                    shadow-none
+                    bg-[#ffffff]
+                    flex flex-col
                     justify-between
                   "
                 >
-                  <CardContent className="flex flex-col justify-around px-3 md:px-3 pt-0 pb-0">
-                    {/* IMAGEN (mismo estilo que ProductCard, pero con hover por CSS) */}
+                  {/* Badge OFERTA */}
+                  {hasDiscount && (
                     <div
                       className="
-                        relative mb-3 sm:mb-4 
-                        mt-0 w-full 
+                        absolute left-4 top-4 z-10
+                        rounded-full px-3 py-1
+                        text-[11px] font-black tracking-wide
+                        bg-green-500 text-white
+                      "
+                    >
+                      OFERTA
+                    </div>
+                  )}
+
+                  <CardContent className="flex flex-col justify-around px-3 md:px-3 pt-0 pb-0">
+                    {/* IMAGEN */}
+                    <div
+                      className="
+                        relative mb-3 sm:mb-4
+                        mt-0 w-full
                         rounded-[14px] sm:rounded-[24px]
                         bg-white
                         flex items-center justify-center overflow-hidden
@@ -184,7 +277,7 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
                         productSlug && router.push(`/product/${productSlug}`)
                       }
                     >
-                      {/* Imagen 1 por defecto */}
+                      {/* Imagen 1 */}
                       {image1 && (
                         <img
                           src={image1}
@@ -197,7 +290,7 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
                         />
                       )}
 
-                      {/* Imagen 2 al hover */}
+                      {/* Imagen 2 */}
                       {image2 && (
                         <img
                           src={image2}
@@ -222,83 +315,56 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
                       className="
                         text-lg
                         leading-none
-                        text-center sm:text-2xl 
-                        font-black  uppercase
+                        text-center sm:text-2xl
+                        font-black uppercase
                         mb-1
                       "
                     >
                       {displayName}
                     </h3>
 
-                    {/* SEPARATOR 1 */}
-                    <div className="h-px w-full bg-[#c0c0c0] mb-1" />
-
-                    {/* SUB + PRECIO */}
-                    <div className="flex items-center justify-between gap-2 mb-1">
-                      <p className="text-l font-semibold text-black ">
-                        {secondaryName}
-                      </p>
-
-                      <p className="text-[15px] font-semibold">
-                        {formatPrice(displayPrice)}
-                      </p>
+                    {/* SUB */}
+                    <div className="flex justify-center py-1 gap-2">
+                      <div className="flex items-center gap-2 text-center">
+                        <p className="text-lg font-semibold text-black">
+                          {secondaryName}
+                        </p>
+                      </div>
                     </div>
 
-                    {/* SEPARATOR 2 */}
-                    <div className="h-px w-full bg-[#c0c0c0] mb-1" />
+                    {/* PRECIO + DESCUENTO */}
+                    <div className="mt-1 flex items-center justify-between gap-2">
+                      {hasDiscount ? (
+                        <div className="pl-4 leading-tight">
+                          <p className="text-[12px] font-semibold text-black/40 line-through">
+                            {formatPrice(basePrice)}
+                          </p>
+                          <p className="text-[17px] sm:text-[17px] font-extrabold text-red-500 tabular-nums">
+                            {formatPrice(finalPrice)}
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-[15px] pl-4 sm:inline-flex items-center justify-center font-semibold">
+                          {formatPrice(basePrice)}
+                        </p>
+                      )}
 
-                    {/* ESTADO + CTA */}
-                    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                      {/* Badge Disponible / No disponible */}
-                      <span
-                        className={`
-                          sm:inline-flex items-center hidden justify-center
-                          rounded-[10px] h-9 px-4 py-1
-                          text-[11px] sm:text-xs font-extrabold uppercase
-                          ${
-                            isActive
-                              ? "bg-[#62DF70] text-white"
-                              : "bg-[#E5E5E5] text-[#777777]"
-                          }
-                        `}
+                      <button
+                        className="
+                          inline-flex h-9 w-9
+                          items-center justify-center cursor-pointer
+                          rounded-[10px]
+                          bg-white text-black/70
+                          transition-colors
+                          flex-shrink-0
+                        "
+                        type="button"
+                        onClick={() =>
+                          productSlug && router.push(`/product/${productSlug}`)
+                        }
                       >
-                        {isActive ? "Disponible" : "No disponible"}
-                      </span>
-
-                      {/* Botón Agregar (manteniendo la funcionalidad original) */}
-                      <div className="flex w-full sm:w-auto items-center justify-between sm:justify-end gap-2">
-                        <Button
-                          onClick={() => router.push(`/product/${productSlug}`)}
-                          className="
-                            h-9 px-4 text-[12px] sm:text-[13px] font-medium
-                            rounded-[10px] bg-black text-white hover:bg-black/90 
-                            flex items-center gap-2
-                            flex-1 sm:flex-none cursor-pointer
-                          "
-                        >
-                           <ShoppingCart
-                            width={15}
-                            strokeWidth={3}>
-                           </ShoppingCart>
-                        </Button>
-
-                        <button
-                      className="
-                        inline-flex h-9 w-9 
-                        sm:
-                        items-center justify-center cursor-pointer
-                        rounded-[10px] border border-[#E3E3E3]
-                        bg-white text-black/70 
-                        transition-colors
-                        flex-shrink-0
-                      "
-                    >
-                      <Heart 
-                      width={20}
-                      strokeWidth={1.5}
-                      className="hover:fill-red-500" />
-                    </button>
-                      </div>
+                        <ChevronRight width={25} strokeWidth={2} />
+                      </button>
                     </div>
                   </CardContent>
                 </Card>

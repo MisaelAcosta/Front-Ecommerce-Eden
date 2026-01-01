@@ -219,7 +219,7 @@ useEffect(() => {
           {loading && (
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-4 gap-6 md:gap-1 ">
-              <SkeletonSchema grid={3} />
+              <SkeletonSchema grid={4} />
               
             </div>
           )}

@@ -6,22 +6,22 @@ const Galeria = () => {
   const items = [
     {
       title: "Malorian Overture de\nCyberpunk 2077",
-      src: "/galeria/malorian.jpg", // 👈 public/galeria/malorian.jpg
+      src: "/arma.png", // 👈 public/galeria/malorian.jpg
     },
     {
       title: "Dispensador de capsulas",
-      src: "/galeria/dispensador.jpg", // 👈 public/galeria/dispensador.jpg
+      src: "/dispensador.png", // 👈 public/galeria/dispensador.jpg
     },
     {
       title: "Organizador modular",
-      src: "/galeria/organizador.jpg", // 👈 public/galeria/organizador.jpg
+      src: "/soporte.png", // 👈 public/galeria/organizador.jpg
     },
   ];
 
   return (
     <section
       id="galeria"
-      className="w-full bg-[#F1F1F1] border border-black/40"
+      className="w-full border-t border-black/40 bg-[#F1F1F1] "
     >
       {/* TITULO */}
       

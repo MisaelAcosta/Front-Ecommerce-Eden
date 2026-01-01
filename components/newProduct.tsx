@@ -14,7 +14,7 @@ import type { ResponseType } from "@/types/response";
 import type { ProductType } from "@/types/product";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
-import { ShoppingCart, Box, Heart } from "lucide-react";
+import { ShoppingCart, Box, Heart, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/formatPrice";
 
@@ -108,6 +108,17 @@ const NewProducts = () => {
                       key={id}
                       className="basis-[85%] sm:basis-1/2 lg:basis-1/3 px-3 md:px-4"
                     >
+                      {/* Corazón */}
+                      <button
+                        className="
+                          flex w-full  items-center justify-end sm:justify-end gap-2
+                          rounded-[10px] 
+                          bg-white text-black/70 transition-colors
+                          flex-shrink-0
+                        "
+                      >
+                        <Heart width={20} strokeWidth={1.5} className="hover:fill-black" />
+                      </button>
                     
                       <Card
                         className="
@@ -185,8 +196,7 @@ const NewProducts = () => {
                             {displayName}
                           </h3>
 
-                          {/* SEPARATOR 1 */}
-                          <div className="h-px w-full bg-[#c0c0c0] " />
+                          
 
                               {/* SUB*/}
                           <div className="flex justify-center py-1 gap-2">
@@ -197,50 +207,33 @@ const NewProducts = () => {
                             </div>
                           </div>
 
-                          {/* SEPARATOR 2 */}
-                          <div className="h-px w-full bg-[#c0c0c0]" />
+                          
 
-                          {/* PRECIO + CTA */}
-                      <div className="mt-3 flex items-center justify-between gap-2">
-                        {/* Badge Disponible / No disponible */}
+                         {/* PRECIO */}
+                      <div className="mt-1 flex items-center justify-between gap-2">
+                        
                         <p className="text-[15px] pl-4 sm:inline-flex items-center justify-center font-semibold">
                         {formatPrice(displayPrice)}
                       </p>
 
-                        {/* Botón de compra + corazón visual */}
-                        <div className="flex w-full sm:w-auto items-center justify-end sm:justify-end gap-2">
-                          <Button
-                            onClick={() => router.push(`/product/${productSlug}`)}
-                            className="
-                              h-8 px-5 sm:h-9 sm:px-4 text-[12px] sm:text-[13px] font-medium
-                              rounded-[10px] bg-black text-white hover:bg-black/90 
-                              flex items-center gap-2
-                              flex-none sm:flex-none cursor-pointer 
-                            "
-                          >
-                            Comprar
-                          </Button>
-
-
-                              <button
+                       <button
                                 className="
                                   inline-flex h-9 w-9 
                                   items-center justify-center cursor-pointer
-                                  rounded-[10px] border border-[#E3E3E3]
+                                  rounded-[10px] 
                                   bg-white text-black/70 
                                   transition-colors
                                   flex-shrink-0
                                 "
                                 type="button"
                               >
-                                <Heart
-                                  width={20}
-                                  strokeWidth={1.5}
-                                  className="hover:fill-black"
+                                <ChevronRight
+                                  width={25}
+                                  strokeWidth={2}
+                                  className=""
                                 />
                               </button>
-                            </div>
-                          </div>
+                      </div>
                         </CardContent>
                       </Card>
                     </CarouselItem>

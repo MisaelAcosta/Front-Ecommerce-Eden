@@ -1,26 +1,51 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Instagram, MessageCircle, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+
+type ActiveCard = "pedidos" | "negocio" | null;
 
 const Contacto = () => {
   const [openMail, setOpenMail] = useState(false);
 
+  const handleGmailSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const form = e.currentTarget;
+    const data = new FormData(form);
+
+    const nombre = String(data.get("Nombre") || "");
+    const correo = String(data.get("Correo") || "");
+    const mensaje = String(data.get("Mensaje") || "");
+
+    const subject = encodeURIComponent(`Contacto Eden 3D - ${nombre}`);
+    const body = encodeURIComponent(
+      `Nombre: ${nombre}\nCorreo: ${correo}\n\nMensaje:\n${mensaje}`
+    );
+
+    // ✅ Abre Gmail con "Redactar" y todo prellenado
+    window.open(
+      `https://mail.google.com/mail/?view=cm&fs=1&to=eden.estudio1@gmail.com&su=${subject}&body=${body}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+
+    form.reset();
+    setOpenMail(false);
+  };
+
   return (
-    <section
-      id="contacto"
-      className="w-full border border-black/40"
-    >
+    <section id="contacto" className="w-full pt-10 sm:px-15">
       {/* FONDO CON IMAGEN */}
       <div
         className="
           relative w-full overflow-hidden
-          rounded-[18px]
-          px-6 sm:px-12 py-14 sm:py-20
+          sm:rounded-[18px]
+          px-20 sm:px-12 py-20 sm:py-30
           text-white
         "
         style={{
-          backgroundImage: "url('/contacto-bg.jpg')", // 👈 TU IMAGEN EXPORTADA
+          backgroundImage: "url('/Rectangle.png')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -30,36 +55,36 @@ const Contacto = () => {
 
         <div className="relative z-10 max-w-5xl mx-auto">
           {/* TITULO */}
-          <h2 className="text-center text-4xl sm:text-5xl font-black tracking-tight mb-14">
+          <h2 className="text-center text-5xl sm:text-6xl font-black tracking-tight mb-14">
             CONTACTO.
           </h2>
 
           {/* LISTA */}
-          <div className="space-y-6">
+          <div className="sm:space-y-15 space-y-9">
             {/* WHATSAPP */}
             <a
-              href="https://wa.me/XXXXXXXXXX" // 👈 reemplaza con tu número
+              href="https://wa.me/56912345678?text=Hola%20Eden%203D%2C%20quiero%20cotizar%20una%20impresi%C3%B3n"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-between border-b border-white/20 pb-6 group"
             >
               <div className="flex items-center gap-6">
                 <span className="text-white/40">(01)</span>
-                <span className="text-lg sm:text-xl">WhatsApp</span>
+                <span className="text-2xl sm:text-3xl">WhatsApp</span>
               </div>
               <ArrowRight className="opacity-60 group-hover:translate-x-1 transition-transform" />
             </a>
 
             {/* INSTAGRAM */}
             <a
-              href="https://instagram.com/TU_USUARIO" // 👈 reemplaza
+              href="https://www.instagram.com/eden.3d_/"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-between border-b border-white/20 pb-6 group"
             >
               <div className="flex items-center gap-6">
                 <span className="text-white/40">(02)</span>
-                <span className="text-lg sm:text-xl">Instagram</span>
+                <span className="text-2xl sm:text-3xl">Instagram</span>
               </div>
               <ArrowRight className="opacity-60 group-hover:translate-x-1 transition-transform" />
             </a>
@@ -73,7 +98,7 @@ const Contacto = () => {
               >
                 <div className="flex items-center gap-6">
                   <span className="text-white/40">(03)</span>
-                  <span className="text-lg sm:text-xl">Gmail</span>
+                  <span className="text-2xl sm:text-3xl">Gmail</span>
                 </div>
                 <ArrowRight
                   className={`opacity-60 transition-transform ${
@@ -82,12 +107,10 @@ const Contacto = () => {
                 />
               </button>
 
-              {/* FORMULARIO DESPLEGABLE */}
+              {/* FORMULARIO DESPLEGABLE (GMAIL COMPOSE) */}
               {openMail && (
                 <form
-                  action="mailto:tucorreo@gmail.com" // 👈 reemplaza
-                  method="POST"
-                  encType="text/plain"
+                  onSubmit={handleGmailSubmit}
                   className="mt-8 grid gap-4 max-w-xl"
                 >
                   <input
@@ -118,7 +141,7 @@ const Contacto = () => {
                     type="submit"
                     className="mt-2 w-fit px-6 py-3 rounded-md bg-white text-black font-medium hover:bg-white/90 transition"
                   >
-                    Enviar correo
+                    Abrir Gmail
                   </button>
                 </form>
               )}
@@ -131,3 +154,4 @@ const Contacto = () => {
 };
 
 export default Contacto;
+

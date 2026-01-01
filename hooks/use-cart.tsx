@@ -1,55 +1,72 @@
 "use client";
 
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import { ProductType } from "@/types/product";
-import { toast } from "sonner";
+import { persist } from "zustand/middleware";
+import type { CartLine } from "@/types/cart";
 
-interface CartStore {
-  items: ProductType[];
-  addItem: (item: ProductType) => void;
-  removeItem: (id: number) => void;
-  removeAll: () => void;
-}
+type CartState = {
+  items: CartLine[];
 
-export const useCart = create<CartStore>()(
-  persist(
+  addItem: (line: Omit<CartLine, "id">) => void;
+  removeItem: (lineId: string) => void;
+
+  incQty: (lineId: string) => void;
+  decQty: (lineId: string) => void;
+
+  clear: () => void;
+};
+
+const makeLineId = (productId: number, variantId: number) =>
+  `${productId}:${variantId}`;
+
+export const useCart = create(
+  persist<CartState>(
     (set, get) => ({
       items: [],
 
-      addItem: (item: ProductType) => {
-        const exists = get().items.some((i) => i.id === item.id);
-        if (exists) {
-          toast.error("⚠️ El producto ya está en el carrito");
+      addItem: (line) => {
+        const id = makeLineId(line.productId, line.variantId);
+        const items = get().items;
+
+        const existing = items.find((i) => i.id === id);
+
+        if (existing) {
+          set({
+            items: items.map((i) =>
+              i.id === id ? { ...i, qty: i.qty + line.qty } : i
+            ),
+          });
           return;
         }
 
-        set({ items: [...get().items, item] });
-        toast.success("🛒 Producto agregado al carrito");
+        set({ items: [...items, { ...line, id }] });
       },
 
-      removeItem: (id: number) => {
-        const before = get().items.length;
-        set({ items: get().items.filter((i) => i.id !== id) });
+      removeItem: (lineId) =>
+        set({ items: get().items.filter((i) => i.id !== lineId) }),
 
-        if (get().items.length < before) {
-          toast("❌ Producto eliminado del carrito");
-        } else {
-          toast("Ese producto no estaba en el carrito");
-        }
-      },
+      incQty: (lineId) =>
+        set({
+          items: get().items.map((i) =>
+            i.id === lineId ? { ...i, qty: i.qty + 1 } : i
+          ),
+        }),
 
-      removeAll: () => {
-        set({ items: [] });
-        toast("🧹 Carrito vaciado");
-      },
+      decQty: (lineId) =>
+        set({
+          items: get().items
+            .map((i) =>
+              i.id === lineId ? { ...i, qty: Math.max(1, i.qty - 1) } : i
+            )
+            .filter((i) => i.qty > 0),
+        }),
+
+      clear: () => set({ items: [] }),
     }),
-    {
-      name: "cart-storage",
-      storage: createJSONStorage(() => localStorage),
-    }
+    { name: "eden-cart" }
   )
 );
+
 
 
 

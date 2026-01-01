@@ -8,7 +8,7 @@ import CartItem from "./components/cart-item"
 
 
 export default function Page() {
-    const {items, removeAll} = useCart()
+    const {items} = useCart()
 
     const prices = items.map((item) => item.price) 
     const totalPrice = prices.reduce((a, b) => a + b, 0)
@@ -28,8 +28,8 @@ export default function Page() {
 
                 <ul>
                     {items.map((item) => (
-                        <CartItem key={item.id} product={item} ></CartItem>
-                    ))}
+                        <CartItem key={item.id} item={item} />
+                        ))}
                 </ul>
                 </div>
 

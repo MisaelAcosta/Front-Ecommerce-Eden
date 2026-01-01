@@ -1,20 +1,88 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { CirclePlus, Heart, ShoppingCart } from "lucide-react";
+import { Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ProductType } from "@/types/product";
 import { formatPrice } from "@/lib/formatPrice";
 import { useState } from "react";
+import type { PromotionType } from "@/types/promotion";
 
 type ProductCardProps = {
   product: ProductType;
 };
 
+/* ----------------------- helpers de promociones ----------------------- */
+
+function isPromoActive(p: PromotionType, now = new Date()) {
+  if (!p?.active) return false;
+  const start = p.startAt ? new Date(p.startAt) : null;
+  const end = p.endAt ? new Date(p.endAt) : null;
+  if (start && now < start) return false;
+  if (end && now > end) return false;
+  return true;
+}
+
+function applyPromo(basePrice: number, promo: PromotionType | null) {
+  if (!promo) return basePrice;
+
+  const val = Number((promo as any).value || 0);
+  let discount = 0;
+
+  // 0.2 => 20%
+  if (val <= 1) discount = basePrice * val;
+  // 20 => 20%
+  else if (val <= 100) discount = basePrice * (val / 100);
+  // 1500 => $1500 off
+  else discount = val;
+
+  return Math.max(0, Math.round(basePrice - discount));
+}
+
+function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
+  if (!promos || promos.length === 0) return null;
+
+  const actives = promos.filter((p) => isPromoActive(p));
+  if (actives.length === 0) return null;
+
+  let best: { promo: PromotionType; finalPrice: number } | null = null;
+
+  for (const p of actives) {
+    const fp = applyPromo(basePrice, p);
+    if (!best || fp < best.finalPrice) best = { promo: p, finalPrice: fp };
+  }
+
+  return best ? best.promo : null;
+}
+
+/* -------------------- normalizar promos (strapi) -------------------- */
+function normalizePromotions(input: any): PromotionType[] {
+  if (!input) return [];
+  if (Array.isArray(input)) return input as PromotionType[];
+
+  if (Array.isArray(input?.data)) {
+    return input.data.map((x: any) => ({
+      id: x?.id ?? x?.attributes?.id,
+      ...(x?.attributes ?? x),
+    })) as PromotionType[];
+  }
+
+  if (input?.data && typeof input.data === "object") {
+    const x = input.data;
+    return [
+      {
+        id: x?.id ?? x?.attributes?.id,
+        ...(x?.attributes ?? x),
+      } as PromotionType,
+    ];
+  }
+
+  return [];
+}
+
 const ProductCard = ({ product }: ProductCardProps) => {
   const router = useRouter();
-  const attrs = product?.attributes || {};
+  const attrs: any = product?.attributes ?? product ?? {};
 
   const [hover, setHover] = useState(false);
 
@@ -43,14 +111,21 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const image2 = toAbsUrl(secondImage);
 
   // -------------------------
-
   const displayName = attrs?.productName ?? "Producto sin nombre";
   const secondaryName =
     attrs?.productName2 ?? attrs?.variant ?? attrs?.subCategory ?? "";
-  const displayPrice =
-    attrs?.price !== undefined && attrs?.price !== null ? attrs.price : "—";
-  const isActive = attrs?.active ?? true;
+
   const productSlug = attrs?.slug ?? "";
+
+  // -------------------------
+  //   PRECIO + PROMO
+  // -------------------------
+  const basePrice = Number(attrs?.price ?? 0);
+  const promos = normalizePromotions(attrs?.promotions);
+  const appliedPromo = pickBestPromo(basePrice, promos);
+
+  const finalPrice = appliedPromo ? applyPromo(basePrice, appliedPromo) : basePrice;
+  const hasDiscount = appliedPromo !== null && finalPrice < basePrice;
 
   return (
     <Card
@@ -59,29 +134,53 @@ const ProductCard = ({ product }: ProductCardProps) => {
         sm:overflow-hidden
         rounded-none
         border-none
-        
         bg-[#ffffff]
         flex flex-col justify-between
         pb-6 sm:py-4
         shadow-none
-        
       "
     >
-      <CardContent className="flex flex-col px-3 pt-0 pb-0">
+      <CardContent className="flex flex-col px-0 sm:px-0 pt-0 pb-0">
+        {/* Badge OFERTA */}
+        {hasDiscount && (
+          <div
+            className="
+              absolute left-3 top-3 z-10
+              rounded-full px-3 py-1
+              text-[11px] font-black tracking-wide
+              bg-green-500 text-white
+            "
+          >
+            OFERTA
+          </div>
+        )}
+
+        {/* Corazón */}
+        <button
+          className="
+            self-end inline-flex h-9 w-9 items-center justify-center cursor-pointer
+            rounded-[10px]
+            bg-white text-black/70 transition-colors
+            flex-shrink-0
+          "
+          type="button"
+        >
+          <Heart width={20} strokeWidth={1.5} className="hover:fill-black" />
+        </button>
 
         {/* IMAGEN */}
         <div
           className="
-            relative mb-3 sm:mb-4 
-            mt-0 w-full 
+            relative mb-3 sm:mb-4
+            mt-0 w-full
             rounded-[14px] sm:rounded-[24px]
-          bg-white
+            bg-white
             flex items-center justify-center overflow-hidden
             pt-1 pb-1 cursor-pointer
           "
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
-          onClick={() => router.push(`/product/${product.attributes.slug}`)}
+          onClick={() => router.push(`/product/${productSlug}`)}
         >
           {/* Imagen por defecto */}
           {image1 && (
@@ -128,56 +227,36 @@ const ProductCard = ({ product }: ProductCardProps) => {
           {displayName}
         </h3>
 
-
-        {/* SEPARATOR 1 */}
-        <div className=" w-full sm:border-[0.3px] sm:border-[#e9e9e9] " />
-
-
-
-        {/* SUB*/}
-        <div className="flex justify-center py-1 md:py-3">
-           <div className="flex items-center gap-2 text-center">
-          <p className="text-sm md:text-lg font-medium  text-black leading-none md:leading-3">
-             {secondaryName}
-           </p>
-          </div>
-          </div>            
-
-
-
-        {/* SEPARATOR 2 */}
-        <div className="h-px w-full sm:border sm:border-[#e9e9e9] " />
-
-
-        {/* PRECIO + CTA */}
-        <div className="mt-0 md:mt-1 pl-13 sm:pl-0 sm:text-center flex items-center text-center sm:justify-center ">
-          {/* Precio */}
-          <p className="text-[16px] sm:text-[18px] pt-none font-semibold pl-2 sm:pl-4 whitespace-nowrap">
-            {formatPrice(displayPrice)}
-          </p>
-
-          {/* Acciones */}
-          <div className="flex items-center gap-2">
-            {/* Comprar (solo desktop) */}
-            
-
-            {/* Corazón */}
-            <button
-              className="
-                inline-flex h-9 w-9 items-center justify-center cursor-pointer
-                rounded-[10px] 
-                bg-white text-black/70 transition-colors
-                flex-shrink-0
-              "
-            >
-              <Heart width={20} strokeWidth={1.5} className="hover:fill-black" />
-            </button>
+        {/* SUB */}
+        <div className="flex justify-center py-1 md:py-1">
+          <div className="flex items-center gap-2 text-center">
+            <p className="text-sm md:text-lg font-medium text-black leading-none md:leading-3">
+              {secondaryName}
+            </p>
           </div>
         </div>
 
+        {/* PRECIO */}
+        <div className="mt-0 md:mt-1 flex justify-center items-center text-center">
+          {hasDiscount ? (
+            <div className="leading-tight">
+              <p className="text-[12px] sm:text-[13px] font-semibold text-black/40 line-through">
+                {formatPrice(basePrice)}
+              </p>
+              <p className="text-[16px] sm:text-[18px] font-extrabold text-red-500 tabular-nums whitespace-nowrap">
+                {formatPrice(finalPrice)}
+              </p>
+            </div>
+          ) : (
+            <p className="text-[16px] sm:text-[18px] font-semibold whitespace-nowrap">
+              {formatPrice(basePrice)}
+            </p>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
 };
 
 export default ProductCard;
+

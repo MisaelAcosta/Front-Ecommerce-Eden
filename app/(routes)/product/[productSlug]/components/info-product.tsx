@@ -75,39 +75,40 @@ function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
 const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
   const { addItem } = useCart();
   const [qty, setQty] = useState<number>(1);
-/* ------------------------------------------------------------------- */
 
-  
-/* ----------------------- Carusel y variantes ----------------------- */
+  /* ----------------------- Carusel y variantes ----------------------- */
 
   // Variantes activas: primero las que vienen del hook, si no las del product
   const variants: VariantType[] =
-    (variantsData ?? product.variants ?? []).filter((v) => v.active) ?? [];
+  ((variantsData && variantsData.length ? variantsData : product.variants) ?? [])
+    .filter((v) => v.active);
 
-    // Al entrar, ninguna variante seleccionada
-  const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
+  // Al entrar, ninguna variante seleccionada
+  const [selectedVariantId, setSelectedVariantId] = useState<number | null>(
+    null
+  );
 
   const currentVariant =
     selectedVariantId != null
       ? variants.find((v) => v.id === selectedVariantId) ?? null
       : null;
 
-
   const dec = () => setQty((q) => Math.max(1, q - 1));
   const inc = () => setQty((q) => Math.min(99, q + 1));
 
-  const handleAddToCart = () => {
-    // TODO: idealmente el carrito debería recibir variant también.
-    for (let i = 0; i < qty; i++) addItem(product);
-  };
+  console.log("product.variants =>", product.variants);
+  console.log("variantsData =>", variantsData);
+
+  useEffect(() => {
+  console.log("🟣 currentVariant FULL:", currentVariant);
+  console.log("🟣 currentVariant.image:", currentVariant?.image);
+}, [currentVariant]);
 
 
-  /* ------------------------------------------------------------------- */
 
   /* ---------------- precio + promo (variant > product) ---------------- */
 
-  const basePrice =
-    currentVariant?.price ?? product.price ?? 0;
+  const basePrice = currentVariant?.price ?? product.price ?? 0;
 
   const bestVariantPromo = currentVariant
     ? pickBestPromo(basePrice, currentVariant.promotions)
@@ -123,8 +124,6 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
   const hasDiscount = appliedPromo !== null && finalPrice < basePrice;
 
   const specsToShow = currentVariant?.specs || product.specs || "";
-  /* ------------------------------------------------------------------- */
-
 
   /* -------------------- imágenes para el carrusel --------------------- */
 
@@ -169,18 +168,52 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
       ? u
       : `${process.env.NEXT_PUBLIC_BACKEND_URL || ""}${u ?? ""}`;
 
+  /* ------------------------------------------------------------------- */
+  /* ✅✅✅ PARTE 3 ADAPTADA: AGREGAR VARIANTE AL CARRITO ✅✅✅ */
+  const handleAddToCart = () => {
+    // Si tu producto tiene variantes, obligamos a elegir una
+    if (variants.length > 0 && !currentVariant) {
+      alert("Selecciona una variante primero 🙏");
+      return;
+    }
 
-  /* ------------------------------------------------------------------- */
-  /* ------------------------------------------------------------------- */
-  /* ------------------------------------------------------------------- */
-  /* ---------------------------Front----------------------------------- */
+    // Si no hay variante seleccionada (y no hay variantes activas), no agregamos
+    if (!currentVariant) {
+      alert("Este producto no tiene variantes configuradas.");
+      return;
+    }
 
+    // imagen de la variante -> si no, primera del producto -> si no, fallback
+    const variantFirstImg = Array.isArray(currentVariant.image)
+      ? currentVariant.image[0]
+      : currentVariant.image;
+
+    const imageUrl =
+      variantFirstImg?.url
+        ? srcOf(variantFirstImg.url)
+        : product.images?.[0]?.url
+        ? srcOf(product.images[0].url)
+        : "/no-image.png";
+
+    // 👇 ahora addItem recibe el "line" basado en variante (como ya dejaste listo el carrito)
+    addItem({
+      productId: product.id,
+      productSlug: product.slug,
+
+      variantId: currentVariant.id,
+      variantName: currentVariant.variantName,
+
+      imageUrl,
+      sku: currentVariant.sku ?? null,
+
+      unitPrice: finalPrice, // precio final (con promo aplicada)
+      qty, // cantidad elegida
+    });
+  };
+  /* ------------------------------------------------------------------- */
 
   return (
-    /* -------------------------Div Padre---------------------- */
     <div className="w-full max-w-6xl mx-auto pt-1 md:pt-0 ">
-
-      {/* Layout: izquierda imagen, derecha info */}
       <div className="grid gap-8 md:gap-14 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
         {/* COLUMNA IZQUIERDA: CARRUSEL */}
         <div className="w-full pt-6 md:pt-0">
@@ -216,8 +249,6 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
                 <CarouselPrevious className="left-2 top-1/2 -translate-y-1/2 hidden md:flex" />
                 <CarouselNext className="right-2 top-1/2 -translate-y-1/2 hidden md:flex" />
               </Carousel>
-              
- {/* --------------------------------------------------------------------------------------- */}                 
 
               {/* Puntos de paginación */}
               <div className="mt-3 flex items-center justify-center gap-2">
@@ -240,9 +271,7 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
 
         {/* COLUMNA DERECHA: INFO */}
         <div className="w-full max-w-[720px] md:max-w-none md:pl-16 pt-7 md:pt-0">
-          {/* Header: títulos, disponibilidad y precio */}
           <div className="flex items-start justify-between gap-2 px-5 md:px-0">
-            {/* Títulos */}
             <div className="min-w-0 mr-3">
               <h1 className="text-2xl font-extrabold leading-tight tracking-tight">
                 {product.productName}
@@ -254,7 +283,6 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
               ) : null}
             </div>
 
-            {/* Disponibilidad y precio */}
             <div className="shrink-0 flex flex-col items-end gap-1">
               <span
                 className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wide ${
@@ -285,7 +313,6 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
 
           <Separator className="my-4" />
 
-          {/* Descripción */}
           <section className="space-y-2 px-5 md:px-0">
             <h3 className="text-xl font-black">DESCRIPCION</h3>
             <p className="text-sm leading-relaxed text-muted-foreground">
@@ -293,7 +320,6 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
             </p>
           </section>
 
-          {/* Especificaciones */}
           <section className="mt-6 space-y-2 px-5 md:px-0">
             <h3 className="text-xl font-black">ESPECIFICACIONES</h3>
             <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
@@ -305,34 +331,25 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
           {variants.length > 0 && (
             <section className="mt-6 space-y-3 px-5 md:px-0">
               <div className="flex items-center gap-3">
-                
-
                 <div className="flex items-center gap-2">
                   {variants.map((v) => {
                     const selected = currentVariant?.id === v.id;
-                    const thumb = v.image?.[0];
+                    const vImgs = normalizeImages(v.image);
+                    const thumb = vImgs[0];
 
                     return (
-                      <button
+                     <button
                         key={v.id}
                         type="button"
                         onClick={() => setSelectedVariantId(v.id)}
                         className={`flex h-15 w-15 items-center cursor-pointer justify-center rounded-full border transition hover:shadow-sm ${
-                          selected
-                            ? "border-black bg-black/5"
-                            : "border-zinc-200 bg-white"
+                          selected ? "border-black bg-black/5" : "border-zinc-200 bg-white"
                         }`}
                         aria-pressed={selected}
                       >
-                        {thumb ? (
+                        {thumb?.url ? (
                           <img
-                            src={
-                              thumb.url?.startsWith("http")
-                                ? thumb.url
-                                : `${process.env.NEXT_PUBLIC_BACKEND_URL || ""}${
-                                    thumb.url
-                                  }`
-                            }
+                            src={srcOf(thumb.url)}
                             alt={v.variantName}
                             className="h-13 w-13 rounded-full object-cover"
                             draggable={false}
@@ -354,7 +371,6 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
 
           {/* CTA: cantidad + botón + wishlist */}
           <div className="flex flex-col items-stretch gap-4 sm:flex-row px-8 md:px-0 sm:items-center sm:justify-start">
-            {/* Stepper cantidad */}
             <div className="inline-flex h-10 items-center justify-between rounded-lg border px-2">
               <button
                 type="button"
@@ -377,10 +393,12 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
               </button>
             </div>
 
-            {/* Botón agregar al carrito + wishlist */}
             <div className="flex items-start justify-between gap-5 md:gap-3">
+              {/* ✅ deshabilita si no hay variante seleccionada cuando existen variantes */}
               <Button
-                disabled={!product.active}
+                disabled={
+                  !product.active || (variants.length > 0 && !currentVariant)
+                }
                 onClick={handleAddToCart}
                 className="h-10 flex-1 sm:flex-none sm:w-auto cursor-pointer"
               >
@@ -408,6 +426,4 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
 };
 
 export default InfoProduct;
-
-
 

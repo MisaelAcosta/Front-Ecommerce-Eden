@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { BaggageClaim, Heart, ShoppingCart, User, UserCheck } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import MenuList from "../menu-list";
 import ItemsMenuMobile from "../items-menu-mobile";
 import { useCart } from "@/hooks/use-cart";
@@ -11,10 +11,9 @@ import { LoginDialog } from "@/components/auth/login-dialog";
 import { ProfileSheet } from "@/components/profile/profile-sheet";
 import type { CurrentUser, ProfileData } from "@/components/profile/profile-types";
 
-
-
 const Navbar = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const cart = useCart();
 
   const [user, setUser] = useState<CurrentUser | null>(null);
@@ -76,12 +75,24 @@ const Navbar = () => {
 
   const AuthIcon = user ? UserCheck : User;
 
-  const fg = scrolled ? "text-black" : "text-white";
-  const border = scrolled ? "border-black" : "border-white";
-  const hoverBtn = scrolled ? "hover:bg-black hover:text-white" : "hover:bg-white hover:text-black";
+  // ✅ SOLO EN /catalogo (y subrutas) forzamos el navbar en negro desde arriba
+  const isCatalog = pathname.startsWith("/category/");
+  const isProduct = pathname.startsWith("/product");
+  const isCart = pathname.startsWith("/cart");
+
+    
+
+  // forceDark = si estoy en catálogo o si ya scrolleé (comportamiento normal)
+  
+  const forceDark = isCatalog || isProduct || isCart || scrolled;
+  
 
 
-
+  const fg = forceDark ? "text-black" : "text-white";
+  const border = forceDark ? "border-black" : "border-white";
+  const hoverBtn = forceDark
+    ? "hover:bg-black hover:text-white"
+    : "hover:bg-white hover:text-black";
 
   return (
     <header
@@ -90,12 +101,11 @@ const Navbar = () => {
         transition-all duration-300
         border-b
         ${hidden ? "-translate-y-full" : "translate-y-0"}
-        ${scrolled ? "bg-white/80 backdrop-blur-md shadow-sm" : "bg-transparent"}
+        ${forceDark ? "bg-white/80 backdrop-blur-md shadow-sm" : "bg-transparent"}
       `}
     >
       <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-3">
         <div className="flex w-full items-center justify-between py-2">
-
           {/* Logo + menú */}
           <div className="flex items-center gap-4 md:gap-10">
             <h1
@@ -109,7 +119,7 @@ const Navbar = () => {
               EDEN.
             </h1>
 
-            <div className={`hidden md:flex  transition-colors duration-300 ${fg}`}>
+            <div className={`hidden md:flex transition-colors duration-300 ${fg}`}>
               <MenuList />
             </div>
           </div>
@@ -198,9 +208,9 @@ const Navbar = () => {
               </>
             )}
 
-            <div className="flex sm:hidden ">
-            <ItemsMenuMobile scrolled={scrolled} />
-          </div>
+            <div className="flex sm:hidden">
+              <ItemsMenuMobile scrolled={forceDark} />
+            </div>
           </div>
         </div>
       </div>

@@ -18,11 +18,6 @@ export type VariantType = {
     alternativeText?: string | null;
   }[];
   
-  image2: {
-    id: number;
-    url: string;
-    alternativeText?: string | null;
-  }[];
 
   // Relaciones
   promotions?: PromotionType[] | null;

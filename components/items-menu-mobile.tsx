@@ -158,7 +158,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
           exit={{ opacity: 0, scale: 0.9, rotate: -10 }}
           transition={{ type: "spring", stiffness: 260, damping: 20 }}
           className="
-          fixed top-6 right-5 z-[3100]
+          fixed top-2 right-4 z-[3100]
           p-2.5 rounded-md
           bg-white 
           text-black
