@@ -11,6 +11,7 @@ import { LoginDialog } from "@/components/auth/login-dialog";
 import { ProfileSheet } from "@/components/profile/profile-sheet";
 import type { CurrentUser, ProfileData } from "@/components/profile/profile-types";
 
+
 const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
@@ -79,12 +80,13 @@ const Navbar = () => {
   const isCatalog = pathname.startsWith("/category/");
   const isProduct = pathname.startsWith("/product");
   const isCart = pathname.startsWith("/cart");
+  const isLoved = pathname.startsWith("/loved-product");
 
     
 
   // forceDark = si estoy en catálogo o si ya scrolleé (comportamiento normal)
   
-  const forceDark = isCatalog || isProduct || isCart || scrolled;
+  const forceDark = isCatalog || isProduct || isCart || scrolled || isLoved;
   
 
 
@@ -145,7 +147,7 @@ const Navbar = () => {
             <Heart
               strokeWidth={1.2}
               className={`cursor-pointer hidden md:inline h-6 w-6 transition-colors duration-300 ${fg}`}
-              onClick={() => router.push("/loved-products")}
+              onClick={() => router.push("/loved-product")}
             />
 
             {/* Desktop: Iniciar / Perfil */}

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ChevronLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { writeAccountProfile } from "@/lib/account-profile";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -145,8 +146,21 @@ export function ProfileInfoForm({
         console.error("Error guardando perfil:", await res.text());
         setErrorMessage("Hubo un problema al guardar tu información.");
       } else {
+        // ✅ 1) Guardamos en localStorage para que el checkout pueda autocompletar
+        writeAccountProfile({
+          name: payload.nombre?.trim(),
+          rutBody: rutBody.trim(),
+          rutDv: rutDv.trim().toUpperCase(),
+          phoneRest: phoneRest.trim(),
+          region: payload.region,
+          comuna: payload.comuna,
+          calle: payload.calle?.trim(),
+          numero: payload.numero?.trim(),
+          depto: payload.depto?.trim(),
+        });
+
+        // ✅ 2) UI feedback
         setSavedMessage("Información guardada correctamente ✅");
-        // Opcional: salir de modo edición al guardar
         setIsEditing(false);
       }
     } catch (err) {
@@ -271,9 +285,7 @@ export function ProfileInfoForm({
                   value={rutBody}
                   onChange={(val) => {
                     if (!isEditing) return;
-                    if (/^\d*$/.test(val)) {
-                      setRutBody(val);
-                    }
+                    if (/^\d*$/.test(val)) setRutBody(val);
                   }}
                 >
                   <InputOTPGroup>
@@ -285,7 +297,6 @@ export function ProfileInfoForm({
                       />
                     ))}
                   </InputOTPGroup>
-
                   <InputOTPSeparator />
                 </InputOTP>
 
@@ -294,9 +305,7 @@ export function ProfileInfoForm({
                   value={rutDv}
                   onChange={(val) => {
                     if (!isEditing) return;
-                    if (/^[0-9kK]?$/.test(val)) {
-                      setRutDv(val.toUpperCase());
-                    }
+                    if (/^[0-9kK]?$/.test(val)) setRutDv(val.toUpperCase());
                   }}
                 >
                   <InputOTPGroup>
@@ -322,9 +331,7 @@ export function ProfileInfoForm({
                 value={phoneRest}
                 onChange={(val) => {
                   if (!isEditing) return;
-                  if (/^\d*$/.test(val)) {
-                    setPhoneRest(val);
-                  }
+                  if (/^\d*$/.test(val)) setPhoneRest(val);
                 }}
               >
                 <InputOTPGroup>
@@ -432,9 +439,7 @@ export function ProfileInfoForm({
         {savedMessage && (
           <p className="text-[11px] text-emerald-600">{savedMessage}</p>
         )}
-        {errorMessage && (
-          <p className="text-[11px] text-red-600">{errorMessage}</p>
-        )}
+        {errorMessage && <p className="text-[11px] text-red-600">{errorMessage}</p>}
 
         {/* Botón guardar solo si se está editando */}
         {isEditing && (
@@ -450,6 +455,7 @@ export function ProfileInfoForm({
     </div>
   );
 }
+
 
 
 

@@ -16,6 +16,9 @@ import { Card, CardContent } from "./ui/card";
 import { Heart, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/formatPrice";
+import { LovedButton } from "./loved-button";
+import { toAbsUrl } from "@/lib/media";
+
 
 // helper para convertir category a string (lo dejamos por si lo quieres usar luego)
 function toText(v: any): string | undefined {
@@ -31,14 +34,6 @@ function toText(v: any): string | undefined {
 }
 
 // Helper URL absoluta
-const toAbsUrl = (url?: string | null) => {
-  if (!url) return null;
-  if (url.startsWith("http")) return url;
-
-  const base = (process.env.NEXT_PUBLIC_BACKEND_URL || "").replace(/\/+$/, "");
-  const clean = url.replace(/^\/+/, "");
-  return `${base}/${clean}`;
-};
 
 /* ----------------------- helpers de promociones ----------------------- */
 
@@ -123,6 +118,7 @@ function normalizePromotions(input: any): PromotionType[] {
 const FeaturedProducts = () => {
   const { result, loading }: ResponseType = useGetFeaturedProducts();
   const router = useRouter();
+  
 
   return (
     <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-8 sm:py-14">
@@ -148,6 +144,8 @@ const FeaturedProducts = () => {
               // -------------------------
               //   OBTENER IMÁGENES
               // -------------------------
+
+              
               const imagesArray =
                 Array.isArray(attrs?.images)
                   ? attrs.images
@@ -186,23 +184,23 @@ const FeaturedProducts = () => {
               const hasDiscount =
                 appliedPromo !== null && finalPrice < basePrice;
 
+              
+
               return (
                 <CarouselItem
                   key={raw.id}
                   className="basis-[85%] sm:basis-1/2 lg:basis-1/3 px-3 md:px-4"
                 >
                   {/* Corazón */}
-                  <button
-                    className="
-                      flex w-full items-center justify-end sm:justify-end gap-2
-                      rounded-[10px]
-                      bg-white text-black/70 transition-colors
-                      flex-shrink-0
-                    "
-                    type="button"
-                  >
-                    <Heart width={20} strokeWidth={1.5} className="hover:fill-black" />
-                  </button>
+                  <LovedButton
+                    product={{
+                      id: raw.id,
+                      title: displayName,
+                      price: basePrice,
+                      slug: productSlug,
+                      imageUrl: toAbsUrl(product.images?.[0]?.url ?? null),
+                    }}
+                  />
 
                   <Card
                     className="
@@ -319,7 +317,7 @@ const FeaturedProducts = () => {
                             {formatPrice(basePrice)}
                           </p>
                         )}
-
+                      
                         <button
                           className="
                             inline-flex h-9 w-9

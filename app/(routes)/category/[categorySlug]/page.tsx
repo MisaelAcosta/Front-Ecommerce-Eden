@@ -173,10 +173,13 @@ useEffect(() => {
     className="
       md:hidden
       flex left-0 right-0
+      items-center
+      content-center
+      px-12
       bottom-[10px] /* altura aprox de la barra + margen */
       max-h-[85vh]
       mx-1
-      rounded-2xl bg-white 
+      rounded-2xl bg-white
       z-50
     "
   >
@@ -234,6 +237,8 @@ useEffect(() => {
               <div className="
               grid
               grid-cols-2
+              pr-3
+              sm:pr-0
               sm:grid-cols-2
               xl:grid-cols-3     /* a 1280px -> 2 columnas */
               md:grid-cols-3

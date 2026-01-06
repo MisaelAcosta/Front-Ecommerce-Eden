@@ -201,7 +201,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
 
                 <motion.div variants={itemVariants}>
                   <Link
-                    href="/favoritos"
+                    href="/loved-product"
                     className="block text-black text-3xl font-semibold hover:text-gray-300 transform hover:translate-x-2"
                     onClick={closeMenu}
                   >

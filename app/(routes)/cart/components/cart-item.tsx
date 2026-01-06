@@ -4,7 +4,7 @@ import { useCart } from "@/hooks/use-cart";
 import { formatPrice } from "@/lib/formatPrice";
 import { cn } from "@/lib/utils";
 import type { CartLine } from "@/types/cart";
-import { X } from "lucide-react";
+import { Minus, Plus, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface CartItemProps {
@@ -13,46 +13,71 @@ interface CartItemProps {
 
 const CartItem = ({ item }: CartItemProps) => {
   const router = useRouter();
-  const { removeItem } = useCart();
+  const { removeItem, incQty, decQty } = useCart();
 
   return (
-    <li className="flex py-6 border-b">
-      {/* Ruta del producto */}
+    <li className="flex items-center gap-4 py-6 border-b">
+      {/* Imagen */}
       <div
         onClick={() => router.push(`/product/${item.productSlug}`)}
         className="cursor-pointer"
       >
         <img
           src={item.imageUrl}
-          alt={item.variantName || "Variant"}
-          className="w-24 h-24 overflow-hidden rounded-md sm:w-auto sm:h-32 object-cover"
+          alt={item.variantName}
+          className="w-20 h-20 rounded-md object-cover"
         />
       </div>
 
-      {/* Nombres y precio */}
-      <div className="flex justify-between flex-1 px-6 gap-4">
+      {/* Info */}
+      <div className="flex flex-1 justify-between items-center gap-4">
         <div className="min-w-0">
-          <h2 className="text-lg font-bold truncate">{item.variantName}</h2>
-          {item.sku ? (
-            <p className="text-xs text-muted-foreground">SKU: {item.sku}</p>
-          ) : null}
-          <p className="text-sm text-muted-foreground">Cantidad: {item.qty}</p>
+          <h2 className="text-sm font-semibold truncate">{item.variantName}</h2>
+
+          {/* Si quieres mostrar descripción real, cámbialo por item.specs o algo tuyo */}
+          <p className="text-xs text-muted-foreground">Soporte de mando</p>
+
+          {/* Control cantidad */}
+          <div className="flex items-center gap-2 mt-2">
+            <button
+              onClick={() => decQty(item.id)}
+              className="h-8 w-8 border rounded-md flex items-center justify-center hover:bg-muted"
+              aria-label="Disminuir cantidad"
+              type="button"
+            >
+              <Minus size={14} />
+            </button>
+
+            <span className="w-6 text-center text-sm font-medium">
+              {item.qty}
+            </span>
+
+            <button
+              onClick={() => incQty(item.id)}
+              className="h-8 w-8 border rounded-md flex items-center justify-center hover:bg-muted"
+              aria-label="Aumentar cantidad"
+              type="button"
+            >
+              <Plus size={14} />
+            </button>
+          </div>
         </div>
 
+        {/* Precio + eliminar */}
         <div className="flex items-center gap-4">
-          <p className="font-semibold">
+          <p className="text-sm font-semibold whitespace-nowrap">
             {formatPrice(item.unitPrice * item.qty)}
           </p>
 
           <button
-            className={cn(
-              "rounded-full flex items-center justify-center bg-white border cursor-pointer p-1"
-            )}
             onClick={() => removeItem(item.id)}
-            aria-label="Eliminar item"
+            className={cn(
+              "h-8 w-8 rounded-full border flex items-center justify-center hover:bg-muted"
+            )}
+            aria-label="Eliminar producto"
             type="button"
           >
-            <X size={20} />
+            <X size={16} />
           </button>
         </div>
       </div>
@@ -61,5 +86,7 @@ const CartItem = ({ item }: CartItemProps) => {
 };
 
 export default CartItem;
+
+
 
 
