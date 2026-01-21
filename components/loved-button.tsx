@@ -20,14 +20,14 @@ export const LovedButton = ({ product }: LovedButtonProps) => {
         e.stopPropagation();
         toggleLoved(product);
       }}
-      className="flex items-center justify-end"
+      className="ml-auto flex items-center justify-end"
     >
       <Heart
         width={20}
         strokeWidth={1.5}
         className={clsx(
-          "transition-colors",
-          isLoved ? "fill-black text-black" : "text-black/60 hover:fill-black"
+          "transition-colors items-right  ht justify-right",
+          isLoved ? "fill-black text-black" : "text-black/40 hover:fill-black"
         )}
       />
     </button>

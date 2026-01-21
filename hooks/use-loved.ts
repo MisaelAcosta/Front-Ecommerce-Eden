@@ -6,6 +6,7 @@ import { persist } from "zustand/middleware";
 export type LovedProduct = {
   id: number;
   title: string;
+  secondaryName: string | null;
   price: number;
   imageUrl?: string | null;
   slug: string;

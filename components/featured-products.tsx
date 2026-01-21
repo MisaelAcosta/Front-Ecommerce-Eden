@@ -196,9 +196,11 @@ const FeaturedProducts = () => {
                     product={{
                       id: raw.id,
                       title: displayName,
+                      secondaryName: secondaryName,
                       price: basePrice,
                       slug: productSlug,
                       imageUrl: toAbsUrl(product.images?.[0]?.url ?? null),
+                      
                     }}
                   />
 
@@ -241,6 +243,7 @@ const FeaturedProducts = () => {
                           bg-white
                           flex items-center justify-center overflow-hidden
                           pt-1 pb-1 cursor-pointer
+                          
                         "
                         onClick={() =>
                           productSlug && router.push(`/product/${productSlug}`)
@@ -252,7 +255,7 @@ const FeaturedProducts = () => {
                             src={image1}
                             alt={displayName}
                             className="
-                              sm:max-h-[310px] w-auto object-contain
+                              sm:max-h-[410px]  w-auto object-contain
                               transition-all duration-300 ease-out
                               opacity-100 group-hover:opacity-0
                             "
@@ -295,7 +298,7 @@ const FeaturedProducts = () => {
                       {/* SUB */}
                       <div className="flex justify-center py-1 gap-2">
                         <div className="flex items-center gap-2 text-center">
-                          <p className="text-lg font-semibold text-black">
+                          <p className="text-lg font-normal text-black">
                             {secondaryName}
                           </p>
                         </div>

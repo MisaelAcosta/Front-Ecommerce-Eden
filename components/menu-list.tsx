@@ -34,6 +34,12 @@ const MenuList = () => {
           </NavigationMenuLink>
         </NavigationMenuItem>
 
+        <NavigationMenuItem>
+          <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+            <Link href="/cotiza">COTIZA</Link>
+          </NavigationMenuLink>
+        </NavigationMenuItem>
+
       </NavigationMenuList>
     </NavigationMenu>
   )
