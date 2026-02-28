@@ -1,16 +1,12 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ProductType } from "@/types/product";
 import { formatPrice } from "@/lib/formatPrice";
 import { useState } from "react";
 import type { PromotionType } from "@/types/promotion";
-
-type ProductCardProps = {
-  product: ProductType;
-};
+import { LovedButton } from "@/components/loved-button";
 
 /* ----------------------- helpers de promociones ----------------------- */
 
@@ -29,11 +25,8 @@ function applyPromo(basePrice: number, promo: PromotionType | null) {
   const val = Number((promo as any).value || 0);
   let discount = 0;
 
-  // 0.2 => 20%
   if (val <= 1) discount = basePrice * val;
-  // 20 => 20%
   else if (val <= 100) discount = basePrice * (val / 100);
-  // 1500 => $1500 off
   else discount = val;
 
   return Math.max(0, Math.round(basePrice - discount));
@@ -55,7 +48,6 @@ function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
   return best ? best.promo : null;
 }
 
-/* -------------------- normalizar promos (strapi) -------------------- */
 function normalizePromotions(input: any): PromotionType[] {
   if (!input) return [];
   if (Array.isArray(input)) return input as PromotionType[];
@@ -80,9 +72,13 @@ function normalizePromotions(input: any): PromotionType[] {
   return [];
 }
 
+type ProductCardProps = {
+  product: ProductType;
+};
+
 const ProductCard = ({ product }: ProductCardProps) => {
   const router = useRouter();
-  const attrs: any = product?.attributes ?? product ?? {};
+  const attrs: any = (product as any)?.attributes ?? product ?? {};
 
   const [hover, setHover] = useState(false);
 
@@ -124,7 +120,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const promos = normalizePromotions(attrs?.promotions);
   const appliedPromo = pickBestPromo(basePrice, promos);
 
-  const finalPrice = appliedPromo ? applyPromo(basePrice, appliedPromo) : basePrice;
+  const finalPrice = appliedPromo
+    ? applyPromo(basePrice, appliedPromo)
+    : basePrice;
+
   const hasDiscount = appliedPromo !== null && finalPrice < basePrice;
 
   return (
@@ -155,25 +154,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </div>
         )}
 
-        {/* Corazón */}
-        <button
-          className="
-            self-end inline-flex h-9 w-9 items-center justify-center cursor-pointer
-            rounded-[10px]
-            bg-white text-black/70 transition-colors
-            flex-shrink-0
-          "
-          type="button"
-        >
-          <Heart width={20} strokeWidth={1.5} className="hover:fill-black" />
-        </button>
-
         {/* IMAGEN */}
         <div
           className="
             relative mb-3 sm:mb-4
             mt-0 w-full
-            rounded-[14px] sm:rounded-[24px]
+            rounded-0 sm:rounded-0
             bg-white
             flex items-center justify-center overflow-hidden
             pt-1 pb-1 cursor-pointer
@@ -182,13 +168,27 @@ const ProductCard = ({ product }: ProductCardProps) => {
           onMouseLeave={() => setHover(false)}
           onClick={() => router.push(`/product/${productSlug}`)}
         >
+          {/* ❤️ Corazón dentro del recuadro */}
+          <div className="absolute top-3 right-3 z-20">
+            <LovedButton
+              product={{
+                id: (product as any)?.id ?? attrs?.id,
+                title: displayName,
+                secondaryName,
+                price: basePrice,
+                slug: productSlug,
+                imageUrl: image1,
+              }}
+            />
+          </div>
+
           {/* Imagen por defecto */}
           {image1 && (
             <img
               src={image1}
               alt={displayName}
               className={`
-                max-h-[280px] sm:max-h-[310px] w-auto object-contain
+                max-h-280px sm:max-h-360px 2xl:max-h-350px
                 transition-all duration-300 ease-out
                 ${hover && image2 ? "opacity-0" : "opacity-100"}
               `}
@@ -201,8 +201,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
               src={image2}
               alt={displayName}
               className={`
-                absolute max-h-[210px] sm:max-h-[410px] max-w-[320px] object-contain
-                transition-all duration-600 ease-out
+                absolute sm:max-h-full sm:w-full object-cover
+                transition-all duration-600 ease-out 
                 ${hover ? "opacity-100" : "opacity-0"}
               `}
             />
@@ -220,7 +220,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
             leading-tight
             text-center
             font-black uppercase
-            mb-1
             line-clamp-1
           "
         >
@@ -228,9 +227,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </h3>
 
         {/* SUB */}
-        <div className="flex justify-center py-1 md:py-1">
+        <div className="flex justify-center">
           <div className="flex items-center gap-2 text-center">
-            <p className="text-sm md:text-lg font-medium text-black leading-none md:leading-3">
+            <p className="text-sm md:text-lg font-light text-black leading-none md:leading-3">
               {secondaryName}
             </p>
           </div>

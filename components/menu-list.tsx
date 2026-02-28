@@ -1,69 +1,60 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { CircleCheckIcon, CircleHelpIcon, CircleIcon } from "lucide-react"
+import * as React from "react";
+import Link from "next/link";
+import { cn } from "@/lib/utils"; // ✅ importante
 
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
   navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
-
+} from "@/components/ui/navigation-menu";
 
 const MenuList = () => {
   return (
     <NavigationMenu viewport={false}>
-      <NavigationMenuList>
-
+      <NavigationMenuList className="gap-2 ">
         <NavigationMenuItem>
-           <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-            <Link
-            href="/category/todos-los-productos">
-            CATALOGO</Link>
-           </NavigationMenuLink>
+          <NavigationMenuLink
+            asChild
+            className={cn(
+              navigationMenuTriggerStyle(),
+              "text-lg font-medium  tracking-wide"
+            )}
+          >
+            <Link href="/category/todos-los-productos">CATALOGO</Link>
+          </NavigationMenuLink>
         </NavigationMenuItem>
 
         <NavigationMenuItem>
-          <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+          <NavigationMenuLink
+            asChild
+            className={cn(
+              navigationMenuTriggerStyle(),
+              "text-lg font-medium tracking-wide"
+            )}
+          >
             <Link href="/servicio">SERVICIOS</Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
 
         <NavigationMenuItem>
-          <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+          <NavigationMenuLink
+            asChild
+            className={cn(
+              navigationMenuTriggerStyle(),
+              "text-lg font-medium hidden  tracking-wide"
+            )}
+          >
             <Link href="/cotiza">COTIZA</Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
-
       </NavigationMenuList>
     </NavigationMenu>
-  )
-}
+  );
+};
 
-export default MenuList
+export default MenuList;
 
-
-function ListItem({
-  title,
-  children,
-  href,
-  ...props
-}: React.ComponentPropsWithoutRef<"li"> & { href: string }) {
-  return (
-    <li {...props}>
-      <NavigationMenuLink asChild>
-        <Link href={href}>
-          <div className="text-sm leading-none font-bold">{title}</div>
-          <p className="line-clamp-10 ">
-            {children}
-          </p>
-        </Link>
-      </NavigationMenuLink>
-    </li>
-  )
-}

@@ -2,12 +2,16 @@
 
 import Image from "next/image";
 
+// ✅ NUEVO: import del componente Fancy (el que instalaste manual)
+// Ajusta la ruta exacta si tu carpeta es distinta
+import LetterSwapForward from "@/components/fancy/text/letter-swap-forward-anim";
+
 const HeaderCotiza = () => {
   return (
     <section className="relative w-full">
       {/* Header wrapper */}
-      <div className="relative w-full h-[280px] 
-      sm:h-[460px] lg:h-[520px] xl:h-[820px]">
+      <div className="relative w-full h-[280px] sm:h-[820px]
+       ">
         {/* Fondo (rayas) */}
         <Image
           src="/bgcotiza.png"
@@ -45,7 +49,7 @@ const HeaderCotiza = () => {
             "
           >
             <Image
-              src="/bambu.png" // ← ruta
+              src="/bambu.png"
               alt="Impresora 3D"
               fill
               priority
@@ -54,29 +58,35 @@ const HeaderCotiza = () => {
           </div>
 
           {/* EN / SEGUNDOS (ENCIMA de todo) */}
-          <div className="absolute bottom-5 
-          right-0 
-          text-left z-30 
-          ">
+          <div className="absolute bottom-5 right-0 text-left z-30">
+            {/*  CAMBIO: antes era un <div> con "EN"
+                Ahora usamos LetterSwapForward pero mantenemos tus clases de tamaño/color
+                - "staggerDuration={0}" para que sea rápido (como tu ejemplo)
+                - Puedes probar staggerDuration={0.02} si quieres más “animación” */}
             <div
               className="
-                font-black leading-none tracking-tight
+                font-black leading-none left-0 text-left tracking-tight
                 text-red-600
-                text-[28px] sm:text-[156px] 
-              "
+                text-[28px] sm:text-[156px]
+              " 
             >
-              EN
+              <LetterSwapForward label="EN" staggerDuration={0} />
             </div>
+
+            {/*  CAMBIO: antes era un <div> con "SEGUNDOS"
+                Lo mismo: lo envolvemos para conservar el layout, márgenes y tamaños */}
             <div
               className="
                 sm:pl-0 -mt-1 sm:-mt-6
                 sm:pr-15
                 font-black leading-none tracking-tight
                 text-red-600
-                text-[44px] sm:text-[156px] 
+                text-[44px] sm:text-[156px]
               "
             >
-              SEGUNDOS
+              <LetterSwapForward label=
+              "SEGUNDOS"
+              staggerDuration={0} reverse={false} />
             </div>
           </div>
 
@@ -102,4 +112,5 @@ const HeaderCotiza = () => {
 };
 
 export default HeaderCotiza;
+
 

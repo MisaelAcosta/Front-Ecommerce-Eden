@@ -191,18 +191,7 @@ const FeaturedProducts = () => {
                   key={raw.id}
                   className="basis-[85%] sm:basis-1/2 lg:basis-1/3 px-3 md:px-4"
                 >
-                  {/* Corazón */}
-                  <LovedButton
-                    product={{
-                      id: raw.id,
-                      title: displayName,
-                      secondaryName: secondaryName,
-                      price: basePrice,
-                      slug: productSlug,
-                      imageUrl: toAbsUrl(product.images?.[0]?.url ?? null),
-                      
-                    }}
-                  />
+                  
 
                   <Card
                     className="
@@ -239,23 +228,33 @@ const FeaturedProducts = () => {
                         className="
                           relative mb-3 sm:mb-4
                           mt-0 w-full
-                          rounded-[14px] sm:rounded-[24px]
                           bg-white
                           flex items-center justify-center overflow-hidden
                           pt-1 pb-1 cursor-pointer
-                          
                         "
-                        onClick={() =>
-                          productSlug && router.push(`/product/${productSlug}`)
-                        }
+                        onClick={() => productSlug && router.push(`/product/${productSlug}`)}
                       >
+                        {/* ❤️ CORAZÓN dentro del recuadro */}
+                        <div className="absolute top-3 cursor-pointer right-3 z-20">
+                          <LovedButton
+                            product={{
+                              id: raw.id,
+                              title: displayName,
+                              secondaryName,
+                              price: basePrice,
+                              slug: productSlug,
+                              imageUrl: image1, // usa la misma que ya calculaste
+                            }}
+                          />
+                        </div>
+
                         {/* Imagen por defecto */}
                         {image1 && (
                           <img
                             src={image1}
                             alt={displayName}
                             className="
-                              sm:max-h-[410px]  w-auto object-contain
+                              sm:max-h-102.5 w-auto object-contain
                               transition-all duration-300 ease-out
                               opacity-100 group-hover:opacity-0
                             "
@@ -268,7 +267,7 @@ const FeaturedProducts = () => {
                             src={image2}
                             alt={displayName}
                             className="
-                              absolute max-h-[410px] sm:max-h-[410px] max-w-[320px] object-contain
+                              absolute sm:max-h-full sm:w-full object-cover
                               transition-all duration-300 ease-out
                               opacity-0 group-hover:opacity-100
                             "
@@ -276,9 +275,7 @@ const FeaturedProducts = () => {
                         )}
 
                         {!image1 && (
-                          <span className="text-sm text-muted-foreground">
-                            Sin imagen
-                          </span>
+                          <span className="text-sm text-muted-foreground">Sin imagen</span>
                         )}
                       </div>
 
@@ -289,7 +286,7 @@ const FeaturedProducts = () => {
                           leading-none
                           text-center sm:text-3xl
                           font-black uppercase pt-0
-                          pb-2
+                          pb-0
                         "
                       >
                         {displayName}
@@ -305,9 +302,9 @@ const FeaturedProducts = () => {
                       </div>
 
                       {/* PRECIO + DESCUENTO */}
-                      <div className="mt-1 flex items-center justify-between gap-2">
+                      <div className="mt-1 flex items-center justify-center gap-2">
                         {hasDiscount ? (
-                          <div className="pl-4 leading-tight">
+                          <div className=" leading-tight text-center">
                             <p className="text-[12px] font-semibold text-black/40 line-through">
                               {formatPrice(basePrice)}
                             </p>
@@ -316,27 +313,11 @@ const FeaturedProducts = () => {
                             </p>
                           </div>
                         ) : (
-                          <p className="text-[15px] pl-4 sm:inline-flex items-center justify-center font-semibold">
+                          <p className="text-[15px] sm:inline-flex items-center justify-center font-semibold text-center">
                             {formatPrice(basePrice)}
                           </p>
                         )}
-                      
-                        <button
-                          className="
-                            inline-flex h-9 w-9
-                            items-center justify-center cursor-pointer
-                            rounded-[10px]
-                            bg-white text-black/70
-                            transition-colors
-                            flex-shrink-0
-                          "
-                          type="button"
-                          onClick={() =>
-                            productSlug && router.push(`/product/${productSlug}`)
-                          }
-                        >
-                          <ChevronRight width={25} strokeWidth={2} />
-                        </button>
+                    
                       </div>
                     </CardContent>
                   </Card>

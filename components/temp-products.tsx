@@ -11,20 +11,12 @@ import {
 import SkeletonSchema from "./skeletonSchema";
 import type { ResponseType } from "@/types/response";
 import { Card, CardContent } from "./ui/card";
-import { Heart, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/formatPrice";
 import type { PromotionType } from "@/types/promotion";
-
-/** Helper URL absoluta (mismo criterio que ProductCard) */
-const toAbsUrl = (url?: string | null) => {
-  if (!url) return null;
-  if (url.startsWith("http")) return url;
-
-  const base = (process.env.NEXT_PUBLIC_BACKEND_URL || "").replace(/\/+$/, "");
-  const clean = url.replace(/^\/+/, "");
-  return `${base}/${clean}`;
-};
+import { LovedButton } from "./loved-button";
+import { toAbsUrl } from "@/lib/media";
 
 /* ----------------------- helpers de promociones ----------------------- */
 
@@ -105,7 +97,7 @@ const TempProducts = () => {
         <h3 className="text-4xl text-center sm:text-left tracking-tight sm:text-5xl font-black mb-2 sm:mb-4">
           PROMOCIONES.
         </h3>
-        <p className="text-black/35 sm:text-left text-center tracking-normal leading-none mb-6 text-base sm:text-base ">
+        <p className="text-black/35 sm:text-left text-center tracking-normal leading-none mb-6 text-base sm:text-base">
           Disfruta de las mejores promociones y ofertas exclusivas en nuestros
           productos seleccionados.
         </p>
@@ -120,8 +112,6 @@ const TempProducts = () => {
             result.map((product: any) => {
               const raw = product;
               const attrs = raw.attributes ?? raw;
-
-              const id = raw.id ?? attrs.id;
 
               // -------------------------
               //   OBTENER IMÁGENES
@@ -147,7 +137,6 @@ const TempProducts = () => {
                 "";
 
               const productSlug = attrs?.slug ?? "";
-              const isActive = attrs?.active ?? true;
 
               // -------------------------
               //   PRECIO + PROMO (PRODUCT)
@@ -166,30 +155,13 @@ const TempProducts = () => {
 
               return (
                 <CarouselItem
-                  key={id}
-                  className="basis-[85%] sm:basis-1/2 lg:basis-1/3 px-4 md:px-4"
+                  key={raw.id}
+                  className="basis-[85%] sm:basis-1/2 lg:basis-1/3 px-3 md:px-4"
                 >
-                  {/* Corazón */}
-                  <button
-                    className="
-                      flex w-full items-center justify-end sm:justify-end gap-2
-                      rounded-[10px]
-                      bg-white text-black/70 transition-colors
-                      flex-shrink-0
-                    "
-                    type="button"
-                  >
-                    <Heart
-                      width={20}
-                      strokeWidth={1.5}
-                      className="hover:fill-black"
-                    />
-                  </button>
-
                   <Card
                     className="
-                      group relative
                       shadow-none
+                      group relative
                       w-full
                       h-auto
                       pt-4
@@ -221,7 +193,6 @@ const TempProducts = () => {
                         className="
                           relative mb-3 sm:mb-4
                           mt-0 w-full
-                          rounded-[14px] sm:rounded-[24px]
                           bg-white
                           flex items-center justify-center overflow-hidden
                           pt-1 pb-1 cursor-pointer
@@ -230,13 +201,27 @@ const TempProducts = () => {
                           productSlug && router.push(`/product/${productSlug}`)
                         }
                       >
+                        {/* ❤️ Corazón dentro del recuadro */}
+                        <div className="absolute top-3 right-3 z-20">
+                          <LovedButton
+                            product={{
+                              id: raw.id,
+                              title: displayName,
+                              secondaryName,
+                              price: basePrice,
+                              slug: productSlug,
+                              imageUrl: image1,
+                            }}
+                          />
+                        </div>
+
                         {/* Imagen principal */}
                         {image1 && (
                           <img
                             src={image1}
                             alt={displayName}
                             className="
-                              sm:max-h-[310px] w-auto object-contain
+                              sm:max-h-[410px] w-auto object-contain
                               transition-all duration-300 ease-out
                               opacity-100 group-hover:opacity-0
                             "
@@ -249,7 +234,7 @@ const TempProducts = () => {
                             src={image2}
                             alt={displayName}
                             className="
-                              absolute max-h-[210px] sm:max-h-[410px] max-w-[320px] object-contain
+                              absolute sm:max-h-full sm:w-full object-cover
                               transition-all duration-300 ease-out
                               opacity-0 group-hover:opacity-100
                             "
@@ -266,11 +251,11 @@ const TempProducts = () => {
                       {/* NOMBRE */}
                       <h3
                         className="
-                          text-lg
+                          text-xl
                           leading-none
-                          text-center sm:text-2xl
+                          text-center sm:text-3xl
                           font-black uppercase pt-0
-                          mb-2
+                          pb-0
                         "
                       >
                         {displayName}
@@ -279,45 +264,29 @@ const TempProducts = () => {
                       {/* SUB */}
                       <div className="flex justify-center py-1 gap-2">
                         <div className="flex items-center gap-2 text-center">
-                          <p className="text-lg font-semibold text-black">
+                          <p className="text-lg font-normal text-black">
                             {secondaryName}
                           </p>
                         </div>
                       </div>
 
                       {/* PRECIO + DESCUENTO */}
-                      <div className="mt-1 flex items-center justify-between gap-2">
+                      <div className="mt-1 flex items-center justify-center gap-2">
                         {hasDiscount ? (
-                          <div className="pl-4 leading-tight">
+                          <div className=" leading-tight text-center">
                             <p className="text-[12px] font-semibold text-black/40 line-through">
                               {formatPrice(basePrice)}
                             </p>
-                            <p className="text-[15px] font-extrabold text-red-500 tabular-nums">
+                            <p className=" text-[17px] sm:text-[17px] font-extrabold text-red-500 tabular-nums">
                               {formatPrice(finalPrice)}
                             </p>
                           </div>
                         ) : (
-                          <p className="text-[15px] pl-4 sm:inline-flex items-center justify-center font-semibold">
+                          <p className="text-[15px] sm:inline-flex items-center justify-center font-semibold text-center">
                             {formatPrice(basePrice)}
                           </p>
                         )}
-
-                        <button
-                          className="
-                            inline-flex h-9 w-9
-                            items-center justify-center cursor-pointer
-                            rounded-[10px]
-                            bg-white text-black/70
-                            transition-colors
-                            flex-shrink-0
-                          "
-                          type="button"
-                          onClick={() =>
-                            productSlug && router.push(`/product/${productSlug}`)
-                          }
-                        >
-                          <ChevronRight width={25} strokeWidth={2} />
-                        </button>
+                    
                       </div>
                     </CardContent>
                   </Card>

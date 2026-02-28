@@ -2,7 +2,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { BaggageClaim, Heart, ShoppingCart, User, UserCheck } from "lucide-react";
+import Image from "next/image";
+import { Heart, ShoppingBag, Smile } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import MenuList from "../menu-list";
 import ItemsMenuMobile from "../items-menu-mobile";
@@ -10,7 +11,6 @@ import { useCart } from "@/hooks/use-cart";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { ProfileSheet } from "@/components/profile/profile-sheet";
 import type { CurrentUser, ProfileData } from "@/components/profile/profile-types";
-
 
 const Navbar = () => {
   const router = useRouter();
@@ -21,10 +21,13 @@ const Navbar = () => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
 
-  // ✅ scroll effects
+  // ✅ scroll effects logo escritorio
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const lastY = useRef(0);
+  const DESKTOP_LOGO_LIGHT = "/icons/logo-eden-white.png";
+  const DESKTOP_LOGO_DARK = "/icons/logo-eden-black.png";
+
 
   useEffect(() => {
     const onScroll = () => {
@@ -32,7 +35,6 @@ const Navbar = () => {
 
       setScrolled(y > 40);
 
-      // hide when scrolling down, show when scrolling up
       const goingDown = y > lastY.current;
       if (y > 120 && goingDown) setHidden(true);
       else setHidden(false);
@@ -74,145 +76,191 @@ const Navbar = () => {
     fetchUser();
   }, []);
 
-  const AuthIcon = user ? UserCheck : User;
-
   // ✅ SOLO EN /catalogo (y subrutas) forzamos el navbar en negro desde arriba
   const isCatalog = pathname.startsWith("/category/");
   const isProduct = pathname.startsWith("/product");
   const isCart = pathname.startsWith("/cart");
   const isLoved = pathname.startsWith("/loved-product");
 
-    
-
-  // forceDark = si estoy en catálogo o si ya scrolleé (comportamiento normal)
-  
   const forceDark = isCatalog || isProduct || isCart || scrolled || isLoved;
-  
-
 
   const fg = forceDark ? "text-black" : "text-white";
-  const border = forceDark ? "border-black" : "border-white";
-  const hoverBtn = forceDark
-    ? "hover:bg-black hover:text-white"
-    : "hover:bg-white hover:text-black";
+
+
+
+
+// ✅ Logos mobile (centrado)
+const MOBILE_LOGO_LIGHT = "/icons/logo-eden-white.png"; 
+const MOBILE_LOGO_DARK = "/icons/logo-eden-black.png";  
+
+
+
 
   return (
     <header
       className={`
         fixed top-0 left-0 z-50 w-full
         transition-all duration-300
-        border-b
         ${hidden ? "-translate-y-full" : "translate-y-0"}
-        ${forceDark ? "bg-white/80 backdrop-blur-md shadow-sm" : "bg-transparent"}
+        ${forceDark ? "bg-white/90 backdrop-blur-md shadow-sm" : "bg-transparent"}
       `}
     >
       <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-3">
-        <div className="flex w-full items-center justify-between py-2">
-          {/* Logo + menú */}
-          <div className="flex items-center gap-4 md:gap-10">
-            <h1
-              className={`
-                cursor-pointer text-3xl font-black md:text-2xl lg:text-4xl
-                transition-colors duration-300
-                ${fg}
-              `}
-              onClick={() => router.push("/")}
-            >
-              EDEN.
-            </h1>
-
-            <div className={`hidden md:flex transition-colors duration-300 ${fg}`}>
-              <MenuList />
+        {/* Layout general: 3 columnas -> Left / Center / Right */}
+        <div className="grid grid-cols-3 items-center py-2">
+          {/* ================= LEFT ================= */}
+          <div className="flex items-center justify-start gap-3">
+            {/* Mobile: Hamburguesa a la izquierda */}
+            <div className="flex md:hidden">
+              <ItemsMenuMobile scrolled={forceDark} />
             </div>
+
+            {/* Desktop: Logo texto + menú */}
+            <div className="hidden md:flex items-center gap-10">
+              <button
+                type="button"
+                onClick={() => router.push("/")}
+                className="relative h-10 w-[110px] lg:h-9 lg:w-[130px] transition-opacity duration-200 hover:opacity-80"
+                aria-label="Ir al inicio"
+              >
+                <Image
+                  key={forceDark ? "dark" : "light"}
+                  src={forceDark ? DESKTOP_LOGO_DARK : DESKTOP_LOGO_LIGHT}
+                  alt="Eden Logo"
+                  fill
+                  priority
+                  className="object-contain "
+                />
+              </button>
+
+
+
+              <div className={`pl-90 text-xl ${fg}`}>
+                <MenuList />
+              </div>
+            </div> 
+
+            {/* Mobile: Smile pegadito a la hamburguesa */}
+            {!loadingUser && (
+              <div className="flex md:hidden">
+                {user ? (
+                  <ProfileSheet
+                    user={user}
+                    profile={profile ?? undefined}
+                    onLogout={() => {
+                      setUser(null);
+                      setProfile(null);
+                    }}
+                  >
+                    <button aria-label="Perfil" className="cursor-pointer">
+                      <Smile
+                        strokeWidth={1.5}
+                        fill="none"
+                        className={`h-7 w-7 transition-colors duration-300 ${fg}`}
+                      />
+                    </button>
+                  </ProfileSheet>
+                ) : (
+                  <LoginDialog>
+                    <button aria-label="Iniciar sesión" className="cursor-pointer">
+                      <Smile
+                        strokeWidth={1.5}
+                        fill="none"
+                        className={`h-6 w-6 transition-colors duration-300 ${fg}`}
+                      />
+                    </button>
+                  </LoginDialog>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* Iconos */}
-          <div className="flex items-center gap-6 md:gap-4">
+
+
+
+
+
+          {/* ================= CENTER ================= */}
+          <div className="flex items-center justify-center">
+            {/* Mobile: logo ícono centrado */}
+            <button
+              type="button"
+              onClick={() => router.push("/")}
+              className="md:hidden relative h-18 w-20"
+              aria-label="Ir al inicio"
+            >
+              <Image
+                key={forceDark ? "m-dark" : "m-light"}
+                src={forceDark ? MOBILE_LOGO_DARK : MOBILE_LOGO_LIGHT}
+                alt="Eden logo"
+                fill
+                className="object-contain"
+                priority
+              />
+            </button>
+
+            {/* Desktop: no centro (porque el menú ya queda con el logo a la izquierda) */}
+          </div>
+
+          {/* ================= RIGHT ================= */}
+          <div className="flex items-center justify-end gap-5 md:gap-8">
+            {/* Desktop: Smile (login/perfil) a la derecha */}
+            {!loadingUser && (
+              <div className="hidden md:flex">
+                {user ? (
+                  <ProfileSheet
+                    user={user}
+                    profile={profile ?? undefined}
+                    onLogout={() => {
+                      setUser(null);
+                      setProfile(null);
+                    }}
+                  >
+                    <button aria-label="Perfil" className="cursor-pointer">
+                      <Smile
+                        strokeWidth={1.5}
+                        fill="none"
+                        className={`h-8 w-8 transition-colors duration-300 ${fg}`}
+                      />
+                    </button>
+                  </ProfileSheet>
+                ) : (
+                  <LoginDialog>
+                    <button aria-label="Iniciar sesión" className="cursor-pointer">
+                      <Smile
+                        strokeWidth={1.5}
+                        fill="none"
+                        className={`h-7 w-7 transition-colors duration-300 ${fg}`}
+                      />
+                    </button>
+                  </LoginDialog>
+                )}
+              </div>
+            )}
+
+            {/* Heart: en desktop y mobile */}
+            <Heart
+              strokeWidth={1.5}
+              className={`cursor-pointer h-7 w-7 transition-colors duration-300 ${fg}`}
+              onClick={() => router.push("/loved-product")}
+            />
+
+            {/* Cart */}
             {cart.items.length === 0 ? (
-              <ShoppingCart
+              <ShoppingBag
                 strokeWidth={1.5}
-                className={`cursor-pointer h-6 w-6 transition-colors duration-300 ${fg}`}
+                className={`cursor-pointer h-7 w-7 transition-colors duration-300 ${fg}`}
                 onClick={() => router.push("/cart")}
               />
             ) : (
               <div
-                className={`flex cursor-pointer gap-1 items-center transition-colors duration-300 ${fg}`}
+                className={`flex cursor-pointer items-center gap-1 transition-colors duration-300 ${fg}`}
                 onClick={() => router.push("/cart")}
               >
-                <BaggageClaim strokeWidth={1.5} className="h-6 w-6" />
+                <ShoppingBag strokeWidth={1.5} className="h-7 w-7" />
                 <span className="text-sm font-semibold">{cart.items.length}</span>
               </div>
             )}
-
-            <Heart
-              strokeWidth={1.2}
-              className={`cursor-pointer hidden md:inline h-6 w-6 transition-colors duration-300 ${fg}`}
-              onClick={() => router.push("/loved-product")}
-            />
-
-            {/* Desktop: Iniciar / Perfil */}
-            {!loadingUser && (
-              <>
-                <div className="hidden sm:flex">
-                  {user ? (
-                    <ProfileSheet
-                      user={user}
-                      profile={profile ?? undefined}
-                      onLogout={() => {
-                        setUser(null);
-                        setProfile(null);
-                      }}
-                    />
-                  ) : (
-                    <LoginDialog>
-                      <span
-                        className={`
-                          cursor-pointer rounded-2xl border px-4 py-1 font-bold
-                          transition duration-200 ease-in-out
-                          ${fg} ${border} ${hoverBtn}
-                        `}
-                      >
-                        Iniciar
-                      </span>
-                    </LoginDialog>
-                  )}
-                </div>
-
-                {/* Mobile: icono */}
-                <div className="flex sm:hidden">
-                  {user ? (
-                    <ProfileSheet
-                      user={user}
-                      profile={profile ?? undefined}
-                      onLogout={() => {
-                        setUser(null);
-                        setProfile(null);
-                      }}
-                    >
-                      <button aria-label="Perfil" className="cursor-pointer">
-                        <AuthIcon
-                          strokeWidth={1.5}
-                          className={`h-6 w-6 transition-colors duration-300 ${fg}`}
-                        />
-                      </button>
-                    </ProfileSheet>
-                  ) : (
-                    <LoginDialog>
-                      <button aria-label="Iniciar sesión" className="cursor-pointer">
-                        <AuthIcon
-                          strokeWidth={1.5}
-                          className={`h-6 w-6 transition-colors duration-300 ${fg}`}
-                        />
-                      </button>
-                    </LoginDialog>
-                  )}
-                </div>
-              </>
-            )}
-
-            <div className="flex sm:hidden">
-              <ItemsMenuMobile scrolled={forceDark} />
-            </div>
           </div>
         </div>
       </div>
@@ -221,6 +269,7 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
 
 
 

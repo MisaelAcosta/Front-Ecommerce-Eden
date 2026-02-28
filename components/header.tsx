@@ -1,7 +1,7 @@
 "use client";
 
 import Block1 from "@/components/block1";
-import Block2 from "@/components/block2";
+
 
 const Header = () => {
   return (

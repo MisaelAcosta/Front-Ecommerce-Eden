@@ -42,16 +42,12 @@ const Contacto = () => {
           relative w-full overflow-hidden
           sm:rounded-[18px]
           px-20 sm:px-12 py-20 sm:py-30
-          text-white
+          text-black
+          bg-white
         "
-        style={{
-          backgroundImage: "url('/Rectangle.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
       >
         {/* overlay extra por si acaso */}
-        <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+        <div className="absolute inset-0 bg-white pointer-events-none" />
 
         <div className="relative z-10 max-w-5xl mx-auto">
           {/* TITULO */}
@@ -66,10 +62,10 @@ const Contacto = () => {
               href="https://wa.me/56912345678?text=Hola%20Eden%203D%2C%20quiero%20cotizar%20una%20impresi%C3%B3n"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between border-b border-white/20 pb-6 group"
+              className="flex items-center justify-between border-b border-black/20 pb-6 group"
             >
               <div className="flex items-center gap-6">
-                <span className="text-white/40">(01)</span>
+                <span className="text-black/40">(01)</span>
                 <span className="text-2xl sm:text-3xl">WhatsApp</span>
               </div>
               <ArrowRight className="opacity-60 group-hover:translate-x-1 transition-transform" />
@@ -80,24 +76,24 @@ const Contacto = () => {
               href="https://www.instagram.com/eden.3d_/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between border-b border-white/20 pb-6 group"
+              className="flex items-center justify-between border-b border-black/20 pb-6 group"
             >
               <div className="flex items-center gap-6">
-                <span className="text-white/40">(02)</span>
+                <span className="text-black/40">(02)</span>
                 <span className="text-2xl sm:text-3xl">Instagram</span>
               </div>
               <ArrowRight className="opacity-60 group-hover:translate-x-1 transition-transform" />
             </a>
 
             {/* GMAIL */}
-            <div className="border-b border-white/20 pb-6">
+            <div className="border-b border-black/20 pb-6">
               <button
                 type="button"
                 onClick={() => setOpenMail(!openMail)}
                 className="w-full flex items-center justify-between group"
               >
                 <div className="flex items-center gap-6">
-                  <span className="text-white/40">(03)</span>
+                  <span className="text-black/40">(03)</span>
                   <span className="text-2xl sm:text-3xl">Gmail</span>
                 </div>
                 <ArrowRight
@@ -118,7 +114,7 @@ const Contacto = () => {
                     name="Nombre"
                     placeholder="Tu nombre"
                     required
-                    className="bg-white/10 border border-white/20 px-4 py-3 rounded-md text-white placeholder:text-white/50 outline-none"
+                    className="bg-black/10 border border-black/20 px-4 py-3 rounded-md text-black placeholder:text-black/50 outline-none"
                   />
 
                   <input
@@ -126,7 +122,7 @@ const Contacto = () => {
                     name="Correo"
                     placeholder="Tu correo"
                     required
-                    className="bg-white/10 border border-white/20 px-4 py-3 rounded-md text-white placeholder:text-white/50 outline-none"
+                    className="bg-black/10 border border-black/20 px-4 py-3 rounded-md text-black placeholder:text-black/50 outline-none"
                   />
 
                   <textarea
@@ -134,12 +130,12 @@ const Contacto = () => {
                     placeholder="Escribe tu mensaje"
                     rows={4}
                     required
-                    className="bg-white/10 border border-white/20 px-4 py-3 rounded-md text-white placeholder:text-white/50 outline-none resize-none"
+                    className="bg-black/10 border border-black/20 px-4 py-3 rounded-md text-black placeholder:text-black/50 outline-none resize-none"
                   />
 
                   <button
                     type="submit"
-                    className="mt-2 w-fit px-6 py-3 rounded-md bg-white text-black font-medium hover:bg-white/90 transition"
+                    className="mt-2 w-fit px-6 py-3 rounded-md bg-black text-white font-medium cursor-pointer hover:bg-black/90  hover:text transition"
                   >
                     Abrir Gmail
                   </button>

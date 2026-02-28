@@ -13,20 +13,12 @@ import SkeletonSchema from "@/components/skeletonSchema";
 import type { ResponseType } from "@/types/response";
 import type { ProductType } from "@/types/product";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { formatPrice } from "@/lib/formatPrice";
 import type { PromotionType } from "@/types/promotion";
 import { useRouter } from "next/navigation";
-
-/** Helper URL absoluta (igual que en ProductCard) */
-const toAbsUrl = (url?: string | null) => {
-  if (!url) return null;
-  if (url.startsWith("http")) return url;
-
-  const base = (process.env.NEXT_PUBLIC_BACKEND_URL || "").replace(/\/+$/, "");
-  const clean = url.replace(/^\/+/, "");
-  return `${base}/${clean}`;
-};
+import { LovedButton } from "@/components/loved-button";
+import { toAbsUrl } from "@/lib/media";
 
 /* ----------------------- helpers de promociones ----------------------- */
 
@@ -45,12 +37,9 @@ function applyPromo(basePrice: number, promo: PromotionType | null) {
   const val = Number((promo as any).value || 0);
   let discount = 0;
 
-  // 0.2 => 20%
-  if (val <= 1) discount = basePrice * val;
-  // 20 => 20%
-  else if (val <= 100) discount = basePrice * (val / 100);
-  // 1500 => $1500 off
-  else discount = val;
+  if (val <= 1) discount = basePrice * val; // 0.2 => 20%
+  else if (val <= 100) discount = basePrice * (val / 100); // 20 => 20%
+  else discount = val; // 1500 => $1500 off
 
   return Math.max(0, Math.round(basePrice - discount));
 }
@@ -71,7 +60,6 @@ function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
   return best ? best.promo : null;
 }
 
-/* -------------------- normalizar promos (strapi) -------------------- */
 function normalizePromotions(input: any): PromotionType[] {
   if (!input) return [];
   if (Array.isArray(input)) return input as PromotionType[];
@@ -96,6 +84,8 @@ function normalizePromotions(input: any): PromotionType[] {
   return [];
 }
 
+/* -------------------------------------------------------------------- */
+
 type RecommendedProps = {
   currentProductId: number;
   categorySlug: string;
@@ -104,13 +94,11 @@ type RecommendedProps = {
 const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
   const router = useRouter();
 
-  // Featured (según tu hook)
   const {
     result: featuredResult,
     loading: loadingFeatured,
-  }: ResponseType = useGetFeaturedProducts(categorySlug);
+  }: ResponseType = useGetFeaturedProducts();
 
-  // Category (según tu hook exacto)
   const {
     result: categoryResult,
     loading: loadingCategory,
@@ -214,35 +202,19 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
             return (
               <CarouselItem
                 key={raw.id ?? productSlug}
-                className="basis-[85%] sm:basis-1/2 lg:basis-1/3 px-4 md:px-4"
+                className="basis-[85%] sm:basis-1/2 lg:basis-1/3 px-3 md:px-4"
               >
-                {/* Corazón */}
-                <button
-                  className="
-                    flex w-full items-center justify-end sm:justify-end gap-2
-                    rounded-[10px]
-                    bg-white text-black/70 transition-colors
-                    flex-shrink-0
-                  "
-                  type="button"
-                >
-                  <Heart
-                    width={20}
-                    strokeWidth={1.5}
-                    className="hover:fill-black"
-                  />
-                </button>
-
                 <Card
                   className="
+                    shadow-none
                     group relative
                     w-full
                     h-auto
                     pt-4
                     pb-4
+                    px-5
                     overflow-hidden
                     border-none
-                    shadow-none
                     bg-[#ffffff]
                     flex flex-col
                     justify-between
@@ -267,8 +239,7 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
                     <div
                       className="
                         relative mb-3 sm:mb-4
-                        mt-0 w-full
-                        rounded-[14px] sm:rounded-[24px]
+                        mt-0 w-full 
                         bg-white
                         flex items-center justify-center overflow-hidden
                         pt-1 pb-1 cursor-pointer
@@ -277,13 +248,27 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
                         productSlug && router.push(`/product/${productSlug}`)
                       }
                     >
+                      {/* ❤️ Corazón dentro del recuadro */}
+                      <div className="absolute top-3 right-3 z-20">
+                        <LovedButton
+                          product={{
+                            id: raw.id,
+                            title: displayName,
+                            secondaryName,
+                            price: basePrice,
+                            slug: productSlug,
+                            imageUrl: image1,
+                          }}
+                        />
+                      </div>
+
                       {/* Imagen 1 */}
                       {image1 && (
                         <img
                           src={image1}
                           alt={displayName}
                           className="
-                            sm:max-h-[310px] w-auto object-contain
+                            sm:max-h-102.5 w-auto object-contain
                             transition-all duration-300 ease-out
                             opacity-100 group-hover:opacity-0
                           "
@@ -296,7 +281,7 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
                           src={image2}
                           alt={displayName}
                           className="
-                            absolute max-h-[210px] sm:max-h-[410px] max-w-[320px] object-contain
+                            absolute sm:max-h-full sm:w-full object-cover
                             transition-all duration-300 ease-out
                             opacity-0 group-hover:opacity-100
                           "
@@ -313,11 +298,11 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
                     {/* NOMBRE */}
                     <h3
                       className="
-                        text-lg
+                        text-xl
                         leading-none
-                        text-center sm:text-2xl
-                        font-black uppercase
-                        mb-1
+                        text-center sm:text-3xl
+                        font-black uppercase pt-0
+                        pb-2
                       "
                     >
                       {displayName}
@@ -326,46 +311,30 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
                     {/* SUB */}
                     <div className="flex justify-center py-1 gap-2">
                       <div className="flex items-center gap-2 text-center">
-                        <p className="text-lg font-semibold text-black">
+                        <p className="text-lg font-normal text-black">
                           {secondaryName}
                         </p>
                       </div>
                     </div>
 
                     {/* PRECIO + DESCUENTO */}
-                    <div className="mt-1 flex items-center justify-between gap-2">
-                      {hasDiscount ? (
-                        <div className="pl-4 leading-tight">
-                          <p className="text-[12px] font-semibold text-black/40 line-through">
+                      <div className="mt-1 flex items-center justify-center gap-2">
+                        {hasDiscount ? (
+                          <div className=" leading-tight text-center">
+                            <p className="text-[12px] font-semibold text-black/40 line-through">
+                              {formatPrice(basePrice)}
+                            </p>
+                            <p className=" text-[17px] sm:text-[17px] font-extrabold text-red-500 tabular-nums">
+                              {formatPrice(finalPrice)}
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-[15px] sm:inline-flex items-center justify-center font-semibold text-center">
                             {formatPrice(basePrice)}
                           </p>
-                          <p className="text-[17px] sm:text-[17px] font-extrabold text-red-500 tabular-nums">
-                            {formatPrice(finalPrice)}
-                          </p>
-                        </div>
-                      ) : (
-                        <p className="text-[15px] pl-4 sm:inline-flex items-center justify-center font-semibold">
-                          {formatPrice(basePrice)}
-                        </p>
-                      )}
-
-                      <button
-                        className="
-                          inline-flex h-9 w-9
-                          items-center justify-center cursor-pointer
-                          rounded-[10px]
-                          bg-white text-black/70
-                          transition-colors
-                          flex-shrink-0
-                        "
-                        type="button"
-                        onClick={() =>
-                          productSlug && router.push(`/product/${productSlug}`)
-                        }
-                      >
-                        <ChevronRight width={25} strokeWidth={2} />
-                      </button>
-                    </div>
+                        )}
+                    
+                      </div>
                   </CardContent>
                 </Card>
               </CarouselItem>

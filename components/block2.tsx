@@ -59,7 +59,7 @@ const Block2 = () => {
   if (loading) return <SkeletonSchema grid={1} />;
   if (error)
     return <p className="text-red-500 text-sm">Error: {String(error)}</p>;
-  if (!Array.isArray(result) || result.length === 0) return null;
+  if (!Array.isArray(result) || (result as any[]).length === 0) return null;
 
   return (
     <section className="relative w-full">
@@ -112,12 +112,11 @@ const Block2 = () => {
                     group
                     relative 
                     mx-auto max-w-7xl px-4 sm:px-6 lg:px-8
-                    h-[280px]
-                    sm:h-[220px]
-                    md:h-[300px]
-                    lg:h-[460px]
+                    h-100
+                    sm:h-55
+                    md:h-75
+                    lg:h-150
                     overflow-hidden
-                    
                     cursor-pointer
 
                   "
@@ -139,7 +138,7 @@ const Block2 = () => {
                       priority
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-b from-neutral-200 to-neutral-700" />
+                    <div className="w-full h-full bg-linear-to-b from-neutral-200 to-neutral-700" />
                   )}
 
                   {/* Overlay degradado + texto + CTA */}
@@ -147,7 +146,7 @@ const Block2 = () => {
                     className="
                       absolute inset-0
                       flex items-end
-                      bg-gradient-to-t
+                      bg-linear-to-t
                       from-black/60
                       via-black/20
                       to-transparent

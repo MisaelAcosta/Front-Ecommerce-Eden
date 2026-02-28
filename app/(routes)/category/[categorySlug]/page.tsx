@@ -3,14 +3,13 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
-import StepCatalog from "@/components/stepCatalog";
 import SkeletonSchema from "@/components/skeletonSchema";
 import FilterCategory from "./components/filter-category";
 import SearchBar from "./components/searchBar";
 import ProductCard from "./components/product-card";
+import CarouselTextBanner from "@/components/carousel-text-banner";
 import { useGetCategoryProduct } from "@/api/useGetCategoryProducts";
 import { ProductType } from "@/types/product";
-import Step from "@/components/step";
 import { SlidersHorizontal } from "lucide-react"; // ícono filtros
 
 // ⬇ importa los componentes de paginación de shadcn
@@ -111,7 +110,7 @@ useEffect(() => {
   return (
     <section className=" pt-15 w-full px-1 md:px-8 lg:px-12 pb-28 md:pb-0">
       <div className="pt-6">
-        <StepCatalog/>
+            <CarouselTextBanner />
       </div>
 
       {/* ENCABEZADO (Desktop) */}
@@ -144,7 +143,7 @@ useEffect(() => {
     className="
       flex items-center justify-between
       w-full bg-[#f5f5f5]
-      rounded-2xl px-4 py-2 pt-3
+      px-4 py-2 pt-3
     "
   >
     <div className="flex-1">
@@ -172,20 +171,18 @@ useEffect(() => {
   <div
     className="
       md:hidden
-      flex left-0 right-0
+      px-10
       items-center
+      text-center
       content-center
-      px-12
-      bottom-[10px] /* altura aprox de la barra + margen */
-      max-h-[85vh]
-      mx-1
-      rounded-2xl bg-white
-      z-50
+      justify-center
+      max-h-[105vh]
+    bg-white
     "
   >
-    <div className="p-3">
+    <div className="p-1">
       <FilterCategory
-        currentCategorySlug={categorySlug}
+        categorySlug={categorySlug}
         activeSubSlug={activeSubSlug}
         onSelectSubcategory={(slug) => {
           handleSelectSubcategory(slug);
@@ -206,7 +203,7 @@ useEffect(() => {
         {/* SIDEBAR IZQ: filtros (solo desktop) */}
         <aside className=" rounded-md p-4 text-sm hidden md:block">
           <FilterCategory
-            currentCategorySlug={categorySlug}
+            categorySlug={categorySlug}
             activeSubSlug={activeSubSlug}
             onSelectSubcategory={handleSelectSubcategory}
             
@@ -221,7 +218,7 @@ useEffect(() => {
         <main className="w-auto px-0 shadow-none md:p-8 ">
           {loading && (
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-4 gap-6 md:gap-1 ">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 gap-6 md:gap-1 ">
               <SkeletonSchema grid={4} />
               
             </div>
@@ -237,15 +234,16 @@ useEffect(() => {
               <div className="
               grid
               grid-cols-2
-              pr-3
+              pr-0
               sm:pr-0
               sm:grid-cols-2
               xl:grid-cols-3     /* a 1280px -> 2 columnas */
               md:grid-cols-3
               2xl:grid-cols-4
               min-[1600px]:grid-cols-4   /* 4 columnas solo en pantallas grandes */
-              gap-0
-              sm:gap-6
+              gap-1 
+              sm:gap-3
+              rounded-none
               
               flex-wrap
               ">
@@ -259,6 +257,8 @@ useEffect(() => {
                   </p>
                 )}
               </div>
+
+
 
 
 

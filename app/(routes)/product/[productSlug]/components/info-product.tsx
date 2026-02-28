@@ -9,6 +9,7 @@ import { ProductType } from "@/types/product";
 import { VariantType } from "@/types/variant";
 import { PromotionType } from "@/types/promotion";
 import { Heart, Minus, Plus } from "lucide-react";
+import { useLoved } from "@/hooks/use-loved";
 
 import { ImageZoom } from "@/components/ui/shadcn-io/image-zoom";
 import {
@@ -72,9 +73,16 @@ function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
   return best ? best.promo : null;
 }
 
+
 const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
   const { addItem } = useCart();
   const [qty, setQty] = useState<number>(1);
+
+  const toggleLoved = useLoved((s) => s.toggleLoved);
+  const isLoved = useLoved((s) => s.isLoved);
+
+  const productId = (product as any)?.id ?? (product as any)?.attributes?.id ?? 0;
+  const loved = isLoved(productId);
 
   /* ----------------------- Carusel y variantes ----------------------- */
 
@@ -169,7 +177,7 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
       : `${process.env.NEXT_PUBLIC_BACKEND_URL || ""}${u ?? ""}`;
 
   /* ------------------------------------------------------------------- */
-  /* ✅✅✅ PARTE 3 ADAPTADA: AGREGAR VARIANTE AL CARRITO ✅✅✅ */
+  /*  PARTE 3 ADAPTADA: AGREGAR VARIANTE AL CARRITO  */
   const handleAddToCart = () => {
     // Si tu producto tiene variantes, obligamos a elegir una
     if (variants.length > 0 && !currentVariant) {
@@ -210,15 +218,29 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
       qty, // cantidad elegida
     });
   };
+
+  //  Favorito (no variante)
+    const productFirstImg =
+      Array.isArray(product.images) ? product.images?.[0] : product.images?.[0];
+
+    const lovedPayload = {
+      id: productId,
+      title: product.productName ?? "Producto sin nombre",
+      secondaryName: product.productName2 ?? null,
+      price: Number(product.price ?? 0), // ✅ precio del producto base
+      imageUrl: productFirstImg?.url ? srcOf(productFirstImg.url) : null, // ✅ imagen del producto base
+      slug: product.slug,
+    };
+
   /* ------------------------------------------------------------------- */
 
   return (
     <div className="w-full max-w-6xl mx-auto pt-1 md:pt-0 ">
       <div className="grid gap-8 md:gap-14 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
         {/* COLUMNA IZQUIERDA: CARRUSEL */}
-        <div className="w-full pt-6 md:pt-0">
+        <div className=" pt-1 md:pt-0">
           {images.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-centerpy-8 text-muted-foreground">
               No hay imágenes disponibles.
             </div>
           ) : (
@@ -231,12 +253,21 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
                 <CarouselContent>
                   {images.map((img, index) => (
                     <CarouselItem key={img.id ?? index}>
-                      <div className="w-full aspect-[3/3] md:rounded-2xl md:border overflow-hidden">
+                      <div
+                        className="
+                          w-full aspect-4/5
+                          sm:aspect-5/6
+                          md:border md:rounded-none
+                          overflow-hidden
+                          bg-black/5
+                          flex items-center justify-center
+                        "
+                      >
                         <ImageZoom>
                           <img
                             src={srcOf(img.url)}
                             alt={`Imagen ${index + 1} del producto`}
-                            className="h-full w-full object-contain select-none"
+                            className="h-full w-full object-contain object-center"
                             height={800}
                             width={800}
                             draggable={false}
@@ -270,7 +301,7 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
         </div>
 
         {/* COLUMNA DERECHA: INFO */}
-        <div className="w-full max-w-[720px] md:max-w-none md:pl-16 pt-7 md:pt-0">
+        <div className="w-full max-w-180 md:max-w-none md:pl-16 pt-1 md:pt-0">
           <div className="flex items-start justify-between gap-2 px-5 md:px-0">
             <div className="min-w-0 mr-3">
               <h1 className="text-2xl font-extrabold leading-tight tracking-tight">
@@ -407,14 +438,14 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
 
               <button
                 type="button"
-                aria-label="Agregar a favoritos"
-                onClick={() => console.log("Add to loved product")}
+                aria-label={loved ? "Quitar de favoritos" : "Agregar a favoritos"}
+                onClick={() => toggleLoved(lovedPayload)}
                 className="grid h-10 w-10 place-items-center border-black/40 rounded-lg cursor-pointer border hover:bg-muted"
               >
                 <Heart
                   width={22}
                   strokeWidth={1.5}
-                  className="hover:fill-foreground/90"
+                  className={loved ? "fill-foreground" : "hover:fill-foreground/90"}
                 />
               </button>
             </div>

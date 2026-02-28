@@ -119,7 +119,7 @@ const FilterCategory = ({ onSelectSubcategory }: FilterCategoryProps) => {
 
               <AccordionContent className="px-2 pb-2">
                 <RadioGroup className="flex flex-col space-y-2">
-                  {cat.subcategories.map((sub) => (
+                  {(cat.subcategories ?? []).map((sub) => (
                     <Label
                       key={sub.id}
                       className="cursor-pointer flex items-center gap-2 rounded-md px-2 py-1 hover:bg-gray-100"

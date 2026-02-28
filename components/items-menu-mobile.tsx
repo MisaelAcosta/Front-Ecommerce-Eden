@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, X, Instagram } from "lucide-react";
+import { Menu, X, Instagram, Youtube } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -32,18 +32,17 @@ const itemVariants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeInOut" } },
 };
 
-//scroller
-    type ItemsMenuMobileProps = {
-    scrolled: boolean;
-  };
+// scroller
+type ItemsMenuMobileProps = {
+  scrolled: boolean;
+};
 
 export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
-
   const [isOpen, setIsOpen] = useState(false);
   const [originPx, setOriginPx] = useState("100% 0%");
   const btnRef = useRef<HTMLButtonElement | null>(null);
 
-  // ✅ portal mount (HOOKS DENTRO DEL COMPONENTE)
+  // ✅ portal mount
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -59,9 +58,6 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
     const y = rect.top + rect.height / 2;
     setOriginPx(`${x}px ${y}px`);
   };
-
- 
-
 
   const fetchUser = async () => {
     setLoadingUser(true);
@@ -137,7 +133,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
       {isOpen && (
         <motion.div
           key="overlay"
-          className="fixed inset-0 z-[3000] bg-white isolate"
+          className="fixed inset-0 z-3000 bg-white isolate"
           variants={overlayVariants(originPx)}
           initial="initial"
           animate="animate"
@@ -145,118 +141,143 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
           onClick={closeMenu}
         >
           <div
-            className="relative h-full w-full flex items-center justify-center"
+            className="relative h-full w-full"
             onClick={(e) => e.stopPropagation()}
           >
-
-           {/* ✅ botón animado (se mantiene) */}
-          <motion.button
-          onClick={closeMenu}
-          aria-label="Cerrar menú"
-          initial={{ opacity: 0, scale: 0.9, rotate: -10 }}
-          animate={{ opacity: 1, scale: 1, rotate: 0 }}
-          exit={{ opacity: 0, scale: 0.9, rotate: -10 }}
-          transition={{ type: "spring", stiffness: 260, damping: 20 }}
-          className="
-          fixed top-2 right-4 z-[3100]
-          p-2.5 rounded-md
-          bg-white 
-          text-black
-          "
-        >
-          <X className="w-6 h-6" />
-        </motion.button>
-
+            {/* Top bar */}
             <motion.div
-              className="text-center w-full space-y-8 px-8"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="absolute top-0 left-0 right-0 flex items-center 
+              justify-between px-5 pt-5"
+            >
+  
+
+              {/* X (arriba izq en el mock, pero acá lo dejo consistente con layout: si lo querís full izq, dime y lo invierto) */}
+              <motion.button
+                onClick={closeMenu}
+                aria-label="Cerrar menú"
+                initial={{ opacity: 0, scale: 0.95, rotate: -10 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                exit={{ opacity: 0, scale: 0.95, rotate: -10 }}
+                transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                className="absolute left-5 top-3 p-2 rounded-md  text-black"
+              >
+                <X className="w-6 h-6" />
+              </motion.button>
+            </motion.div>
+
+            {/* Content */}
+            <motion.div
+              className="h-full w-full px-5 pt-24 pb-8 flex flex-col"
               variants={listVariants}
               initial="hidden"
               animate="show"
             >
-              <motion.div className="mb-20" variants={itemVariants}>
-                <h2 className="text-black text-6xl font-black mb-2">Eden</h2>
-                <p className="text-gray-400 text-sm">Navegación</p>
-              </motion.div>
-
-              <motion.div className="space-y-8">
-                <motion.div variants={itemVariants}>
-                  <Link
-                    href="/category/todos-los-productos"
-                    className="block text-black text-3xl font-semibold hover:text-gray-300 transform hover:translate-x-2"
-                    onClick={closeMenu}
-                  >
-                    CATALOGO
-                  </Link>
-                </motion.div>
-
-                <motion.div variants={itemVariants}>
-                  <Link
-                    href="/servicio"
-                    className="block text-black text-3xl font-semibold hover:text-gray-300 transform hover:translate-x-2"
-                    onClick={closeMenu}
-                  >
-                    SERVICIOS
-                  </Link>
-                </motion.div>
-
-                <motion.div variants={itemVariants}>
-                  <Link
-                    href="/loved-product"
-                    className="block text-black text-3xl font-semibold hover:text-gray-300 transform hover:translate-x-2"
-                    onClick={closeMenu}
-                  >
-                    FAVORITOS
-                  </Link>
-                </motion.div>
-
-                <motion.div variants={itemVariants} className="flex justify-center">
-                  {loadingUser ? (
-                    <span className="block text-black text-3xl font-semibold opacity-40">
-                     
+              {/* Menú principal */}
+              <div className="flex-1">
+                <motion.div variants={itemVariants} className="space-y-15">
+                  {/* INICIO */}
+                  <div className="relative pt-10 ">
+                    <span className="absolute -top-4 pt-10 right-45 text-red-500 text-xs font-semibold">
+                      01
                     </span>
-                  ) : user ? (
-                    <ProfileSheet
-                      user={user}
-                      profile={profile ?? undefined}
-                      onLogout={() => {
-                        setUser(null);
-                        setProfile(null);
-                      }}
+                    <Link
+                      href="/"
+                      className="block text-black font-black tracking-tighter leading-none text-6xl sm:text-6xl"
+                      onClick={closeMenu}
                     >
-                      <button
-                        className="block text-black text-3xl font-semibold hover:text-gray-300 transform hover:translate-x-2"
-                        type="button"
-                        onClick={closeMenu}
-                      >
-                        
-                      </button>
-                    </ProfileSheet>
-                  ) : (
-                    <LoginDialog>
-                      <button
-                        className="block text-black text-3xl font-semibold hover:text-gray-300 transform hover:translate-x-2"
-                        type="button"
-                        onClick={closeMenu}
-                      >
-                        
-                      </button>
-                    </LoginDialog>
-                  )}
-                </motion.div>
-              </motion.div>
+                      INICIO
+                    </Link>
+                  </div>
 
-              <motion.div
-                className="mt-16 pt-8 flex items-center justify-center"
-                variants={itemVariants}
-              >
-                <Link
-                  href="https://instagram.com/tuusuario"
-                  target="_blank"
-                  className="flex items-center gap-2 bg-black px-3 py-1 rounded-full text-white text-sm hover:bg-black/90 transition-colors"
-                >
-                  <Instagram className="w-4 h-4" />
-                  Instagram
-                </Link>
+                  {/* CATALOGO */}
+                  <div className="relative">
+                    <span className="absolute -top-4  right-10 text-red-500 text-xs font-semibold">
+                      02
+                    </span>
+                    <Link
+                      href="/category/todos-los-productos"
+                      className="block text-black font-black tracking-tighter leading-none text-6xl sm:text-6xl"
+                      onClick={closeMenu}
+                    >
+                      CATALOGO
+                    </Link>
+                  </div>
+
+                  {/* SERVICIOS */}
+                  <div className="relative">
+                    <span className="absolute -top-4 right-10 text-red-500 text-xs font-semibold">
+                      03
+                    </span>
+                    <Link
+                      href="/servicio"
+                      className="block text-black font-black tracking-tighter leading-none text-6xl sm:text-6xl"
+                      onClick={closeMenu}
+                    >
+                      SERVICIOS
+                    </Link>
+                  </div>
+
+                  
+
+                  {/* Auth (sin romper tu lógica; queda oculto si no hay texto) */}
+                  <div className="hidden">
+                    {loadingUser ? (
+                      <span className="block text-black text-3xl font-semibold opacity-40" />
+                    ) : user ? (
+                      <ProfileSheet
+                        user={user}
+                        profile={profile ?? undefined}
+                        onLogout={() => {
+                          setUser(null);
+                          setProfile(null);
+                        }}
+                      >
+                        <button
+                          className="block text-black text-3xl font-semibold"
+                          type="button"
+                          onClick={closeMenu}
+                        />
+                      </ProfileSheet>
+                    ) : (
+                      <LoginDialog>
+                        <button
+                          className="block text-black text-3xl font-semibold"
+                          type="button"
+                          onClick={closeMenu}
+                        />
+                      </LoginDialog>
+                    )}
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Redes abajo */}
+              <motion.div variants={itemVariants} className="pb-10">
+                <div className="text-xs text-black/50 mb-4 pl-3">(REDES)</div>
+
+                <div className="flex items-center justify-between text-xl px-3">
+                  <Link
+                    href="https://instagram.com/tuusuario"
+                    target="_blank"
+                    className="inline-flex items-center gap-2 text-black font-extrabold"
+                  >
+                    <Instagram className="w-4 h-4" />
+                    INSTAGRAM <span className="text-black/60 font-extrabold">↗</span>
+                  </Link>
+
+                  <Link
+                    href="https://youtube.com"
+                    target="_blank"
+                    className="inline-flex items-center gap-2 text-black font-extrabold"
+                  >
+                    <Youtube className="w-5 h-5" />
+                    YOUTUBE <span className="text-black/90  pb-2 font-extrabold"> ↗</span>
+                  </Link>
+                </div>
               </motion.div>
             </motion.div>
           </div>
@@ -269,26 +290,30 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
     <>
       {/* botón */}
       <button
-  ref={btnRef}
-  onClick={handleToggle}
-  aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
-  aria-expanded={isOpen}
-  className={`
-    relative z-[2100]
-    p-2.5 rounded-md
-    duration-300
-    bg-none
-    ${scrolled ? "  text-black  20" : "text-white "}
-  `}
->
-  <motion.div
-    initial={false}
-    animate={{ rotate: isOpen ? 90 : 0, scale: isOpen ? 1.05 : 1 }}
-    transition={{ type: "spring", stiffness: 320, damping: 22 }}
-  >
-    {isOpen ? <X className="w-5 h-5"  /> : <Menu className="w-6 h-6" strokeWidth={2.5} />}
-  </motion.div>
-</button>
+        ref={btnRef}
+        onClick={handleToggle}
+        aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
+        aria-expanded={isOpen}
+        className={`
+          relative z-[2100]
+          p-2.5 rounded-md
+          duration-300
+          bg-none
+          ${scrolled ? "text-black" : "text-white"}
+        `}
+      >
+        <motion.div
+          initial={false}
+          animate={{ rotate: isOpen ? 90 : 0, scale: isOpen ? 1.05 : 1 }}
+          transition={{ type: "spring", stiffness: 320, damping: 22 }}
+        >
+          {isOpen ? (
+            <X className="w-5 h-5" />
+          ) : (
+            <Menu className="w-6 h-6" strokeWidth={2.5} />
+          )}
+        </motion.div>
+      </button>
 
       {/* portal */}
       {mounted ? createPortal(overlay, document.body) : null}

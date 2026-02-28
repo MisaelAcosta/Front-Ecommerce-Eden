@@ -13,16 +13,12 @@ export default function Home() {
   return (
   <main>
     <Header />
-    <CarouselTextBanner />
     <FeaturedProducts />
     <TempProducts/>
     <Block2 />
     <NewProduct />
     <ChooseCategory />
-    <Step />
-    
-    
-  </main>
+    </main>
   );
 }
 
