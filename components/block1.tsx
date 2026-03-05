@@ -103,7 +103,7 @@ const Block1 = () => {
             return (
               <CarouselItem key={id}>
                 <div
-                  className={`relative w-full h-[950px] md:h-[975px]  overflow-hidden ${
+                  className={`relative w-full h-screen sm:w-full overflow-hidden ${
                     hasLink ? "cursor-pointer" : ""
                   }`}
                   onClick={hasLink ? handleClick : undefined}
@@ -114,7 +114,7 @@ const Block1 = () => {
                       src={imgUrl}
                       alt={altTxt}
                       fill
-                      className="object-cover"
+                      className="object-cover object-center "
                       unoptimized
                       priority
                     />
@@ -123,7 +123,7 @@ const Block1 = () => {
                   )}
 
                   {/* Gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/40 via-black/10" />
 
                   
 

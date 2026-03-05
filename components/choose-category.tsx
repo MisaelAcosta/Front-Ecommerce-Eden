@@ -132,7 +132,7 @@ const ChooseCategory = () => {
                     category={categories[0]}
                     idx={0}
                     className="col-span-2"
-                    heightClass="h-[320px] lg:h-[460px]"
+                    heightClass="h-[320px] lg:h-[520px]"
                   />
                 )}
 

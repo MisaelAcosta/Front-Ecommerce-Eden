@@ -25,7 +25,7 @@ const Block2 = () => {
     return `${base}${path}`;
   };
 
-  // Strapi v5: imageBlock2 es multiple media => array [{ id, url, alternativeText }]
+  // Strapi v5: media puede venir como array o como objeto
   const getMediaUrl = (item: any, key: string): string | null => {
     const media = item?.[key];
     if (!media) return null;
@@ -57,31 +57,42 @@ const Block2 = () => {
   };
 
   if (loading) return <SkeletonSchema grid={1} />;
-  if (error)
-    return <p className="text-red-500 text-sm">Error: {String(error)}</p>;
-  if (!Array.isArray(result) || (result as any[]).length === 0) return null;
+  if (error) return <p className="text-red-500 text-sm">Error: {String(error)}</p>;
+  if (!Array.isArray(result) || result.length === 0) return null;
 
   return (
     <section className="relative w-full">
       <Carousel>
         <CarouselContent>
-          {(result as any[]).map((item) => {
-            // Campos directos en Strapi v5
+          {result.map((item: any) => {
             const id = item?.id ?? item?.documentId ?? crypto.randomUUID();
             const titulo = item?.tituloBlock2 ?? "";
             const description = item?.description ?? "";
             const blockSlug = item?.slug ?? "";
 
-            // Relaciones sin .data ni attributes
             const categorySlug = item?.category?.slug ?? null;
             const productSlug = item?.product?.slug ?? null;
 
-            // Imagen
-            const urlRel = getMediaUrl(item, "imageBlock2");
-            const imgUrl = toAbsUrl(urlRel);
-            const altTxt = getMediaAlt(item, "imageBlock2") || titulo || "Banner";
+            // ✅ Desktop image (imageBlock2)
+            const desktopRel = getMediaUrl(item, "imageBlock2");
+            const desktopUrl = toAbsUrl(desktopRel);
+            const desktopAlt =
+              getMediaAlt(item, "imageBlock2") || titulo || "Banner";
 
-            // Lógica de navegación
+            // ✅ Mobile image (imageMobile)
+            const mobileRel = getMediaUrl(item, "imageMobile");
+            const mobileUrl = toAbsUrl(mobileRel);
+            const mobileAlt =
+              getMediaAlt(item, "imageMobile") || titulo || "Banner";
+
+            // ✅ Fallback: si no hay mobile, usamos desktop
+            const finalMobileUrl = mobileUrl || desktopUrl;
+            const finalMobileAlt = mobileUrl ? mobileAlt : desktopAlt;
+
+            // ✅ Fallback: si no hay desktop, usamos mobile
+            const finalDesktopUrl = desktopUrl || mobileUrl;
+            const finalDesktopAlt = desktopUrl ? desktopAlt : mobileAlt;
+
             const handleClick = () => {
               if (productSlug) {
                 router.push(`/product/${productSlug}`);
@@ -110,33 +121,52 @@ const Block2 = () => {
                   }
                   className="
                     group
-                    relative 
+                    relative
                     mx-auto max-w-7xl px-4 sm:px-6 lg:px-8
-                    h-100
+                    h-200
                     sm:h-55
                     md:h-75
                     lg:h-150
                     overflow-hidden
                     cursor-pointer
-
                   "
                 >
-                  {imgUrl ? (
-                    <Image
-                      src={imgUrl}
-                      alt={altTxt}
-                      fill
-                      className="
-                        object-cover
-                        transition-transform
-                        duration-500
-                        ease-out
-                        group-hover:scale-[1.03]
-                      "
-                      // quita esto cuando agregues el dominio del backend en next.config.js
-                      unoptimized
-                      priority
-                    />
+                  {(finalMobileUrl || finalDesktopUrl) ? (
+                    <>
+                      {/* ✅ MOBILE (hasta sm) */}
+                      {finalMobileUrl && (
+                        <Image
+                          src={finalMobileUrl}
+                          alt={finalMobileAlt}
+                          fill
+                          className="
+                            block sm:hidden
+                            object-cover
+                            object-top
+                            
+                          "
+                          unoptimized
+                          priority
+                        />
+                      )}
+
+                      {/* ✅ DESKTOP (sm y arriba) */}
+                      {finalDesktopUrl && (
+                        <Image
+                          src={finalDesktopUrl}
+                          alt={finalDesktopAlt}
+                          fill
+                          className="
+                            hidden sm:block
+                            object-center object-contain sm:object-cover
+                            transition-transform duration-500 ease-out
+                            group-hover:scale-[1.03]
+                          "
+                          unoptimized
+                          priority
+                        />
+                      )}
+                    </>
                   ) : (
                     <div className="w-full h-full bg-linear-to-b from-neutral-200 to-neutral-700" />
                   )}
@@ -147,8 +177,6 @@ const Block2 = () => {
                       absolute inset-0
                       flex items-end
                       bg-linear-to-t
-                      from-black/60
-                      via-black/20
                       to-transparent
                       p-4
                       sm:p-6
@@ -176,7 +204,7 @@ const Block2 = () => {
                           }}
                           className="mt-3 text-sm font-medium text-white underline underline-offset-4"
                         >
-                          
+                          Ver más
                         </button>
                       )}
                     </div>
@@ -187,8 +215,8 @@ const Block2 = () => {
           })}
         </CarouselContent>
 
-        <CarouselPrevious className="hidden " />
-        <CarouselNext className="hidden " />
+        <CarouselPrevious className="hidden" />
+        <CarouselNext className="hidden" />
       </Carousel>
     </section>
   );

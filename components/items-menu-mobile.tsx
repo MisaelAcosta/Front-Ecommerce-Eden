@@ -261,7 +261,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
 
                 <div className="flex items-center justify-between text-xl px-3">
                   <Link
-                    href="https://instagram.com/tuusuario"
+                    href="https://www.instagram.com/eden.3d_/"
                     target="_blank"
                     className="inline-flex items-center gap-2 text-black font-extrabold"
                   >

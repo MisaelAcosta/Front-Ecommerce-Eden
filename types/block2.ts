@@ -37,6 +37,10 @@ export type Block2Type = {
       data: StrapiImageType[] | null;
     };
 
+    imageMobile?: {
+      data: StrapiImageType[] | null;
+    };
+
     // Relación oneToOne con Category
     category?: {
       data: CategoryType | null;

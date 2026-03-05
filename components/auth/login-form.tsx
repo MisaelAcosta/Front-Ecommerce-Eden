@@ -123,7 +123,7 @@ export function LoginForm({
       <Button
         type="button"
         variant="outline"
-        className="mt-3 flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white text-sm font-medium"
+        className="mt-3 hidden sm:hidden h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white text-sm font-medium"
         onClick={() => {
         window.location.href = `${STRAPI_URL}/api/connect/google`;
        }}

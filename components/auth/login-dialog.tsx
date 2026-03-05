@@ -24,7 +24,7 @@ export function LoginDialog({ children }: LoginDialogProps) {
       <DialogTrigger asChild>{children}</DialogTrigger>
 
       <DialogContent className="border-0 bg-transparent p-0 max-w-none shadow-none sm:max-w-md">
-        <div className="flex h-[100vh] w-screen items-center justify-center  p-4 sm:h-auto sm:w-full ">
+        <div className="flex h-screen w-screen items-center justify-center  p-4 sm:h-auto sm:w-full ">
           {mode === "login" ? (
             <LoginForm onSwitchToRegister={() => setMode("register")} onSwitchToForgot={() => setMode("forgot")} />
           ) : mode === "register" ? (
