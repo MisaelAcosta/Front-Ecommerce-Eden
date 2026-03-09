@@ -9,6 +9,14 @@ import { useCartWizard } from "@/hooks/use-cart-wizard";
 
 type UiStatus = "loading" | "paid" | "rejected" | "pending" | "error";
 
+type FlowDetail = {
+  message?: string;
+  status?: string | number;
+  paymentStatus?: string | number;
+  state?: string | number;
+  [key: string]: unknown;
+};
+
 export default function FlowReturnPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -16,7 +24,7 @@ export default function FlowReturnPage() {
   const token = useMemo(() => searchParams.get("token"), [searchParams]);
 
   const [status, setStatus] = useState<UiStatus>("loading");
-  const [detail, setDetail] = useState<any>(null);
+  const [detail, setDetail] = useState<FlowDetail | null>(null);
 
   const cart = useCart();
   const wizard = useCartWizard();
@@ -41,7 +49,7 @@ export default function FlowReturnPage() {
           cache: "no-store",
         });
 
-        const json = await res.json();
+        const json: { ok?: boolean; data?: FlowDetail; message?: string } = await res.json();
 
         if (!alive) return;
 
@@ -55,16 +63,11 @@ export default function FlowReturnPage() {
 
         // ⚠️ Flow devuelve distintos campos según el producto.
         // Lo común: viene un "status" numérico o textual.
-        // Guardamos raw y determinamos algo útil:
         const rawStatus = data?.status ?? data?.paymentStatus ?? data?.state ?? null;
 
-        // Heurística segura:
-        // - Si viene "2" o "PAID"/"AUTHORIZED" => paid
-        // - Si viene "3" o "REJECTED"/"CANCELED" => rejected
-        // - Si viene "1" o "PENDING" => pending
         const s = String(rawStatus ?? "").toLowerCase();
 
-        setDetail(data);
+        setDetail(data ?? null);
 
         if (s === "2" || s.includes("paid") || s.includes("authorized") || s.includes("success")) {
           setStatus("paid");
@@ -85,15 +88,18 @@ export default function FlowReturnPage() {
         setStatus("pending");
 
         if (tries >= maxTries) {
-          // seguimos en pending, paramos polling
           return;
         }
 
         setTimeout(tick, 2000);
-      } catch (e: any) {
+      } catch (e: unknown) {
         if (!alive) return;
+
+        const message =
+          e instanceof Error ? e.message : "Error consultando el estado.";
+
         setStatus("error");
-        setDetail({ message: e?.message ?? "Error consultando el estado." });
+        setDetail({ message });
       }
     };
 
@@ -114,9 +120,7 @@ export default function FlowReturnPage() {
 
         <Separator className="my-4" />
 
-        {status === "loading" && (
-          <p className="text-sm">Procesando…</p>
-        )}
+        {status === "loading" && <p className="text-sm">Procesando…</p>}
 
         {status === "pending" && (
           <div className="space-y-2">
@@ -175,7 +179,6 @@ export default function FlowReturnPage() {
           </div>
         )}
 
-        {/* Debug opcional (puedes borrar cuando esté listo) */}
         {detail && (
           <>
             <Separator className="my-4" />
