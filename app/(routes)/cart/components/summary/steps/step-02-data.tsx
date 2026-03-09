@@ -41,11 +41,18 @@ type ProfileData = {
   notifyEmail: boolean;
 };
 
+type LocalProfileData = {
+  name?: string | null;
+  email?: string | null;
+  rutBody?: string | null;
+  rutDv?: string | null;
+  phoneRest?: string | null;
+};
+
 const isValidEmail = (v?: string | null) => {
   const s = String(v ?? "").trim();
   return s.length >= 6 && s.includes("@") && s.includes(".");
 };
-
 
 const Step02Data = ({ onContinue, onBack }: Props) => {
   const { items } = useCart();
@@ -79,7 +86,7 @@ const Step02Data = ({ onContinue, onBack }: Props) => {
     rutDv.length === 1 &&
     phoneRest.length === 8;
 
-  const applyFromLocalProfile = (p: any) => {
+  const applyFromLocalProfile = (p: LocalProfileData | null) => {
     if (!p) return false;
 
     let applied = false;

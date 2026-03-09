@@ -10,6 +10,26 @@ import { useCartWizard } from "@/hooks/use-cart-wizard";
 
 type Step = 1 | 2 | 3;
 
+type CartItem = {
+  id: number | string;
+  variantId?: number | string | null;
+  qty: number | string;
+  unitPrice: number | string;
+  sku?: string | null;
+  variantName?: string | null;
+  imageUrl?: string | null;
+  variant?: {
+    id?: number | string | null;
+    sku?: string | null;
+    variantName?: string | null;
+  } | null;
+  productName?: string | null;
+  product?: {
+    productName?: string | null;
+    name?: string | null;
+  } | null;
+};
+
 const Summary = () => {
   const [step, setStep] = useState<Step>(1);
   const [paying, setPaying] = useState(false);
@@ -22,9 +42,11 @@ const Summary = () => {
   const { items } = useCart();
   const { step02, step03 } = useCartWizard();
 
+  const cartItems = items as CartItem[];
+
   const subtotal = useMemo(
-    () => items.reduce((acc, it: any) => acc + Number(it.unitPrice) * Number(it.qty), 0),
-    [items]
+    () => cartItems.reduce((acc, it) => acc + Number(it.unitPrice) * Number(it.qty), 0),
+    [cartItems]
   );
 
   const shippingCost = step03?.shippingCost ?? 0;
@@ -36,7 +58,7 @@ const Summary = () => {
     setPayError(null);
 
     // ===== Validaciones mínimas =====
-    if (items.length === 0) {
+    if (cartItems.length === 0) {
       setPayError("Tu carrito está vacío.");
       return;
     }
@@ -72,7 +94,7 @@ const Summary = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: items.map((it: any) => ({
+          items: cartItems.map((it) => ({
             // ⚠️ ajusta si tu cart tiene otra estructura
             variantId: Number(it.variantId ?? it.variant?.id ?? it.id),
             qty: Number(it.qty),
@@ -196,8 +218,11 @@ const Summary = () => {
 
       // ===== 4) Redirect a Flow =====
       window.location.href = paymentUrl;
-    } catch (e: any) {
-      setPayError(e?.message ?? "Error inesperado al iniciar el pago.");
+    } catch (e: unknown) {
+      const message =
+        e instanceof Error ? e.message : "Error inesperado al iniciar el pago.";
+
+      setPayError(message);
     } finally {
       setPaying(false);
     }
