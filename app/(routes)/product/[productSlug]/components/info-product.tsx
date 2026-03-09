@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
@@ -23,8 +24,22 @@ import {
 
 export type InfoProductProps = {
   product: ProductType;
-  variantsData?: VariantType[] | null; // viene desde useGetVariant
+  variantsData?: VariantType[] | null;
 };
+
+type ProductWithOptionalAttributes = ProductType & {
+  id?: number;
+  attributes?: {
+    id?: number;
+  };
+};
+
+type ImageLike = {
+  id?: number | string;
+  url?: string | null;
+};
+
+type ImageInput = ImageLike | ImageLike[] | null | undefined;
 
 /* ----------------------- helpers de promociones ----------------------- */
 
@@ -73,7 +88,6 @@ function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
   return best ? best.promo : null;
 }
 
-
 const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
   const { addItem } = useCart();
   const [qty, setQty] = useState<number>(1);
@@ -81,20 +95,18 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
   const toggleLoved = useLoved((s) => s.toggleLoved);
   const isLoved = useLoved((s) => s.isLoved);
 
-  const productId = (product as any)?.id ?? (product as any)?.attributes?.id ?? 0;
+  const productData = product as ProductWithOptionalAttributes;
+  const productId = productData?.id ?? productData?.attributes?.id ?? 0;
   const loved = isLoved(productId);
 
   /* ----------------------- Carusel y variantes ----------------------- */
 
-  // Variantes activas: primero las que vienen del hook, si no las del product
   const variants: VariantType[] =
-  ((variantsData && variantsData.length ? variantsData : product.variants) ?? [])
-    .filter((v) => v.active);
+    ((variantsData && variantsData.length ? variantsData : product.variants) ?? []).filter(
+      (v) => v.active
+    );
 
-  // Al entrar, ninguna variante seleccionada
-  const [selectedVariantId, setSelectedVariantId] = useState<number | null>(
-    null
-  );
+  const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
 
   const currentVariant =
     selectedVariantId != null
@@ -108,11 +120,9 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
   console.log("variantsData =>", variantsData);
 
   useEffect(() => {
-  console.log("🟣 currentVariant FULL:", currentVariant);
-  console.log("🟣 currentVariant.image:", currentVariant?.image);
-}, [currentVariant]);
-
-
+    console.log("🟣 currentVariant FULL:", currentVariant);
+    console.log("🟣 currentVariant.image:", currentVariant?.image);
+  }, [currentVariant]);
 
   /* ---------------- precio + promo (variant > product) ---------------- */
 
@@ -135,15 +145,12 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
 
   /* -------------------- imágenes para el carrusel --------------------- */
 
-  // normalizar helper
-  const normalizeImages = (imgs: any) =>
+  const normalizeImages = (imgs: ImageInput): ImageLike[] =>
     Array.isArray(imgs) ? imgs : imgs ? [imgs] : [];
 
-  const productImages = normalizeImages(product.images);
-  const variantImages = normalizeImages(currentVariant?.image);
+  const productImages = normalizeImages(product.images as ImageInput);
+  const variantImages = normalizeImages(currentVariant?.image as ImageInput);
 
-  // - primero imágenes de la variante
-  // - luego imágenes del producto (sin repetir por URL)
   const images = [
     ...variantImages,
     ...productImages.filter(
@@ -164,7 +171,6 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
     };
   }, [api]);
 
-  // Cuando cambia la variante, volvemos a la primera imagen del carrusel
   useEffect(() => {
     if (!api) return;
     api.scrollTo(0);
@@ -176,34 +182,29 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
       ? u
       : `${process.env.NEXT_PUBLIC_BACKEND_URL || ""}${u ?? ""}`;
 
-  /* ------------------------------------------------------------------- */
-  /*  PARTE 3 ADAPTADA: AGREGAR VARIANTE AL CARRITO  */
+  /* -------------------- agregar variante al carrito ------------------- */
+
   const handleAddToCart = () => {
-    // Si tu producto tiene variantes, obligamos a elegir una
     if (variants.length > 0 && !currentVariant) {
       alert("Selecciona una variante primero 🙏");
       return;
     }
 
-    // Si no hay variante seleccionada (y no hay variantes activas), no agregamos
     if (!currentVariant) {
       alert("Este producto no tiene variantes configuradas.");
       return;
     }
 
-    // imagen de la variante -> si no, primera del producto -> si no, fallback
     const variantFirstImg = Array.isArray(currentVariant.image)
       ? currentVariant.image[0]
       : currentVariant.image;
 
-    const imageUrl =
-      variantFirstImg?.url
-        ? srcOf(variantFirstImg.url)
-        : product.images?.[0]?.url
-        ? srcOf(product.images[0].url)
-        : "/no-image.png";
+    const imageUrl = variantFirstImg?.url
+      ? srcOf(variantFirstImg.url)
+      : product.images?.[0]?.url
+      ? srcOf(product.images[0].url)
+      : "/no-image.png";
 
-    // 👇 ahora addItem recibe el "line" basado en variante (como ya dejaste listo el carrito)
     addItem({
       productId: product.id,
       productSlug: product.slug,
@@ -214,25 +215,23 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
       imageUrl,
       sku: currentVariant.sku ?? null,
 
-      unitPrice: finalPrice, // precio final (con promo aplicada)
-      qty, // cantidad elegida
+      unitPrice: finalPrice,
+      qty,
     });
   };
 
-  //  Favorito (no variante)
-    const productFirstImg =
-      Array.isArray(product.images) ? product.images?.[0] : product.images?.[0];
+  const productFirstImg = Array.isArray(product.images)
+    ? product.images?.[0]
+    : product.images?.[0];
 
-    const lovedPayload = {
-      id: productId,
-      title: product.productName ?? "Producto sin nombre",
-      secondaryName: product.productName2 ?? null,
-      price: Number(product.price ?? 0), // ✅ precio del producto base
-      imageUrl: productFirstImg?.url ? srcOf(productFirstImg.url) : null, // ✅ imagen del producto base
-      slug: product.slug,
-    };
-
-  /* ------------------------------------------------------------------- */
+  const lovedPayload = {
+    id: productId,
+    title: product.productName ?? "Producto sin nombre",
+    secondaryName: product.productName2 ?? null,
+    price: Number(product.price ?? 0),
+    imageUrl: productFirstImg?.url ? srcOf(productFirstImg.url) : null,
+    slug: product.slug,
+  };
 
   return (
     <div className="w-full max-w-6xl mx-auto pt-1 md:pt-0 ">
@@ -264,13 +263,14 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
                         "
                       >
                         <ImageZoom>
-                          <img
-                            src={srcOf(img.url)}
+                          <Image
+                            src={srcOf(img.url ?? undefined) || "/no-image.png"}
                             alt={`Imagen ${index + 1} del producto`}
                             className="h-full w-full object-contain object-center"
                             height={800}
                             width={800}
                             draggable={false}
+                            unoptimized
                           />
                         </ImageZoom>
                       </div>
@@ -365,11 +365,11 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
                 <div className="flex items-center gap-2">
                   {variants.map((v) => {
                     const selected = currentVariant?.id === v.id;
-                    const vImgs = normalizeImages(v.image);
+                    const vImgs = normalizeImages(v.image as ImageInput);
                     const thumb = vImgs[0];
 
                     return (
-                     <button
+                      <button
                         key={v.id}
                         type="button"
                         onClick={() => setSelectedVariantId(v.id)}
@@ -379,11 +379,14 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
                         aria-pressed={selected}
                       >
                         {thumb?.url ? (
-                          <img
-                            src={srcOf(thumb.url)}
+                          <Image
+                            src={srcOf(thumb.url) || "/no-image.png"}
                             alt={v.variantName}
                             className="h-13 w-13 rounded-full object-cover"
+                            width={52}
+                            height={52}
                             draggable={false}
+                            unoptimized
                           />
                         ) : (
                           <span className="text-xs font-semibold text-muted-foreground text-center px-1">
@@ -425,11 +428,8 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
             </div>
 
             <div className="flex items-start justify-between gap-5 md:gap-3">
-              {/* ✅ deshabilita si no hay variante seleccionada cuando existen variantes */}
               <Button
-                disabled={
-                  !product.active || (variants.length > 0 && !currentVariant)
-                }
+                disabled={!product.active || (variants.length > 0 && !currentVariant)}
                 onClick={handleAddToCart}
                 className="h-10 flex-1 sm:flex-none sm:w-auto cursor-pointer"
               >

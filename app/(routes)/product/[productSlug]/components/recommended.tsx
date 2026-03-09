@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useGetFeaturedProducts } from "@/api/useGetFeaturedProducts";
 import { getCategoryRecommended } from "@/api/getCategoryRecommend";
 import {
@@ -13,12 +14,51 @@ import SkeletonSchema from "@/components/skeletonSchema";
 import type { ResponseType } from "@/types/response";
 import type { ProductType } from "@/types/product";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronRight } from "lucide-react";
 import { formatPrice } from "@/lib/formatPrice";
 import type { PromotionType } from "@/types/promotion";
 import { useRouter } from "next/navigation";
 import { LovedButton } from "@/components/loved-button";
 import { toAbsUrl } from "@/lib/media";
+
+/* ----------------------- types auxiliares ----------------------- */
+
+type StrapiEntity<T> = {
+  id?: number;
+  attributes?: T;
+} & T;
+
+type ProductImage = {
+  url?: string;
+};
+
+type ProductAttrs = {
+  id?: number;
+  slug?: string;
+  price?: number | string;
+  productName?: string;
+  productName2?: string;
+  variant?: string;
+  subCategory?: string;
+  sub_category?: string;
+  images?:
+    | ProductImage[]
+    | {
+        data?: StrapiEntity<ProductImage>[];
+      };
+  promotions?:
+    | PromotionType[]
+    | {
+        data?: StrapiEntity<PromotionType> | StrapiEntity<PromotionType>[];
+      };
+};
+
+type ProductWithAttrs = ProductType & {
+  attributes?: ProductAttrs;
+};
+
+type PromotionWithValue = PromotionType & {
+  value?: number | string;
+};
 
 /* ----------------------- helpers de promociones ----------------------- */
 
@@ -34,12 +74,13 @@ function isPromoActive(p: PromotionType, now = new Date()) {
 function applyPromo(basePrice: number, promo: PromotionType | null) {
   if (!promo) return basePrice;
 
-  const val = Number((promo as any).value || 0);
+  const promoWithValue = promo as PromotionWithValue;
+  const val = Number(promoWithValue.value ?? 0);
   let discount = 0;
 
-  if (val <= 1) discount = basePrice * val; // 0.2 => 20%
-  else if (val <= 100) discount = basePrice * (val / 100); // 20 => 20%
-  else discount = val; // 1500 => $1500 off
+  if (val <= 1) discount = basePrice * val;
+  else if (val <= 100) discount = basePrice * (val / 100);
+  else discount = val;
 
   return Math.max(0, Math.round(basePrice - discount));
 }
@@ -60,25 +101,44 @@ function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
   return best ? best.promo : null;
 }
 
-function normalizePromotions(input: any): PromotionType[] {
+function normalizePromotions(
+  input: ProductAttrs["promotions"]
+): PromotionType[] {
   if (!input) return [];
-  if (Array.isArray(input)) return input as PromotionType[];
+
+  if (Array.isArray(input)) {
+    return input;
+  }
 
   if (Array.isArray(input?.data)) {
-    return input.data.map((x: any) => ({
-      id: x?.id ?? x?.attributes?.id,
+    return input.data.map((x) => ({
       ...(x?.attributes ?? x),
+      id: x?.id ?? x?.attributes?.id,
     })) as PromotionType[];
   }
 
-  if (input?.data && typeof input.data === "object") {
+  if (input?.data && typeof input.data === "object" && !Array.isArray(input.data)) {
     const x = input.data;
     return [
       {
-        id: x?.id ?? x?.attributes?.id,
         ...(x?.attributes ?? x),
+        id: x?.id ?? x?.attributes?.id,
       } as PromotionType,
     ];
+  }
+
+  return [];
+}
+
+function getImagesArray(images: ProductAttrs["images"]): ProductImage[] {
+  if (!images) return [];
+
+  if (Array.isArray(images)) {
+    return images;
+  }
+
+  if (Array.isArray(images.data)) {
+    return images.data.map((img) => img.attributes ?? img);
   }
 
   return [];
@@ -91,7 +151,10 @@ type RecommendedProps = {
   categorySlug: string;
 };
 
-const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
+const Recommmended = ({
+  currentProductId,
+  categorySlug,
+}: RecommendedProps) => {
   const router = useRouter();
 
   const {
@@ -108,12 +171,10 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
 
   let products: ProductType[] = [];
 
-  // 1) categoría (sin el producto actual)
   if (Array.isArray(categoryResult)) {
     products = categoryResult.filter((p) => p.id !== currentProductId);
   }
 
-  // 2) agregamos destacados sin duplicar
   if (Array.isArray(featuredResult)) {
     const featuredClean = featuredResult.filter(
       (p) =>
@@ -123,7 +184,6 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
     products = [...products, ...featuredClean];
   }
 
-  // 3) max 6
   products = products.slice(0, 6);
 
   if (loading) {
@@ -153,43 +213,31 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
 
       <Carousel>
         <CarouselContent className="ml-1 md:-ml-4">
-          {products.map((product: ProductType) => {
-            const raw: any = product;
-            const attrs = raw.attributes ?? raw;
+          {products.map((product) => {
+            const raw = product as ProductWithAttrs;
+            const attrs: ProductAttrs = raw.attributes ?? raw;
 
-            // -------------------------
-            //   IMÁGENES
-            // -------------------------
-            const imagesArray =
-              Array.isArray(attrs?.images)
-                ? attrs.images
-                : attrs?.images?.data?.map((i: any) => i.attributes) || [];
+            const imagesArray = getImagesArray(attrs.images);
 
-            const firstImage = imagesArray?.[0]?.url ?? null;
-            const secondImage = imagesArray?.[1]?.url ?? null;
+            const firstImage = imagesArray[0]?.url ?? null;
+            const secondImage = imagesArray[1]?.url ?? null;
 
             const image1 = toAbsUrl(firstImage);
             const image2 = toAbsUrl(secondImage);
 
-            // -------------------------
-            //   TEXTO
-            // -------------------------
-            const displayName = attrs?.productName ?? "Producto sin nombre";
+            const displayName = attrs.productName ?? "Producto sin nombre";
             const secondaryName =
-              attrs?.productName2 ??
-              attrs?.variant ??
-              attrs?.subCategory ??
-              attrs?.sub_category ??
+              attrs.productName2 ??
+              attrs.variant ??
+              attrs.subCategory ??
+              attrs.sub_category ??
               "";
 
-            const productSlug = attrs?.slug ?? "";
+            const productSlug = attrs.slug ?? "";
 
-            // -------------------------
-            //   PRECIO + PROMO
-            // -------------------------
-            const basePrice = Number(attrs?.price ?? 0);
+            const basePrice = Number(attrs.price ?? 0);
 
-            const promos = normalizePromotions(attrs?.promotions);
+            const promos = normalizePromotions(attrs.promotions);
             const appliedPromo = pickBestPromo(basePrice, promos);
 
             const finalPrice = appliedPromo
@@ -220,7 +268,6 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
                     justify-between
                   "
                 >
-                  {/* Badge OFERTA */}
                   {hasDiscount && (
                     <div
                       className="
@@ -235,24 +282,23 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
                   )}
 
                   <CardContent className="flex flex-col justify-around px-3 md:px-3 pt-0 pb-0">
-                    {/* IMAGEN */}
                     <div
                       className="
                         relative mb-3 sm:mb-4
-                        mt-0 w-full 
+                        mt-0 w-full
                         bg-white
                         flex items-center justify-center overflow-hidden
                         pt-1 pb-1 cursor-pointer
+                        min-h-[260px]
                       "
                       onClick={() =>
                         productSlug && router.push(`/product/${productSlug}`)
                       }
                     >
-                      {/* ❤️ Corazón dentro del recuadro */}
                       <div className="absolute top-3 right-3 z-20">
                         <LovedButton
                           product={{
-                            id: raw.id,
+                            id: raw.id ?? 0,
                             title: displayName,
                             secondaryName,
                             price: basePrice,
@@ -262,26 +308,28 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
                         />
                       </div>
 
-                      {/* Imagen 1 */}
                       {image1 && (
-                        <img
+                        <Image
                           src={image1}
                           alt={displayName}
+                          width={500}
+                          height={500}
                           className="
-                            sm:max-h-102.5 w-auto object-contain
+                            sm:max-h-[410px] h-auto w-auto object-contain
                             transition-all duration-300 ease-out
                             opacity-100 group-hover:opacity-0
                           "
                         />
                       )}
 
-                      {/* Imagen 2 */}
                       {image2 && (
-                        <img
+                        <Image
                           src={image2}
                           alt={displayName}
+                          fill
+                          sizes="(max-width: 640px) 85vw, (max-width: 1024px) 50vw, 33vw"
                           className="
-                            absolute sm:max-h-full sm:w-full object-cover
+                            absolute inset-0 object-cover
                             transition-all duration-300 ease-out
                             opacity-0 group-hover:opacity-100
                           "
@@ -295,7 +343,6 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
                       )}
                     </div>
 
-                    {/* NOMBRE */}
                     <h3
                       className="
                         text-xl
@@ -308,7 +355,6 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
                       {displayName}
                     </h3>
 
-                    {/* SUB */}
                     <div className="flex justify-center py-1 gap-2">
                       <div className="flex items-center gap-2 text-center">
                         <p className="text-lg font-normal text-black">
@@ -317,24 +363,22 @@ const Recommmended = ({ currentProductId, categorySlug }: RecommendedProps) => {
                       </div>
                     </div>
 
-                    {/* PRECIO + DESCUENTO */}
-                      <div className="mt-1 flex items-center justify-center gap-2">
-                        {hasDiscount ? (
-                          <div className=" leading-tight text-center">
-                            <p className="text-[12px] font-semibold text-black/40 line-through">
-                              {formatPrice(basePrice)}
-                            </p>
-                            <p className=" text-[17px] sm:text-[17px] font-extrabold text-red-500 tabular-nums">
-                              {formatPrice(finalPrice)}
-                            </p>
-                          </div>
-                        ) : (
-                          <p className="text-[15px] sm:inline-flex items-center justify-center font-semibold text-center">
+                    <div className="mt-1 flex items-center justify-center gap-2">
+                      {hasDiscount ? (
+                        <div className="leading-tight text-center">
+                          <p className="text-[12px] font-semibold text-black/40 line-through">
                             {formatPrice(basePrice)}
                           </p>
-                        )}
-                    
-                      </div>
+                          <p className="text-[17px] sm:text-[17px] font-extrabold text-red-500 tabular-nums">
+                            {formatPrice(finalPrice)}
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-[15px] sm:inline-flex items-center justify-center font-semibold text-center">
+                          {formatPrice(basePrice)}
+                        </p>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               </CarouselItem>

@@ -10,6 +10,53 @@ import { LovedButton } from "@/components/loved-button";
 
 /* ----------------------- helpers de promociones ----------------------- */
 
+type PromotionLike = PromotionType & {
+  value?: number | string | null;
+};
+
+type StrapiPromotionNode = {
+  id?: number | string;
+  attributes?: PromotionType & {
+    id?: number | string;
+  };
+} & (PromotionType & {
+  id?: number | string;
+});
+
+type PromotionsInput =
+  | PromotionType[]
+  | {
+      data?: StrapiPromotionNode[] | StrapiPromotionNode | null;
+    }
+  | null
+  | undefined;
+
+type ProductAttrs = {
+  id?: number | string;
+  productName?: string | null;
+  productName2?: string | null;
+  variant?: string | null;
+  subCategory?: string | null;
+  slug?: string | null;
+  price?: number | string | null;
+  promotions?: PromotionsInput;
+  images?:
+    | Array<{ url?: string | null }>
+    | {
+        data?: Array<{
+          attributes?: {
+            url?: string | null;
+          };
+        }>;
+      }
+    | null;
+};
+
+type ProductWithOptionalAttributes = ProductType & {
+  id?: number | string;
+  attributes?: ProductAttrs;
+};
+
 function isPromoActive(p: PromotionType, now = new Date()) {
   if (!p?.active) return false;
   const start = p.startAt ? new Date(p.startAt) : null;
@@ -22,7 +69,8 @@ function isPromoActive(p: PromotionType, now = new Date()) {
 function applyPromo(basePrice: number, promo: PromotionType | null) {
   if (!promo) return basePrice;
 
-  const val = Number((promo as any).value || 0);
+  const promoValue = (promo as PromotionLike).value;
+  const val = Number(promoValue || 0);
   let discount = 0;
 
   if (val <= 1) discount = basePrice * val;
@@ -48,23 +96,23 @@ function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
   return best ? best.promo : null;
 }
 
-function normalizePromotions(input: any): PromotionType[] {
+function normalizePromotions(input: PromotionsInput): PromotionType[] {
   if (!input) return [];
-  if (Array.isArray(input)) return input as PromotionType[];
+  if (Array.isArray(input)) return input;
 
   if (Array.isArray(input?.data)) {
-    return input.data.map((x: any) => ({
-      id: x?.id ?? x?.attributes?.id,
+    return input.data.map((x: StrapiPromotionNode) => ({
       ...(x?.attributes ?? x),
+      id: x?.id ?? x?.attributes?.id,
     })) as PromotionType[];
   }
 
-  if (input?.data && typeof input.data === "object") {
+  if (input?.data && typeof input.data === "object" && !Array.isArray(input.data)) {
     const x = input.data;
     return [
       {
-        id: x?.id ?? x?.attributes?.id,
         ...(x?.attributes ?? x),
+        id: x?.id ?? x?.attributes?.id,
       } as PromotionType,
     ];
   }
@@ -78,7 +126,8 @@ type ProductCardProps = {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const router = useRouter();
-  const attrs: any = (product as any)?.attributes ?? product ?? {};
+  const productData = product as ProductWithOptionalAttributes;
+  const attrs: ProductAttrs = productData?.attributes ?? (product as ProductAttrs) ?? {};
 
   const [hover, setHover] = useState(false);
 
@@ -95,10 +144,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
   // -------------------------
   //   OBTENER IMÁGENES
   // -------------------------
-  const imagesArray =
-    Array.isArray(attrs?.images)
-      ? attrs.images
-      : attrs?.images?.data?.map((i: any) => i.attributes) || [];
+  const imagesArray = Array.isArray(attrs?.images)
+    ? attrs.images
+    : attrs?.images?.data?.map((i) => i.attributes ?? {}) || [];
 
   const firstImage = imagesArray?.[0]?.url ?? null;
   const secondImage = imagesArray?.[1]?.url ?? null;
@@ -172,7 +220,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           <div className="absolute top-3 right-3 z-20">
             <LovedButton
               product={{
-                id: (product as any)?.id ?? attrs?.id,
+                id: productData?.id ?? attrs?.id,
                 title: displayName,
                 secondaryName,
                 price: basePrice,

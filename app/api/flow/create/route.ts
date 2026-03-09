@@ -7,7 +7,7 @@ type CreateFlowBody = {
   subject: string;       // ej: "Compra Eden 3D"
   amount: number;        // total final (subtotal + envio)
   email: string;         // email del pagador (Flow lo requiere)
-  optional?: Record<string, any>; // opcional: { rut, nombre, ... }
+  optional?: Record<string, unknown>; // opcional: { rut, nombre, ... }
 };
 
 function mustEnv(name: string) {
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Flow requiere form-urlencoded y firma 's'. :contentReference[oaicite:3]{index=3}
+    // Flow requiere form-urlencoded y firma "s"
     const params: Record<string, string | number> = {
       apiKey: FLOW_API_KEY,
       commerceOrder: body.commerceOrder,
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
       urlReturn,
     };
 
-    // optional va como string JSON si lo usas :contentReference[oaicite:4]{index=4}
+    // optional va como string JSON si lo usas
     if (body.optional) {
       params.optional = JSON.stringify(body.optional);
     }
@@ -78,12 +78,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // Respuesta Flow: { url, token, flowOrder } :contentReference[oaicite:5]{index=5}
+    // Respuesta Flow: { url, token, flowOrder }
     const url = json?.url;
     const token = json?.token;
     const flowOrder = json?.flowOrder;
-
-
 
     if (!url || !token) {
       return NextResponse.json(
@@ -100,9 +98,11 @@ export async function POST(req: Request) {
       token,
       flowOrder,
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Error interno";
+
     return NextResponse.json(
-      { ok: false, error: err?.message ?? "Error interno" },
+      { ok: false, error: message },
       { status: 500 }
     );
   }

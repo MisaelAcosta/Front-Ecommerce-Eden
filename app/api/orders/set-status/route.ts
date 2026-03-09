@@ -2,6 +2,13 @@
 import { NextResponse } from "next/server";
 import { strapiAdminFetch } from "@/lib/strapi-admin";
 
+type OrderStatusPayload = {
+  data: {
+    statusOrder: string;
+    paidAt?: string;
+  };
+};
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -17,8 +24,13 @@ export async function POST(req: Request) {
       );
     }
 
-    const payload: any = { data: { statusOrder } };
-    if (statusOrder === "PAID") payload.data.paidAt = paidAt ?? new Date().toISOString();
+    const payload: OrderStatusPayload = {
+      data: { statusOrder },
+    };
+
+    if (statusOrder === "PAID") {
+      payload.data.paidAt = paidAt ?? new Date().toISOString();
+    }
 
     await strapiAdminFetch(`/api/orders/${orderId}`, {
       method: "PUT",
@@ -26,9 +38,14 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ ok: true }, { status: 200 });
-  } catch (err: any) {
+
+  } catch (err: unknown) {
+
+    const message =
+      err instanceof Error ? err.message : "Error set-status";
+
     return NextResponse.json(
-      { ok: false, error: err?.message ?? "Error set-status" },
+      { ok: false, error: message },
       { status: 500 }
     );
   }

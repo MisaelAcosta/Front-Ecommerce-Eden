@@ -41,6 +41,26 @@ type ProfileData = {
   notifyEmail: boolean;
 };
 
+type LocalProfileData = {
+  region?: string | null;
+  comuna?: string | null;
+  calle?: string | null;
+  numero?: string | null;
+  depto?: string | null;
+  nota?: string | null;
+};
+
+type Step03Data = {
+  useAccount: boolean;
+  region: string | null;
+  comuna: string | null;
+  calle: string;
+  numero: string;
+  depto: string;
+  nota: string;
+  shippingCost?: number;
+};
+
 const Step03Shipping = ({ onPay, onBack }: Props) => {
   const { items } = useCart();
 
@@ -59,8 +79,8 @@ const Step03Shipping = ({ onPay, onBack }: Props) => {
     numero,
     depto,
     nota,
-    shippingCost: shippingCostFromStore, // ✅ nuevo en store
-  } = step03 as any; // si TS molesta hasta que agregues shippingCost al store, déjalo así por ahora
+    shippingCost: shippingCostFromStore,
+  } = step03 as Step03Data;
 
   const setUseAccount = (v: boolean) => setStep03({ useAccount: v });
   const [loadingAccount, setLoadingAccount] = useState(false);
@@ -101,7 +121,7 @@ const Step03Shipping = ({ onPay, onBack }: Props) => {
     calle.trim().length > 2 &&
     numero.trim().length > 0;
 
-  const applyFromLocalProfile = (p: any) => {
+  const applyFromLocalProfile = (p: LocalProfileData | null) => {
     if (!p) return false;
 
     let applied = false;
@@ -395,5 +415,3 @@ const Step03Shipping = ({ onPay, onBack }: Props) => {
 };
 
 export default Step03Shipping;
-
-

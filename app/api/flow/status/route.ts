@@ -8,6 +8,8 @@ function mustEnv(name: string) {
   return v;
 }
 
+type FlowStatusResponse = Record<string, unknown> | { raw: string };
+
 export async function GET(req: Request) {
   try {
     const FLOW_API_KEY = mustEnv("FLOW_API_KEY");
@@ -18,10 +20,12 @@ export async function GET(req: Request) {
     const token = searchParams.get("token");
 
     if (!token) {
-      return NextResponse.json({ ok: false, error: "Falta token" }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: "Falta token" },
+        { status: 400 }
+      );
     }
 
-    // Parámetros requeridos por Flow para getStatus
     const params: Record<string, string> = {
       apiKey: FLOW_API_KEY,
       token,
@@ -41,9 +45,10 @@ export async function GET(req: Request) {
     });
 
     const text = await res.text();
-    let json: any = null;
+    let json: FlowStatusResponse = { raw: text };
+
     try {
-      json = JSON.parse(text);
+      json = JSON.parse(text) as Record<string, unknown>;
     } catch {
       json = { raw: text };
     }
@@ -55,11 +60,13 @@ export async function GET(req: Request) {
       );
     }
 
-    // Flow devuelve data con estado, etc.
     return NextResponse.json({ ok: true, data: json }, { status: 200 });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message =
+      err instanceof Error ? err.message : "Error interno";
+
     return NextResponse.json(
-      { ok: false, error: err?.message ?? "Error interno" },
+      { ok: false, error: message },
       { status: 500 }
     );
   }

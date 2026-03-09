@@ -32,9 +32,11 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ ok: true }, { status: 200 });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Error attach-flow";
+
     return NextResponse.json(
-      { ok: false, error: err?.message ?? "Error attach-flow" },
+      { ok: false, error: message },
       { status: 500 }
     );
   }

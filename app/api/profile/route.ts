@@ -4,12 +4,70 @@ import { cookies } from "next/headers";
 
 const STRAPI_URL = process.env.STRAPI_URL ?? "http://localhost:1338";
 
+type StrapiMeUser = {
+  id?: number;
+  username?: string | null;
+  email?: string | null;
+  nombre?: string | null;
+  rut?: string | null;
+  telefono?: string | null;
+  region?: string | null;
+  comuna?: string | null;
+  calle?: string | null;
+  numero?: string | null;
+  depto?: string | null;
+  nota?: string | null;
+  notifyWhatsapp?: boolean | null;
+  notifyEmail?: boolean | null;
+};
+
+type ProfileUpdateBody = {
+  userId: number;
+  nombre?: string;
+  rut?: string;
+  telefono?: string;
+  region?: string | null;
+  comuna?: string | null;
+  calle?: string;
+  numero?: string;
+  depto?: string;
+  nota?: string;
+  notifyWhatsapp?: boolean;
+  notifyEmail?: boolean;
+};
+
+type UpdatePayload = {
+  nombre: string;
+  rut: string;
+  telefono: string;
+  calle: string;
+  numero: string;
+  depto: string;
+  nota: string;
+  notifyWhatsapp: boolean;
+  notifyEmail: boolean;
+  region?: string;
+  comuna?: string;
+};
+
+type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
+type GenericJsonObject = {
+  [key: string]: JsonValue;
+};
+
 /**
- * ✅ GET /api/profile
+ *  GET /api/profile
  * Devuelve el perfil del usuario autenticado desde Strapi.
  * Usamos /api/users/me para NO depender de userId.
  *
- * ✅ Nuevo: también devolvemos account.email (email real del user)
+ *  Nuevo: también devolvemos account.email (email real del user)
  */
 export async function GET() {
   try {
@@ -21,15 +79,12 @@ export async function GET() {
       null;
 
     if (!jwt) {
-      // Para Step02 conviene devolver 200 con profile null (no romper UX)
       return NextResponse.json(
         { ok: true, profile: null, account: null },
         { status: 200 }
       );
     }
 
-    // 👇 Pedimos campos del perfil + email/id/username (para checkout)
-    // Nota: en /api/users/me el email es campo base del user (users-permissions).
     const fields = [
       "id",
       "username",
@@ -59,16 +114,15 @@ export async function GET() {
     const meText = await meRes.text();
 
     if (!meRes.ok) {
-      // Si el token expiró o algo falló, devolvemos null para no crashear Step02
       return NextResponse.json(
         { ok: true, profile: null, account: null, detail: meText },
         { status: 200 }
       );
     }
 
-    let user: any;
+    let user: StrapiMeUser | null = null;
     try {
-      user = JSON.parse(meText);
+      user = JSON.parse(meText) as StrapiMeUser;
     } catch {
       user = null;
     }
@@ -80,14 +134,12 @@ export async function GET() {
       );
     }
 
-    // ✅ account: datos base del user (incluye email real)
     const account = {
       id: user.id ?? null,
       email: user.email ?? null,
       username: user.username ?? null,
     };
 
-    // ✅ profile: tu shape actual (INFO)
     const profile = {
       nombre: user.nombre ?? null,
       rut: user.rut ?? null,
@@ -103,7 +155,7 @@ export async function GET() {
     };
 
     return NextResponse.json({ ok: true, profile, account }, { status: 200 });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("💥 Error inesperado en GET /api/profile:", err);
     return NextResponse.json(
       { ok: true, profile: null, account: null },
@@ -128,17 +180,19 @@ export async function POST(req: Request) {
       );
     }
 
-    const body = await req.json();
+    const body = (await req.json()) as ProfileUpdateBody;
     console.log("🟦 /api/profile BODY recibido desde el cliente:", body);
 
     const { userId, ...profile } = body;
 
     if (!userId) {
-      return NextResponse.json({ error: "Falta userId en el body" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Falta userId en el body" },
+        { status: 400 }
+      );
     }
 
-    // Mapeamos solo los campos que queremos actualizar
-    const updatePayload: Record<string, any> = {
+    const updatePayload: UpdatePayload = {
       nombre: profile.nombre || "",
       rut: profile.rut || "",
       telefono: profile.telefono || "",
@@ -150,7 +204,6 @@ export async function POST(req: Request) {
       notifyEmail: !!profile.notifyEmail,
     };
 
-    // Región y comuna: solo si vienen definidas
     if (profile.region) updatePayload.region = profile.region;
     if (profile.comuna) updatePayload.comuna = profile.comuna;
 
@@ -169,7 +222,11 @@ export async function POST(req: Request) {
     });
 
     const updateText = await updateRes.text();
-    console.log("🟥 Respuesta de Strapi al actualizar user:", updateRes.status, updateText);
+    console.log(
+      "🟥 Respuesta de Strapi al actualizar user:",
+      updateRes.status,
+      updateText
+    );
 
     if (!updateRes.ok) {
       return NextResponse.json(
@@ -178,15 +235,15 @@ export async function POST(req: Request) {
       );
     }
 
-    let updatedUser: any;
+    let updatedUser: GenericJsonObject | string = updateText;
     try {
-      updatedUser = JSON.parse(updateText);
+      updatedUser = JSON.parse(updateText) as GenericJsonObject;
     } catch {
       updatedUser = updateText;
     }
 
     return NextResponse.json({ ok: true, user: updatedUser });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("💥 Error inesperado en /api/profile:", err);
     return NextResponse.json(
       { error: "Error inesperado en el servidor" },
@@ -194,7 +251,6 @@ export async function POST(req: Request) {
     );
   }
 }
-
 
 
 
