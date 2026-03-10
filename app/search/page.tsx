@@ -46,10 +46,7 @@ type StrapiProductsResponse = {
   data?: StrapiProductItem[];
 };
 
-function buildImageUrl(
-  base: string,
-  url?: string | null
-): string {
+function buildImageUrl(base: string, url?: string | null): string {
   if (!url) return "";
   return url.startsWith("http") ? url : `${base}${url}`;
 }
@@ -106,7 +103,12 @@ async function fetchResults(q: string): Promise<ProductType[]> {
       }
 
       // v4 populate
-      else if (Array.isArray(src.images?.data)) {
+      else if (
+        src.images &&
+        typeof src.images === "object" &&
+        "data" in src.images &&
+        Array.isArray(src.images.data)
+      ) {
         imgs = src.images.data
           .map((imgWrap: StrapiMediaV4) => ({
             url: buildImageUrl(base, imgWrap.attributes?.url),
@@ -126,12 +128,17 @@ async function fetchResults(q: string): Promise<ProductType[]> {
   return mapped;
 }
 
+type SearchPageProps = {
+  searchParams?: Promise<{
+    q?: string;
+  }>;
+};
+
 export default async function SearchPage({
   searchParams,
-}: {
-  searchParams?: { q?: string };
-}) {
-  const q = (searchParams?.q ?? "").trim();
+}: SearchPageProps) {
+  const params = await searchParams;
+  const q = (params?.q ?? "").trim();
 
   if (!q) {
     return (
