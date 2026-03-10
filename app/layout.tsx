@@ -20,12 +20,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-       
+      <body className={`${inter.className} min-h-screen flex flex-col`}>
+
+
+        <ThemeProvider>
           <Navbar></Navbar>
-          {children}
+            <main className="flex-1">
+            {children}
+          </main>
           <Toaster></Toaster>
           <Footer></Footer>
+        </ThemeProvider>
+
       </body>
     </html>
   );

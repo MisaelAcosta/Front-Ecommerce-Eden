@@ -1,7 +1,7 @@
 // lib/strapi-admin.ts
 export const STRAPI_URL = process.env.STRAPI_URL ?? "http://localhost:1338";
 
-function mustEnv(name: string) {
+function mustEnv(name: string): string {
   const v = process.env[name];
   if (!v) throw new Error(`Missing env: ${name}`);
   return v;
@@ -24,7 +24,8 @@ export async function strapiAdminFetch<T>(
   });
 
   const text = await res.text();
-  let json: any = null;
+  let json: unknown = null;
+
   try {
     json = JSON.parse(text);
   } catch {

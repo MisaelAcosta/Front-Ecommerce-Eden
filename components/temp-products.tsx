@@ -11,12 +11,59 @@ import {
 import SkeletonSchema from "./skeletonSchema";
 import type { ResponseType } from "@/types/response";
 import { Card, CardContent } from "./ui/card";
-import { ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/formatPrice";
 import type { PromotionType } from "@/types/promotion";
 import { LovedButton } from "./loved-button";
 import { toAbsUrl } from "@/lib/media";
+import Image from "next/image";
+import type { ProductType } from "@/types/product";
+
+type ProductImage = {
+  url?: string | null;
+};
+
+type StrapiImageWrapper = {
+  attributes?: ProductImage | null;
+};
+
+type StrapiRelationArray<T> = {
+  data?: T[] | null;
+};
+
+type StrapiRelationSingle<T> = {
+  data?: T | null;
+};
+
+type PromotionLike = PromotionType & {
+  value?: number | string | null;
+};
+
+type PromotionStrapiItem = {
+  id?: number;
+  attributes?: PromotionLike;
+} & PromotionLike;
+
+type ProductAttrs = {
+  productName?: string | null;
+  productName2?: string | null;
+  variant?: string | null;
+  subCategory?: string | null;
+  sub_category?: string | null;
+  slug?: string | null;
+  price?: number | string | null;
+  images?: ProductImage[] | StrapiRelationArray<StrapiImageWrapper> | null;
+  promotions?:
+    | PromotionType[]
+    | StrapiRelationArray<PromotionStrapiItem>
+    | StrapiRelationSingle<PromotionStrapiItem>
+    | null;
+};
+
+type ProductWithAttributes = ProductType & {
+  id: number;
+  attributes?: ProductAttrs;
+} & ProductAttrs;
 
 /* ----------------------- helpers de promociones ----------------------- */
 
@@ -32,14 +79,12 @@ function isPromoActive(p: PromotionType, now = new Date()) {
 function applyPromo(basePrice: number, promo: PromotionType | null) {
   if (!promo) return basePrice;
 
-  const val = Number((promo as any).value || 0);
+  const promoValue = promo as PromotionLike;
+  const val = Number(promoValue.value || 0);
   let discount = 0;
 
-  // 0.2 => 20%
   if (val <= 1) discount = basePrice * val;
-  // 20 => 20%
   else if (val <= 100) discount = basePrice * (val / 100);
-  // 1500 => $1500 off
   else discount = val;
 
   return Math.max(0, Math.round(basePrice - discount));
@@ -62,18 +107,25 @@ function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
 }
 
 /* -------------------- normalizar promos (strapi) -------------------- */
-function normalizePromotions(input: any): PromotionType[] {
+function normalizePromotions(
+  input:
+    | PromotionType[]
+    | StrapiRelationArray<PromotionStrapiItem>
+    | StrapiRelationSingle<PromotionStrapiItem>
+    | null
+    | undefined
+): PromotionType[] {
   if (!input) return [];
   if (Array.isArray(input)) return input as PromotionType[];
 
-  if (Array.isArray(input?.data)) {
-    return input.data.map((x: any) => ({
+  if ("data" in input && Array.isArray(input.data)) {
+    return input.data.map((x: PromotionStrapiItem) => ({
       id: x?.id ?? x?.attributes?.id,
       ...(x?.attributes ?? x),
     })) as PromotionType[];
   }
 
-  if (input?.data && typeof input.data === "object") {
+  if ("data" in input && input.data && typeof input.data === "object") {
     const x = input.data;
     return [
       {
@@ -86,8 +138,21 @@ function normalizePromotions(input: any): PromotionType[] {
   return [];
 }
 
+function getImagesArray(attrs: ProductAttrs): ProductImage[] {
+  if (Array.isArray(attrs.images)) {
+    return attrs.images;
+  }
+
+  if (attrs.images && "data" in attrs.images && Array.isArray(attrs.images.data)) {
+    return attrs.images.data
+      .map((i: StrapiImageWrapper) => i.attributes)
+      .filter((img): img is ProductImage => Boolean(img));
+  }
+
+  return [];
+}
+
 const TempProducts = () => {
-  // OJO: cambia 'halloween' por el slug real que quieras usar
   const { result, loading }: ResponseType = useGetTempProducts("halloween");
   const router = useRouter();
 
@@ -109,41 +174,30 @@ const TempProducts = () => {
 
           {!loading &&
             Array.isArray(result) &&
-            result.map((product: any) => {
-              const raw = product;
-              const attrs = raw.attributes ?? raw;
+            result.map((product: ProductType) => {
+              const raw = product as ProductWithAttributes;
+              const attrs: ProductAttrs = raw.attributes ?? raw;
 
-              // -------------------------
-              //   OBTENER IMÁGENES
-              // -------------------------
-              const imagesArray =
-                Array.isArray(attrs?.images)
-                  ? attrs.images
-                  : attrs?.images?.data?.map((i: any) => i.attributes) || [];
+              const imagesArray = getImagesArray(attrs);
 
-              const firstImage = imagesArray?.[0]?.url ?? null;
-              const secondImage = imagesArray?.[1]?.url ?? null;
+              const firstImage = imagesArray[0]?.url ?? null;
+              const secondImage = imagesArray[1]?.url ?? null;
 
               const image1 = toAbsUrl(firstImage);
               const image2 = toAbsUrl(secondImage);
 
-              // -------------------------
-              const displayName = attrs?.productName ?? "Producto sin nombre";
+              const displayName = attrs.productName ?? "Producto sin nombre";
               const secondaryName =
-                attrs?.productName2 ??
-                attrs?.variant ??
-                attrs?.subCategory ??
-                attrs?.sub_category ??
+                attrs.productName2 ??
+                attrs.variant ??
+                attrs.subCategory ??
+                attrs.sub_category ??
                 "";
 
-              const productSlug = attrs?.slug ?? "";
+              const productSlug = attrs.slug ?? "";
+              const basePrice = Number(attrs.price ?? 0);
 
-              // -------------------------
-              //   PRECIO + PROMO (PRODUCT)
-              // -------------------------
-              const basePrice = Number(attrs?.price ?? 0);
-
-              const promos = normalizePromotions(attrs?.promotions);
+              const promos = normalizePromotions(attrs.promotions);
               const appliedPromo = pickBestPromo(basePrice, promos);
 
               const finalPrice = appliedPromo
@@ -173,7 +227,6 @@ const TempProducts = () => {
                       justify-between
                     "
                   >
-                    {/* Badge OFERTA */}
                     {hasDiscount && (
                       <div
                         className="
@@ -188,7 +241,6 @@ const TempProducts = () => {
                     )}
 
                     <CardContent className="flex flex-col justify-around px-3 md:px-3 pt-0 pb-0">
-                      {/* IMAGEN */}
                       <div
                         className="
                           relative mb-3 sm:mb-4
@@ -201,7 +253,6 @@ const TempProducts = () => {
                           productSlug && router.push(`/product/${productSlug}`)
                         }
                       >
-                        {/* ❤️ Corazón dentro del recuadro */}
                         <div className="absolute top-3 right-3 z-20">
                           <LovedButton
                             product={{
@@ -215,26 +266,30 @@ const TempProducts = () => {
                           />
                         </div>
 
-                        {/* Imagen principal */}
                         {image1 && (
-                          <img
+                          <Image
                             src={image1}
                             alt={displayName}
+                            width={700}
+                            height={700}
+                            unoptimized
                             className="
-                              sm:max-h-[410px] w-auto object-contain
+                              sm:max-h-[410px] h-auto w-auto object-contain
                               transition-all duration-300 ease-out
                               opacity-100 group-hover:opacity-0
                             "
                           />
                         )}
 
-                        {/* Segunda imagen al hover */}
                         {image2 && (
-                          <img
+                          <Image
                             src={image2}
                             alt={displayName}
+                            fill
+                            unoptimized
                             className="
-                              absolute sm:max-h-full sm:w-full object-cover
+                              absolute inset-0
+                              object-cover
                               transition-all duration-300 ease-out
                               opacity-0 group-hover:opacity-100
                             "
@@ -248,7 +303,6 @@ const TempProducts = () => {
                         )}
                       </div>
 
-                      {/* NOMBRE */}
                       <h3
                         className="
                           text-xl
@@ -261,7 +315,6 @@ const TempProducts = () => {
                         {displayName}
                       </h3>
 
-                      {/* SUB */}
                       <div className="flex justify-center py-1 gap-2">
                         <div className="flex items-center gap-2 text-center">
                           <p className="text-lg font-normal text-black">
@@ -270,14 +323,13 @@ const TempProducts = () => {
                         </div>
                       </div>
 
-                      {/* PRECIO + DESCUENTO */}
                       <div className="mt-1 flex items-center justify-center gap-2">
                         {hasDiscount ? (
-                          <div className=" leading-tight text-center">
+                          <div className="leading-tight text-center">
                             <p className="text-[12px] font-semibold text-black/40 line-through">
                               {formatPrice(basePrice)}
                             </p>
-                            <p className=" text-[17px] sm:text-[17px] font-extrabold text-red-500 tabular-nums">
+                            <p className="text-[17px] sm:text-[17px] font-extrabold text-red-500 tabular-nums">
                               {formatPrice(finalPrice)}
                             </p>
                           </div>
@@ -286,7 +338,6 @@ const TempProducts = () => {
                             {formatPrice(basePrice)}
                           </p>
                         )}
-                    
                       </div>
                     </CardContent>
                   </Card>

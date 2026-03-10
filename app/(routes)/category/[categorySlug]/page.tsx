@@ -109,8 +109,9 @@ export default function Page() {
         <CarouselTextBanner />
       </div>
 
-      {/* ENCABEZADO (Desktop) */}
-      <div className="pt-2 hidden md:flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+      {/* Barra de busqueda (Desktop) */}
+      <div className="pt-2 hidden md:flex flex-col 
+      gap-2 md:flex-row md:items-start md:justify-between">
         <div />
         <div className="w-full md:max-w-xs text-center item-center">
           <SearchBar

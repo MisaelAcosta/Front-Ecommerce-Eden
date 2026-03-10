@@ -13,11 +13,30 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Autoplay from "embla-carousel-autoplay";
 
+type MediaItem = {
+  url?: string | null;
+  alternativeText?: string | null;
+};
+
+type RelatedEntity = {
+  slug?: string | null;
+};
+
+type Block1Item = {
+  id?: number | string;
+  documentId?: string;
+  tituloBlock1?: string | null;
+  description?: string | null;
+  slug?: string | null;
+  category?: RelatedEntity | null;
+  product?: RelatedEntity | null;
+  imageBlock1?: MediaItem | MediaItem[] | null;
+};
+
 const Block1 = () => {
   const { result, loading, error } = useGetFeaturedBlock1();
   const router = useRouter();
 
-  // Convertir URL relativa -> absoluta
   const toAbsUrl = (url?: string | null) => {
     if (!url) return null;
     if (url.startsWith("http")) return url;
@@ -26,32 +45,38 @@ const Block1 = () => {
     return `${base}${path}`;
   };
 
-  // Manejo de imágenes Strapi v5
-  const getMediaUrl = (item: any, key: string): string | null => {
-    const media = item?.[key];
+  const getMediaUrl = (item: Block1Item, key: keyof Block1Item): string | null => {
+    const media = item[key];
+
     if (!media) return null;
 
-    // Multiple Media = array
     if (Array.isArray(media)) {
-      return typeof media[0]?.url === "string" ? media[0].url : null;
+      const firstMedia = media[0];
+      return typeof firstMedia?.url === "string" ? firstMedia.url : null;
     }
 
-    // Single Media = objeto
-    if (typeof media?.url === "string") return media.url;
+    if (typeof media === "object" && "url" in media) {
+      return typeof media.url === "string" ? media.url : null;
+    }
 
     return null;
   };
 
-  const getMediaAlt = (item: any, key: string) => {
-    const media = item?.[key];
+  const getMediaAlt = (item: Block1Item, key: keyof Block1Item): string | null => {
+    const media = item[key];
 
     if (!media) return null;
 
     if (Array.isArray(media)) {
-      return media[0]?.alternativeText ?? null;
+      const firstMedia = media[0];
+      return firstMedia?.alternativeText ?? null;
     }
 
-    return media?.alternativeText ?? null;
+    if (typeof media === "object" && "alternativeText" in media) {
+      return media.alternativeText ?? null;
+    }
+
+    return null;
   };
 
   if (loading) return <SkeletonSchema grid={1} />;
@@ -59,7 +84,7 @@ const Block1 = () => {
   if (!Array.isArray(result) || result.length === 0) return null;
 
   return (
-    <section className="relative ">
+    <section className="relative">
       <Carousel
         className="w-full overflow-hidden"
         plugins={[
@@ -69,25 +94,21 @@ const Block1 = () => {
         ]}
       >
         <CarouselContent>
-          {result.map((item: any) => {
+          {(result as Block1Item[]).map((item: Block1Item) => {
             console.log("🧱 Block1 item:", item);
 
-            // Campos directos (Strapi v5)
             const id = item.id ?? item.documentId;
             const titulo = item.tituloBlock1 ?? "Destacado";
             const description = item.description ?? "";
             const blockSlug = item.slug ?? "";
 
-            // Relaciones (sin attributes y sin .data)
             const categorySlug = item.category?.slug ?? null;
             const productSlug = item.product?.slug ?? null;
 
-            // Imagen
             const img = getMediaUrl(item, "imageBlock1");
             const imgUrl = toAbsUrl(img);
             const altTxt = getMediaAlt(item, "imageBlock1") || titulo;
 
-            // A dónde navegar según lo que mandó Strapi
             const handleClick = () => {
               if (productSlug) {
                 router.push(`/product/${productSlug}`);
@@ -101,20 +122,19 @@ const Block1 = () => {
             const hasLink = Boolean(productSlug || categorySlug || blockSlug);
 
             return (
-              <CarouselItem key={id}>
+              <CarouselItem key={String(id)}>
                 <div
                   className={`relative w-full h-screen sm:w-full overflow-hidden ${
                     hasLink ? "cursor-pointer" : ""
                   }`}
                   onClick={hasLink ? handleClick : undefined}
                 >
-                  {/* Imagen */}
                   {imgUrl ? (
                     <Image
                       src={imgUrl}
                       alt={altTxt}
                       fill
-                      className="object-cover object-center "
+                      className="object-cover object-center"
                       unoptimized
                       priority
                     />
@@ -122,12 +142,8 @@ const Block1 = () => {
                     <div className="w-full h-full bg-neutral-300" />
                   )}
 
-                  {/* Gradient */}
                   <div className="absolute inset-0 bg-linear-to-t from-black/40 via-black/10" />
 
-                  
-
-                  {/* Texto */}
                   <div className="absolute left-5 right-4 md:px-15 bottom-20 md:bottom-20">
                     <h2 className="text-3xl md:text-5xl leading-none font-black text-white">
                       {titulo.toUpperCase()}
@@ -139,7 +155,6 @@ const Block1 = () => {
                       </p>
                     )}
 
-                    {/* Botón Ver más */}
                     {hasLink && (
                       <button
                         className="mt-4 md:mt-4 px-1 md:px-1 cursor-pointer font-normal text-white"
@@ -148,8 +163,7 @@ const Block1 = () => {
                           handleClick();
                         }}
                       >
-                            Ver más
-
+                        Ver más
                       </button>
                     )}
                   </div>

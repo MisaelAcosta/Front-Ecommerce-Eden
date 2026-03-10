@@ -1,24 +1,69 @@
 // app/search/page.tsx
 import Image from "next/image";
 
-// ⚠ esto corre en el server component por defecto
-// así que podemos hacer fetch directo acá sin "use client"
+// corre en server component por defecto
+
+type ProductImage = {
+  url: string;
+};
 
 type ProductType = {
   id: number;
   productName: string;
   slug: string;
-  price?: number;
-  images?: { url: string }[];
+  price?: number | null;
+  images?: ProductImage[];
 };
+
+type StrapiMediaV5 = {
+  url?: string | null;
+};
+
+type StrapiMediaV4 = {
+  attributes?: {
+    url?: string | null;
+  } | null;
+};
+
+type ProductSource = {
+  productName?: string | null;
+  slug?: string | null;
+  price?: number | null;
+  images?:
+    | StrapiMediaV5[]
+    | {
+        data?: StrapiMediaV4[] | null;
+      }
+    | null;
+};
+
+type StrapiProductItem = {
+  id: number;
+  attributes?: ProductSource;
+} & ProductSource;
+
+type StrapiProductsResponse = {
+  data?: StrapiProductItem[];
+};
+
+function buildImageUrl(
+  base: string,
+  url?: string | null
+): string {
+  if (!url) return "";
+  return url.startsWith("http") ? url : `${base}${url}`;
+}
 
 async function fetchResults(q: string): Promise<ProductType[]> {
   const base = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-  // armamos la query con filtros $or
+  if (!base) {
+    console.error("[/search] NEXT_PUBLIC_BACKEND_URL no está definido");
+    return [];
+  }
+
   const url = new URL(`${base}/api/products`);
 
-  // Filtros OR por nombre y descripción (ajustá los field names reales)
   url.searchParams.append(
     "filters[$or][0][productName][$containsi]",
     q
@@ -28,7 +73,6 @@ async function fetchResults(q: string): Promise<ProductType[]> {
     q
   );
 
-  // populate imágenes (ajusta si tus imágenes viven en "images")
   url.searchParams.append("populate", "*");
 
   const res = await fetch(url.toString(), {
@@ -36,7 +80,6 @@ async function fetchResults(q: string): Promise<ProductType[]> {
     headers: {
       "Content-Type": "application/json",
     },
-    // opcional: no caches en prod si querés "en vivo"
     cache: "no-store",
   });
 
@@ -45,36 +88,30 @@ async function fetchResults(q: string): Promise<ProductType[]> {
     return [];
   }
 
-  const json = await res.json();
+  const json: StrapiProductsResponse = await res.json();
 
-  // adaptar al tipo plano que usas en el front
   const mapped: ProductType[] =
-    json?.data?.map((item: any) => {
-      // soportar v5 plano y v4 con attributes
-      const src = item.attributes ?? item;
+    json.data?.map((item: StrapiProductItem) => {
+      const src: ProductSource = item.attributes ?? item;
 
-      // imagen principal
-      let imgs: { url: string }[] = [];
+      let imgs: ProductImage[] = [];
 
-      // v5 plano (images es array de media)
+      // v5 plano
       if (Array.isArray(src.images)) {
-        imgs = src.images.map((img: any) => ({
-          url: img.url?.startsWith("http")
-            ? img.url
-            : `${base}${img.url}`,
-        }));
+        imgs = src.images
+          .map((img: StrapiMediaV5) => ({
+            url: buildImageUrl(base, img.url),
+          }))
+          .filter((img) => img.url !== "");
       }
 
-      // v4 style populate
+      // v4 populate
       else if (Array.isArray(src.images?.data)) {
-        imgs = src.images.data.map((imgWrap: any) => {
-          const urlImg = imgWrap?.attributes?.url;
-          return {
-            url: urlImg?.startsWith("http")
-              ? urlImg
-              : `${base}${urlImg}`,
-          };
-        });
+        imgs = src.images.data
+          .map((imgWrap: StrapiMediaV4) => ({
+            url: buildImageUrl(base, imgWrap.attributes?.url),
+          }))
+          .filter((img) => img.url !== "");
       }
 
       return {
@@ -96,7 +133,6 @@ export default async function SearchPage({
 }) {
   const q = (searchParams?.q ?? "").trim();
 
-  // si no hay término -> mensaje vacío
   if (!q) {
     return (
       <section className="px-6 py-10">
@@ -110,7 +146,6 @@ export default async function SearchPage({
     );
   }
 
-  // buscamos
   const results = await fetchResults(q);
 
   return (

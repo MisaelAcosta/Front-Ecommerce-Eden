@@ -1,4 +1,4 @@
-"use client";
+/*"use client";
 
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,12 +32,12 @@ export default function ProductCard({ product, iconSrc = "/icons/planet.svg" }: 
       className="group relative rounded-2xl border border-gray-200 shadow-none hover:shadow-sm transition-shadow"
       key={id}
     >
-      {/* Header (categoría + icono) */}
-      <div className="flex items-start justify-between px-5 pt-4">
+      {/* Header (categoría + icono) */
+      /*<div className="flex items-start justify-between px-5 pt-4">
         <span className="text-sm text-muted-foreground">{category ?? "—"}</span>
 
-        {/* Botón circular con icono (usa tu svg/png si existe; si no, Globe de Lucide) */}
-        <button
+        {/* Botón circular con icono (usa tu svg/png si existe; si no, Globe de Lucide) */
+        /*<button
           className="h-8 w-8 shrink-0 rounded-full border border-gray-200 bg-white/70 backdrop-blur hover:bg-white flex items-center justify-center"
           aria-label="Detalles"
           type="button"
@@ -57,8 +57,8 @@ export default function ProductCard({ product, iconSrc = "/icons/planet.svg" }: 
       </div>
 
       <CardContent className="px-5 pb-5 pt-2">
-        {/* Imagen del producto */}
-        <div className="rounded-xl bg-muted/10 aspect-square w-full overflow-hidden mb-4 flex items-center justify-center">
+        {/* Imagen del producto */
+        /*<div className="rounded-xl bg-muted/10 aspect-square w-full overflow-hidden mb-4 flex items-center justify-center">
           {imgPath ? (
             <img
               src={imgPath}
@@ -71,17 +71,17 @@ export default function ProductCard({ product, iconSrc = "/icons/planet.svg" }: 
           )}
         </div>
 
-        {/* Títulos */}
-        <div className="mb-2">
+        {/* Títulos */
+        /*<div className="mb-2">
           <h3 className="text-base font-semibold leading-tight">{productName}</h3>
-          {/* Subtítulo (usa tu subcategoría, variante, o slug si no hay) */}
-          <p className="text-sm text-muted-foreground">
+          {/* Subtítulo (usa tu subcategoría, variante, o slug si no hay) */
+          /*<p className="text-sm text-muted-foreground">
             {(product as any)?.subtitle ?? (product as any)?.variant ?? (product as any)?.subCategory ?? "—"}
           </p>
         </div>
 
-        {/* Precio + CTA */}
-        <div className="flex items-center justify-between">
+        {/* Precio + CTA */
+        /*<div className="flex items-center justify-between">
           <p className="text-base font-semibold">${price}</p>
 
           <Button
@@ -95,4 +95,4 @@ export default function ProductCard({ product, iconSrc = "/icons/planet.svg" }: 
       </CardContent>
     </Card>
   );
-}
+} */

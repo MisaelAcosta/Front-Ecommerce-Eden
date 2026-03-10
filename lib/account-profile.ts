@@ -1,3 +1,8 @@
+type LocationOption = {
+  value: string;
+  label: string;
+};
+
 export type AccountProfile = {
   name?: string;
 
@@ -11,9 +16,9 @@ export type AccountProfile = {
   numero?: string;
   depto?: string;
 
-  // combobox (objeto o string, según tu implementación)
-  region?: any;
-  comuna?: any;
+  // combobox
+  region?: LocationOption;
+  comuna?: LocationOption;
 };
 
 export const ACCOUNT_PROFILE_KEY = "eden-profile";

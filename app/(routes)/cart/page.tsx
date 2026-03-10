@@ -8,7 +8,7 @@ export default function Page() {
   const { items } = useCart();
 
   return (
-    <div className="max-w-6xl px-4 py-16 mx-auto sm:px-6 lg:px-8">
+    <div className="max-w-6xl px-4 py-16 mx-auto sm:px-0 ">
       <h1 className="mb-8 pt-10  text-2xl sm:text-3xl font-black">
         CHEKOUT</h1>
 

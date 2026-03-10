@@ -12,11 +12,31 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+type MediaItem = {
+  url?: string | null;
+  alternativeText?: string | null;
+};
+
+type RelatedEntity = {
+  slug?: string | null;
+};
+
+type Block2Item = {
+  id?: number | string;
+  documentId?: string;
+  tituloBlock2?: string | null;
+  description?: string | null;
+  slug?: string | null;
+  category?: RelatedEntity | null;
+  product?: RelatedEntity | null;
+  imageBlock2?: MediaItem | MediaItem[] | null;
+  imageMobile?: MediaItem | MediaItem[] | null;
+};
+
 const Block2 = () => {
   const { result, loading, error } = useGetFeaturedBlock2();
   const router = useRouter();
 
-  // URL absoluta segura (http(s) + path correcto)
   const toAbsUrl = (url?: string | null) => {
     if (!url) return null;
     if (url.startsWith("http")) return url;
@@ -25,33 +45,38 @@ const Block2 = () => {
     return `${base}${path}`;
   };
 
-  // Strapi v5: media puede venir como array o como objeto
-  const getMediaUrl = (item: any, key: string): string | null => {
-    const media = item?.[key];
+  const getMediaUrl = (item: Block2Item, key: keyof Block2Item): string | null => {
+    const media = item[key];
     if (!media) return null;
 
     if (Array.isArray(media)) {
       const first = media[0];
-      if (first && typeof first.url === "string") return first.url;
+      return typeof first?.url === "string" ? first.url : null;
     }
 
-    if (typeof media?.url === "string") return media.url;
+    if (typeof media === "object" && "url" in media) {
+      return typeof media.url === "string" ? media.url : null;
+    }
 
     return null;
   };
 
-  const getMediaAlt = (item: any, key: string): string | null => {
-    const media = item?.[key];
+  const getMediaAlt = (item: Block2Item, key: keyof Block2Item): string | null => {
+    const media = item[key];
     if (!media) return null;
 
     if (Array.isArray(media)) {
       const first = media[0];
-      if (first && typeof first.alternativeText === "string") {
-        return first.alternativeText;
-      }
+      return typeof first?.alternativeText === "string"
+        ? first.alternativeText
+        : null;
     }
 
-    if (typeof media?.alternativeText === "string") return media.alternativeText;
+    if (typeof media === "object" && "alternativeText" in media) {
+      return typeof media.alternativeText === "string"
+        ? media.alternativeText
+        : null;
+    }
 
     return null;
   };
@@ -64,32 +89,28 @@ const Block2 = () => {
     <section className="relative w-full">
       <Carousel>
         <CarouselContent>
-          {result.map((item: any) => {
-            const id = item?.id ?? item?.documentId ?? crypto.randomUUID();
-            const titulo = item?.tituloBlock2 ?? "";
-            const description = item?.description ?? "";
-            const blockSlug = item?.slug ?? "";
+          {(result as Block2Item[]).map((item: Block2Item) => {
+            const id = item.id ?? item.documentId ?? crypto.randomUUID();
+            const titulo = item.tituloBlock2 ?? "";
+            const description = item.description ?? "";
+            const blockSlug = item.slug ?? "";
 
-            const categorySlug = item?.category?.slug ?? null;
-            const productSlug = item?.product?.slug ?? null;
+            const categorySlug = item.category?.slug ?? null;
+            const productSlug = item.product?.slug ?? null;
 
-            // ✅ Desktop image (imageBlock2)
             const desktopRel = getMediaUrl(item, "imageBlock2");
             const desktopUrl = toAbsUrl(desktopRel);
             const desktopAlt =
               getMediaAlt(item, "imageBlock2") || titulo || "Banner";
 
-            // ✅ Mobile image (imageMobile)
             const mobileRel = getMediaUrl(item, "imageMobile");
             const mobileUrl = toAbsUrl(mobileRel);
             const mobileAlt =
               getMediaAlt(item, "imageMobile") || titulo || "Banner";
 
-            // ✅ Fallback: si no hay mobile, usamos desktop
             const finalMobileUrl = mobileUrl || desktopUrl;
             const finalMobileAlt = mobileUrl ? mobileAlt : desktopAlt;
 
-            // ✅ Fallback: si no hay desktop, usamos mobile
             const finalDesktopUrl = desktopUrl || mobileUrl;
             const finalDesktopAlt = desktopUrl ? desktopAlt : mobileAlt;
 
@@ -106,7 +127,7 @@ const Block2 = () => {
             const hasLink = Boolean(productSlug || categorySlug || blockSlug);
 
             return (
-              <CarouselItem key={id}>
+              <CarouselItem key={String(id)}>
                 <div
                   role={hasLink ? "link" : "group"}
                   tabIndex={hasLink ? 0 : -1}
@@ -131,9 +152,8 @@ const Block2 = () => {
                     cursor-pointer
                   "
                 >
-                  {(finalMobileUrl || finalDesktopUrl) ? (
+                  {finalMobileUrl || finalDesktopUrl ? (
                     <>
-                      {/* ✅ MOBILE (hasta sm) */}
                       {finalMobileUrl && (
                         <Image
                           src={finalMobileUrl}
@@ -143,14 +163,12 @@ const Block2 = () => {
                             block sm:hidden
                             object-cover
                             object-top
-                            
                           "
                           unoptimized
                           priority
                         />
                       )}
 
-                      {/* ✅ DESKTOP (sm y arriba) */}
                       {finalDesktopUrl && (
                         <Image
                           src={finalDesktopUrl}
@@ -171,7 +189,6 @@ const Block2 = () => {
                     <div className="w-full h-full bg-linear-to-b from-neutral-200 to-neutral-700" />
                   )}
 
-                  {/* Overlay degradado + texto + CTA */}
                   <div
                     className="
                       absolute inset-0
@@ -204,7 +221,7 @@ const Block2 = () => {
                           }}
                           className="mt-3 text-sm font-medium text-white underline underline-offset-4"
                         >
-                          Ver más
+                          
                         </button>
                       )}
                     </div>

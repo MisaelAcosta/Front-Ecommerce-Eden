@@ -34,9 +34,6 @@ const CartItem = ({ item }: CartItemProps) => {
         <div className="min-w-0">
           <h2 className="text-sm font-semibold truncate">{item.variantName}</h2>
 
-          {/* Si quieres mostrar descripción real, cámbialo por item.specs o algo tuyo */}
-          <p className="text-xs text-muted-foreground">Soporte de mando</p>
-
           {/* Control cantidad */}
           <div className="flex items-center gap-2 mt-2">
             <button

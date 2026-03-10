@@ -49,12 +49,14 @@ const isRM = (region: string) => {
   return r.includes("metropolitana") || r === "rm";
 };
 
-export function getShippingCost(region: string | null, comuna?: string | null): ShippingQuote {
+export function getShippingCost(
+  region: string | null,
+  _comuna?: string | null
+): ShippingQuote {
   if (!region) return { cost: 0, label: "—" };
 
   if (isRM(region)) return { cost: 2990, label: "RM (tarifa fija)" };
 
-  // match por nombre “bonito” (sin tildes)
   const regionNorm = normalize(region);
 
   const inSet = (set: Set<string>) =>
@@ -64,6 +66,5 @@ export function getShippingCost(region: string | null, comuna?: string | null): 
   if (inSet(CENTER)) return { cost: 6990, label: "Región centro" };
   if (inSet(SOUTH)) return { cost: 7990, label: "Región sur" };
 
-  // fallback: un valor medio si viene una región no contemplada
   return { cost: 6990, label: "Región (tarifa estándar)" };
 }
