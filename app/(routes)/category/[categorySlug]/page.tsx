@@ -48,12 +48,12 @@ export default function Page() {
   }, [categorySlug]);
 
   const { products, loading, error, totalPages } = useGetCategoryProduct({
-    categorySlug,
-    subSlug: activeSubSlug,
-    page: currentPage,
-    pageSize: 8,
-    searchTerm,
-  });
+  categorySlug,
+  subSlug: activeSubSlug,
+  page: currentPage,
+  pageSize: 8,
+  searchTerm,
+});
 
   const handleSelectSubcategory = (slugSub: string | null) => {
     setActiveSubSlug(slugSub);

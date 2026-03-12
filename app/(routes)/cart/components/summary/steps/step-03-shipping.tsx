@@ -12,11 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { ArrowLeft, ShieldCheck, CreditCard } from "lucide-react";
 import { readAccountProfile } from "@/lib/account-profile";
 import { useCartWizard } from "@/hooks/use-cart-wizard";
-
-// ✅ Nuevo helper de envío
 import { getShippingCost } from "@/lib/shipping";
-
-// Reutiliza tus selects del perfil (mismo look/UX)
 import {
   RegionCombobox,
   CommuneCombobox,
@@ -41,9 +37,19 @@ type ProfileData = {
   notifyEmail: boolean;
 };
 
+type LocationLike =
+  | string
+  | {
+      value?: string | null;
+      label?: string | null;
+      name?: string | null;
+    }
+  | null
+  | undefined;
+
 type LocalProfileData = {
-  region?: string | null;
-  comuna?: string | null;
+  region?: LocationLike;
+  comuna?: LocationLike;
   calle?: string | null;
   numero?: string | null;
   depto?: string | null;
@@ -61,6 +67,27 @@ type Step03Data = {
   shippingCost?: number;
 };
 
+const normalizeLocationValue = (value: LocationLike): string | null => {
+  if (!value) return null;
+
+  if (typeof value === "string") {
+    const clean = value.trim();
+    return clean.length > 0 ? clean : null;
+  }
+
+  if (typeof value === "object") {
+    const candidate =
+      (typeof value.value === "string" && value.value.trim()) ||
+      (typeof value.label === "string" && value.label.trim()) ||
+      (typeof value.name === "string" && value.name.trim()) ||
+      null;
+
+    return candidate && candidate.length > 0 ? candidate : null;
+  }
+
+  return null;
+};
+
 const Step03Shipping = ({ onPay, onBack }: Props) => {
   const { items } = useCart();
 
@@ -69,7 +96,6 @@ const Step03Shipping = ({ onPay, onBack }: Props) => {
     [items]
   );
 
-  // Toggle cuenta
   const { step03, setStep03 } = useCartWizard();
   const {
     useAccount,
@@ -86,10 +112,8 @@ const Step03Shipping = ({ onPay, onBack }: Props) => {
   const [loadingAccount, setLoadingAccount] = useState(false);
   const [accountHint, setAccountHint] = useState<string | null>(null);
 
-  // ✅ Flag para evitar que se limpie comuna durante autofill
   const isAutofillingRef = useRef(false);
 
-  // Form envío
   const setRegion = (v: string | null) => setStep03({ region: v });
   const setComuna = (v: string | null) => setStep03({ comuna: v });
   const setCalle = (v: string) => setStep03({ calle: v });
@@ -97,14 +121,12 @@ const Step03Shipping = ({ onPay, onBack }: Props) => {
   const setDepto = (v: string) => setStep03({ depto: v });
   const setNota = (v: string) => setStep03({ nota: v });
 
-  // ✅ Costo envío según región (RM fijo 2990)
   const shipping = useMemo(() => {
     return getShippingCost(region, comuna);
   }, [region, comuna]);
 
   const shippingCost = shipping.cost;
 
-  // ✅ Persistir shippingCost en wizard store (para usarlo al crear Order / Flow)
   useEffect(() => {
     if ((shippingCostFromStore ?? 0) !== shippingCost) {
       setStep03({ shippingCost });
@@ -126,26 +148,34 @@ const Step03Shipping = ({ onPay, onBack }: Props) => {
 
     let applied = false;
 
-    if (p.region) {
-      setRegion(String(p.region));
+    const regionValue = normalizeLocationValue(p.region);
+    const comunaValue = normalizeLocationValue(p.comuna);
+
+    if (regionValue) {
+      setRegion(regionValue);
       applied = true;
     }
-    if (p.comuna) {
-      setComuna(String(p.comuna));
+
+    if (comunaValue) {
+      setComuna(comunaValue);
       applied = true;
     }
+
     if (p.calle) {
       setCalle(String(p.calle).trim());
       applied = true;
     }
+
     if (p.numero) {
       setNumero(String(p.numero).trim());
       applied = true;
     }
+
     if (p.depto) {
       setDepto(String(p.depto).trim());
       applied = true;
     }
+
     if (p.nota) {
       setNota(String(p.nota).trim());
       applied = true;
@@ -189,7 +219,6 @@ const Step03Shipping = ({ onPay, onBack }: Props) => {
 
   return (
     <div className="w-full rounded-md border bg-white p-5 shadow-none">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <button
@@ -214,7 +243,6 @@ const Step03Shipping = ({ onPay, onBack }: Props) => {
 
       <Separator className="my-3" />
 
-      {/* Toggle */}
       <div className="flex items-center justify-between">
         <p className="text-[11px] font-medium text-muted-foreground">
           USAR DIRECCIÓN DE MI CUENTA
@@ -233,12 +261,9 @@ const Step03Shipping = ({ onPay, onBack }: Props) => {
 
             setLoadingAccount(true);
             setAccountHint(null);
-
-            // ✅ Entramos en modo autofill (para que no se limpie comuna)
             isAutofillingRef.current = true;
 
             try {
-              // 1) localStorage
               const pLocal = readAccountProfile();
               const appliedLocal = applyFromLocalProfile(pLocal);
 
@@ -247,7 +272,6 @@ const Step03Shipping = ({ onPay, onBack }: Props) => {
                 return;
               }
 
-              // 2) Strapi
               const res = await fetch("/api/profile", {
                 method: "GET",
                 cache: "no-store",
@@ -268,7 +292,6 @@ const Step03Shipping = ({ onPay, onBack }: Props) => {
             } catch {
               setAccountHint("* No se pudo cargar tu dirección. Intenta de nuevo.");
             } finally {
-              // ✅ Salimos del autofill
               isAutofillingRef.current = false;
               setLoadingAccount(false);
             }
@@ -285,7 +308,6 @@ const Step03Shipping = ({ onPay, onBack }: Props) => {
 
       <Separator className="my-3" />
 
-      {/* Dirección */}
       <div className="space-y-4">
         <p className="text-[11px] font-medium text-muted-foreground">
           DIRECCIÓN DE ENVÍO
@@ -299,8 +321,6 @@ const Step03Shipping = ({ onPay, onBack }: Props) => {
               onChange={(val) => {
                 setRegion(val);
 
-                // ✅ Si el usuario cambia región manualmente, limpiamos comuna
-                // (pero NO durante autofill)
                 if (!isAutofillingRef.current) {
                   setComuna(null);
                 }
@@ -359,7 +379,6 @@ const Step03Shipping = ({ onPay, onBack }: Props) => {
 
       <Separator className="my-4" />
 
-      {/* Totales */}
       <div className="space-y-2 text-sm">
         <div className="flex items-center justify-between">
           <p className="text-xs text-muted-foreground">Subtotal</p>
@@ -384,7 +403,6 @@ const Step03Shipping = ({ onPay, onBack }: Props) => {
         </div>
       </div>
 
-      {/* Badges seguridad */}
       <div className="mt-4 flex items-center gap-2 rounded-md border bg-neutral-50 p-3">
         <ShieldCheck className="h-4 w-4" />
         <p className="text-[11px] text-neutral-700">
@@ -396,7 +414,6 @@ const Step03Shipping = ({ onPay, onBack }: Props) => {
         </span>
       </div>
 
-      {/* CTA */}
       <Button
         className="mt-4 w-full bg-black text-white hover:bg-black/90"
         onClick={onPay}
