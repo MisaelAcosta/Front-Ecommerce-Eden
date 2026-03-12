@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { useGetCategories } from "@/api/useGetCategories";
 
@@ -37,7 +37,7 @@ const FilterCategory = ({
   onSelectSubcategory,
 }: FilterCategoryProps) => {
   const router = useRouter();
-  const pathname = usePathname();
+
 
   const { categories, loading, error } = useGetCategories();
 
