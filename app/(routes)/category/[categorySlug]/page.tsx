@@ -38,8 +38,6 @@ export default function Page() {
   const [activeSubSlug, setActiveSubSlug] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
-
-  // control del dropdown de filtros en mobile
   const [showFiltersMobile, setShowFiltersMobile] = useState(true);
 
   useEffect(() => {
@@ -49,7 +47,6 @@ export default function Page() {
     setShowFiltersMobile(true);
   }, [categorySlug]);
 
-  // hook al backend con paginación real
   const { products, loading, error, totalPages } = useGetCategoryProduct({
     categorySlug,
     subSlug: activeSubSlug,
@@ -65,7 +62,6 @@ export default function Page() {
     setShowFiltersMobile(true);
   };
 
-  // filtro frontend por texto del buscador
   const filteredProducts = useMemo(() => {
     if (!products) return [];
 
@@ -187,7 +183,7 @@ export default function Page() {
                   flex-wrap
                 "
               >
-                {filteredProducts && filteredProducts.length > 0 ? (
+                {filteredProducts.length > 0 ? (
                   filteredProducts.map((p) => (
                     <ProductCard key={String(p.id)} product={p} />
                   ))
@@ -262,7 +258,6 @@ export default function Page() {
     </section>
   );
 }
-
 
 
 

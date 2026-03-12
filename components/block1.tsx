@@ -1,7 +1,6 @@
 "use client";
 
 import { useGetFeaturedBlock1 } from "@/api/useGetFeaturedBlock1";
-import SkeletonSchema from "./skeletonSchema";
 import {
   Carousel,
   CarouselContent,
