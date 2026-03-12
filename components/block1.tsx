@@ -1,6 +1,7 @@
 "use client";
 
 import { useGetFeaturedBlock1 } from "@/api/useGetFeaturedBlock1";
+import SkeletonSchema from "./skeletonSchema";
 import {
   Carousel,
   CarouselContent,
@@ -78,6 +79,13 @@ const Block1 = () => {
     return null;
   };
 
+ if (loading) {
+  return (
+    <div className="w-full h-[500px] flex items-center justify-center">
+      <p className="text-gray-500">Cargando...</p>
+    </div>
+  );
+}
 
   if (error) return <p className="text-red-500">{String(error)}</p>;
   if (!Array.isArray(result) || result.length === 0) return null;

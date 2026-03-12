@@ -32,7 +32,6 @@ export const dataCarouselTop = [
 
 
 const CarouselTextBanner = () => {
-    const router = useRouter()
     return (
         <div className="bg-[#f3f3f3] mt-5 sm:mt-0 dark:bg-primary">
             <Carousel

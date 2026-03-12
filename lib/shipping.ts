@@ -50,8 +50,10 @@ const isRM = (region: string) => {
 };
 
 export function getShippingCost(
-  region: string | null
+  region: string | null,
+  _comuna?: string | null
 ): ShippingQuote {
+  void _comuna;
   if (!region) return { cost: 0, label: "—" };
 
   if (isRM(region)) return { cost: 2990, label: "RM (tarifa fija)" };
