@@ -12,6 +12,7 @@ import { useGetCategoryProduct } from "@/api/useGetCategoryProducts";
 import { ProductType } from "@/types/product";
 import { SlidersHorizontal } from "lucide-react";
 
+// ⬇ importa los componentes de paginación de shadcn
 import {
   Pagination,
   PaginationContent,
@@ -35,10 +36,22 @@ export default function Page() {
   const params = useParams();
   const { categorySlug } = params as { categorySlug: string };
 
+  const [lastScrollY, setLastScrollY] = useState(0);
   const [activeSubSlug, setActiveSubSlug] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
+
+  // NUEVO: control del dropdown de filtros en mobile
   const [showFiltersMobile, setShowFiltersMobile] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setLastScrollY(window.scrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     setActiveSubSlug(null);
@@ -47,13 +60,14 @@ export default function Page() {
     setShowFiltersMobile(true);
   }, [categorySlug]);
 
+  // hook al backend con paginación real
   const { products, loading, error, totalPages } = useGetCategoryProduct({
-  categorySlug,
-  subSlug: activeSubSlug,
-  page: currentPage,
-  pageSize: 8,
-  searchTerm,
-});
+    categorySlug: categorySlug,
+    subSlug: activeSubSlug,
+    page: currentPage,
+    pageSize: 8,
+    searchTerm,
+  });
 
   const handleSelectSubcategory = (slugSub: string | null) => {
     setActiveSubSlug(slugSub);
@@ -62,6 +76,7 @@ export default function Page() {
     setShowFiltersMobile(true);
   };
 
+  // filtro frontend por texto del buscador
   const filteredProducts = useMemo(() => {
     if (!products) return [];
 
@@ -78,6 +93,7 @@ export default function Page() {
     });
   }, [products, searchTerm]);
 
+  // handlers de paginación
   const goToPage = (page: number) => {
     if (page < 1) return;
     if (page > totalPages) return;
@@ -88,13 +104,14 @@ export default function Page() {
   const handleNext = () => goToPage(currentPage + 1);
 
   return (
-    <section className="pt-15 w-full px-1 md:px-8 lg:px-12 pb-28 md:pb-0">
+    <section className=" pt-15 w-full px-1 md:px-8 lg:px-12 pb-28 md:pb-0">
       <div className="pt-6">
         <CarouselTextBanner />
       </div>
 
-      {/* Barra de búsqueda (Desktop) */}
-      <div className="pt-2 hidden md:flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+      {/* Barra de busqueda (Desktop) */}
+      <div className="pt-2 hidden md:flex flex-col 
+      gap-2 md:flex-row md:items-start md:justify-between">
         <div />
         <div className="w-full md:max-w-xs text-center item-center">
           <SearchBar
@@ -107,15 +124,26 @@ export default function Page() {
         </div>
       </div>
 
-      {/* MOBILE */}
-      <div className="md:hidden flex left-0 right-0 z-50 bg-white/90 px-5 pt-10 pb-3">
-        <div className="flex items-center justify-between w-full bg-[#f5f5f5] px-4 py-2 pt-3">
+      {/* ==== BARRA FLOTANTE y barra de busqueda  (MOBILE) ==== */}
+      <div
+        className="
+          md:hidden
+          flex left-0 right-0 z-50
+          bg-white/90 
+          px-5 pt-10 pb-3"
+      >
+        <div
+          className="
+            flex items-center justify-between
+            w-full bg-[#f5f5f5]
+            px-4 py-2 pt-3
+          "
+        >
           <div className="flex-1">
             <SearchBar
               value={searchTerm}
               onChange={(val) => {
                 setSearchTerm(val);
-                setCurrentPage(1);
               }}
             />
           </div>
@@ -130,11 +158,24 @@ export default function Page() {
         </div>
       </div>
 
-      {/* PANEL FILTROS MOBILE */}
+      {/* ==== PANEL DE FILTROS FLOTANTE (MOBILE) ==== */}
       {showFiltersMobile && (
-        <div className="md:hidden px-10 items-center text-center content-center justify-center max-h-[105vh] bg-white">
+        <div
+          className="
+            md:hidden
+            px-10
+            items-center
+            text-center
+            content-center
+            justify-center
+            max-h-[105vh]
+            bg-white
+          "
+        >
           <div className="p-1">
             <FilterCategory
+              categorySlug={categorySlug}
+              activeSubSlug={activeSubSlug}
               onSelectSubcategory={(slug) => {
                 handleSelectSubcategory(slug);
                 setShowFiltersMobile(true);
@@ -146,18 +187,29 @@ export default function Page() {
 
       <Separator className="my-2" />
 
-      <div className="grid grid-cols-1 md:grid-cols-[205px_1fr] shadow-none gap-4">
-        {/* SIDEBAR */}
+      {/* LAYOUT principal  BARRA DE IZQUIERDA*/}
+      <div
+        className="grid grid-cols-1 
+        md:grid-cols-[205px_1fr] shadow-none
+        gap-4"
+      >
+        {/* SIDEBAR IZQ: filtros (solo desktop) */}
         <aside className="rounded-md p-4 text-sm hidden md:block">
-          <FilterCategory onSelectSubcategory={handleSelectSubcategory} />
+          <FilterCategory
+            categorySlug={categorySlug}
+            activeSubSlug={activeSubSlug}
+            onSelectSubcategory={handleSelectSubcategory}
+          />
         </aside>
 
-        {/* PRODUCTOS */}
-        <main className="w-auto px-0 shadow-none md:p-8">
+        {/* LISTA DE PRODUCTOS */}
+        <main className="w-auto px-0 shadow-none md:p-8 ">
           {loading && (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 md:gap-1">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3
+             2xl:grid-cols-4 gap-3 md:gap-1 ">
               <SkeletonSchema grid={8} />
             </div>
+            
           )}
 
           {error && (
@@ -166,24 +218,25 @@ export default function Page() {
 
           {!loading && !error && (
             <>
+              {/* resultados */}
               <div
                 className="
-                  grid
-                  grid-cols-2
-                  pr-0
-                  sm:pr-0
-                  sm:grid-cols-2
-                  xl:grid-cols-3
-                  md:grid-cols-3
-                  2xl:grid-cols-4
-                  min-[1600px]:grid-cols-4
-                  gap-1
-                  sm:gap-3
-                  rounded-none
-                  flex-wrap
-                "
+                grid
+                grid-cols-2
+                pr-0
+                sm:pr-0
+                sm:grid-cols-2
+                xl:grid-cols-3
+                md:grid-cols-3
+                2xl:grid-cols-4
+                min-[1600px]:grid-cols-4
+                gap-1 
+                sm:gap-3
+                rounded-none
+                flex-wrap
+              "
               >
-                {filteredProducts.length > 0 ? (
+                {filteredProducts && filteredProducts.length > 0 ? (
                   filteredProducts.map((p) => (
                     <ProductCard key={String(p.id)} product={p} />
                   ))
@@ -194,10 +247,12 @@ export default function Page() {
                 )}
               </div>
 
+              {/* PAGINATION */}
               {totalPages > 1 && (
                 <div className="mt-8 flex justify-center">
                   <Pagination>
                     <PaginationContent className="flex flex-wrap gap-2">
+                      {/* Prev */}
                       <PaginationItem>
                         <button
                           onClick={handlePrev}
@@ -212,6 +267,7 @@ export default function Page() {
                         </button>
                       </PaginationItem>
 
+                      {/* Números de página */}
                       {Array.from({ length: totalPages }).map((_, idx) => {
                         const pageNum = idx + 1;
                         const isActive = pageNum === currentPage;
@@ -234,6 +290,7 @@ export default function Page() {
                         );
                       })}
 
+                      {/* Next */}
                       <PaginationItem>
                         <button
                           onClick={handleNext}
@@ -258,6 +315,8 @@ export default function Page() {
     </section>
   );
 }
+
+
 
 
 
