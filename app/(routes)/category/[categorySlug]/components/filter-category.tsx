@@ -15,6 +15,8 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 type FilterCategoryProps = {
+  categorySlug: string;
+  activeSubSlug: string | null;
   onSelectSubcategory: (slugSub: string | null) => void;
 };
 
@@ -29,26 +31,23 @@ const allProductsCategory = {
   }[],
 };
 
-const FilterCategory = ({ onSelectSubcategory }: FilterCategoryProps) => {
+const FilterCategory = ({
+  categorySlug,
+  activeSubSlug,
+  onSelectSubcategory,
+}: FilterCategoryProps) => {
   const router = useRouter();
   const pathname = usePathname();
 
   const { categories, loading, error } = useGetCategories();
 
-  // 🔹 slug de la categoría actual desde la URL: /category/[cat]/[sub]?
-  const currentCatSlug = useMemo(() => {
-    const parts = pathname.split("/").filter(Boolean);
-    const catIdx = parts.indexOf("category");
-    return catIdx >= 0 ? parts[catIdx + 1] ?? null : null;
-  }, [pathname]);
-
   // 🔹 acordeón abierto
   const [openSlug, setOpenSlug] = useState<string | undefined>(undefined);
 
-  // 🔹 mantener abierto el acordeón al navegar
+  // 🔹 mantener abierto el acordeón según la categoría actual
   useEffect(() => {
-    setOpenSlug(currentCatSlug ?? undefined);
-  }, [currentCatSlug]);
+    setOpenSlug(categorySlug ?? undefined);
+  }, [categorySlug]);
 
   // 🔹 navegar a categoría
   const goCategory = (slugCat: string) => {
@@ -72,7 +71,6 @@ const FilterCategory = ({ onSelectSubcategory }: FilterCategoryProps) => {
 
   return (
     <aside className="my-5 bg-white text-black text-lg space-y-4 font-light">
-      {/* 🔹 Un solo Accordion para todas las categorías */}
       <Accordion
         type="single"
         collapsible
@@ -82,18 +80,17 @@ const FilterCategory = ({ onSelectSubcategory }: FilterCategoryProps) => {
       >
         {allCategories.map((cat) => {
           const hasSubs = cat.subcategories && cat.subcategories.length > 0;
+          const isCategoryActive = categorySlug === cat.slug;
 
           // 🔹 categoría sin subcategorías
           if (!hasSubs) {
-            const isActive = pathname === `/category/${cat.slug}`;
-
             return (
               <button
                 key={cat.id}
                 onClick={() => goCategory(cat.slug)}
                 className={`
                   w-full text-left px-2 py-2 rounded-md transition
-                  ${isActive ? "bg-black text-white" : "hover:bg-muted"}
+                  ${isCategoryActive ? "bg-black text-white" : "hover:bg-muted"}
                 `}
               >
                 {cat.categoryName}
@@ -110,16 +107,23 @@ const FilterCategory = ({ onSelectSubcategory }: FilterCategoryProps) => {
             >
               <AccordionTrigger
                 onClick={() => goCategory(cat.slug)}
-                className="px-2 py-2 text-left cursor-pointer text-lg font-light"
+                className={`
+                  px-2 py-2 text-left cursor-pointer text-lg font-light
+                  ${isCategoryActive ? "text-black" : ""}
+                `}
               >
                 {cat.categoryName}
               </AccordionTrigger>
 
               <AccordionContent className="px-2 pb-2">
-                <RadioGroup className="flex flex-col space-y-2">
+                <RadioGroup
+                  value={activeSubSlug ?? ""}
+                  className="flex flex-col space-y-2"
+                >
                   {(cat.subcategories ?? []).map((sub) => (
                     <Label
                       key={sub.id}
+                      htmlFor={`sub-${sub.slug}`}
                       className="cursor-pointer flex items-center gap-2 rounded-md px-2 py-1 hover:bg-gray-100"
                       onClick={() => goSubcategory(sub.slug)}
                     >
