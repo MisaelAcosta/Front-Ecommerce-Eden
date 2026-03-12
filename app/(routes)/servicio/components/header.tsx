@@ -4,21 +4,11 @@ import Image from "next/image";
 import { useState } from "react";
 import localFont from "next/font/local";
 
-
-
-// -------- TIPOGRAFÍA (OPCIÓN B: FONT LOCAL) --------
-// 1) Coloca tu archivo en: /public/fonts/servicio/Servicio.ttf
-// 2) Si el nombre o formato cambia, ajusta el src.
+// -------- TIPOGRAFÍA (FONT LOCAL) --------
 const servicioLocal = localFont({
   src: "./fonts/SCHABO-XCondensed.otf",
   display: "auto",
 });
-
-
-
-// -------- CONFIG: CAMBIA AQUÍ PARA PROBAR --------
-const USAR_FONT_LOCAL = false;
-// -----------------------------------------------
 
 type ActiveCard = "pedidos" | "negocio" | null;
 
@@ -28,8 +18,6 @@ const Header = () => {
   const toggle = (key: Exclude<ActiveCard, null>) => {
     setActive((prev) => (prev === key ? null : key));
   };
-
-  
 
   return (
     <section className="w-full">
@@ -43,16 +31,13 @@ const Header = () => {
           className="object-cover object-center"
         />
 
-        {/* (Opcional) leve sombra arriba para que se sienta más pro */}
         <div className="" />
       </div>
-    
+
       {/* -------- BLOQUE BLANCO (TÍTULO + TEXTO) -------- */}
       <div className="w-full bg-white border-b border-black/20 ">
-
         <div className=" max-w-7xl py-8 sm:pt-15  sm:pb-25">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10
-           md:gap-0 items-start ">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-0 items-start ">
             {/* -------- TÍTULO GRANDE “SERVICIO” -------- */}
             <h1
               className={`
@@ -67,7 +52,7 @@ const Header = () => {
                 font-condensed lg:text-[380px]
               `}
               style={{
-                fontFamily: servicioLocal.style.fontFamily, // fuerza la font de next/font
+                fontFamily: servicioLocal.style.fontFamily,
                 transform: "scaleY(1.05)",
                 transformOrigin: "left top",
               }}
@@ -76,7 +61,8 @@ const Header = () => {
             </h1>
 
             {/* -------- SUBTÍTULO -------- */}
-            <p className="
+            <p
+              className="
               mt-2
               text-black
               text-base sm:text-sm md:text-xl
@@ -87,13 +73,15 @@ const Header = () => {
               uppercase sm:pt-70  lg:pt-75
               absolute 
               sm:absolute  
-            ">
+            "
+            >
               EN IMPRESION Y MODELADO 3D
             </p>
 
             {/* -------- TEXTO DESCRIPTIVO A LA DERECHA -------- */}
             <div className="md:pt-45">
-              <p className="text-black/65 sm:absolute
+              <p
+                className="text-black/65 sm:absolute
                 sm:pl-90  text-sm font-light sm:text-xl
                 sm:pr-30 
                 sm:px-0
@@ -102,18 +90,17 @@ const Header = () => {
                 sm:py-0
                 sm:pt-0
                 px-12
-                ">
-                Diseñamos y fabricamos piezas personalizadas en impresión 3D, uniendo funcionalidad y diseño. Trabajamos desde la idea inicial hasta la producción final, 
-                adaptando cada pieza a su uso, material y acabado.
+                "
+              >
+                Diseñamos y fabricamos piezas personalizadas en impresión 3D,
+                uniendo funcionalidad y diseño. Trabajamos desde la idea inicial
+                hasta la producción final, adaptando cada pieza a su uso,
+                material y acabado.
               </p>
             </div>
           </div>
         </div>
       </div>
-
-
-
-
 
       {/* -------- 2 BLOQUES (PEDIDOS / NEGOCIO) -------- */}
       <div className="grid grid-cols-1 md:grid-cols-2">
@@ -137,20 +124,25 @@ const Header = () => {
               className={`
                 h-full px-6 sm:px-10 py-8 flex flex-col
                 transition-all duration-500 ease-out
-                ${active === "pedidos" ? "opacity-0 blur-sm scale-[0.98]" : "opacity-100 blur-0 scale-100"}
+                ${
+                  active === "pedidos"
+                    ? "opacity-0 blur-sm scale-[0.98]"
+                    : "opacity-100 blur-0 scale-100"
+                }
               `}
             >
               <div className="flex-1 flex items-center sm:justify-center">
                 <p
                   className="
                     text-sm sm:text-base lg:text-lg 2xl:text-xl sm:text-center
-                      text-black/60 group-hover:text-white/80
-                      transition-colors duration-300 font-light
+                    text-black/60 group-hover:text-white/80
+                    transition-colors duration-300 font-light
                     max-w-130
                   "
                 >
-                  Diseñamos e imprimimos piezas únicas inspiradas en videojuegos, anime y series,
-                  adaptadas a tu idea, estilo y necesidad.
+                  Diseñamos e imprimimos piezas únicas inspiradas en
+                  videojuegos, anime y series, adaptadas a tu idea, estilo y
+                  necesidad.
                 </p>
               </div>
 
@@ -172,7 +164,11 @@ const Header = () => {
               className={`
                 absolute inset-0
                 transition-all duration-500 ease-out
-                ${active === "pedidos" ? "opacity-100 blur-0 translate-y-0" : "opacity-0 blur-sm translate-y-2 pointer-events-none"}
+                ${
+                  active === "pedidos"
+                    ? "opacity-100 blur-0 translate-y-0"
+                    : "opacity-0 blur-sm translate-y-2 pointer-events-none"
+                }
               `}
             >
               <Image
@@ -188,12 +184,14 @@ const Header = () => {
               <div className="absolute inset-0 px-6 sm:px-10 py-8 flex flex-col justify-end">
                 <div className="max-w-130 text-white">
                   <p className="text-xs sm:text-base font-light sm:font-medium mb-2">
-                    Ideal para fans de videojuegos, anime y series; también para regalos, piezas coleccionables,
-                    miniaturas y decoración.
+                    Ideal para fans de videojuegos, anime y series; también
+                    para regalos, piezas coleccionables, miniaturas y
+                    decoración.
                   </p>
 
                   <p className="text-xs sm:text-base mt-2 font-light sm:font-medium">
-                    Cada pedido se hace a medida: ajustamos tamaño, material y acabado según tu idea.
+                    Cada pedido se hace a medida: ajustamos tamaño, material y
+                    acabado según tu idea.
                   </p>
 
                   <span className="inline-block mt-6 text-xs sm:text-sm opacity-80 underline underline-offset-4">
@@ -213,7 +211,7 @@ const Header = () => {
           className="
             group relative w-full text-left
             border-t
-             md:border-t-0 border-black/20
+            md:border-t-0 border-black/20
             min-h-[40vh] md:min-h-[52vh]
             bg-white transition-colors duration-300
             hover:bg-black data-[open=true]:hover:bg-white
@@ -226,7 +224,11 @@ const Header = () => {
               className={`
                 h-full px-6 sm:px-10 py-8 flex flex-col
                 transition-all duration-500 ease-out
-                ${active === "negocio" ? "opacity-0 blur-sm scale-[0.98]" : "opacity-100 blur-0 scale-100"}
+                ${
+                  active === "negocio"
+                    ? "opacity-0 blur-sm scale-[0.98]"
+                    : "opacity-100 blur-0 scale-100"
+                }
               `}
             >
               <div className="flex-1 flex items-center sm:justify-center">
@@ -238,8 +240,9 @@ const Header = () => {
                     max-w-130
                   "
                 >
-                  Desarrollamos soluciones en impresión 3D para resolver problemas reales, optimizar procesos
-                  y adaptarnos a las necesidades de tu negocio.
+                  Desarrollamos soluciones en impresión 3D para resolver
+                  problemas reales, optimizar procesos y adaptarnos a las
+                  necesidades de tu negocio.
                 </p>
               </div>
 
@@ -261,7 +264,11 @@ const Header = () => {
               className={`
                 absolute inset-0
                 transition-all duration-500 ease-out
-                ${active === "negocio" ? "opacity-100 blur-0 translate-y-0" : "opacity-0 blur-sm translate-y-2 pointer-events-none"}
+                ${
+                  active === "negocio"
+                    ? "opacity-100 blur-0 translate-y-0"
+                    : "opacity-0 blur-sm translate-y-2 pointer-events-none"
+                }
               `}
             >
               <Image
@@ -277,11 +284,13 @@ const Header = () => {
               <div className="absolute inset-0 px-6 sm:px-10 py-8 flex flex-col justify-end">
                 <div className="max-w-130 text-white">
                   <p className="text-xs sm:text-base font-medium mb-2">
-                    La impresión 3D permite crear soluciones a medida cuando lo estándar no alcanza.
+                    La impresión 3D permite crear soluciones a medida cuando lo
+                    estándar no alcanza.
                   </p>
 
                   <p className="text-xs sm:text-base mt-2 opacity-90">
-                    Analizamos tu problema y desarrollamos una pieza funcional que se adapte exactamente a tu uso.
+                    Analizamos tu problema y desarrollamos una pieza funcional
+                    que se adapte exactamente a tu uso.
                   </p>
 
                   <span className="inline-block mt-6 text-xs sm:text-sm opacity-80 underline underline-offset-4">

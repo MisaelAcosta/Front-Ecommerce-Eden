@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 
-type ActiveCard = "pedidos" | "negocio" | null;
-
 const Contacto = () => {
   const [openMail, setOpenMail] = useState(false);
 

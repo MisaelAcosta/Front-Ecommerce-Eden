@@ -170,7 +170,7 @@ const NewProducts = () => {
 
       <Carousel>
         <CarouselContent className="ml-1 md:-ml-4">
-          {loading && <SkeletonSchema grid={3} />}
+          {loading && <SkeletonSchema grid={1} />}
 
           {Array.isArray(result) &&
             result.map((product: ProductType) => {

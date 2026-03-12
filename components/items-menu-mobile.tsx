@@ -117,7 +117,6 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
   // 1ra carga
   useEffect(() => {
     fetchUser();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const closeMenu = () => setIsOpen(false);

@@ -1,5 +1,4 @@
 "use client"
-import { Car } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Carousel, CarouselContent, CarouselItem } from "./ui/carousel";
 import { Card, CardContent } from "./ui/card";

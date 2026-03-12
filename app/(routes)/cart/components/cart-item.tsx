@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCart } from "@/hooks/use-cart";
 import { formatPrice } from "@/lib/formatPrice";
 import { cn } from "@/lib/utils";
@@ -22,9 +23,11 @@ const CartItem = ({ item }: CartItemProps) => {
         onClick={() => router.push(`/product/${item.productSlug}`)}
         className="cursor-pointer"
       >
-        <img
+        <Image
           src={item.imageUrl}
           alt={item.variantName}
+          width={80}
+          height={80}
           className="w-20 h-20 rounded-md object-cover"
         />
       </div>
@@ -83,7 +86,6 @@ const CartItem = ({ item }: CartItemProps) => {
 };
 
 export default CartItem;
-
 
 
 

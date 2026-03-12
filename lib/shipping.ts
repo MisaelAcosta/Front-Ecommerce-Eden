@@ -50,8 +50,7 @@ const isRM = (region: string) => {
 };
 
 export function getShippingCost(
-  region: string | null,
-  _comuna?: string | null
+  region: string | null
 ): ShippingQuote {
   if (!region) return { cost: 0, label: "—" };
 

@@ -170,7 +170,7 @@ const TempProducts = () => {
 
       <Carousel>
         <CarouselContent className="ml-1 md:-ml-4">
-          {loading && <SkeletonSchema grid={3} />}
+          {loading && <SkeletonSchema grid={1} />}
 
           {!loading &&
             Array.isArray(result) &&

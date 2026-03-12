@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { ProductType } from "@/types/product";
@@ -107,7 +108,11 @@ function normalizePromotions(input: PromotionsInput): PromotionType[] {
     })) as PromotionType[];
   }
 
-  if (input?.data && typeof input.data === "object" && !Array.isArray(input.data)) {
+  if (
+    input?.data &&
+    typeof input.data === "object" &&
+    !Array.isArray(input.data)
+  ) {
     const x = input.data;
     return [
       {
@@ -127,7 +132,8 @@ type ProductCardProps = {
 const ProductCard = ({ product }: ProductCardProps) => {
   const router = useRouter();
   const productData = product as ProductWithOptionalAttributes;
-  const attrs: ProductAttrs = productData?.attributes ?? (product as ProductAttrs) ?? {};
+  const attrs: ProductAttrs =
+    productData?.attributes ?? (product as ProductAttrs) ?? {};
 
   const [hover, setHover] = useState(false);
 
@@ -217,7 +223,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           onClick={() => router.push(`/product/${productSlug}`)}
         >
           {/* ❤️ Corazón dentro del recuadro */}
-          <div className="absolute top-3 right-3 z-20">
+          <div className="absolute top-4 sm:top-4 right-3 sm:right-5  z-20">
             <LovedButton
               product={{
                 id: productData?.id ?? attrs?.id,
@@ -230,35 +236,43 @@ const ProductCard = ({ product }: ProductCardProps) => {
             />
           </div>
 
-          {/* Imagen por defecto */}
-          {image1 && (
-            <img
-              src={image1}
-              alt={displayName}
-              className={`
-                max-h-280px sm:max-h-360px 2xl:max-h-350px
-                transition-all duration-300 ease-out
-                ${hover && image2 ? "opacity-0" : "opacity-100"}
-              `}
-            />
-          )}
+          <div className="relative w-full h-68 sm:h-88">
+            {/* Imagen por defecto */}
+            {image1 && (
+              <Image
+                src={image1}
+                alt={displayName}
+                fill
+                sizes="(max-width: 840px) 130vw, (max-width: 1124px) 70vw, 34vw"
+                className={`
+                  object-contain
+                  transition-all duration-300 ease-out
+                  ${hover && image2 ? "opacity-0" : "opacity-100"}
+                `}
+              />
+            )}
 
-          {/* 2da imagen al hover */}
-          {image2 && (
-            <img
-              src={image2}
-              alt={displayName}
-              className={`
-                absolute sm:max-h-full sm:w-full object-cover
-                transition-all duration-600 ease-out 
-                ${hover ? "opacity-100" : "opacity-0"}
-              `}
-            />
-          )}
+            {/* 2da imagen al hover */}
+            {image2 && (
+              <Image
+                src={image2}
+                alt={displayName}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                className={`
+                  object-cover
+                  transition-all duration-500 ease-out
+                  ${hover ? "opacity-100" : "opacity-0"}
+                `}
+              />
+            )}
 
-          {!image1 && (
-            <span className="text-sm text-muted-foreground">Sin imagen</span>
-          )}
+            {!image1 && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-sm text-muted-foreground">Sin imagen</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* NOMBRE */}

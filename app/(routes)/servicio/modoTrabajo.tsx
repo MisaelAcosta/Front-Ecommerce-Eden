@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-
 const ModoTrabajo = () => {
   return (
     <section
@@ -21,7 +19,7 @@ const ModoTrabajo = () => {
           <h2 className="text-black font-black tracking-tight text-3xl sm:text-5xl ">
             COMO TRABAJAMOS?
           </h2>
-          <p className="text-black/90 px-20 text-center 
+          <p className="text-black/80 px-20 text-center 
            pt-2 sm:pt-3 text-sm font-light sm:text-xl tracking-wide">
           <span className="font-bold">
             Te acompañamos paso a paso
@@ -35,7 +33,7 @@ const ModoTrabajo = () => {
       </div>
 
       {/* PASO A PASO (3 tarjetas) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 sm:px-20">
+      <div className="grid grid-cols-1 md:grid-cols-3 sm:px-10">
        {/* 01 */}
           <div className="relative min-h-[28vh] sm:min-h-[20vh]  bg-black/15
             py-10 overflow-hidden ">

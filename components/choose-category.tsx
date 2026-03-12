@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useGetCategories } from "@/api/getProducts";
 import { ResponseType } from "@/types/response";
 import { CategoryType } from "@/types/category";
@@ -17,12 +18,10 @@ const ChooseCategory = () => {
 
   const CategoryBlock = ({
     category,
-    idx,
     className = "",
     heightClass = "h-[260px]",
   }: {
     category: CategoryType;
-    idx: number;
     className?: string;
     heightClass?: string;
   }) => {
@@ -44,10 +43,12 @@ const ChooseCategory = () => {
         {/* fondo */}
         <div className="absolute inset-0">
           {mainImageUrl ? (
-            <img
+            <Image
               src={mainImageUrl}
               alt={name}
-              className=" 
+              fill
+              sizes="(max-width:768px) 100vw, 50vw"
+              className="
               absolute inset-0
               h-full w-full
               object-cover object-center
@@ -89,8 +90,8 @@ const ChooseCategory = () => {
   };
 
   return (
-    <section className="bg-white w-full py-10 sm:py-14">
-      <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0">
+    <section className="bg-white  w-full pt-8 sm:py-14">
+      <div className="max-w-6xl mx-auto px-0 sm:px-8 lg:px-0">
         <h3 className="text-4xl text-black tracking-tight text-center 
         sm:text-6xl font-black mb-6 sm:mb-10">
           CATEGORÍAS DESTACADAS
@@ -130,7 +131,7 @@ const ChooseCategory = () => {
                 {categories[0] && (
                   <CategoryBlock
                     category={categories[0]}
-                    idx={0}
+
                     className="col-span-2"
                     heightClass="h-[320px] lg:h-[520px]"
                   />
@@ -140,36 +141,36 @@ const ChooseCategory = () => {
                 {categories[1] && (
                   <CategoryBlock
                     category={categories[1]}
-                    idx={1}
+
                     heightClass="h-[260px] lg:h-[480px]"
                   />
                 )}
                 {categories[2] && (
                   <CategoryBlock
                     category={categories[2]}
-                    idx={2}
+
                     heightClass="h-[260px] lg:h-[480px]"
                   />
                 )}
               </div>
             </div>
 
-            {/* ✅ MOBILE: 1 arriba + 2 abajo */}
+            {/*  MOBILE: 1 arriba + 2 abajo */}
             <div className="sm:hidden grid grid-cols-2 gap-1">
               {categories[0] && (
                 <CategoryBlock
                   category={categories[0]}
-                  idx={0}
+
                   className="col-span-2"
                   heightClass="h-[340px]"
                 />
               )}
 
               {categories[1] && (
-                <CategoryBlock category={categories[1]} idx={1} heightClass="h-[295px]" />
+                <CategoryBlock category={categories[1]}  heightClass="h-[295px]" />
               )}
               {categories[2] && (
-                <CategoryBlock category={categories[2]} idx={2} heightClass="h-[295px]" />
+                <CategoryBlock category={categories[2]}  heightClass="h-[295px]" />
               )}
             </div>
           </>

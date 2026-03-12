@@ -18,6 +18,17 @@ type FilterCategoryProps = {
   onSelectSubcategory: (slugSub: string | null) => void;
 };
 
+const allProductsCategory = {
+  id: "virtual-all",
+  categoryName: "Todos los productos",
+  slug: "todos-los-productos",
+  subcategories: [] as {
+    id: string | number;
+    categoryName: string;
+    slug: string;
+  }[],
+};
+
 const FilterCategory = ({ onSelectSubcategory }: FilterCategoryProps) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -51,18 +62,6 @@ const FilterCategory = ({ onSelectSubcategory }: FilterCategoryProps) => {
     onSelectSubcategory(slugSub);
   };
 
-  // 🔹 categoría virtual "todos"
-  const allProductsCategory = {
-    id: "virtual-all",
-    categoryName: "Todos los productos",
-    slug: "todos-los-productos",
-    subcategories: [] as {
-      id: string | number;
-      categoryName: string;
-      slug: string;
-    }[],
-  };
-
   const allCategories = useMemo(
     () => [allProductsCategory, ...(categories || [])],
     [categories]
@@ -82,8 +81,7 @@ const FilterCategory = ({ onSelectSubcategory }: FilterCategoryProps) => {
         className="space-y-2 shadow-none"
       >
         {allCategories.map((cat) => {
-          const hasSubs =
-            cat.subcategories && cat.subcategories.length > 0;
+          const hasSubs = cat.subcategories && cat.subcategories.length > 0;
 
           // 🔹 categoría sin subcategorías
           if (!hasSubs) {

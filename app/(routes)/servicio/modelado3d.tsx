@@ -30,7 +30,7 @@ const Modelodo3D = () => {
 
           {/* -------- TEXTO DESCRIPTIVO -------- */}
           <div className="max-w-520px ">
-            <p className="text-black/70 
+            <p className="text-black/80 
             mt-15
             px-5 
             sm:px-20 sm:ml-20 sm:text-xl sm:mt-30 
@@ -38,7 +38,10 @@ const Modelodo3D = () => {
             font-light
             leading-relaxed
             sm:leading-[1.3]">
-              Ofrecemos modelado 3D personalizado para desarrollar piezas únicas y funcionales.
+              <span className="font-bold mr-1">
+              Ofrecemos modelado 3D
+            </span>
+              personalizado para desarrollar piezas únicas y funcionales.
               Diseñamos modelos desde cero o realizamos ajustes sobre diseños existentes,
               siempre considerando su uso final y proceso de impresión.
             </p>

@@ -8,7 +8,6 @@ import { DialogClose } from "@/components/ui/dialog";
 import { X, Eye, EyeOff } from "lucide-react";
 import { registerUserAction } from "@/components/data/actions/auth-actions";
 import {
-  initialRegisterState,
   type RegisterState,
 } from "@/components/data/actions/auth-state";
 
