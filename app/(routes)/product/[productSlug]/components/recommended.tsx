@@ -31,6 +31,16 @@ type ProductImage = {
   url?: string;
 };
 
+type SubCategoryLike =
+  | string
+  | {
+      id?: number;
+      documentId?: string;
+      categoryName?: string;
+      slug?: string;
+    }
+  | null;
+
 type ProductAttrs = {
   id?: number;
   slug?: string;
@@ -38,8 +48,8 @@ type ProductAttrs = {
   productName?: string;
   productName2?: string;
   variant?: string;
-  subCategory?: string;
-  sub_category?: string;
+  subCategory?: string | null;
+  sub_category?: SubCategoryLike;
   images?:
     | ProductImage[]
     | {
@@ -226,12 +236,17 @@ const Recommmended = ({
             const image2 = toAbsUrl(secondImage);
 
             const displayName = attrs.productName ?? "Producto sin nombre";
-            const secondaryName =
-              attrs.productName2 ??
-              attrs.variant ??
-              attrs.subCategory ??
-              attrs.sub_category ??
-              "";
+            const subCategoryLabel =
+            typeof attrs.sub_category === "string"
+              ? attrs.sub_category
+              : attrs.sub_category?.categoryName ?? "";
+
+          const secondaryName =
+            attrs.productName2 ??
+            attrs.variant ??
+            attrs.subCategory ??
+            subCategoryLabel ??
+            "";
 
             const productSlug = attrs.slug ?? "";
 
