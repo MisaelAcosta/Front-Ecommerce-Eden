@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -17,7 +17,7 @@ type FlowDetail = {
   [key: string]: unknown;
 };
 
-export default function FlowReturnPage() {
+function FlowReturnContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -38,53 +38,59 @@ export default function FlowReturnPage() {
 
     let alive = true;
     let tries = 0;
-    const maxTries = 20; // ~40s si es cada 2s
+    const maxTries = 20;
 
     const tick = async () => {
       tries += 1;
 
       try {
-        const res = await fetch(`/api/flow/status?token=${encodeURIComponent(token)}`, {
-          method: "GET",
-          cache: "no-store",
-        });
+        const res = await fetch(
+          `/api/flow/status?token=${encodeURIComponent(token)}`,
+          {
+            method: "GET",
+            cache: "no-store",
+          }
+        );
 
-        const json: { ok?: boolean; data?: FlowDetail; message?: string } = await res.json();
+        const json: { ok?: boolean; data?: FlowDetail; message?: string } =
+          await res.json();
 
         if (!alive) return;
 
         if (!res.ok || !json?.ok) {
           setStatus("error");
-          setDetail(json);
+          setDetail(json?.data ?? { message: json?.message ?? "Error consultando Flow." });
           return;
         }
 
         const data = json?.data;
-
-        // ⚠️ Flow devuelve distintos campos según el producto.
-        // Lo común: viene un "status" numérico o textual.
         const rawStatus = data?.status ?? data?.paymentStatus ?? data?.state ?? null;
-
         const s = String(rawStatus ?? "").toLowerCase();
 
         setDetail(data ?? null);
 
-        if (s === "2" || s.includes("paid") || s.includes("authorized") || s.includes("success")) {
+        if (
+          s === "2" ||
+          s.includes("paid") ||
+          s.includes("authorized") ||
+          s.includes("success")
+        ) {
           setStatus("paid");
-
-          // ✅ limpiar carrito + wizard
           cart.clear();
           wizard.resetWizard?.();
-
           return;
         }
 
-        if (s === "3" || s.includes("rejected") || s.includes("failed") || s.includes("canceled")) {
+        if (
+          s === "3" ||
+          s.includes("rejected") ||
+          s.includes("failed") ||
+          s.includes("canceled")
+        ) {
           setStatus("rejected");
           return;
         }
 
-        // si no es definitivo, seguimos consultando un rato
         setStatus("pending");
 
         if (tries >= maxTries) {
@@ -169,7 +175,11 @@ export default function FlowReturnPage() {
             </p>
 
             <div className="flex gap-2 pt-2">
-              <Button variant="outline" className="w-full" onClick={() => window.location.reload()}>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => window.location.reload()}
+              >
                 Reintentar
               </Button>
               <Button className="w-full" onClick={() => router.push("/cart")}>
@@ -194,5 +204,22 @@ export default function FlowReturnPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function FlowReturnPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-xl px-4 py-16">
+          <div className="rounded-md border bg-white p-6">
+            <h1 className="text-xl font-black">RESULTADO DEL PAGO</h1>
+            <p className="mt-2 text-sm text-muted-foreground">Cargando…</p>
+          </div>
+        </div>
+      }
+    >
+      <FlowReturnContent />
+    </Suspense>
   );
 }
