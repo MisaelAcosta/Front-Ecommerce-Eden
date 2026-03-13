@@ -56,10 +56,11 @@ type ProductAttrs = {
         data?: StrapiEntity<ProductImage>[];
       };
   promotions?:
-    | PromotionType[]
-    | {
-        data?: StrapiEntity<PromotionType> | StrapiEntity<PromotionType>[];
-      };
+  | PromotionType[]
+  | {
+      data?: StrapiEntity<PromotionType> | StrapiEntity<PromotionType>[];
+    }
+  | null;
 };
 
 type ProductWithAttrs = ProductType & {
