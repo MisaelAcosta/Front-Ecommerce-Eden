@@ -107,6 +107,16 @@ function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
 }
 
 /* -------------------- normalizar promos (strapi) -------------------- */
+function normalizePromotionItem(x: PromotionStrapiItem): PromotionType {
+  const source = x?.attributes ?? x;
+  const { id: sourceId, ...rest } = source;
+
+  return {
+    ...rest,
+    id: x?.id ?? sourceId,
+  } as PromotionType;
+}
+
 function normalizePromotions(
   input:
     | PromotionType[]
@@ -116,23 +126,19 @@ function normalizePromotions(
     | undefined
 ): PromotionType[] {
   if (!input) return [];
-  if (Array.isArray(input)) return input as PromotionType[];
 
-  if ("data" in input && Array.isArray(input.data)) {
-    return input.data.map((x: PromotionStrapiItem) => ({
-      id: x?.id ?? x?.attributes?.id,
-      ...(x?.attributes ?? x),
-    })) as PromotionType[];
+  if (Array.isArray(input)) {
+    return input;
   }
 
-  if ("data" in input && input.data && typeof input.data === "object") {
-    const x = input.data;
-    return [
-      {
-        id: x?.id ?? x?.attributes?.id,
-        ...(x?.attributes ?? x),
-      } as PromotionType,
-    ];
+  const data = "data" in input ? input.data : null;
+
+  if (Array.isArray(data)) {
+    return data.map(normalizePromotionItem);
+  }
+
+  if (data && typeof data === "object") {
+    return [normalizePromotionItem(data)];
   }
 
   return [];
