@@ -73,7 +73,7 @@ export function ProfileInfoForm({
     () => initialProfile?.comuna ?? null
   );
 
-  // 🧹 Reset a los valores originales cuando el usuario cancela edición
+  //  Reset a los valores originales cuando el usuario cancela edición
   const resetFromInitial = () => {
     setNotifyWhatsapp(initialProfile?.notifyWhatsapp ?? false);
     setNotifyEmail(initialProfile?.notifyEmail ?? true);
@@ -146,18 +146,22 @@ export function ProfileInfoForm({
         console.error("Error guardando perfil:", await res.text());
         setErrorMessage("Hubo un problema al guardar tu información.");
       } else {
-        // ✅ 1) Guardamos en localStorage para que el checkout pueda autocompletar
+        // 1) Guardamos en localStorage para que el checkout pueda autocompletar
         writeAccountProfile({
-          name: payload.nombre?.trim(),
-          rutBody: rutBody.trim(),
-          rutDv: rutDv.trim().toUpperCase(),
-          phoneRest: phoneRest.trim(),
-          region: payload.region,
-          comuna: payload.comuna,
-          calle: payload.calle?.trim(),
-          numero: payload.numero?.trim(),
-          depto: payload.depto?.trim(),
-        });
+        name: payload.nombre?.trim(),
+        rutBody: rutBody.trim(),
+        rutDv: rutDv.trim().toUpperCase(),
+        phoneRest: phoneRest.trim(),
+        region: payload.region
+          ? { value: payload.region, label: payload.region }
+          : undefined,
+        comuna: payload.comuna
+          ? { value: payload.comuna, label: payload.comuna }
+          : undefined,
+        calle: payload.calle?.trim(),
+        numero: payload.numero?.trim(),
+        depto: payload.depto?.trim(),
+      });
 
         // ✅ 2) UI feedback
         setSavedMessage("Información guardada correctamente ✅");
