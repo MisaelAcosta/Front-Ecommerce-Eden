@@ -82,14 +82,17 @@ const Block2 = () => {
   };
 
   if (loading) return <SkeletonSchema grid={1} />;
-  if (error) return <p className="text-red-500 text-sm">Error: {String(error)}</p>;
-  if (!Array.isArray(result) || result.length === 0) return null;
+  if (error) return <p className="text-red-500">{String(error)}</p>;
+
+  const items = (result ?? []) as Block2Item[];
+
+  if (items.length === 0) return null;
 
   return (
     <section className="relative w-full">
       <Carousel>
         <CarouselContent>
-          {(result as Block2Item[]).map((item: Block2Item) => {
+          {items.map((item: Block2Item) => {
             const id = item.id ?? item.documentId ?? crypto.randomUUID();
             const titulo = item.tituloBlock2 ?? "";
             const description = item.description ?? "";
