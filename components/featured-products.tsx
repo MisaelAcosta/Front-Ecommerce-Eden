@@ -70,10 +70,13 @@ type ProductWithAttributes = ProductType & {
 
 function isPromoActive(p: PromotionType, now = new Date()) {
   if (!p?.active) return false;
+
   const start = p.startAt ? new Date(p.startAt) : null;
   const end = p.endAt ? new Date(p.endAt) : null;
+
   if (start && now < start) return false;
   if (end && now > end) return false;
+
   return true;
 }
 
@@ -92,8 +95,7 @@ function applyPromo(basePrice: number, promo: PromotionType | null) {
     discount = val;
   }
 
-  const finalPrice = Math.max(0, Math.round(basePrice - discount));
-  return finalPrice;
+  return Math.max(0, Math.round(basePrice - discount));
 }
 
 function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
@@ -106,6 +108,7 @@ function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
 
   for (const p of actives) {
     const fp = applyPromo(basePrice, p);
+
     if (!best || fp < best.finalPrice) {
       best = { promo: p, finalPrice: fp };
     }
@@ -115,6 +118,17 @@ function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
 }
 
 /* -------------------- normalizar promos (strapi) -------------------- */
+
+function normalizePromotionItem(x: PromotionStrapiItem): PromotionType {
+  const source = x?.attributes ?? x;
+  const { id: sourceId, ...rest } = source;
+
+  return {
+    ...rest,
+    id: x?.id ?? sourceId,
+  } as PromotionType;
+}
+
 function normalizePromotions(
   input:
     | PromotionType[]
@@ -130,20 +144,16 @@ function normalizePromotions(
   }
 
   if ("data" in input && Array.isArray(input.data)) {
-    return input.data.map((x: PromotionStrapiItem) => ({
-      id: x?.id ?? x?.attributes?.id,
-      ...(x?.attributes ?? x),
-    })) as PromotionType[];
+    return input.data.map(normalizePromotionItem);
   }
 
-  if ("data" in input && input.data && typeof input.data === "object") {
-    const x = input.data;
-    return [
-      {
-        id: x?.id ?? x?.attributes?.id,
-        ...(x?.attributes ?? x),
-      } as PromotionType,
-    ];
+  if (
+    "data" in input &&
+    input.data &&
+    !Array.isArray(input.data) &&
+    typeof input.data === "object"
+  ) {
+    return [normalizePromotionItem(input.data)];
   }
 
   return [];
@@ -182,9 +192,6 @@ const FeaturedProducts = () => {
         <CarouselContent className="ml-1 md:-ml-4">
           {loading && <SkeletonSchema grid={1} />}
 
-
-
-
           {Array.isArray(result) &&
             result.map((product: ProductType) => {
               const raw = product as ProductWithAttributes;
@@ -207,7 +214,6 @@ const FeaturedProducts = () => {
                 "";
 
               const productSlug = attrs.slug ?? "";
-
               const basePrice = Number(attrs.price ?? 0);
 
               const promos = normalizePromotions(attrs.promotions);
