@@ -87,7 +87,10 @@ const Block1 = () => {
 }
 
   if (error) return <p className="text-red-500">{String(error)}</p>;
-  if (!Array.isArray(result) || result.length === 0) return null;
+
+  const items = (result ?? []) as Block1Item[];
+
+if (items.length === 0) return null;
 
   return (
     <section className="relative">
@@ -100,7 +103,7 @@ const Block1 = () => {
         ]}
       >
         <CarouselContent>
-          {(result as Block1Item[]).map((item: Block1Item) => {
+          {items.map((item: Block1Item) => {
             console.log("🧱 Block1 item:", item);
 
             const id = item.id ?? item.documentId;
