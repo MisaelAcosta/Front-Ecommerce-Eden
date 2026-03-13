@@ -3,33 +3,56 @@
 import { Menu, X, Instagram, Youtube } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { createPortal } from "react-dom";
 
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { ProfileSheet } from "@/components/profile/profile-sheet";
 import type { CurrentUser, ProfileData } from "@/components/profile/profile-types";
 
-const overlayVariants = (originPx: string) => ({
-  initial: { clipPath: `circle(0px at ${originPx})` },
+const overlayVariants = (originPx: string): Variants => ({
+  initial: {
+    clipPath: `circle(0px at ${originPx})`,
+  },
   animate: {
     clipPath: `circle(200vmax at ${originPx})`,
-    transition: { duration: 0.5, ease: "easeInOut" },
+    transition: {
+      duration: 0.5,
+      ease: [0.42, 0, 0.58, 1],
+    },
   },
   exit: {
     clipPath: `circle(0px at ${originPx})`,
-    transition: { duration: 0.4, ease: "easeInOut" },
+    transition: {
+      duration: 0.4,
+      ease: [0.42, 0, 0.58, 1],
+    },
   },
 });
 
-const listVariants = {
+const listVariants: Variants = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.06, delayChildren: 0.15 } },
+  show: {
+    transition: {
+      staggerChildren: 0.06,
+      delayChildren: 0.15,
+    },
+  },
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 8 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeInOut" } },
+const itemVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 8,
+  },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.35,
+      ease: [0.42, 0, 0.58, 1],
+    },
+  },
 };
 
 // scroller
