@@ -6,6 +6,14 @@ import { useGetVariant } from "@/api/getVariant";
 import InfoProduct from "./components/info-product";
 import { ArrowLeft } from "lucide-react";
 import Recommmended from "./components/recommended";
+import type { ProductType } from "@/types/product";
+
+type ProductPageItem = ProductType & {
+  id: number;
+  category?: {
+    slug?: string;
+  } | null;
+};
 
 export default function Page() {
   const router = useRouter();
@@ -17,11 +25,11 @@ export default function Page() {
 
   const { result: variantsResult } = useGetVariant(productSlug);
 
-  if (loadingProduct || !productResult) {
+  if (loadingProduct || !productResult || !Array.isArray(productResult) || productResult.length === 0) {
     return <div>Cargando...</div>;
   }
 
-  const product = productResult[0];
+  const product = productResult[0] as ProductPageItem;
 
   return (
     <div className="mx-auto max-w-7xl py-4 sm:py-22 sm:px-14 md:pr-0">
@@ -46,7 +54,7 @@ export default function Page() {
       <div className="pt-30">
         <Recommmended
           currentProductId={product.id}
-          categorySlug={product.category.slug}
+          categorySlug={product.category?.slug ?? ""}
         />
       </div>
     </div>
