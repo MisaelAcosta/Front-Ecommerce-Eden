@@ -25,11 +25,13 @@ export default function Page() {
 
   const { result: variantsResult } = useGetVariant(productSlug);
 
-  if (loadingProduct || !productResult || !Array.isArray(productResult) || productResult.length === 0) {
+  const products = (productResult ?? []) as ProductPageItem[];
+
+  if (loadingProduct || products.length === 0) {
     return <div>Cargando...</div>;
   }
 
-  const product = productResult[0] as ProductPageItem;
+  const product = products[0];
 
   return (
     <div className="mx-auto max-w-7xl py-4 sm:py-22 sm:px-14 md:pr-0">
