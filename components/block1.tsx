@@ -30,6 +30,7 @@ type Block1Item = {
   category?: RelatedEntity | null;
   product?: RelatedEntity | null;
   imageBlock1?: MediaItem | MediaItem[] | null;
+  imageBlock1Movile?: MediaItem | MediaItem[] | null;
 };
 
 const Block1 = () => {
@@ -39,6 +40,7 @@ const Block1 = () => {
   const toAbsUrl = (url?: string | null) => {
     if (!url) return null;
     if (url.startsWith("http")) return url;
+
     const base = (process.env.NEXT_PUBLIC_BACKEND_URL || "").replace(/\/+$/, "");
     const path = url.startsWith("/") ? url : `/${url}`;
     return `${base}${path}`;
@@ -46,7 +48,6 @@ const Block1 = () => {
 
   const getMediaUrl = (item: Block1Item, key: keyof Block1Item): string | null => {
     const media = item[key];
-
     if (!media) return null;
 
     if (Array.isArray(media)) {
@@ -63,37 +64,41 @@ const Block1 = () => {
 
   const getMediaAlt = (item: Block1Item, key: keyof Block1Item): string | null => {
     const media = item[key];
-
     if (!media) return null;
 
     if (Array.isArray(media)) {
       const firstMedia = media[0];
-      return firstMedia?.alternativeText ?? null;
+      return typeof firstMedia?.alternativeText === "string"
+        ? firstMedia.alternativeText
+        : null;
     }
 
     if (typeof media === "object" && "alternativeText" in media) {
-      return media.alternativeText ?? null;
+      return typeof media.alternativeText === "string"
+        ? media.alternativeText
+        : null;
     }
 
     return null;
   };
 
- if (loading) {
-  return (
-    <div className="w-full h-[500px] flex items-center justify-center">
-      <p className="text-gray-500">Cargando...</p>
-    </div>
-  );
-}
+  if (loading) {
+    return (
+      <div className="w-full h-227.5 flex items-center 
+      shadow-none bg-white justify-center">
+        <p className="text-gray-500">Cargando...</p>
+      </div>
+    );
+  }
 
   if (error) return <p className="text-red-500">{String(error)}</p>;
 
   const items = (result ?? []) as Block1Item[];
 
-if (items.length === 0) return null;
+  if (items.length === 0) return null;
 
   return (
-    <section className="relative">
+    <section className="relative shadow-none">
       <Carousel
         className="w-full overflow-hidden"
         plugins={[
@@ -104,9 +109,7 @@ if (items.length === 0) return null;
       >
         <CarouselContent>
           {items.map((item: Block1Item) => {
-            console.log("🧱 Block1 item:", item);
-
-            const id = item.id ?? item.documentId;
+            const id = item.id ?? item.documentId ?? crypto.randomUUID();
             const titulo = item.tituloBlock1 ?? "Destacado";
             const description = item.description ?? "";
             const blockSlug = item.slug ?? "";
@@ -114,9 +117,21 @@ if (items.length === 0) return null;
             const categorySlug = item.category?.slug ?? null;
             const productSlug = item.product?.slug ?? null;
 
-            const img = getMediaUrl(item, "imageBlock1");
-            const imgUrl = toAbsUrl(img);
-            const altTxt = getMediaAlt(item, "imageBlock1") || titulo;
+            const desktopRel = getMediaUrl(item, "imageBlock1");
+            const desktopUrl = toAbsUrl(desktopRel);
+            const desktopAlt =
+              getMediaAlt(item, "imageBlock1") || titulo || "Banner principal";
+
+            const mobileRel = getMediaUrl(item, "imageBlock1Movile");
+            const mobileUrl = toAbsUrl(mobileRel);
+            const mobileAlt =
+              getMediaAlt(item, "imageBlock1Movile") || titulo || "Banner principal";
+
+            const finalMobileUrl = mobileUrl || desktopUrl;
+            const finalMobileAlt = mobileUrl ? mobileAlt : desktopAlt;
+
+            const finalDesktopUrl = desktopUrl || mobileUrl;
+            const finalDesktopAlt = desktopUrl ? desktopAlt : mobileAlt;
 
             const handleClick = () => {
               if (productSlug) {
@@ -133,25 +148,65 @@ if (items.length === 0) return null;
             return (
               <CarouselItem key={String(id)}>
                 <div
-                  className={`relative w-full h-screen sm:w-full overflow-hidden ${
+                  role={hasLink ? "link" : "group"}
+                  tabIndex={hasLink ? 0 : -1}
+                  aria-label={titulo || "ver más"}
+                  onClick={hasLink ? handleClick : undefined}
+                  onKeyDown={
+                    hasLink
+                      ? (e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            handleClick();
+                          }
+                        }
+                      : undefined
+                  }
+                  className={`relative w-full h-screen shadow overflow-hidden ${
                     hasLink ? "cursor-pointer" : ""
                   }`}
-                  onClick={hasLink ? handleClick : undefined}
                 >
-                  {imgUrl ? (
-                    <Image
-                      src={imgUrl}
-                      alt={altTxt}
-                      fill
-                      className="object-cover object-center"
-                      unoptimized
-                      priority
-                    />
+                  {finalMobileUrl || finalDesktopUrl ? (
+                    <>
+                      {finalMobileUrl && (
+                        <div className="
+                        absolute inset-0 min-h-[103svh]
+                        max-h-[113svh] block sm:hidden">
+                          <Image
+                            src={finalMobileUrl}
+                            alt={finalMobileAlt}
+                            fill
+                            className="object-cover object-center"
+                            sizes="100vw"
+                            unoptimized
+                            priority
+                          />
+                        </div>
+                      )}
+
+
+
+                      {finalDesktopUrl && (
+                        <div className="absolute inset-0 
+                        min-h-[101svh]
+                        max-h-[113svh]
+                        hidden sm:block">
+                          <Image
+                            src={finalDesktopUrl}
+                            alt={finalDesktopAlt}
+                            fill
+                            className="object-cover object-center"
+                            sizes="100vw"
+                            unoptimized
+                            priority
+                          />
+                        </div>
+                      )}
+                    </>
                   ) : (
-                    <div className="w-full h-full bg-neutral-300" />
+                    <div className="w-full h-full " />
                   )}
 
-                  <div className="absolute inset-0 bg-linear-to-t from-black/40 via-black/10" />
+                  <div className="absolute inset-0 " />
 
                   <div className="absolute left-5 right-4 md:px-15 bottom-20 md:bottom-20">
                     <h2 className="text-3xl md:text-5xl leading-none font-black text-white">
@@ -166,6 +221,7 @@ if (items.length === 0) return null;
 
                     {hasLink && (
                       <button
+                        type="button"
                         className="mt-4 md:mt-4 px-1 md:px-1 cursor-pointer font-normal text-white"
                         onClick={(e) => {
                           e.stopPropagation();

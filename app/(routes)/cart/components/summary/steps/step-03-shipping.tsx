@@ -406,11 +406,11 @@ const Step03Shipping = ({ onPay, onBack }: Props) => {
       <div className="mt-4 flex items-center gap-2 rounded-md border bg-neutral-50 p-3">
         <ShieldCheck className="h-4 w-4" />
         <p className="text-[11px] text-neutral-700">
-          Compra segura • Datos protegidos
+          Compra segura • 
         </p>
         <span className="ml-auto inline-flex items-center gap-1 rounded-full border bg-white px-2 py-1 text-[10px]">
           <CreditCard className="h-3.5 w-3.5" />
-          Webpay
+          Flow
         </span>
       </div>
 
