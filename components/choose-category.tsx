@@ -9,12 +9,24 @@ import { CategoryType } from "@/types/category";
 const ChooseCategory = () => {
   const { result, loading, error }: ResponseType = useGetCategories();
 
-  // ✅ ahora usamos 3 para armar el layout (1 grande + 2 chicos)
   const categories = Array.isArray(result)
     ? result.filter((c: CategoryType) => c.isFeatured).slice(0, 3)
     : [];
 
-  const backend = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+  const backend = (process.env.NEXT_PUBLIC_BACKEND_URL || "").replace(/\/+$/, "");
+
+  const toAbsUrl = (url?: string | null) => {
+    if (!url) return "";
+
+    const cleanUrl = url.trim();
+
+    if (/^https?:\/\//i.test(cleanUrl)) {
+      return cleanUrl;
+    }
+
+    const path = cleanUrl.startsWith("/") ? cleanUrl : `/${cleanUrl}`;
+    return `${backend}${path}`;
+  };
 
   const CategoryBlock = ({
     category,
@@ -28,11 +40,7 @@ const ChooseCategory = () => {
     const name = category.categoryName;
     const slug = category.slug;
 
-    const mainImageUrl = category.mainImage?.url
-      ? `${backend}${category.mainImage.url}`
-      : "";
-
-
+    const mainImageUrl = toAbsUrl(category.mainImage?.url);
 
     return (
       <Link
@@ -49,11 +57,12 @@ const ChooseCategory = () => {
               fill
               sizes="(max-width:768px) 100vw, 50vw"
               className="
-              absolute inset-0
-              h-full w-full
-              object-cover object-center
-              transition-transform duration-500 ease-out
-              group-hover:scale-[1.04]"
+                absolute inset-0
+                h-full w-full
+                object-cover object-center
+                transition-transform duration-500 ease-out
+                group-hover:scale-[1.04]
+              "
             />
           ) : (
             <div className="h-full w-full bg-zinc-200" />
@@ -61,7 +70,7 @@ const ChooseCategory = () => {
           <div className="absolute inset-0 bg-black/25" />
         </div>
 
-        {/* ✅ texto esquina inferior derecha (como tu imagen) */}
+        {/* texto esquina inferior derecha */}
         <div className="absolute bottom-5 right-5 z-10 text-right">
           <h4 className="text-white font-extrabold tracking-tight text-2xl sm:text-3xl">
             {(name || "").toUpperCase()}
@@ -83,17 +92,18 @@ const ChooseCategory = () => {
             group-hover:opacity-100 group-hover:translate-y-0
           "
         >
-          
         </div>
       </Link>
     );
   };
 
   return (
-    <section className="bg-white  w-full pt-8 sm:py-14">
+    <section className="bg-white w-full pt-8 sm:py-14">
       <div className="max-w-6xl mx-auto px-0 sm:px-8 lg:px-0">
-        <h3 className="text-4xl text-black tracking-tight text-center 
-        sm:text-6xl font-black mb-6 sm:mb-10">
+        <h3
+          className="text-4xl text-black tracking-tight text-center
+          sm:text-6xl font-black mb-6 sm:mb-10"
+        >
           CATEGORÍAS DESTACADAS
         </h3>
 
@@ -103,7 +113,6 @@ const ChooseCategory = () => {
           </p>
         )}
 
-        {/* SKELETON (ahora 3) */}
         {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -124,53 +133,55 @@ const ChooseCategory = () => {
 
         {!loading && categories.length > 0 && (
           <>
-            {/* DESKTOP / TABLET: 1 arriba grande + 2 abajo */}
+            {/* DESKTOP / TABLET */}
             <div className="hidden sm:block">
               <div className="grid grid-cols-2 gap-4 lg:gap-3">
-                {/* bloque grande */}
                 {categories[0] && (
                   <CategoryBlock
                     category={categories[0]}
-
                     className="col-span-2"
                     heightClass="h-[320px] lg:h-[520px]"
                   />
                 )}
 
-                {/* 2 bloques abajo */}
                 {categories[1] && (
                   <CategoryBlock
                     category={categories[1]}
-
                     heightClass="h-[260px] lg:h-[480px]"
                   />
                 )}
+
                 {categories[2] && (
                   <CategoryBlock
                     category={categories[2]}
-
                     heightClass="h-[260px] lg:h-[480px]"
                   />
                 )}
               </div>
             </div>
 
-            {/*  MOBILE: 1 arriba + 2 abajo */}
+            {/* MOBILE */}
             <div className="sm:hidden grid grid-cols-2 gap-1">
               {categories[0] && (
                 <CategoryBlock
                   category={categories[0]}
-
                   className="col-span-2"
                   heightClass="h-[340px]"
                 />
               )}
 
               {categories[1] && (
-                <CategoryBlock category={categories[1]}  heightClass="h-[295px]" />
+                <CategoryBlock
+                  category={categories[1]}
+                  heightClass="h-[295px]"
+                />
               )}
+
               {categories[2] && (
-                <CategoryBlock category={categories[2]}  heightClass="h-[295px]" />
+                <CategoryBlock
+                  category={categories[2]}
+                  heightClass="h-[295px]"
+                />
               )}
             </div>
           </>

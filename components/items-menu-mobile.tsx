@@ -245,7 +245,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
 
                   
 
-                  {/* Auth (sin romper tu lógica; queda oculto si no hay texto) */}
+                  {/* Auth (sin romper lógica; queda oculto si no hay texto) */}
                   <div className="hidden">
                     {loadingUser ? (
                       <span className="block text-black text-3xl font-semibold opacity-40" />
@@ -318,9 +318,11 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
         aria-expanded={isOpen}
         className={`
           relative z-[2100]
-          p-2.5 rounded-md
+          p-1.5 sm:p-2
+          rounded-md
           duration-300
           bg-none
+          shrink-0
           ${scrolled ? "text-black" : "text-white"}
         `}
       >

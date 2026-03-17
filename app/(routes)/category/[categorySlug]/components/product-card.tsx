@@ -209,71 +209,77 @@ const ProductCard = ({ product }: ProductCardProps) => {
         )}
 
         {/* IMAGEN */}
-        <div
-          className="
-            relative mb-3 sm:mb-4
-            mt-0 w-full
-            rounded-0 sm:rounded-0
-            bg-white
-            flex items-center justify-center overflow-hidden
-            pt-1 pb-1 cursor-pointer
-          "
-          onMouseEnter={() => setHover(true)}
-          onMouseLeave={() => setHover(false)}
-          onClick={() => router.push(`/product/${productSlug}`)}
-        >
-          {/* ❤️ Corazón dentro del recuadro */}
-          <div className="absolute top-4 sm:top-4 right-3 sm:right-5  z-20">
-            <LovedButton
-              product={{
-                id: productData?.id ?? attrs?.id,
-                title: displayName,
-                secondaryName,
-                price: basePrice,
-                slug: productSlug,
-                imageUrl: image1,
-              }}
-            />
-          </div>
-
-          <div className="relative w-full h-68 sm:h-88">
-            {/* Imagen por defecto */}
-            {image1 && (
-              <Image
-                src={image1}
-                alt={displayName}
-                fill
-                sizes="(max-width: 840px) 130vw, (max-width: 1124px) 70vw, 34vw"
-                className={`
-                  object-contain
-                  transition-all duration-300 ease-out
-                  ${hover && image2 ? "opacity-0" : "opacity-100"}
-                `}
+          <div
+            className="
+              relative mb-3 sm:mb-4
+              mt-0 w-full
+              bg-white
+              flex items-center justify-center overflow-hidden
+              pt-1 pb-1 cursor-pointer
+            "
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
+            onClick={() => router.push(`/product/${productSlug}`)}
+          >
+            {/* ❤️ Corazón dentro del recuadro */}
+            <div className="absolute top-2 right-2 sm:top-4 sm:right-5 z-20">
+              <LovedButton
+                product={{
+                  id: productData?.id ?? attrs?.id,
+                  title: displayName,
+                  secondaryName,
+                  price: basePrice,
+                  slug: productSlug,
+                  imageUrl: image1,
+                }}
               />
-            )}
+            </div>
 
-            {/* 2da imagen al hover */}
-            {image2 && (
-              <Image
-                src={image2}
-                alt={displayName}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                className={`
-                  object-cover
-                  transition-all duration-500 ease-out
-                  ${hover ? "opacity-100" : "opacity-0"}
-                `}
-              />
-            )}
+            <div
+              className="
+                relative w-full
+                aspect-4/5
+                sm:aspect-4/5
+                md:aspect-4/5
+              "
+            >
+              {/* Imagen por defecto */}
+              {image1 && (
+                <Image
+                  src={image1}
+                  alt={displayName}
+                  fill
+                  sizes="(max-width: 480px) 50vw, (max-width: 768px) 45vw, (max-width: 1024px) 33vw, 25vw"
+                  className={`
+                    object-contain
+                    transition-all duration-300 ease-out
+                    ${hover && image2 ? "opacity-0" : "opacity-100"}
+                  `}
+                />
+              )}
 
-            {!image1 && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-sm text-muted-foreground">Sin imagen</span>
-              </div>
-            )}
+              {/* 2da imagen al hover */}
+              {image2 && (
+                <Image
+                  src={image2}
+                  alt={displayName}
+                  fill
+                  sizes="(max-width: 480px) 50vw, (max-width: 768px) 45vw, (max-width: 1024px) 33vw, 25vw"
+                  className={`
+                    object-contain
+                    transition-all duration-500 ease-out
+                    ${hover ? "opacity-100" : "opacity-0"}
+                  `}
+                />
+              )}
+
+              {!image1 && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-sm text-muted-foreground">Sin imagen</span>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
         {/* NOMBRE */}
         <h3

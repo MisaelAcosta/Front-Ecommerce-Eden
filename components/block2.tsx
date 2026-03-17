@@ -131,106 +131,127 @@ const Block2 = () => {
 
             return (
               <CarouselItem key={String(id)}>
-                <div
-                  role={hasLink ? "link" : "group"}
-                  tabIndex={hasLink ? 0 : -1}
-                  aria-label={titulo || "ver más"}
-                  onClick={hasLink ? handleClick : undefined}
-                  onKeyDown={
-                    hasLink
-                      ? (e) => {
-                          if (e.key === "Enter" || e.key === " ") handleClick();
-                        }
-                      : undefined
-                  }
-                  className="
-                    group
-                    relative
-                    mx-auto max-w-7xl px-4 sm:px-6 lg:px-8
-                    h-200
-                    sm:h-55
-                    md:h-75
-                    lg:h-150
-                    overflow-hidden
-                    cursor-pointer
-                  "
-                >
-                  {finalMobileUrl || finalDesktopUrl ? (
-                    <>
-                      {finalMobileUrl && (
-                        <Image
-                          src={finalMobileUrl}
-                          alt={finalMobileAlt}
-                          fill
-                          className="
-                            block sm:hidden
-                            object-cover
-                            object-top
-                          "
-                          unoptimized
-                          priority
-                        />
-                      )}
+  <div
+    role={hasLink ? "link" : "group"}
+    tabIndex={hasLink ? 0 : -1}
+    aria-label={titulo || "ver más"}
+    onClick={hasLink ? handleClick : undefined}
+    onKeyDown={
+      hasLink
+        ? (e) => {
+            if (e.key === "Enter" || e.key === " ") handleClick();
+          }
+        : undefined
+    }
+    className="
+      group
+      relative
+      mx-auto w-full max-w-7xl
+      px-0
+      sm:px-6
+      lg:px-8
+      cursor-pointer
+      shadow-none
+    "
+  >
+    <div
+      className="
+        group
+        relative
+        mx-auto w-full max-w-7xl
+        px-0 sm:px-6 lg:px-8
+        min-h-[75svh]
+        max-h-[88svh]
+        sm:h-55
+        md:h-75
+        lg:h-150
+        overflow-hidden
+        cursor-pointer
+        bg-white
+        rounded-2xl
+        shadow-none
+      "
+    >
+      {finalMobileUrl || finalDesktopUrl ? (
+        <>
+          {finalMobileUrl && (
+            <div className="absolute inset-0 block sm:hidden">
+              <Image
+                src={finalMobileUrl}
+                alt={finalMobileAlt}
+                fill
+                className="
+                  object-cover
+                  object-top
+                "
+                sizes="100vw"
+                unoptimized
+                priority
+              />
+            </div>
+          )}
 
-                      {finalDesktopUrl && (
-                        <Image
-                          src={finalDesktopUrl}
-                          alt={finalDesktopAlt}
-                          fill
-                          className="
-                            hidden sm:block
-                            object-center object-contain sm:object-cover
-                            transition-transform duration-500 ease-out
-                            group-hover:scale-[1.03]
-                          "
-                          unoptimized
-                          priority
-                        />
-                      )}
-                    </>
-                  ) : (
-                    <div className="w-full h-full bg-linear-to-b from-neutral-200 to-neutral-700" />
-                  )}
+          {finalDesktopUrl && (
+            <div className="absolute inset-0 hidden sm:block">
+              <Image
+                src={finalDesktopUrl}
+                alt={finalDesktopAlt}
+                fill
+                className="
+                  object-center sm:object-cover
+                  transition-transform duration-500 ease-out
+                  group-hover:scale-[1]
+                "
+                sizes="100vw"
+                unoptimized
+                priority
+              />
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="w-full h-full " />
+      )}
 
-                  <div
-                    className="
-                      absolute inset-0
-                      flex items-end
-                      bg-linear-to-t
-                      to-transparent
-                      p-4
-                      sm:p-6
-                    "
-                  >
-                    <div className="max-w-xl">
-                      {titulo && (
-                        <h3 className="text-white text-xl sm:text-2xl md:text-3xl font-bold leading-tight">
-                          {titulo}
-                        </h3>
-                      )}
+      <div
+        className="
+          pointer-events-none
 
-                      {description && (
-                        <p className="mt-1 sm:mt-2 text-white/90 text-sm sm:text-base line-clamp-2">
-                          {description}
-                        </p>
-                      )}
+          absolute inset-0
+          flex items-end
+          bg-linear-to-t 
+          p-4 sm:p-6
+        "
+      >
+        <div className="max-w-xl">
+          {titulo && (
+            <h3 className="text-white text-xl sm:text-2xl md:text-3xl font-bold leading-tight">
+              {titulo}
+            </h3>
+          )}
 
-                      {hasLink && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleClick();
-                          }}
-                          className="mt-3 text-sm font-medium text-white underline underline-offset-4"
-                        >
-                          
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </CarouselItem>
+          {description && (
+            <p className="mt-1 sm:mt-2 text-white/90 text-sm sm:text-base line-clamp-2">
+              {description}
+            </p>
+          )}
+
+          {hasLink && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClick();
+              }}
+              className="pointer-events-auto mt-3 text-sm font-medium text-white underline underline-offset-4"
+            >
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+</CarouselItem>
             );
           })}
         </CarouselContent>
