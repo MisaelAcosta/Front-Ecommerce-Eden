@@ -38,7 +38,6 @@ const Summary = () => {
   const next = () => setStep((s) => (s === 3 ? 3 : ((s + 1) as Step)));
   const back = () => setStep((s) => (s === 1 ? 1 : ((s - 1) as Step)));
 
-  // Datos carrito + wizard
   const { items } = useCart();
   const { step02, step03 } = useCartWizard();
 
@@ -57,7 +56,6 @@ const Summary = () => {
   const handlePay = async () => {
     setPayError(null);
 
-    // ===== Validaciones mínimas =====
     if (cartItems.length === 0) {
       setPayError("Tu carrito está vacío.");
       return;
@@ -89,18 +87,14 @@ const Summary = () => {
     setPaying(true);
 
     try {
-      // ===== 1) Crear Order + OrderItems (tu endpoint real espera step02/step03) =====
       const createOrderRes = await fetch("/api/orders/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items: cartItems.map((it) => ({
-            // ⚠️ ajusta si tu cart tiene otra estructura
             variantId: Number(it.variantId ?? it.variant?.id ?? it.id),
             qty: Number(it.qty),
             unitPrice: Number(it.unitPrice),
-
-            // snapshots (si existen)
             sku: it.sku ?? it.variant?.sku ?? null,
             variantName: it.variantName ?? it.variant?.variantName ?? null,
             productName: it.productName ?? it.product?.productName ?? it.product?.name ?? null,
@@ -143,20 +137,20 @@ const Summary = () => {
       }
 
       const orderId = createOrderJson?.orderId;
+      const orderDocumentId = createOrderJson?.orderDocumentId;
       const commerceOrder = createOrderJson?.commerceOrder;
 
-      if (!orderId || !commerceOrder) {
-        setPayError("La API de órdenes no devolvió orderId/commerceOrder.");
+      if (!orderId || !orderDocumentId || !commerceOrder) {
+        setPayError("La API de órdenes no devolvió orderId/orderDocumentId/commerceOrder.");
         return;
       }
 
-      // Guardar para /cart/return (recomendado)
       try {
         localStorage.setItem("eden_last_order_id", String(orderId));
+        localStorage.setItem("eden_last_order_document_id", String(orderDocumentId));
         localStorage.setItem("eden_last_commerce_order", String(commerceOrder));
       } catch {}
 
-      // ===== 2) Crear pago en Flow (tu endpoint real) =====
       const flowRes = await fetch("/api/flow/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -167,6 +161,7 @@ const Summary = () => {
           email,
           optional: {
             orderId,
+            orderDocumentId,
             name,
             rut: `${rutBody}-${rutDv}`,
             region: step03.region ?? null,
@@ -194,12 +189,11 @@ const Summary = () => {
         return;
       }
 
-      // ===== 3) Adjuntar token + url a la orden =====
       const attachRes = await fetch("/api/orders/attach-flow", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          orderId,
+          orderDocumentId,
           flowToken,
           paymentUrl,
         }),
@@ -216,7 +210,6 @@ const Summary = () => {
         return;
       }
 
-      // ===== 4) Redirect a Flow =====
       window.location.href = paymentUrl;
     } catch (e: unknown) {
       const message =

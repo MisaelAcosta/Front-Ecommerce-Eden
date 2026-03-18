@@ -13,13 +13,13 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const orderId = Number(body?.orderId);
+    const orderDocumentId = String(body?.orderDocumentId ?? "");
     const statusOrder = String(body?.statusOrder ?? "");
     const paidAt = body?.paidAt ? new Date(body.paidAt).toISOString() : null;
 
-    if (!orderId || !statusOrder) {
+    if (!orderDocumentId || !statusOrder) {
       return NextResponse.json(
-        { ok: false, error: "Faltan datos (orderId, statusOrder)" },
+        { ok: false, error: "Faltan datos (orderDocumentId, statusOrder)" },
         { status: 400 }
       );
     }
@@ -32,17 +32,17 @@ export async function POST(req: Request) {
       payload.data.paidAt = paidAt ?? new Date().toISOString();
     }
 
-    await strapiAdminFetch(`/api/orders/${orderId}`, {
+    await strapiAdminFetch(`/api/orders/${orderDocumentId}`, {
       method: "PUT",
       body: JSON.stringify(payload),
     });
 
     return NextResponse.json({ ok: true }, { status: 200 });
-
   } catch (err: unknown) {
-
     const message =
       err instanceof Error ? err.message : "Error set-status";
+
+    console.error("💥 /api/orders/set-status error:", message);
 
     return NextResponse.json(
       { ok: false, error: message },
