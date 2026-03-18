@@ -6,13 +6,13 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const orderId = Number(body?.orderId);
+    const orderDocumentId = String(body?.orderDocumentId ?? "");
     const flowToken = String(body?.flowToken ?? "");
     const paymentUrl = String(body?.paymentUrl ?? "");
 
-    if (!orderId || !flowToken || !paymentUrl) {
+    if (!orderDocumentId || !flowToken || !paymentUrl) {
       return NextResponse.json(
-        { ok: false, error: "Faltan datos (orderId, flowToken, paymentUrl)" },
+        { ok: false, error: "Faltan datos (orderDocumentId, flowToken, paymentUrl)" },
         { status: 400 }
       );
     }
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
       },
     };
 
-    await strapiAdminFetch(`/api/orders/${orderId}`, {
+    await strapiAdminFetch(`/api/orders/${orderDocumentId}`, {
       method: "PUT",
       body: JSON.stringify(payload),
     });
@@ -34,6 +34,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Error attach-flow";
+
+    console.error("💥 /api/orders/attach-flow error:", message);
 
     return NextResponse.json(
       { ok: false, error: message },

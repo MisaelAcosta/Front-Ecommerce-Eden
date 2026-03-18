@@ -44,6 +44,7 @@ type StrapiSingleResponse<T> = {
 
 type CreatedOrderData = {
   id: number;
+  documentId: string;
 };
 
 type OrderPayload = {
@@ -175,10 +176,11 @@ export async function POST(req: Request) {
     });
 
     const orderId = createdOrder?.data?.id;
+    const orderDocumentId = createdOrder?.data?.documentId;
 
-    if (!orderId) {
+    if (!orderId || !orderDocumentId) {
       return NextResponse.json(
-        { ok: false, error: "No se pudo crear Order" },
+        { ok: false, error: "No se pudo crear Order correctamente" },
         { status: 500 }
       );
     }
@@ -215,7 +217,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json(
-      { ok: true, orderId, commerceOrder },
+      { ok: true, orderId, orderDocumentId, commerceOrder },
       { status: 200 }
     );
   } catch (err: unknown) {
