@@ -100,7 +100,6 @@ const Summary = () => {
             productName: it.productName ?? it.product?.productName ?? it.product?.name ?? null,
             imageUrl: it.imageUrl ?? null,
           })),
-
           step02: {
             name,
             email,
@@ -108,7 +107,6 @@ const Summary = () => {
             rutDv,
             phoneRest,
           },
-
           step03: {
             region: step03.region ?? null,
             comuna: step03.comuna ?? null,
@@ -118,7 +116,6 @@ const Summary = () => {
             nota: String(step03.nota ?? "").trim(),
             shippingCost,
           },
-
           subtotal: Math.round(subtotal),
           shippingCost: Math.round(shippingCost),
           total: Math.round(totalFinal),
@@ -209,12 +206,10 @@ const Summary = () => {
         setPayError(String(msg));
         return;
       }
-/* No dependencia de token */
+
       try {
         localStorage.setItem("eden_last_flow_token", String(flowToken));
       } catch {}
-
-/* ------------------------ */
 
       window.location.href = paymentUrl;
     } catch (e: unknown) {
