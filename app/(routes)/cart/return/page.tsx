@@ -37,6 +37,7 @@ function FlowReturnContent() {
     }
 
     let alive = true;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
     let tries = 0;
     const maxTries = 20;
 
@@ -52,19 +53,27 @@ function FlowReturnContent() {
           }
         );
 
-        const json: { ok?: boolean; data?: FlowDetail; message?: string } =
-          await res.json();
+        const json: {
+          ok?: boolean;
+          data?: FlowDetail;
+          message?: string;
+        } = await res.json();
 
         if (!alive) return;
 
         if (!res.ok || !json?.ok) {
           setStatus("error");
-          setDetail(json?.data ?? { message: json?.message ?? "Error consultando Flow." });
+          setDetail(
+            json?.data ?? {
+              message: json?.message ?? "Error consultando Flow.",
+            }
+          );
           return;
         }
 
         const data = json?.data;
-        const rawStatus = data?.status ?? data?.paymentStatus ?? data?.state ?? null;
+        const rawStatus =
+          data?.status ?? data?.paymentStatus ?? data?.state ?? null;
         const s = String(rawStatus ?? "").toLowerCase();
 
         setDetail(data ?? null);
@@ -93,16 +102,16 @@ function FlowReturnContent() {
 
         setStatus("pending");
 
-        if (tries >= maxTries) {
-          return;
-        }
+        if (tries >= maxTries) return;
 
-        setTimeout(tick, 2000);
-      } catch (e: unknown) {
+        timeoutId = setTimeout(tick, 2000);
+      } catch (error: unknown) {
         if (!alive) return;
 
         const message =
-          e instanceof Error ? e.message : "Error consultando el estado.";
+          error instanceof Error
+            ? error.message
+            : "Error consultando el estado.";
 
         setStatus("error");
         setDetail({ message });
@@ -113,6 +122,7 @@ function FlowReturnContent() {
 
     return () => {
       alive = false;
+      if (timeoutId) clearTimeout(timeoutId);
     };
   }, [token, cart, wizard]);
 
@@ -154,7 +164,9 @@ function FlowReturnContent() {
 
         {status === "rejected" && (
           <div className="space-y-3">
-            <p className="text-sm font-semibold">❌ Pago rechazado o cancelado</p>
+            <p className="text-sm font-semibold">
+              ❌ Pago rechazado o cancelado
+            </p>
             <p className="text-xs text-muted-foreground">
               Puedes intentar nuevamente desde el carrito.
             </p>
@@ -169,7 +181,9 @@ function FlowReturnContent() {
 
         {status === "error" && (
           <div className="space-y-3">
-            <p className="text-sm font-semibold">⚠️ No pudimos validar el pago</p>
+            <p className="text-sm font-semibold">
+              ⚠️ No pudimos validar el pago
+            </p>
             <p className="text-xs text-muted-foreground">
               Intenta refrescar o vuelve al carrito.
             </p>
