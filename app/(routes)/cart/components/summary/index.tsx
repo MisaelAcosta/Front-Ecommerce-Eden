@@ -209,6 +209,12 @@ const Summary = () => {
         setPayError(String(msg));
         return;
       }
+/* No dependencia de token */
+      try {
+        localStorage.setItem("eden_last_flow_token", String(flowToken));
+      } catch {}
+
+/* ------------------------ */
 
       window.location.href = paymentUrl;
     } catch (e: unknown) {

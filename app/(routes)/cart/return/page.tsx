@@ -21,7 +21,17 @@ function FlowReturnContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const token = useMemo(() => searchParams.get("token"), [searchParams]);
+  const token = useMemo(() => {
+  const fromUrl = searchParams.get("token");
+  if (fromUrl) return fromUrl;
+
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("eden_last_flow_token");
+  }
+
+  return null;
+}, [searchParams]);
+  
 
   const [status, setStatus] = useState<UiStatus>("loading");
   const [detail, setDetail] = useState<FlowDetail | null>(null);
@@ -79,16 +89,19 @@ function FlowReturnContent() {
         setDetail(data ?? null);
 
         if (
-          s === "2" ||
-          s.includes("paid") ||
-          s.includes("authorized") ||
-          s.includes("success")
-        ) {
-          setStatus("paid");
-          cart.clear();
-          wizard.resetWizard?.();
-          return;
-        }
+        s === "2" ||
+        s.includes("paid") ||
+        s.includes("authorized") ||
+        s.includes("success")
+      ) {
+        setStatus("paid");
+        cart.clear();
+        wizard.resetWizard?.();
+        try {
+          localStorage.removeItem("eden_last_flow_token");
+        } catch {}
+        return;
+      }
 
         if (
           s === "3" ||
