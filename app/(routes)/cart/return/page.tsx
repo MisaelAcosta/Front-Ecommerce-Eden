@@ -71,70 +71,87 @@ function FlowReturnContent() {
       setDetail(info ?? { message });
     };
 
-    const checkOrderInStrapi = async (): Promise<"paid" | "rejected" | "pending" | "not-found" | "error"> => {
-      let orderDocumentId = "";
-      let commerceOrder = "";
+    const checkOrderInStrapi = async (): Promise<
+  "paid" | "rejected" | "pending" | "not-found" | "error"
+> => {
+  let orderDocumentId = "";
+  let commerceOrder = "";
 
-      try {
-        orderDocumentId = localStorage.getItem("eden_last_order_document_id") ?? "";
-        commerceOrder = localStorage.getItem("eden_last_commerce_order") ?? "";
-      } catch {}
+  try {
+    orderDocumentId =
+      localStorage.getItem("eden_last_order_document_id") ?? "";
+    commerceOrder =
+      localStorage.getItem("eden_last_commerce_order") ?? "";
+  } catch {}
 
-      if (!orderDocumentId && !commerceOrder) {
-        return "not-found";
-      }
+  console.log("DEBUG STRAPI IDS", {
+    orderDocumentId,
+    commerceOrder,
+  });
 
-      const qs = new URLSearchParams();
-      if (orderDocumentId) {
-        qs.set("orderDocumentId", orderDocumentId);
-      } else {
-        qs.set("commerceOrder", commerceOrder);
-      }
+  if (!orderDocumentId && !commerceOrder) {
+    return "not-found";
+  }
 
-      const res = await fetch(`/api/orders/get-status?${qs.toString()}`, {
-        method: "GET",
-        cache: "no-store",
-      });
+  const qs = new URLSearchParams();
+  if (orderDocumentId) {
+    qs.set("orderDocumentId", orderDocumentId);
+  } else {
+    qs.set("commerceOrder", commerceOrder);
+  }
 
-      const json: {
-        ok?: boolean;
-        data?: OrderStatusData | null;
-        error?: string;
-      } = await res.json();
+  try {
+    const res = await fetch(`/api/orders/get-status?${qs.toString()}`, {
+      method: "GET",
+      cache: "no-store",
+    });
 
-      if (!alive) return "error";
+    const json = await res.json();
 
-      if (!res.ok || !json?.ok) {
-        return "error";
-      }
+    // 🔥 DEBUG IMPORTANTE
+    console.log("GET STATUS RESPONSE", {
+      status: res.status,
+      ok: res.ok,
+      json,
+    });
 
-      const order = json?.data ?? null;
-      setDetail(order);
+    if (!alive) return "error";
 
-      const statusOrder = String(order?.statusOrder ?? "").toUpperCase();
+    if (!res.ok || !json?.ok) {
+      return "error";
+    }
 
-      if (statusOrder === "PAID") {
-        markPaid(order);
-        return "paid";
-      }
+    const order = json?.data ?? null;
+    setDetail(order);
 
-      if (
-        statusOrder === "REJECTED" ||
-        statusOrder === "FAILED" ||
-        statusOrder === "CANCELLED" ||
-        statusOrder === "CANCELED"
-      ) {
-        markRejected(order);
-        return "rejected";
-      }
+    const statusOrder = String(order?.statusOrder ?? "").toUpperCase();
 
-      if (statusOrder) {
-        setStatus("pending");
-        return "pending";
-      }
+    if (statusOrder === "PAID") {
+      markPaid(order);
+      return "paid";
+    }
 
-      return "not-found";
-    };
+    if (
+      statusOrder === "REJECTED" ||
+      statusOrder === "FAILED" ||
+      statusOrder === "CANCELLED" ||
+      statusOrder === "CANCELED"
+    ) {
+      markRejected(order);
+      return "rejected";
+    }
+
+    if (statusOrder) {
+      setStatus("pending");
+      return "pending";
+    }
+
+    return "not-found";
+  } catch (error) {
+    console.error("ERROR GET STATUS", error);
+    return "error";
+  }
+};
 
     const checkFlowStatus = async (): Promise<"paid" | "rejected" | "pending" | "no-token" | "error"> => {
       let token = tokenFromUrl;
