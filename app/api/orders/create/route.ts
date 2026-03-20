@@ -47,6 +47,11 @@ type CreatedOrderData = {
   documentId: string;
 };
 
+type CreatedOrderItemData = {
+  id: number;
+  documentId?: string;
+};
+
 type OrderPayload = {
   data: {
     orderName: string;
@@ -71,11 +76,15 @@ type OrderPayload = {
   };
 };
 
+type RelationConnect = {
+  connect: number[];
+};
+
 type OrderItemPayload = {
   data: {
     orderItemName: string;
-    order: number;
-    variant: number;
+    order: RelationConnect;
+    variant: RelationConnect;
     qty: number;
     unitPrice: number;
     lineTotal: number;
@@ -168,12 +177,16 @@ export async function POST(req: Request) {
       orderPayload.data.customer = customerId;
     }
 
+    console.log("ORDER PAYLOAD", JSON.stringify(orderPayload, null, 2));
+
     const createdOrder = await strapiAdminFetch<
       StrapiSingleResponse<CreatedOrderData>
     >("/api/orders", {
       method: "POST",
       body: JSON.stringify(orderPayload),
     });
+
+    console.log("ORDER CREATED", JSON.stringify(createdOrder, null, 2));
 
     const orderId = createdOrder?.data?.id;
     const orderDocumentId = createdOrder?.data?.documentId;
@@ -185,6 +198,8 @@ export async function POST(req: Request) {
       );
     }
 
+    const createdItems: Array<{ index: number; id?: number; ok: boolean }> = [];
+
     for (let i = 0; i < body.items.length; i++) {
       const it = body.items[i];
 
@@ -195,8 +210,12 @@ export async function POST(req: Request) {
       const itemPayload: OrderItemPayload = {
         data: {
           orderItemName: `Item ${commerceOrder}-${i + 1}`,
-          order: orderId,
-          variant: it.variantId,
+          order: {
+            connect: [orderId],
+          },
+          variant: {
+            connect: [Number(it.variantId)],
+          },
           qty,
           unitPrice,
           lineTotal,
@@ -207,17 +226,33 @@ export async function POST(req: Request) {
         },
       };
 
-      await strapiAdminFetch<StrapiSingleResponse<{ id: number }>>(
-        "/api/order-items",
-        {
-          method: "POST",
-          body: JSON.stringify(itemPayload),
-        }
-      );
+      console.log("ORDER ITEM PAYLOAD", JSON.stringify(itemPayload, null, 2));
+
+      const createdItem = await strapiAdminFetch<
+        StrapiSingleResponse<CreatedOrderItemData>
+      >("/api/order-items", {
+        method: "POST",
+        body: JSON.stringify(itemPayload),
+      });
+
+      console.log("ORDER ITEM CREATED", JSON.stringify(createdItem, null, 2));
+
+      createdItems.push({
+        index: i,
+        id: createdItem?.data?.id,
+        ok: Boolean(createdItem?.data?.id),
+      });
     }
 
+    console.log("ORDER ITEMS SUMMARY", JSON.stringify(createdItems, null, 2));
+
     return NextResponse.json(
-      { ok: true, orderId, orderDocumentId, commerceOrder },
+      {
+        ok: true,
+        orderId,
+        orderDocumentId,
+        commerceOrder,
+      },
       { status: 200 }
     );
   } catch (err: unknown) {
