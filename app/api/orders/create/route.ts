@@ -79,7 +79,7 @@ type OrderPayload = {
 type OrderItemPayload = {
   data: {
     orderItemName: string;
-    order: number;
+    order: string;
     variant: number;
     qty: number;
     unitPrice: number;
@@ -88,12 +88,6 @@ type OrderItemPayload = {
     variantNameSnapshot: string;
     productNameSnapshot: string;
     imageUrlSnapshot: string;
-  };
-};
-
-type UpdateOrderItemsPayload = {
-  data: {
-    order_items: number[];
   };
 };
 
@@ -193,6 +187,11 @@ export async function POST(req: Request) {
     const orderId = createdOrder?.data?.id;
     const orderDocumentId = createdOrder?.data?.documentId;
 
+    console.log("ORDER IDS", {
+      orderId,
+      orderDocumentId,
+    });
+
     if (!orderId || !orderDocumentId) {
       return NextResponse.json(
         { ok: false, error: "No se pudo crear Order correctamente" },
@@ -212,7 +211,7 @@ export async function POST(req: Request) {
       const itemPayload: OrderItemPayload = {
         data: {
           orderItemName: `Item ${commerceOrder}-${i + 1}`,
-          order: orderId,
+          order: orderDocumentId,
           variant: Number(it.variantId),
           qty,
           unitPrice,
@@ -224,7 +223,10 @@ export async function POST(req: Request) {
         },
       };
 
-      console.log("ORDER ITEM PAYLOAD", JSON.stringify(itemPayload, null, 2));
+      console.log(
+        `ORDER ITEM PAYLOAD [${i}]`,
+        JSON.stringify(itemPayload, null, 2)
+      );
 
       const createdItem = await strapiAdminFetch<
         StrapiSingleResponse<CreatedOrderItemData>
@@ -233,7 +235,10 @@ export async function POST(req: Request) {
         body: JSON.stringify(itemPayload),
       });
 
-      console.log("ORDER ITEM CREATED", JSON.stringify(createdItem, null, 2));
+      console.log(
+        `ORDER ITEM CREATED [${i}]`,
+        JSON.stringify(createdItem, null, 2)
+      );
 
       const createdItemId = createdItem?.data?.id;
 
@@ -245,33 +250,9 @@ export async function POST(req: Request) {
     }
 
     console.log("ORDER ITEM IDS", createdItemIds);
-
-    const updateOrderPayload = {
-  data: {
-    order_items: {
-      connect: createdItemIds,
-    },
-  },
-};
-
-console.log(
-  "ORDER UPDATE PAYLOAD",
-  JSON.stringify(updateOrderPayload, null, 2)
-);
-
-const updatedOrder = await strapiAdminFetch<
-  StrapiSingleResponse<CreatedOrderData>
->(`/api/orders/${orderDocumentId}`, {
-  method: "PUT",
-  body: JSON.stringify(updateOrderPayload),
-});
-
-console.log(
-  "ORDER UPDATED WITH ITEMS",
-  JSON.stringify(updatedOrder, null, 2)
-);
-
-    console.log("ORDER UPDATED WITH ITEMS", JSON.stringify(updatedOrder, null, 2));
+    console.log(
+      "RELATION TEST OK: se omitió temporalmente el update final de order_items para probar relación directa desde OrderItem -> Order"
+    );
 
     return NextResponse.json(
       {
