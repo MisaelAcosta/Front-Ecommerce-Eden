@@ -246,20 +246,30 @@ export async function POST(req: Request) {
 
     console.log("ORDER ITEM IDS", createdItemIds);
 
-    const updateOrderPayload: UpdateOrderItemsPayload = {
-      data: {
-        order_items: createdItemIds,
-      },
-    };
+    const updateOrderPayload = {
+  data: {
+    order_items: {
+      connect: createdItemIds,
+    },
+  },
+};
 
-    console.log("ORDER UPDATE PAYLOAD", JSON.stringify(updateOrderPayload, null, 2));
+console.log(
+  "ORDER UPDATE PAYLOAD",
+  JSON.stringify(updateOrderPayload, null, 2)
+);
 
-    const updatedOrder = await strapiAdminFetch<
-      StrapiSingleResponse<CreatedOrderData>
-    >(`/api/orders/${orderId}`, {
-      method: "PUT",
-      body: JSON.stringify(updateOrderPayload),
-    });
+const updatedOrder = await strapiAdminFetch<
+  StrapiSingleResponse<CreatedOrderData>
+>(`/api/orders/${orderDocumentId}`, {
+  method: "PUT",
+  body: JSON.stringify(updateOrderPayload),
+});
+
+console.log(
+  "ORDER UPDATED WITH ITEMS",
+  JSON.stringify(updatedOrder, null, 2)
+);
 
     console.log("ORDER UPDATED WITH ITEMS", JSON.stringify(updatedOrder, null, 2));
 
