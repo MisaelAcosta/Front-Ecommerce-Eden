@@ -208,16 +208,22 @@ export async function POST(req: Request) {
       const unitPrice = Math.round(Number(it.unitPrice || 0));
       const lineTotal = Math.round(unitPrice * qty);
 
+      const variantName = (it.variantName ?? "").trim();
+
+      const friendlyOrderItemName = variantName
+        ? `${variantName} x${qty}`
+        : `Item ${commerceOrder}-${i + 1} x${qty}`;
+
       const itemPayload: OrderItemPayload = {
         data: {
-          orderItemName: `Item ${commerceOrder}-${i + 1}`,
+          orderItemName: friendlyOrderItemName,
           order: orderDocumentId,
           variant: Number(it.variantId),
           qty,
           unitPrice,
           lineTotal,
           skuSnapshot: it.sku ?? "",
-          variantNameSnapshot: it.variantName ?? "",
+          variantNameSnapshot: variantName,
           productNameSnapshot: it.productName ?? "",
           imageUrlSnapshot: it.imageUrl ?? "",
         },
