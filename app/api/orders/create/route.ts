@@ -76,15 +76,11 @@ type OrderPayload = {
   };
 };
 
-type RelationConnect = {
-  connect: number[];
-};
-
 type OrderItemPayload = {
   data: {
     orderItemName: string;
-    order: RelationConnect;
-    variant: RelationConnect;
+    order: number;
+    variant: number;
     qty: number;
     unitPrice: number;
     lineTotal: number;
@@ -92,6 +88,12 @@ type OrderItemPayload = {
     variantNameSnapshot: string;
     productNameSnapshot: string;
     imageUrlSnapshot: string;
+  };
+};
+
+type UpdateOrderItemsPayload = {
+  data: {
+    order_items: number[];
   };
 };
 
@@ -198,7 +200,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const createdItems: Array<{ index: number; id?: number; ok: boolean }> = [];
+    const createdItemIds: number[] = [];
 
     for (let i = 0; i < body.items.length; i++) {
       const it = body.items[i];
@@ -210,12 +212,8 @@ export async function POST(req: Request) {
       const itemPayload: OrderItemPayload = {
         data: {
           orderItemName: `Item ${commerceOrder}-${i + 1}`,
-          order: {
-            connect: [orderId],
-          },
-          variant: {
-            connect: [Number(it.variantId)],
-          },
+          order: orderId,
+          variant: Number(it.variantId),
           qty,
           unitPrice,
           lineTotal,
@@ -237,14 +235,33 @@ export async function POST(req: Request) {
 
       console.log("ORDER ITEM CREATED", JSON.stringify(createdItem, null, 2));
 
-      createdItems.push({
-        index: i,
-        id: createdItem?.data?.id,
-        ok: Boolean(createdItem?.data?.id),
-      });
+      const createdItemId = createdItem?.data?.id;
+
+      if (!createdItemId) {
+        throw new Error(`No se pudo crear OrderItem en índice ${i}`);
+      }
+
+      createdItemIds.push(createdItemId);
     }
 
-    console.log("ORDER ITEMS SUMMARY", JSON.stringify(createdItems, null, 2));
+    console.log("ORDER ITEM IDS", createdItemIds);
+
+    const updateOrderPayload: UpdateOrderItemsPayload = {
+      data: {
+        order_items: createdItemIds,
+      },
+    };
+
+    console.log("ORDER UPDATE PAYLOAD", JSON.stringify(updateOrderPayload, null, 2));
+
+    const updatedOrder = await strapiAdminFetch<
+      StrapiSingleResponse<CreatedOrderData>
+    >(`/api/orders/${orderId}`, {
+      method: "PUT",
+      body: JSON.stringify(updateOrderPayload),
+    });
+
+    console.log("ORDER UPDATED WITH ITEMS", JSON.stringify(updatedOrder, null, 2));
 
     return NextResponse.json(
       {
@@ -252,6 +269,7 @@ export async function POST(req: Request) {
         orderId,
         orderDocumentId,
         commerceOrder,
+        createdItemIds,
       },
       { status: 200 }
     );
