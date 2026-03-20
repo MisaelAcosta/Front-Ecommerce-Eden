@@ -43,21 +43,26 @@ function FlowReturnContent() {
     const maxTries = 15;
 
     const markPaid = (info?: FlowDetail | OrderStatusData | null) => {
-      if (!alive) return;
+  if (!alive) return;
 
-      setStatus("paid");
-      setDetail(info ?? null);
+  setStatus("paid");
+  setDetail(info ?? null);
 
-      cart.clear();
-      wizard.resetWizard?.();
+  cart.clear();
+  wizard.resetWizard?.();
 
+  //  limpiar solo una vez con tiempo para evitar borrar datos si el usuario regresa a la página después de un pago exitoso
+  if (typeof window !== "undefined") {
+    setTimeout(() => {
       try {
         localStorage.removeItem("eden_last_flow_token");
         localStorage.removeItem("eden_last_order_id");
         localStorage.removeItem("eden_last_order_document_id");
         localStorage.removeItem("eden_last_commerce_order");
       } catch {}
-    };
+    }, 5000);
+  }
+};
 
     const markRejected = (info?: FlowDetail | OrderStatusData | null) => {
       if (!alive) return;
