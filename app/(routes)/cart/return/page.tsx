@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -35,6 +35,7 @@ function FlowReturnContent() {
 
   const cart = useCart();
   const wizard = useCartWizard();
+  const finishedRef = useRef(false);
 
   useEffect(() => {
     let alive = true;
@@ -43,127 +44,136 @@ function FlowReturnContent() {
     const maxTries = 15;
 
     const markPaid = (info?: FlowDetail | OrderStatusData | null) => {
-  if (!alive) return;
+      if (!alive || finishedRef.current) return;
 
-  setStatus("paid");
-  setDetail(info ?? null);
+      finishedRef.current = true;
 
-  cart.clear();
-  wizard.resetWizard?.();
+      setStatus("paid");
+      setDetail(info ?? null);
 
-  //  limpiar solo una vez con tiempo para evitar borrar datos si el usuario regresa a la página después de un pago exitoso
-  if (typeof window !== "undefined") {
-    setTimeout(() => {
-      try {
-        localStorage.removeItem("eden_last_flow_token");
-        localStorage.removeItem("eden_last_order_id");
-        localStorage.removeItem("eden_last_order_document_id");
-        localStorage.removeItem("eden_last_commerce_order");
-      } catch {}
-    }, 5000);
-  }
-};
+      cart.clear();
+      wizard.resetWizard?.();
+
+      if (typeof window !== "undefined") {
+        setTimeout(() => {
+          try {
+            localStorage.removeItem("eden_last_flow_token");
+            localStorage.removeItem("eden_last_order_id");
+            localStorage.removeItem("eden_last_order_document_id");
+            localStorage.removeItem("eden_last_commerce_order");
+          } catch {}
+        }, 5000);
+      }
+    };
 
     const markRejected = (info?: FlowDetail | OrderStatusData | null) => {
-      if (!alive) return;
+      if (!alive || finishedRef.current) return;
+
+      finishedRef.current = true;
       setStatus("rejected");
       setDetail(info ?? null);
     };
 
-    const markError = (message: string, info?: FlowDetail | OrderStatusData | null) => {
-      if (!alive) return;
+    const markError = (
+      message: string,
+      info?: FlowDetail | OrderStatusData | null
+    ) => {
+      if (!alive || finishedRef.current) return;
+
+      finishedRef.current = true;
       setStatus("error");
       setDetail(info ?? { message });
     };
 
     const checkOrderInStrapi = async (): Promise<
-  "paid" | "rejected" | "pending" | "not-found" | "error"
-> => {
-  let orderDocumentId = "";
-  let commerceOrder = "";
+      "paid" | "rejected" | "pending" | "not-found" | "error"
+    > => {
+      let orderDocumentId = "";
+      let commerceOrder = "";
 
-  try {
-    orderDocumentId =
-      localStorage.getItem("eden_last_order_document_id") ?? "";
-    commerceOrder =
-      localStorage.getItem("eden_last_commerce_order") ?? "";
-  } catch {}
+      try {
+        orderDocumentId =
+          localStorage.getItem("eden_last_order_document_id") ?? "";
+        commerceOrder =
+          localStorage.getItem("eden_last_commerce_order") ?? "";
+      } catch {}
 
-  console.log("DEBUG STRAPI IDS", {
-    orderDocumentId,
-    commerceOrder,
-  });
+      console.log("DEBUG STRAPI IDS", {
+        orderDocumentId,
+        commerceOrder,
+      });
 
-  if (!orderDocumentId && !commerceOrder) {
-    return "not-found";
-  }
+      if (!orderDocumentId && !commerceOrder) {
+        return "not-found";
+      }
 
-  const qs = new URLSearchParams();
-  if (orderDocumentId) {
-    qs.set("orderDocumentId", orderDocumentId);
-  } else {
-    qs.set("commerceOrder", commerceOrder);
-  }
+      const qs = new URLSearchParams();
+      if (orderDocumentId) {
+        qs.set("orderDocumentId", orderDocumentId);
+      } else {
+        qs.set("commerceOrder", commerceOrder);
+      }
 
-  try {
-    const res = await fetch(`/api/orders/get-status?${qs.toString()}`, {
-      method: "GET",
-      cache: "no-store",
-    });
+      try {
+        const res = await fetch(`/api/orders/get-status?${qs.toString()}`, {
+          method: "GET",
+          cache: "no-store",
+        });
 
-    const json = await res.json();
+        const json = await res.json();
 
-    // 🔥 DEBUG IMPORTANTE
-    console.log("GET STATUS RESPONSE", {
-      status: res.status,
-      ok: res.ok,
-      json,
-    });
+        console.log("GET STATUS RESPONSE", {
+          status: res.status,
+          ok: res.ok,
+          json,
+        });
 
-    if (!alive) return "error";
+        if (!alive || finishedRef.current) return "error";
 
-    if (!res.ok || !json?.ok) {
-      return "error";
-    }
+        if (!res.ok || !json?.ok) {
+          return "error";
+        }
 
-    const order = json?.data ?? null;
-    setDetail(order);
+        const order = json?.data ?? null;
+        setDetail(order);
 
-    const statusOrder = String(order?.statusOrder ?? "").toUpperCase();
+        const statusOrder = String(order?.statusOrder ?? "").toUpperCase();
 
-    if (statusOrder === "PAID") {
-      markPaid(order);
-      return "paid";
-    }
+        if (statusOrder === "PAID") {
+          markPaid(order);
+          return "paid";
+        }
 
-    if (
-      statusOrder === "REJECTED" ||
-      statusOrder === "FAILED" ||
-      statusOrder === "CANCELLED" ||
-      statusOrder === "CANCELED"
-    ) {
-      markRejected(order);
-      return "rejected";
-    }
+        if (
+          statusOrder === "REJECTED" ||
+          statusOrder === "FAILED" ||
+          statusOrder === "CANCELLED" ||
+          statusOrder === "CANCELED"
+        ) {
+          markRejected(order);
+          return "rejected";
+        }
 
-    if (statusOrder) {
-      setStatus("pending");
-      return "pending";
-    }
+        if (statusOrder) {
+          setStatus("pending");
+          return "pending";
+        }
 
-    return "not-found";
-  } catch (error) {
-    console.error("ERROR GET STATUS", error);
-    return "error";
-  }
-};
+        return "not-found";
+      } catch (error) {
+        console.error("ERROR GET STATUS", error);
+        return "error";
+      }
+    };
 
-    const checkFlowStatus = async (): Promise<"paid" | "rejected" | "pending" | "no-token" | "error"> => {
+    const checkFlowStatus = async (): Promise<
+      "paid" | "rejected" | "pending" | "no-token" | "error"
+    > => {
       let token = tokenFromUrl;
 
       if (!token) {
         try {
-          token = localStorage.getItem("eden_last_flow_token");
+          token = localStorage.getItem("eden_last_flow_token") ?? "";
         } catch {}
       }
 
@@ -171,10 +181,13 @@ function FlowReturnContent() {
         return "no-token";
       }
 
-      const res = await fetch(`/api/flow/status?token=${encodeURIComponent(token)}`, {
-        method: "GET",
-        cache: "no-store",
-      });
+      const res = await fetch(
+        `/api/flow/status?token=${encodeURIComponent(token)}`,
+        {
+          method: "GET",
+          cache: "no-store",
+        }
+      );
 
       const json: {
         ok?: boolean;
@@ -183,7 +196,7 @@ function FlowReturnContent() {
         error?: string;
       } = await res.json();
 
-      if (!alive) return "error";
+      if (!alive || finishedRef.current) return "error";
 
       if (!res.ok || !json?.ok) {
         markError(
@@ -224,31 +237,33 @@ function FlowReturnContent() {
     };
 
     const tick = async () => {
+      if (!alive || finishedRef.current) return;
+
       tries += 1;
 
       try {
         const orderResult = await checkOrderInStrapi();
-        if (!alive) return;
+        if (!alive || finishedRef.current) return;
 
         if (orderResult === "paid" || orderResult === "rejected") {
           return;
         }
 
         if (orderResult === "pending") {
-          if (tries < maxTries) {
+          if (tries < maxTries && !finishedRef.current) {
             timeoutId = setTimeout(tick, 2000);
           }
           return;
         }
 
         const flowResult = await checkFlowStatus();
-        if (!alive) return;
+        if (!alive || finishedRef.current) return;
 
         if (flowResult === "paid" || flowResult === "rejected") {
           return;
         }
 
-        if (flowResult === "pending" && tries < maxTries) {
+        if (flowResult === "pending" && tries < maxTries && !finishedRef.current) {
           timeoutId = setTimeout(tick, 2000);
           return;
         }
@@ -262,11 +277,11 @@ function FlowReturnContent() {
           return;
         }
 
-        if (tries < maxTries) {
+        if (tries < maxTries && !finishedRef.current) {
           timeoutId = setTimeout(tick, 2000);
         }
       } catch (e: unknown) {
-        if (!alive) return;
+        if (!alive || finishedRef.current) return;
 
         const message =
           e instanceof Error ? e.message : "Error consultando el estado.";
@@ -284,8 +299,8 @@ function FlowReturnContent() {
   }, [tokenFromUrl, cart, wizard]);
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-16">
-      <div className="rounded-md border bg-white p-6">
+    <div className="mx-auto max-w-xl px-4 py-35 shadow-none sm:pt-30">
+      <div className=" lg:border bg-white p-6">
         <h1 className="text-xl font-black">RESULTADO DEL PAGO</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Estamos verificando tu transacción con Flow.
@@ -341,7 +356,7 @@ function FlowReturnContent() {
               Intenta refrescar o vuelve al carrito.
             </p>
 
-            <div className="flex gap-2 pt-2">
+            <div className=" gap-2 pt-2 ">
               <Button
                 variant="outline"
                 className="w-full"
@@ -359,7 +374,7 @@ function FlowReturnContent() {
         {detail && (
           <>
             <Separator className="my-4" />
-            <details className="text-xs">
+            <details className="text-xs hidden">
               <summary className="cursor-pointer text-muted-foreground">
                 Ver detalle (debug)
               </summary>

@@ -52,6 +52,7 @@ const Summary = () => {
   const totalFinal = subtotal + shippingCost;
 
   const payerEmail = (step02?.email ?? "").trim().toLowerCase();
+  console.log("CART ITEMS SUMMARY", cartItems);
 
   const handlePay = async () => {
     setPayError(null);
