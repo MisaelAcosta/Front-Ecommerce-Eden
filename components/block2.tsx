@@ -168,7 +168,7 @@ const Block2 = () => {
         overflow-hidden
         cursor-pointer
         bg-white
-        rounded-2xl
+        
         shadow-none
       "
     >

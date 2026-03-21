@@ -110,7 +110,7 @@ const Block1 = () => {
         <CarouselContent>
           {items.map((item: Block1Item) => {
             const id = item.id ?? item.documentId ?? crypto.randomUUID();
-            const titulo = item.tituloBlock1 ?? "Destacado";
+            const titulo = item.tituloBlock1 ?? "";
             const description = item.description ?? "";
             const blockSlug = item.slug ?? "";
 
