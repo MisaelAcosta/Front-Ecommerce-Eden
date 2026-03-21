@@ -228,7 +228,7 @@ const Block1 = () => {
                           handleClick();
                         }}
                       >
-                        Ver más
+                        
                       </button>
                     )}
                   </div>
