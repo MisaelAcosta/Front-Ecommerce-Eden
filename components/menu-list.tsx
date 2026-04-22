@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { cn } from "@/lib/utils"; // ✅ importante
+import localFont from "next/font/local";
+import { cn } from "@/lib/utils";
 
 import {
   NavigationMenu,
@@ -12,16 +13,21 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 
+const maratypeFont = localFont({
+  src: "./fonts/Maratype.otf",
+  display: "swap",
+});
+
 const MenuList = () => {
   return (
     <NavigationMenu viewport={false}>
-      <NavigationMenuList className="gap-2 ">
+      <NavigationMenuList className="gap-2">
         <NavigationMenuItem>
           <NavigationMenuLink
             asChild
             className={cn(
               navigationMenuTriggerStyle(),
-              "text-lg font-medium  tracking-wide"
+              `${maratypeFont.className} text-3xl font-medium tracking-wide`
             )}
           >
             <Link href="/category/todos-los-productos">CATALOGO</Link>
@@ -33,7 +39,7 @@ const MenuList = () => {
             asChild
             className={cn(
               navigationMenuTriggerStyle(),
-              "text-lg font-medium tracking-wide"
+              `${maratypeFont.className} text-3xl font-medium tracking-wide`
             )}
           >
             <Link href="/servicio">SERVICIOS</Link>
@@ -45,7 +51,7 @@ const MenuList = () => {
             asChild
             className={cn(
               navigationMenuTriggerStyle(),
-              "text-lg font-medium hidden  tracking-wide"
+              `${maratypeFont.className} hidden text-3xl font-medium tracking-wide`
             )}
           >
             <Link href="/cotiza">COTIZA</Link>
@@ -57,4 +63,3 @@ const MenuList = () => {
 };
 
 export default MenuList;
-

@@ -1,7 +1,24 @@
 "use client"
+
+import localFont from "next/font/local";
 import { Carousel, CarouselContent, CarouselItem } from "./ui/carousel";
 import { Card, CardContent } from "./ui/card";
 import  Autoplay  from "embla-carousel-autoplay";
+
+// Tipografias locales usadas en el banner superior.
+const khInterferenceBoldFont = localFont({
+    src: "./fonts/KHInterferenceTRIAL-Bold.otf",
+    weight: "700",
+    style: "normal",
+    display: "swap",
+});
+
+const khInterferenceRegularFont = localFont({
+    src: "./fonts/KHInterferenceTRIAL-Regular.otf",
+    weight: "400",
+    style: "normal",
+    display: "swap",
+});
 
 
 export const dataCarouselTop = [
@@ -48,11 +65,11 @@ const CarouselTextBanner = () => {
                             <CardContent className="flex flex-col items-center leading-none justify-center gap-1 sm:gap-none py-0">
                                 
 
-                                <p className="sm:text-lg  font-black text-wrap text-red-600">
+                                <p className={`${khInterferenceBoldFont.className} sm:text-lg text-wrap tracking-wide text-red-600`}>
                                     {title}
                                 </p>
 
-                                <p className="text-xs sm:text-sm dark:text-secondary text-center max-w-xs">
+                                <p className={`${khInterferenceRegularFont.className} text-xs sm:text-sm dark:text-secondary text-center max-w-xs`}>
                                     {description}
                                 </p>
 

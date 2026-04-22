@@ -14,6 +14,10 @@ import { readAccountProfile } from "@/lib/account-profile";
 import { useCartWizard } from "@/hooks/use-cart-wizard";
 import { getShippingCost } from "@/lib/shipping";
 import {
+  khInterferenceLightFont,
+  khInterferenceRegularFont,
+} from "../../cart-fonts";
+import {
   RegionCombobox,
   CommuneCombobox,
 } from "@/components/profile/region-commune-select";

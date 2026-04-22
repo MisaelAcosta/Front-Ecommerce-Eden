@@ -7,6 +7,10 @@ import { cn } from "@/lib/utils";
 import type { CartLine } from "@/types/cart";
 import { Minus, Plus, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import {
+  khInterferenceLightFont,
+  khInterferenceRegularFont,
+} from "./cart-fonts";
 
 interface CartItemProps {
   item: CartLine;
@@ -35,7 +39,11 @@ const CartItem = ({ item }: CartItemProps) => {
       {/* Info */}
       <div className="flex flex-1 justify-between items-center gap-4">
         <div className="min-w-0">
-          <h2 className="text-sm font-semibold truncate">{item.variantName}</h2>
+          <h2
+            className={`${khInterferenceRegularFont.className} text-sm truncate`}
+          >
+            {item.variantName}
+          </h2>
 
           {/* Control cantidad */}
           <div className="flex items-center gap-2 mt-2">
@@ -48,7 +56,9 @@ const CartItem = ({ item }: CartItemProps) => {
               <Minus size={14} />
             </button>
 
-            <span className="w-6 text-center text-sm font-medium">
+            <span
+              className={`${khInterferenceLightFont.className} w-6 text-center text-sm`}
+            >
               {item.qty}
             </span>
 
@@ -65,7 +75,9 @@ const CartItem = ({ item }: CartItemProps) => {
 
         {/* Precio + eliminar */}
         <div className="flex items-center gap-4">
-          <p className="text-sm font-semibold whitespace-nowrap">
+          <p
+            className={`${khInterferenceLightFont.className} text-sm whitespace-nowrap`}
+          >
             {formatPrice(item.unitPrice * item.qty)}
           </p>
 

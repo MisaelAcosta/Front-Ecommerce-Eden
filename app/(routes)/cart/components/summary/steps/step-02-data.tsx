@@ -11,6 +11,10 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
 import { readAccountProfile } from "@/lib/account-profile";
 import { useCartWizard } from "@/hooks/use-cart-wizard";
+import {
+  khInterferenceLightFont,
+  khInterferenceRegularFont,
+} from "../../cart-fonts";
 
 import {
   InputOTP,
@@ -189,7 +193,11 @@ const Step02Data = ({ onContinue, onBack }: Props) => {
             <ArrowLeft size={16} />
           </button>
 
-          <h3 className="text-sm font-semibold tracking-wide">DATOS</h3>
+          <h3
+            className={`${khInterferenceRegularFont.className} text-sm tracking-wide`}
+          >
+            DATOS
+          </h3>
         </div>
 
         <div className="flex items-center gap-1">
@@ -203,7 +211,9 @@ const Step02Data = ({ onContinue, onBack }: Props) => {
 
       {/* Toggle */}
       <div className="flex items-center justify-between">
-        <p className="text-[11px] font-medium text-muted-foreground">
+        <p
+          className={`${khInterferenceLightFont.className} text-[11px] text-muted-foreground`}
+        >
           USAR DATOS DE MI CUENTA
         </p>
 
@@ -408,10 +418,16 @@ const Step02Data = ({ onContinue, onBack }: Props) => {
       {/* Total */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs font-semibold leading-4">ESTIMADO</p>
-          <p className="text-xs font-semibold leading-4">TOTAL</p>
+          <p className={`${khInterferenceRegularFont.className} text-xs leading-4`}>
+            ESTIMADO
+          </p>
+          <p className={`${khInterferenceRegularFont.className} text-xs leading-4`}>
+            TOTAL
+          </p>
         </div>
-        <p className="text-sm font-semibold">{formatPrice(subtotal)}</p>
+        <p className={`${khInterferenceLightFont.className} text-sm`}>
+          {formatPrice(subtotal)}
+        </p>
       </div>
 
       {/* CTA */}
@@ -425,7 +441,9 @@ const Step02Data = ({ onContinue, onBack }: Props) => {
 
       {/* Hint */}
       {useAccount && (
-        <p className="mt-3 text-[11px] text-muted-foreground">
+        <p
+          className={`${khInterferenceLightFont.className} mt-3 text-[11px] text-muted-foreground`}
+        >
           {accountHint ?? "* Cargando datos de tu cuenta..."}
         </p>
       )}

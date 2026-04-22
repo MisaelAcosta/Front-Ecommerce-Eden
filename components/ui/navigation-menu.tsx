@@ -67,7 +67,7 @@ const navigationMenuTriggerStyle = cva(
     "after:absolute after:-bottom-0.5 after:left-1/2 after:h-[2px] after:w-0 after:-translate-x-1/2 after:rounded-full after:bg-current after:transition-all after:duration-250",
     // hover underline
     "hover:after:w-16",
-    // ✅ activo: underline fijo
+    //  activo: underline fijo
     "aria-[current=page]:after:w-8 aria-[current=page]:font-bold",
     // si usas Radix open (dropdown)
     "data-[state=open]:after:w-6"

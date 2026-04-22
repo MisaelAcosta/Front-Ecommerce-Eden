@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import localFont from "next/font/local";
 
 import { useGetCategories } from "@/api/useGetCategories";
 
@@ -13,6 +14,19 @@ import {
   AccordionContent,
 } from "@/components/ui/accordion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
+// Tipografias locales usadas en el filtro de categorias.
+const maratypeFont = localFont({
+  src: "../../../../../components/fonts/Maratype.otf",
+  display: "swap",
+});
+
+const khInterferenceRegularFont = localFont({
+  src: "../../../../../components/fonts/KHInterferenceTRIAL-Regular.otf",
+  weight: "400",
+  style: "normal",
+  display: "swap",
+});
 
 type FilterCategoryProps = {
   categorySlug: string;
@@ -41,22 +55,22 @@ const FilterCategory = ({
 
   const { categories, loading, error } = useGetCategories();
 
-  // 🔹 acordeón abierto
+  //  acordeón abierto
   const [openSlug, setOpenSlug] = useState<string | undefined>(undefined);
 
-  // 🔹 mantener abierto el acordeón según la categoría actual
+  //  mantener abierto el acordeón según la categoría actual
   useEffect(() => {
     setOpenSlug(categorySlug ?? undefined);
   }, [categorySlug]);
 
-  // 🔹 navegar a categoría
+  //  navegar a categoría
   const goCategory = (slugCat: string) => {
     setOpenSlug(slugCat);
     onSelectSubcategory(null);
     router.push(`/category/${slugCat}`);
   };
 
-  // 🔹 seleccionar subcategoría (sin navegar)
+  //  seleccionar subcategoría (sin navegar)
   const goSubcategory = (slugSub: string) => {
     onSelectSubcategory(slugSub);
   };
@@ -82,14 +96,18 @@ const FilterCategory = ({
           const hasSubs = cat.subcategories && cat.subcategories.length > 0;
           const isCategoryActive = categorySlug === cat.slug;
 
-          // 🔹 categoría sin subcategorías
+          //  categoría sin subcategorías
           if (!hasSubs) {
             return (
               <button
                 key={cat.id}
                 onClick={() => goCategory(cat.slug)}
                 className={`
-                  w-full text-left px-2 py-2 rounded-md transition
+                  ${maratypeFont.className}
+                  w-full text-left px-2 py-2 
+                  text-xl  sm:text-2xl
+                  tracking-normal sm:tracking-wide
+                  rounded-md transition
                   ${isCategoryActive ? "bg-black text-white" : "hover:bg-muted"}
                 `}
               >
@@ -98,7 +116,7 @@ const FilterCategory = ({
             );
           }
 
-          // 🔹 categoría con subcategorías
+          //  categoría con subcategorías
           return (
             <AccordionItem
               key={cat.id}
@@ -108,7 +126,9 @@ const FilterCategory = ({
               <AccordionTrigger
                 onClick={() => goCategory(cat.slug)}
                 className={`
-                  px-2 py-2 text-left cursor-pointer text-lg font-light
+                  ${maratypeFont.className}
+                  px-2 py-2 text-left cursor-pointer 
+                  text-xl  sm:text-2xl
                   ${isCategoryActive ? "text-black" : ""}
                 `}
               >
@@ -124,7 +144,7 @@ const FilterCategory = ({
                     <Label
                       key={sub.id}
                       htmlFor={`sub-${sub.slug}`}
-                      className="cursor-pointer flex items-center gap-2 rounded-md px-2 py-1 hover:bg-gray-100"
+                      className={`${khInterferenceRegularFont.className} cursor-pointer flex items-center gap-2 rounded-md px-2 py-1 hover:bg-gray-100`}
                       onClick={() => goSubcategory(sub.slug)}
                     >
                       <RadioGroupItem

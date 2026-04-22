@@ -4,6 +4,10 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { formatPrice } from "@/lib/formatPrice";
+import {
+  khInterferenceLightFont,
+  khInterferenceRegularFont,
+} from "../../cart-fonts";
 
 type Props = {
   onContinue: () => void;
@@ -21,7 +25,11 @@ const Step01Order = ({ onContinue }: Props) => {
     <div className="w-full rounded-md border bg-white p-5 shadow-none">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold tracking-wide">RESUMEN DE ORDEN</h3>
+        <h3
+          className={`${khInterferenceRegularFont.className} text-sm tracking-wide`}
+        >
+          RESUMEN DE ORDEN
+        </h3>
 
         {/* mini “paginador” visual (solo decorativo por ahora) */}
         <div className="flex items-center gap-1">
@@ -36,20 +44,26 @@ const Step01Order = ({ onContinue }: Props) => {
       {/* Items */}
       <div className="space-y-2">
         {items.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
+          <p
+            className={`${khInterferenceLightFont.className} text-sm text-muted-foreground`}
+          >
             No hay productos en el carrito.
           </p>
         ) : (
           items.map((it) => (
             <div key={it.id} className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-xs text-muted-foreground truncate">
+                <p
+                  className={`${khInterferenceLightFont.className} text-xs text-muted-foreground truncate`}
+                >
                   {it.variantName}
                   {it.qty > 1 ? ` × ${it.qty}` : ""}
                 </p>
               </div>
 
-              <p className="text-xs text-muted-foreground whitespace-nowrap">
+              <p
+                className={`${khInterferenceLightFont.className} text-xs text-muted-foreground whitespace-nowrap`}
+              >
                 {formatPrice(it.unitPrice * it.qty)}
               </p>
             </div>
@@ -62,11 +76,17 @@ const Step01Order = ({ onContinue }: Props) => {
       {/* Total */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs font-semibold leading-4">ESTIMADO</p>
-          <p className="text-xs font-semibold leading-4">TOTAL</p>
+          <p className={`${khInterferenceRegularFont.className} text-xs leading-4`}>
+            ESTIMADO
+          </p>
+          <p className={`${khInterferenceRegularFont.className} text-xs leading-4`}>
+            TOTAL
+          </p>
         </div>
 
-        <p className="text-sm font-semibold">{formatPrice(subtotal)}</p>
+        <p className={`${khInterferenceLightFont.className} text-sm`}>
+          {formatPrice(subtotal)}
+        </p>
       </div>
 
       {/* CTA */}

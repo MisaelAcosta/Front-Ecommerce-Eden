@@ -2,6 +2,7 @@
 
 import { Menu, X, Instagram, Youtube } from "lucide-react";
 import Link from "next/link";
+import localFont from "next/font/local";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { createPortal } from "react-dom";
@@ -9,6 +10,18 @@ import { createPortal } from "react-dom";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { ProfileSheet } from "@/components/profile/profile-sheet";
 import type { CurrentUser, ProfileData } from "@/components/profile/profile-types";
+
+const maratypeFont = localFont({
+  src: "./fonts/Maratype.otf",
+  display: "swap",
+});
+
+const khInterferenceBoldFont = localFont({
+  src: "./fonts/KHInterferenceTRIAL-Bold.otf",
+  weight: "700",
+  style: "normal",
+  display: "swap",
+});
 
 const overlayVariants = (originPx: string): Variants => ({
   initial: {
@@ -208,7 +221,8 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
                     </span>
                     <Link
                       href="/"
-                      className="block text-black font-black tracking-tighter leading-none text-6xl sm:text-6xl"
+                      className={`${maratypeFont.className} block
+                       text-black tracking-tighter leading-none text-8xl sm:text-6xl`}
                       onClick={closeMenu}
                     >
                       INICIO
@@ -217,12 +231,14 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
 
                   {/* CATALOGO */}
                   <div className="relative">
-                    <span className="absolute -top-4  right-10 text-red-500 text-xs font-semibold">
+                    <span className="absolute -top-4  
+                    right-10 text-red-500 text-xs font-semibold">
                       02
                     </span>
                     <Link
                       href="/category/todos-los-productos"
-                      className="block text-black font-black tracking-tighter leading-none text-6xl sm:text-6xl"
+                      className={`${maratypeFont.className} block text-black 
+                      tracking-tighter leading-none text-8xl sm:text-6xl`}
                       onClick={closeMenu}
                     >
                       CATALOGO
@@ -236,7 +252,9 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
                     </span>
                     <Link
                       href="/servicio"
-                      className="block text-black font-black tracking-tighter leading-none text-6xl sm:text-6xl"
+                      className={`${maratypeFont.className} block
+                       text-black tracking-tighter 
+                       leading-none text-8xl sm:text-6xl`}
                       onClick={closeMenu}
                     >
                       SERVICIOS
@@ -285,7 +303,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
                   <Link
                     href="https://www.instagram.com/eden.3d_/"
                     target="_blank"
-                    className="inline-flex items-center gap-2 text-black font-extrabold"
+                    className={`${khInterferenceBoldFont.className} inline-flex items-center gap-2 text-black tracking-wide`}
                   >
                     <Instagram className="w-4 h-4" />
                     INSTAGRAM <span className="text-black/60 font-extrabold">↗</span>
@@ -294,7 +312,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
                   <Link
                     href="https://youtube.com"
                     target="_blank"
-                    className="inline-flex items-center gap-2 text-black font-extrabold"
+                    className={`${khInterferenceBoldFont.className} inline-flex items-center gap-2 text-black tracking-wide`}
                   >
                     <Youtube className="w-5 h-5" />
                     YOUTUBE <span className="text-black/90  pb-2 font-extrabold"> ↗</span>
