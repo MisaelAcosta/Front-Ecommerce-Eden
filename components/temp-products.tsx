@@ -1,6 +1,7 @@
 "use client";
 
 import { useGetTempProducts } from "@/api/useGetTempProducts";
+import localFont from "next/font/local";
 import {
   Carousel,
   CarouselContent,
@@ -18,6 +19,26 @@ import { LovedButton } from "./loved-button";
 import { toAbsUrl } from "@/lib/media";
 import Image from "next/image";
 import type { ProductType } from "@/types/product";
+
+// Local fonts used only by the temp products section.
+const maratypeFont = localFont({
+  src: "./fonts/Maratype.otf",
+  display: "swap",
+});
+
+const khInterferenceLightFont = localFont({
+  src: "./fonts/KHInterferenceTRIAL-Light.otf",
+  weight: "300",
+  style: "normal",
+  display: "swap",
+});
+
+const khInterferenceRegularFont = localFont({
+  src: "./fonts/KHInterferenceTRIAL-Regular.otf",
+  weight: "400",
+  style: "normal",
+  display: "swap",
+});
 
 type ProductImage = {
   url?: string | null;
@@ -48,8 +69,6 @@ type ProductAttrs = {
   productName?: string | null;
   productName2?: string | null;
   variant?: string | null;
-  subCategory?: string | null;
-  sub_category?: string | null;
   slug?: string | null;
   price?: number | string | null;
   images?: ProductImage[] | StrapiRelationArray<StrapiImageWrapper> | null;
@@ -65,8 +84,19 @@ type ProductWithAttributes = ProductType & {
   attributes?: ProductAttrs;
 } & ProductAttrs;
 
-/* ----------------------- helpers de promociones ----------------------- */
+type TempProductCardData = {
+  id: number;
+  displayName: string;
+  secondaryName: string;
+  productSlug: string;
+  basePrice: number;
+  finalPrice: number;
+  hasDiscount: boolean;
+  image1: string | null;
+  image2: string | null;
+};
 
+// Promotion helpers used to decide the final visible price.
 function isPromoActive(p: PromotionType, now = new Date()) {
   if (!p?.active) return false;
   const start = p.startAt ? new Date(p.startAt) : null;
@@ -106,7 +136,7 @@ function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
   return best ? best.promo : null;
 }
 
-/* -------------------- normalizar promos (strapi) -------------------- */
+// Normalize Strapi promotion payloads into a flat array the UI can consume.
 function normalizePromotionItem(x: PromotionStrapiItem): PromotionType {
   const source = x?.attributes ?? x;
   const { id: sourceId, ...rest } = source;
@@ -144,12 +174,17 @@ function normalizePromotions(
   return [];
 }
 
+// Resolve product images regardless of whether Strapi returns raw arrays or relations.
 function getImagesArray(attrs: ProductAttrs): ProductImage[] {
   if (Array.isArray(attrs.images)) {
     return attrs.images;
   }
 
-  if (attrs.images && "data" in attrs.images && Array.isArray(attrs.images.data)) {
+  if (
+    attrs.images &&
+    "data" in attrs.images &&
+    Array.isArray(attrs.images.data)
+  ) {
     return attrs.images.data
       .map((i: StrapiImageWrapper) => i.attributes)
       .filter((img): img is ProductImage => Boolean(img));
@@ -158,19 +193,225 @@ function getImagesArray(attrs: ProductAttrs): ProductImage[] {
   return [];
 }
 
+// Convert the raw product payload into the shape used by the card UI.
+function buildTempProductCardData(product: ProductType): TempProductCardData {
+  const raw = product as ProductWithAttributes;
+  const attrs: ProductAttrs = raw.attributes ?? raw;
+  const imagesArray = getImagesArray(attrs);
+  const image1 = toAbsUrl(imagesArray[0]?.url ?? null);
+  const image2 = toAbsUrl(imagesArray[1]?.url ?? null);
+  const displayName = attrs.productName ?? "Producto sin nombre";
+  const secondaryName = attrs.productName2 ?? attrs.variant ?? "";
+  const productSlug = attrs.slug ?? "";
+  const basePrice = Number(attrs.price ?? 0);
+  const promos = normalizePromotions(attrs.promotions);
+  const appliedPromo = pickBestPromo(basePrice, promos);
+  const finalPrice = appliedPromo
+    ? applyPromo(basePrice, appliedPromo)
+    : basePrice;
+
+  return {
+    id: raw.id,
+    displayName,
+    secondaryName,
+    productSlug,
+    basePrice,
+    finalPrice,
+    hasDiscount: appliedPromo !== null && finalPrice < basePrice,
+    image1,
+    image2,
+  };
+}
+
+// Product card renderer used by the carousel to keep the main section compact.
+function TempProductCard({
+  product,
+  onOpenProduct,
+}: {
+  product: TempProductCardData;
+  onOpenProduct: (slug: string) => void;
+}) {
+  const {
+    id,
+    displayName,
+    secondaryName,
+    productSlug,
+    basePrice,
+    finalPrice,
+    hasDiscount,
+    image1,
+    image2,
+  } = product;
+
+  return (
+    <CarouselItem
+      key={id}
+      className="basis-[85%] sm:basis-1/2 lg:basis-1/3 px-3 md:px-4"
+    >
+      <Card
+        className="
+          shadow-none
+          group relative
+          w-full
+          h-auto
+          pt-4
+          pb-4
+          overflow-hidden
+          border-none
+          bg-[#ffffff]
+          flex flex-col
+          justify-between
+        "
+      >
+        {hasDiscount && (
+          <div
+            className="
+              absolute left-4 top-4 z-10
+              rounded-full px-3 py-1
+              text-[11px] font-black tracking-wide
+              bg-green-500 text-white
+            "
+          >
+            OFERTA
+          </div>
+        )}
+
+        <CardContent className="flex flex-col justify-around px-3 md:px-3 pt-0 pb-0">
+          <div
+            className="
+              relative mb-3 sm:mb-4
+              mt-0 w-full
+              bg-white
+              flex items-center justify-center overflow-hidden
+              pt-1 pb-1 cursor-pointer
+            "
+            onClick={() => onOpenProduct(productSlug)}
+          >
+            <div className="absolute top-3 right-3 z-20">
+              <LovedButton
+                product={{
+                  id,
+                  title: displayName,
+                  secondaryName,
+                  price: basePrice,
+                  slug: productSlug,
+                  imageUrl: image1,
+                }}
+              />
+            </div>
+
+            {image1 && (
+              <Image
+                src={image1}
+                alt={displayName}
+                width={700}
+                height={700}
+                unoptimized
+                className="
+                  sm:max-h-[410px] h-auto w-auto object-contain
+                  transition-all duration-300 ease-out
+                  opacity-100 group-hover:opacity-0
+                "
+              />
+            )}
+
+            {image2 && (
+              <Image
+                src={image2}
+                alt={displayName}
+                fill
+                unoptimized
+                className="
+                  absolute inset-0
+                  object-cover
+                  transition-all duration-300 ease-out
+                  opacity-0 group-hover:opacity-100
+                "
+              />
+            )}
+
+            {!image1 && (
+              <span className="text-sm text-muted-foreground">Sin imagen</span>
+            )}
+          </div>
+
+          <h3
+            className={`${khInterferenceRegularFont.className}
+              text-lg
+              leading-none
+              text-left sm:text-2xl
+              uppercase pt-0
+              pb-0
+            `}
+          >
+            {displayName}
+          </h3>
+
+          <div className="flex justify-start gap-2">
+            <div className="flex items-center gap-2 text-left">
+              <p
+                className={`${khInterferenceLightFont.className} text-lg font-normal text-left text-black`}
+              >
+                {secondaryName}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-start gap-2">
+            {hasDiscount ? (
+              <div className="leading-tight text-left">
+                <p
+                  className={`${khInterferenceLightFont.className} text-[12px] font-semibold text-black/40 line-through`}
+                >
+                  {formatPrice(basePrice)}
+                </p>
+                <p
+                  className={`${khInterferenceLightFont.className} text-[17px] sm:text-[17px] font-extrabold text-red-500 tabular-nums`}
+                >
+                  {formatPrice(finalPrice)}
+                </p>
+              </div>
+            ) : (
+              <p
+                className={`${khInterferenceLightFont.className} text-[15px] sm:inline-flex items-center justify-start font-semibold text-left`}
+              >
+                {formatPrice(basePrice)}
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </CarouselItem>
+  );
+}
+
 const TempProducts = () => {
   const { result, loading }: ResponseType = useGetTempProducts("halloween");
   const router = useRouter();
+  const tempProducts = Array.isArray(result)
+    ? result.map(buildTempProductCardData)
+    : [];
+
+  // Keep navigation logic in one place instead of repeating it in the JSX.
+  const handleOpenProduct = (slug: string) => {
+    if (!slug) return;
+    router.push(`/product/${slug}`);
+  };
 
   return (
     <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-8 sm:py-14">
       <div>
-        <h3 className="text-4xl text-center sm:text-left tracking-tight sm:text-5xl font-black mb-2 sm:mb-4">
-          PROMOCIONES.
+        <h3
+          className={`${maratypeFont.className} text-4xl 
+          text-left tracking-wide sm:tracking-tight sm:text-5xl mb-2 sm:mb-4`}
+        >
+          PROMOCIONES
         </h3>
-        <p className="text-black/35 sm:text-left text-center tracking-normal leading-none mb-6 text-base sm:text-base">
+        <p
+          className={`${khInterferenceLightFont.className} text-black/35 text-left leading-none tracking-normal mb-6 text-base sm:text-base`}
+        >
           Disfruta de las mejores promociones y ofertas exclusivas en nuestros
-          productos seleccionados.
+          productos seleccionados
         </p>
       </div>
 
@@ -179,177 +420,13 @@ const TempProducts = () => {
           {loading && <SkeletonSchema grid={1} />}
 
           {!loading &&
-            Array.isArray(result) &&
-            result.map((product: ProductType) => {
-              const raw = product as ProductWithAttributes;
-              const attrs: ProductAttrs = raw.attributes ?? raw;
-
-              const imagesArray = getImagesArray(attrs);
-
-              const firstImage = imagesArray[0]?.url ?? null;
-              const secondImage = imagesArray[1]?.url ?? null;
-
-              const image1 = toAbsUrl(firstImage);
-              const image2 = toAbsUrl(secondImage);
-
-              const displayName = attrs.productName ?? "Producto sin nombre";
-              const secondaryName =
-                attrs.productName2 ??
-                attrs.variant ??
-                attrs.subCategory ??
-                attrs.sub_category ??
-                "";
-
-              const productSlug = attrs.slug ?? "";
-              const basePrice = Number(attrs.price ?? 0);
-
-              const promos = normalizePromotions(attrs.promotions);
-              const appliedPromo = pickBestPromo(basePrice, promos);
-
-              const finalPrice = appliedPromo
-                ? applyPromo(basePrice, appliedPromo)
-                : basePrice;
-
-              const hasDiscount =
-                appliedPromo !== null && finalPrice < basePrice;
-
-              return (
-                <CarouselItem
-                  key={raw.id}
-                  className="basis-[85%] sm:basis-1/2 lg:basis-1/3 px-3 md:px-4"
-                >
-                  <Card
-                    className="
-                      shadow-none
-                      group relative
-                      w-full
-                      h-auto
-                      pt-4
-                      pb-4
-                      overflow-hidden
-                      border-none
-                      bg-[#ffffff]
-                      flex flex-col
-                      justify-between
-                    "
-                  >
-                    {hasDiscount && (
-                      <div
-                        className="
-                          absolute left-4 top-4 z-10
-                          rounded-full px-3 py-1
-                          text-[11px] font-black tracking-wide
-                          bg-green-500 text-white
-                        "
-                      >
-                        OFERTA
-                      </div>
-                    )}
-
-                    <CardContent className="flex flex-col justify-around px-3 md:px-3 pt-0 pb-0">
-                      <div
-                        className="
-                          relative mb-3 sm:mb-4
-                          mt-0 w-full
-                          bg-white
-                          flex items-center justify-center overflow-hidden
-                          pt-1 pb-1 cursor-pointer
-                        "
-                        onClick={() =>
-                          productSlug && router.push(`/product/${productSlug}`)
-                        }
-                      >
-                        <div className="absolute top-3 right-3 z-20">
-                          <LovedButton
-                            product={{
-                              id: raw.id,
-                              title: displayName,
-                              secondaryName,
-                              price: basePrice,
-                              slug: productSlug,
-                              imageUrl: image1,
-                            }}
-                          />
-                        </div>
-
-                        {image1 && (
-                          <Image
-                            src={image1}
-                            alt={displayName}
-                            width={700}
-                            height={700}
-                            unoptimized
-                            className="
-                              sm:max-h-[410px] h-auto w-auto object-contain
-                              transition-all duration-300 ease-out
-                              opacity-100 group-hover:opacity-0
-                            "
-                          />
-                        )}
-
-                        {image2 && (
-                          <Image
-                            src={image2}
-                            alt={displayName}
-                            fill
-                            unoptimized
-                            className="
-                              absolute inset-0
-                              object-cover
-                              transition-all duration-300 ease-out
-                              opacity-0 group-hover:opacity-100
-                            "
-                          />
-                        )}
-
-                        {!image1 && (
-                          <span className="text-sm text-muted-foreground">
-                            Sin imagen
-                          </span>
-                        )}
-                      </div>
-
-                      <h3
-                        className="
-                          text-xl
-                          leading-none
-                          text-center sm:text-3xl
-                          font-black uppercase pt-0
-                          pb-0
-                        "
-                      >
-                        {displayName}
-                      </h3>
-
-                      <div className="flex justify-center py-1 gap-2">
-                        <div className="flex items-center gap-2 text-center">
-                          <p className="text-lg font-normal text-black">
-                            {secondaryName}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="mt-1 flex items-center justify-center gap-2">
-                        {hasDiscount ? (
-                          <div className="leading-tight text-center">
-                            <p className="text-[12px] font-semibold text-black/40 line-through">
-                              {formatPrice(basePrice)}
-                            </p>
-                            <p className="text-[17px] sm:text-[17px] font-extrabold text-red-500 tabular-nums">
-                              {formatPrice(finalPrice)}
-                            </p>
-                          </div>
-                        ) : (
-                          <p className="text-[15px] sm:inline-flex items-center justify-center font-semibold text-center">
-                            {formatPrice(basePrice)}
-                          </p>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </CarouselItem>
-              );
-            })}
+            tempProducts.map((product) => (
+              <TempProductCard
+                key={product.id}
+                product={product}
+                onOpenProduct={handleOpenProduct}
+              />
+            ))}
         </CarouselContent>
 
         <CarouselPrevious />

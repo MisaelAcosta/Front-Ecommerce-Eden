@@ -1,11 +1,9 @@
+import StepsStack from "@/components/stepsStack";
 
-import HeaderCotiza from "./components/headerCotiza";
-
-
-export default function Home () {
-    return(
-        <main>
-            <HeaderCotiza />
-        </main>
-    )
+export default function Home() {
+  return (
+    <main>
+      <StepsStack />
+    </main>
+  );
 }
