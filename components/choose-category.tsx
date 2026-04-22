@@ -7,6 +7,8 @@ import localFont from "next/font/local";
 import { useGetCategories } from "@/api/getProducts";
 import type { ResponseType } from "@/types/response";
 import type { CategoryType } from "@/types/category";
+import { motion } from "motion/react";
+import { fadeUp } from "@/lib/fade-up";
 
 // Tipografias locales de la seccion categorias.
 const maratypeFont = localFont({
@@ -209,11 +211,16 @@ const ChooseCategory = () => {
   return (
     <section className="w-full bg-white py-8 sm:py-14">
       <div className="mx-auto max-w-6xl px-4 sm:px-8 lg:px-0">
-        <h3
+        <motion.h3
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25 }}
+          custom={0}
           className={`${maratypeFont.className} mb-4 text-left text-4xl leading-none text-black sm:mb-8 sm:text-6xl`}
         >
           CATEGORIAS
-        </h3>
+        </motion.h3>
 
         {error && (
           <p className="mb-5 text-sm text-red-600">
@@ -244,7 +251,13 @@ const ChooseCategory = () => {
         )}
 
         {!loading && activeCategory && (
-          <>
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            custom={0.15}
+          >
             {/* Vista escritorio y tablet. */}
             <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start lg:gap-8">
               <div className="grid grid-cols-[0.36fr_0.64fr] gap-3">
@@ -365,7 +378,7 @@ const ChooseCategory = () => {
                 ))}
               </div>
             </div>
-          </>
+          </motion.div>
         )}
       </div>
     </section>

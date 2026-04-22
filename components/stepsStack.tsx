@@ -4,11 +4,11 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { ReactLenis } from "lenis/react";
 
 import HeaderCotiza from "@/app/(routes)/cotiza/components/headerCotiza";
 import Paso1 from "@/app/(routes)/cotiza/components/paso1";
 import Paso2 from "@/app/(routes)/cotiza/components/paso2";
+import SmoothScroll from "@/components/smooth-scroll";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -109,15 +109,7 @@ const StepsStack = () => {
   );
 
   return (
-    <ReactLenis
-      root
-      options={{
-        lerp: 0.08,
-        duration: 1.2,
-        smoothWheel: true,
-        syncTouch: false,
-      }}
-    >
+    <SmoothScroll>
       <div ref={containerRef} className="relative bg-white">
         <section className="cotiza-intro relative h-screen overflow-hidden">
           <div className="h-full">
@@ -139,7 +131,7 @@ const StepsStack = () => {
 
         <section className="cotiza-outro h-[20vh] md:h-[30vh]" />
       </div>
-    </ReactLenis>
+    </SmoothScroll>
   );
 };
 

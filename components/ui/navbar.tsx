@@ -105,18 +105,18 @@ const MOBILE_LOGO_DARK = "/icons/logo-eden-black.png";
         ${forceDark ? "bg-white/90 backdrop-blur-md shadow-sm" : "bg-transparent"}
       `}
     >
-      <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-3">
+      <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-3 lg:px-4">
         {/* Layout general: 3 columnas -> Left / Center / Right */}
         <div className="grid grid-cols-3 items-center py-2">
           {/* ================= LEFT ================= */}
           <div className="flex items-center justify-start gap-3">
             {/* Mobile: Hamburguesa a la izquierda */}
-            <div className="flex md:hidden">
+            <div className="flex lg:hidden">
               <ItemsMenuMobile scrolled={forceDark} />
             </div>
 
             {/* Desktop: Logo texto + menú */}
-            <div className="hidden md:flex items-center gap-10">
+            <div className="hidden lg:flex items-center gap-10">
               <button
                 type="button"
                 onClick={() => router.push("/")}
@@ -132,17 +132,14 @@ const MOBILE_LOGO_DARK = "/icons/logo-eden-black.png";
                   className="object-contain "
                 />
               </button>
-
-
-
-              <div className={`pl-90 text-xl ${fg}`}>
+              <div className={`text-xl ${fg}`}>
                 <MenuList />
               </div>
             </div> 
 
             {/* Mobile: Smile pegadito a la hamburguesa */}
             {!loadingUser && (
-              <div className="flex md:hidden">
+              <div className="flex lg:hidden">
                 {user ? (
                   <ProfileSheet
                     user={user}
@@ -186,7 +183,7 @@ const MOBILE_LOGO_DARK = "/icons/logo-eden-black.png";
             <button
               type="button"
               onClick={() => router.push("/")}
-              className="md:hidden relative h-18 w-20"
+              className="relative h-18 w-20 lg:hidden"
               aria-label="Ir al inicio"
             >
               <Image
@@ -203,10 +200,10 @@ const MOBILE_LOGO_DARK = "/icons/logo-eden-black.png";
           </div>
 
           {/* ================= RIGHT ================= */}
-          <div className="flex items-center justify-end gap-5 md:gap-8">
+          <div className="flex items-center justify-end gap-5 lg:gap-8">
             {/* Desktop: Smile (login/perfil) a la derecha */}
             {!loadingUser && (
-              <div className="hidden md:flex">
+              <div className="hidden lg:flex">
                 {user ? (
                   <ProfileSheet
                     user={user}

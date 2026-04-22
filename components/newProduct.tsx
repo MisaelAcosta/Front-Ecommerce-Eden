@@ -19,6 +19,8 @@ import { formatPrice } from "@/lib/formatPrice";
 import { LovedButton } from "./loved-button";
 import { toAbsUrl } from "@/lib/media";
 import Image from "next/image";
+import { motion } from "motion/react";
+import { fadeUp } from "@/lib/fade-up";
 
 // Local fonts used only by the new products section.
 const maratypeFont = localFont({
@@ -401,36 +403,54 @@ const NewProducts = () => {
   return (
     <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-8 sm:py-14">
       <div>
-        <h3
+        <motion.h3
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25 }}
+          custom={0}
           className={`${maratypeFont.className} text-4xl 
           tracking-wide sm:tracking-normal text-left sm:text-5xl mb-2 sm:mb-4`}
         >
           NOVEDADES
-        </h3>
-        <p
+        </motion.h3>
+        <motion.p
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25 }}
+          custom={0.12}
           className={`${khInterferenceLightFont.className} text-black/35 text-left leading-none tracking-normal mb-6 text-base sm:text-base`}
         >
           Recien salidos del horno, descubre los ultimos modelos anadidos a
           nuestro catalogo
-        </p>
+        </motion.p>
       </div>
 
-      <Carousel>
-        <CarouselContent className="ml-1 md:-ml-4">
-          {loading && <SkeletonSchema grid={1} />}
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.15 }}
+        custom={0.2}
+      >
+        <Carousel>
+          <CarouselContent className="ml-1 md:-ml-4">
+            {loading && <SkeletonSchema grid={1} />}
 
-          {newProducts.map((product) => (
-            <NewProductCard
-              key={product.id}
-              product={product}
-              onOpenProduct={handleOpenProduct}
-            />
-          ))}
-        </CarouselContent>
+            {newProducts.map((product) => (
+              <NewProductCard
+                key={product.id}
+                product={product}
+                onOpenProduct={handleOpenProduct}
+              />
+            ))}
+          </CarouselContent>
 
-        <CarouselPrevious />
-        <CarouselNext className="hidden sm:flex" />
-      </Carousel>
+          <CarouselPrevious />
+          <CarouselNext className="hidden sm:flex" />
+        </Carousel>
+      </motion.div>
     </section>
   );
 };

@@ -11,6 +11,8 @@ import {
 } from "./ui/carousel";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { motion } from "motion/react";
+import { fadeUp } from "@/lib/fade-up";
 
 type MediaItem = {
   url?: string | null;
@@ -89,7 +91,14 @@ const Block2 = () => {
   if (items.length === 0) return null;
 
   return (
-    <section className="relative w-full">
+    <motion.section
+      variants={fadeUp}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.15 }}
+      custom={0.2}
+      className="relative w-full"
+    >
       <Carousel>
         <CarouselContent>
           {items.map((item: Block2Item) => {
@@ -251,7 +260,7 @@ const Block2 = () => {
       </div>
     </div>
   </div>
-</CarouselItem>
+              </CarouselItem>
             );
           })}
         </CarouselContent>
@@ -259,7 +268,7 @@ const Block2 = () => {
         <CarouselPrevious className="hidden" />
         <CarouselNext className="hidden" />
       </Carousel>
-    </section>
+    </motion.section>
   );
 };
 

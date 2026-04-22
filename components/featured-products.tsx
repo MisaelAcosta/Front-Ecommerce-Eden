@@ -19,6 +19,8 @@ import { formatPrice } from "@/lib/formatPrice";
 import { LovedButton } from "./loved-button";
 import { toAbsUrl } from "@/lib/media";
 import Image from "next/image";
+import { motion } from "motion/react";
+import { fadeUp } from "@/lib/fade-up";
 
 // Local fonts used only by the featured products section.
 const maratypeFont = localFont({
@@ -418,20 +420,37 @@ const FeaturedProducts = () => {
   return (
     <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-8 sm:py-14">
       <div>
-        <h3
+        <motion.h3
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25 }}
+          custom={0}
           className={`${maratypeFont.className} text-4xl 
           text-left tracking-wide sm:tracking-tight sm:text-5xl mb-2 sm:mb-4`}
         >
           TOP VENTAS
-        </h3>
-        <p
+        </motion.h3>
+        <motion.p
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.25 }}
+          custom={0.12}
           className={`${khInterferenceLightFont.className} text-black/35 text-left leading-none tracking-normal mb-6 text-base sm:text-base`}
         >
           Los modelos más pedidos y mejor valorados
-        </p>
+        </motion.p>
       </div>
 
-      <Carousel>
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.15 }}
+        custom={0.2}
+      >
+        <Carousel>
         <CarouselContent className="ml-1 md:-ml-4">
           {loading && <SkeletonSchema grid={1} />}
 
@@ -446,7 +465,8 @@ const FeaturedProducts = () => {
 
         <CarouselPrevious />
         <CarouselNext className="hidden sm:flex" />
-      </Carousel>
+        </Carousel>
+      </motion.div>
     </section>
   );
 };
