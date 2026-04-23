@@ -1,81 +1,81 @@
 "use client";
 
 import Image from "next/image";
+import localFont from "next/font/local";
+
+const maratypeFont = localFont({
+  src: "../../../../components/fonts/Maratype.otf",
+  display: "swap",
+});
+
+const khInterferenceRegularFont = localFont({
+  src: "../../../../components/fonts/KHInterferenceTRIAL-Regular.otf",
+  weight: "400",
+  style: "normal",
+  display: "swap",
+});
+
+const items = [
+  {
+    title: "ORGANIZADOR\nMODULAR",
+    src: "/arma.png",
+    alt: "Organizador modular naranja",
+  },
+  {
+    title: "ORGANIZADOR\nMODULAR",
+    src: "/dispensador.png",
+    alt: "Organizador modular para café",
+  },
+  {
+    title: "ORGANIZADOR\nMODULAR",
+    src: "/soporte.png",
+    alt: "Organizador modular impreso en 3D",
+  },
+  {
+    title: "ORGANIZADOR\nMODULAR",
+    src: "/arma.png",
+    alt: "Organizador modular en exhibición",
+  },
+];
 
 const Galeria = () => {
-  const items = [
-    {
-      title: "Malorian Overture Cyberpunk 2077",
-      src: "/arma.png", // 👈 public/galeria/malorian.jpg
-    },
-    {
-      title: "Dispensador de capsulas",
-      src: "/dispensador.png", // 👈 public/galeria/dispensador.jpg
-    },
-    {
-      title: "Organizador \nmodular",
-      src: "/soporte.png", // 👈 public/galeria/organizador.jpg
-    },
-
-    
-  ];
-
   return (
-    <section
-      id="galeria"
-      className="w-full  bg-white "
-    >
-      {/* TITULO */}
-      
+    <section id="galeria" className="w-full bg-white py-12 sm:py-16">
+      <div className="mx-auto max-w-[1220px] px-4 sm:px-6 lg:px-10">
+        <div className="grid items-start gap-8 lg:grid-cols-[150px_minmax(0,1fr)] lg:gap-10">
+          <div className="lg:sticky lg:top-24">
+            <h2
+              className={`${maratypeFont.className} text-left text-[2.8rem] leading-[0.88] text-black sm:text-[4.5rem] lg:text-[4.8rem]`}
+            >
+              GALERIA
+            </h2>
+          </div>
 
-      {/* GRID */}
-      <div className="px-2 sm:mt-20 mt-20 sm:px-10 py-12 sm:py-18">
-        {/* Texto arriba */}
-        <div className="mb-12 sm:mb-18 ">
-          <h1 className="text-3xl text-center sm:text-4xl font-black mb-4">
-          GALERIA
-          </h1>
-          <p className="text-black/80 text-center text-sm sm:text-base leading-relaxed">
-          Aquí puedes ver parte de nuestro trabajo y cómo transformamos 
-          ideas en piezas reales.
-          </p>
-        </div>
-        
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-14">
-          {items.map((it, idx) => (
-            <div key={idx} className="w-full">
-              <div className="relative w-full aspect-square overflow-hidden group">
-                
-                {/* Imagen */}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+            {items.map((item, index) => (
+              <article
+                key={`${item.src}-${index}`}
+                className="group relative aspect-square overflow-hidden bg-neutral-200"
+              >
                 <Image
-                  src={it.src}
-                  alt={it.title.replace("\n", " ")}
+                  src={item.src}
+                  alt={item.alt}
                   fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                 />
 
-                {/* Degradado inferior */}
-                <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
 
-                {/* Texto encima */}
-                <div className="absolute bottom-6 left-16 sm:left-0 px-15 sm:px-17 z-10">
-                  <p className="
-                    text-white
-                    text-xl sm:text-2xl
-                    font-black
-                    text-right
-                    sm:ml-15
-                    
-                    
-                  ">
-                    {it.title}
+                <div className="absolute right-3 bottom-3 z-10">
+                  <p
+                    className={`${khInterferenceRegularFont.className} whitespace-pre-line text-right text-[0.82rem] leading-[0.9] tracking-[0.02em] text-white sm:text-[0.92rem]`}
+                  >
+                    {item.title}
                   </p>
                 </div>
-
-              </div>
-            </div>
-          ))}
+              </article>
+            ))}
+          </div>
         </div>
       </div>
     </section>

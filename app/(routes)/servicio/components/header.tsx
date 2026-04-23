@@ -4,107 +4,96 @@ import Image from "next/image";
 import { useState } from "react";
 import localFont from "next/font/local";
 
-// -------- TIPOGRAFÍA (FONT LOCAL) --------
-const servicioLocal = localFont({
-  src: "./fonts/SCHABO-XCondensed.otf",
-  display: "auto",
+// Tipografias locales del header de servicio.
+const maratypeFont = localFont({
+  src: "../../../../components/fonts/Maratype.otf",
+  display: "swap",
+});
+
+const khInterferenceLightFont = localFont({
+  src: "../../../../components/fonts/KHInterferenceTRIAL-Light.otf",
+  weight: "300",
+  style: "normal",
+  display: "swap",
+});
+
+const khInterferenceRegularFont = localFont({
+  src: "../../../../components/fonts/KHInterferenceTRIAL-Regular.otf",
+  weight: "400",
+  style: "normal",
+  display: "swap",
+});
+
+const khInterferenceBoldFont = localFont({
+  src: "../../../../components/fonts/KHInterferenceTRIAL-Bold.otf",
+  weight: "700",
+  style: "normal",
+  display: "swap",
 });
 
 type ActiveCard = "pedidos" | "negocio" | null;
 
+// Reemplaza este nombre cuando subas la imagen final a public/servicios.
+const HERO_IMAGE_SRC = "/servicios/hero-servicio.jpg";
+const HERO_IMAGE_FALLBACK = "/headerser.jpg";
+
 const Header = () => {
   const [active, setActive] = useState<ActiveCard>(null);
+  const [heroImageSrc, setHeroImageSrc] = useState(HERO_IMAGE_SRC);
 
   const toggle = (key: Exclude<ActiveCard, null>) => {
     setActive((prev) => (prev === key ? null : key));
   };
 
   return (
-    <section className="w-full">
-      {/* -------- HERO (IMAGEN SUPERIOR) -------- */}
-      <div className="relative w-full h-[55vh] sm:h-[220px] md:h-[530px] overflow-hidden bg-black">
-        <Image
-          src="/headerser.jpg"
-          alt="Servicio impresión 3D"
-          fill
-          priority
-          className="object-cover object-center"
-        />
-
-        <div className="" />
-      </div>
-
-      {/* -------- BLOQUE BLANCO (TÍTULO + TEXTO) -------- */}
-      <div className="w-full bg-white border-b border-black/20 ">
-        <div className=" max-w-7xl py-8 sm:pt-15  sm:pb-25">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-0 items-start ">
-            {/* -------- TÍTULO GRANDE “SERVICIO” -------- */}
+    <section className="w-full bg-white">
+      {/* Bloque superior: titulo, subtitulo, descripcion e imagen principal. */}
+      <div className="mx-auto max-w-[1220px] px-4 pt-28 pb-8 sm:px-6 sm:pt-32 lg:px-10 lg:pb-10">
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-8">
+          <div>
             <h1
-              className={`
-                ${servicioLocal.className}
-                text-[#FF0000]
-                leading-[0.85]
-                items-left
-                ml-3
-                sm:ml-15
-                items-start
-                text-[18vh] sm:text-[190px] md:text-[190px] 
-                font-condensed lg:text-[380px]
-              `}
-              style={{
-                fontFamily: servicioLocal.style.fontFamily,
-                transform: "scaleY(1.05)",
-                transformOrigin: "left top",
-              }}
+              className={`${maratypeFont.className} text-left text-[3.55rem] leading-[0.9] text-black sm:text-[6.2rem] lg:text-[7.4rem]`}
             >
-              SERVICIO
+              EDEN ESTUDIO
             </h1>
 
-            {/* -------- SUBTÍTULO -------- */}
             <p
-              className="
-              mt-2
-              text-black
-              text-base sm:text-sm md:text-xl
-              tracking-[2 em]
-              ml-3
-              pt-33
-              sm:ml-15
-              uppercase sm:pt-70  lg:pt-75
-              absolute 
-              sm:absolute  
-            "
+              className={`${khInterferenceBoldFont.className} mt-2 text-left text-[0.92rem] uppercase leading-none tracking-wide text-black sm:text-[1.1rem] lg:text-[1.35rem]`}
             >
-              EN IMPRESION Y MODELADO 3D
+              SERVICIO DE IMPRESIÓN Y MODELADO 3D
             </p>
+          </div>
 
-            {/* -------- TEXTO DESCRIPTIVO A LA DERECHA -------- */}
-            <div className="md:pt-45">
-              <p
-                className="text-black/65 sm:absolute
-                sm:pl-90  text-sm font-light sm:text-xl
-                sm:pr-30 
-                sm:px-0
-                pt-18
-                py-10
-                sm:py-0
-                sm:pt-0
-                px-12
-                "
-              >
-                Diseñamos y fabricamos piezas personalizadas en impresión 3D,
-                uniendo funcionalidad y diseño. Trabajamos desde la idea inicial
-                hasta la producción final, adaptando cada pieza a su uso,
-                material y acabado.
-              </p>
-            </div>
+          <p
+            className={`${khInterferenceLightFont.className} max-w-[300px] pt-2 text-left text-[0.72rem] uppercase leading-[1.15] text-black/70 sm:text-[0.82rem] lg:pt-5`}
+          >
+            Diseñamos y fabricamos piezas personalizadas mediante impresión 3D,
+            combinando funcionalidad y diseño para proyectos reales. Trabajamos
+            desde la idea inicial hasta la producción final, adaptando cada
+            pieza a su uso, material y acabado.
+          </p>
+        </div>
+
+        <div className="relative mt-6 overflow-hidden border border-black/10 bg-neutral-100 sm:mt-8">
+          <div className="relative aspect-[16/10] w-full sm:aspect-[16/8.2]">
+            <Image
+              src={heroImageSrc}
+              alt="Servicio de impresión y modelado 3D"
+              fill
+              priority
+              className="object-cover object-center"
+              onError={() => {
+                if (heroImageSrc !== HERO_IMAGE_FALLBACK) {
+                  setHeroImageSrc(HERO_IMAGE_FALLBACK);
+                }
+              }}
+            />
           </div>
         </div>
       </div>
 
-      {/* -------- 2 BLOQUES (PEDIDOS / NEGOCIO) -------- */}
-      <div className="grid grid-cols-1 md:grid-cols-2">
-        {/* -------- BLOQUE 01: PEDIDOS PERSONALIZADOS -------- */}
+      {/* Bloques interactivos de servicio. */}
+      <div className="mx-auto grid max-w-[1220px] grid-cols-1 border-t border-black/20 md:grid-cols-2">
         <button
           type="button"
           onClick={() => toggle("pedidos")}
@@ -119,7 +108,6 @@ const Header = () => {
           "
         >
           <div className="relative h-full w-full">
-            {/* -------- ESTADO CERRADO -------- */}
             <div
               className={`
                 h-full px-6 sm:px-10 py-8 flex flex-col
@@ -133,12 +121,12 @@ const Header = () => {
             >
               <div className="flex-1 flex items-center sm:justify-center">
                 <p
-                  className="
+                  className={`${khInterferenceLightFont.className}
                     text-sm sm:text-base lg:text-lg 2xl:text-xl sm:text-center
                     text-black/60 group-hover:text-white/80
-                    transition-colors duration-300 font-light
-                    max-w-130
-                  "
+                    transition-colors duration-300
+                    max-w-130 uppercase leading-[1.08]
+                  `}
                 >
                   Diseñamos e imprimimos piezas únicas inspiradas en
                   videojuegos, anime y series, adaptadas a tu idea, estilo y
@@ -147,19 +135,22 @@ const Header = () => {
               </div>
 
               <div className="flex items-end justify-between gap-6">
-                <h3 className="text-base sm:text-xl font-semibold leading-tight text-black group-hover:text-white transition-colors duration-300">
+                <h3
+                  className={`${khInterferenceRegularFont.className} text-base sm:text-xl leading-tight text-black group-hover:text-white transition-colors duration-300 uppercase`}
+                >
                   PEDIDOS
                   <br />
                   PERSONALIZADOS
                 </h3>
 
-                <span className="text-xs sm:text-sm text-black/50 group-hover:text-white/70 transition-colors duration-300">
-                  Saber más
+                <span
+                  className={`${khInterferenceLightFont.className} text-xs sm:text-sm text-black/50 group-hover:text-white/70 transition-colors duration-300 uppercase`}
+                >
+                  SABER MAS
                 </span>
               </div>
             </div>
 
-            {/* -------- ESTADO ABIERTO -------- */}
             <div
               className={`
                 absolute inset-0
@@ -183,19 +174,25 @@ const Header = () => {
 
               <div className="absolute inset-0 px-6 sm:px-10 py-8 flex flex-col justify-end">
                 <div className="max-w-130 text-white">
-                  <p className="text-xs sm:text-base font-light sm:font-medium mb-2">
-                    Ideal para fans de videojuegos, anime y series; también
-                    para regalos, piezas coleccionables, miniaturas y
-                    decoración.
-                  </p>
+                  <p
+                  className={`${khInterferenceLightFont.className} text-xs sm:text-base mb-2 uppercase leading-[1.08]`}
+                >
+                  Ideal para fans de videojuegos, anime y series; también
+                  para regalos, piezas coleccionables, miniaturas y
+                  decoración.
+                </p>
 
-                  <p className="text-xs sm:text-base mt-2 font-light sm:font-medium">
-                    Cada pedido se hace a medida: ajustamos tamaño, material y
-                    acabado según tu idea.
-                  </p>
+                  <p
+                  className={`${khInterferenceLightFont.className} text-xs sm:text-base mt-2 uppercase leading-[1.08]`}
+                >
+                  Cada pedido se hace a medida: ajustamos tamaño, material y
+                  acabado según tu idea.
+                </p>
 
-                  <span className="inline-block mt-6 text-xs sm:text-sm opacity-80 underline underline-offset-4">
-                    Click para volver
+                  <span
+                    className={`${khInterferenceLightFont.className} inline-block mt-6 text-xs sm:text-sm opacity-80 underline underline-offset-4 uppercase`}
+                  >
+                    CLICK PARA VOLVER
                   </span>
                 </div>
               </div>
@@ -203,15 +200,13 @@ const Header = () => {
           </div>
         </button>
 
-        {/* -------- BLOQUE 02: SOLUCIONES PARA TU NEGOCIO -------- */}
         <button
           type="button"
           onClick={() => toggle("negocio")}
           data-open={active === "negocio"}
           className="
             group relative w-full text-left
-            border-t
-            md:border-t-0 border-black/20
+            border-t md:border-t-0 border-black/20
             min-h-[40vh] md:min-h-[52vh]
             bg-white transition-colors duration-300
             hover:bg-black data-[open=true]:hover:bg-white
@@ -219,7 +214,6 @@ const Header = () => {
           "
         >
           <div className="relative h-full w-full">
-            {/* -------- ESTADO CERRADO -------- */}
             <div
               className={`
                 h-full px-6 sm:px-10 py-8 flex flex-col
@@ -233,12 +227,12 @@ const Header = () => {
             >
               <div className="flex-1 flex items-center sm:justify-center">
                 <p
-                  className="
+                  className={`${khInterferenceLightFont.className}
                     text-black/60 group-hover:text-white/80
                     transition-colors duration-300
-                    text-sm sm:text-base font-light lg:text-lg 2xl:text-xl sm:text-center
-                    max-w-130
-                  "
+                    text-sm sm:text-base lg:text-lg 2xl:text-xl sm:text-center
+                    max-w-130 uppercase leading-[1.08]
+                  `}
                 >
                   Desarrollamos soluciones en impresión 3D para resolver
                   problemas reales, optimizar procesos y adaptarnos a las
@@ -247,19 +241,22 @@ const Header = () => {
               </div>
 
               <div className="flex items-end justify-between gap-6">
-                <h3 className="text-base sm:text-xl font-semibold leading-tight text-black group-hover:text-white transition-colors duration-300">
+                <h3
+                  className={`${khInterferenceRegularFont.className} text-base sm:text-xl leading-tight text-black group-hover:text-white transition-colors duration-300 uppercase`}
+                >
                   SOLUCIONES PARA
                   <br />
                   TU NEGOCIO
                 </h3>
 
-                <span className="text-xs sm:text-sm text-black/50 group-hover:text-white/70 transition-colors duration-300">
-                  Saber más
+                <span
+                  className={`${khInterferenceLightFont.className} text-xs sm:text-sm text-black/50 group-hover:text-white/70 transition-colors duration-300 uppercase`}
+                >
+                  SABER MAS
                 </span>
               </div>
             </div>
 
-            {/* -------- ESTADO ABIERTO -------- */}
             <div
               className={`
                 absolute inset-0
@@ -283,18 +280,24 @@ const Header = () => {
 
               <div className="absolute inset-0 px-6 sm:px-10 py-8 flex flex-col justify-end">
                 <div className="max-w-130 text-white">
-                  <p className="text-xs sm:text-base font-medium mb-2">
+                  <p
+                  className={`${khInterferenceLightFont.className} text-xs sm:text-base mb-2 uppercase leading-[1.08]`}
+                >
                     La impresión 3D permite crear soluciones a medida cuando lo
                     estándar no alcanza.
                   </p>
 
-                  <p className="text-xs sm:text-base mt-2 opacity-90">
+                  <p
+                    className={`${khInterferenceLightFont.className} text-xs sm:text-base mt-2 uppercase leading-[1.08]`}
+                  >
                     Analizamos tu problema y desarrollamos una pieza funcional
                     que se adapte exactamente a tu uso.
                   </p>
 
-                  <span className="inline-block mt-6 text-xs sm:text-sm opacity-80 underline underline-offset-4">
-                    Click para volver
+                  <span
+                    className={`${khInterferenceLightFont.className} inline-block mt-6 text-xs sm:text-sm opacity-80 underline underline-offset-4 uppercase`}
+                  >
+                    CLICK PARA VOLVER
                   </span>
                 </div>
               </div>
@@ -307,6 +310,3 @@ const Header = () => {
 };
 
 export default Header;
-
-
-

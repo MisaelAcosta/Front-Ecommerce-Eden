@@ -1,21 +1,29 @@
 "use client";
 
+import localFont from "next/font/local";
+
 const VIDEO_3D = "/video3d.mp4";
+
+const maratypeFont = localFont({
+  src: "../../../components/fonts/Maratype.otf",
+  display: "swap",
+});
+
+const khInterferenceLightFont = localFont({
+  src: "../../../components/fonts/KHInterferenceTRIAL-Light.otf",
+  weight: "300",
+  style: "normal",
+  display: "swap",
+});
 
 const Modelodo3D = () => {
   return (
-    <section className="w-full bg-white border-t border-black/30">
-      {/* -------- CONTENEDOR PRINCIPAL -------- */}
-      <div className="  pt-28 sm:pt-40  sm:px-0 py-12 ">
-        {/* -------- GRID: VIDEO IZQUIERDA / TEXTO DERECHA -------- */}
-        <div className="grid grid-cols-1 md:grid-cols-2  items-center">
-          
-          {/* -------- VIDEO (CUADRO NEGRO) -------- */}
+    <section className="w-full bg-white py-12 sm:py-16">
+      <div className="mx-auto max-w-[1220px] px-4 sm:px-6 lg:px-10">
+        <div className="grid items-start gap-6 lg:grid-cols-[0.66fr_0.34fr] lg:gap-8">
+          {/* Bloque visual de modelado 3D. */}
           <div className="w-full">
-            <div className="relative w-full  aspect-31/25 
-             sm:aspect-35/22  
-             sm:ml-15
-             bg-black overflow-hidden">
+            <div className="relative aspect-[31/25] w-full overflow-hidden bg-black sm:aspect-[35/22]">
               <video
                 className="absolute inset-0 h-full w-full object-cover"
                 src={VIDEO_3D}
@@ -28,25 +36,23 @@ const Modelodo3D = () => {
             </div>
           </div>
 
-          {/* -------- TEXTO DESCRIPTIVO -------- */}
-          <div className="max-w-520px ">
-            <p className="text-black/80 
-            mt-15
-            px-5 
-            sm:px-20 sm:ml-20 sm:text-xl sm:mt-30 
-            text-sm 
-            font-light
-            leading-relaxed
-            sm:leading-[1.3]">
-              <span className="font-bold mr-1">
-              Ofrecemos modelado 3D
-            </span>
-              personalizado para desarrollar piezas únicas y funcionales.
-              Diseñamos modelos desde cero o realizamos ajustes sobre diseños existentes,
-              siempre considerando su uso final y proceso de impresión.
+          {/* Texto descriptivo de la sección. */}
+          <div className="flex flex-col gap-4 pt-1">
+            <h2
+              className={`${maratypeFont.className} text-left text-[2.3rem] leading-[0.92] text-black sm:text-[3.4rem] lg:text-[4rem]`}
+            >
+              MODELADO 3D
+            </h2>
+
+            <p
+              className={`${khInterferenceLightFont.className} max-w-[300px] text-left text-[0.72rem] uppercase leading-[1.15] text-black/70 sm:text-[0.82rem]`}
+            >
+              Ofrecemos modelado 3D personalizado para desarrollar piezas
+              únicas y funcionales. Diseñamos modelos desde cero o realizamos
+              ajustes sobre diseños existentes, siempre considerando su uso
+              final y el proceso de impresión.
             </p>
           </div>
-
         </div>
       </div>
     </section>
