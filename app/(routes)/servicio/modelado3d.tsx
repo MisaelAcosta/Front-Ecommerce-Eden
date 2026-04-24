@@ -2,7 +2,7 @@
 
 import localFont from "next/font/local";
 
-const VIDEO_3D = "/video3d.mp4";
+const VIDEO_3D = "/servicios/video3d.mp4";
 
 const maratypeFont = localFont({
   src: "../../../components/fonts/Maratype.otf",
@@ -45,7 +45,10 @@ const Modelodo3D = () => {
             </h2>
 
             <p
-              className={`${khInterferenceLightFont.className} max-w-[300px] text-left text-[0.72rem] uppercase leading-[1.15] text-black/70 sm:text-[0.82rem]`}
+              className={`${khInterferenceLightFont.className} 
+              max-w-[300px] lg:max-w-[600px] text-left text-[0.72rem] 
+              uppercase leading-[1.15] text-black/70 
+              sm:text-[0.82rem] lg:text-lg`}
             >
               Ofrecemos modelado 3D personalizado para desarrollar piezas
               únicas y funcionales. Diseñamos modelos desde cero o realizamos

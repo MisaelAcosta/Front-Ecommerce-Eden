@@ -21,7 +21,7 @@ const Navbar = () => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
 
-  // ✅ scroll effects logo escritorio
+  //  scroll effects logo escritorio
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const lastY = useRef(0);
@@ -76,20 +76,21 @@ const Navbar = () => {
     fetchUser();
   }, []);
 
-  // ✅ SOLO EN /catalogo (y subrutas) forzamos el navbar en negro desde arriba
+  //  SOLO EN /catalogo (y subrutas) forzamos el navbar en negro desde arriba
   const isCatalog = pathname.startsWith("/category/");
   const isProduct = pathname.startsWith("/product");
   const isCart = pathname.startsWith("/cart");
   const isLoved = pathname.startsWith("/loved-product");
+  const isService = pathname.startsWith("/servicio");
 
-  const forceDark = isCatalog || isProduct || isCart || scrolled || isLoved;
+  const forceDark = isCatalog || isProduct || isCart || scrolled || isLoved || isService;
 
   const fg = forceDark ? "text-black" : "text-white";
 
 
 
 
-// ✅ Logos mobile (centrado)
+//  Logos mobile (centrado)
 const MOBILE_LOGO_LIGHT = "/icons/logo-eden-white.png"; 
 const MOBILE_LOGO_DARK = "/icons/logo-eden-black.png";  
 

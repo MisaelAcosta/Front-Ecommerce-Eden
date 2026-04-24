@@ -45,7 +45,8 @@ const Galeria = () => {
         <div className="grid items-start gap-8 lg:grid-cols-[150px_minmax(0,1fr)] lg:gap-10">
           <div className="lg:sticky lg:top-24">
             <h2
-              className={`${maratypeFont.className} text-left text-[2.8rem] leading-[0.88] text-black sm:text-[4.5rem] lg:text-[4.8rem]`}
+              className={`${maratypeFont.className} text-left 
+              text-[2.8rem] leading-[0.88] text-black sm:text-[4.5rem] lg:text-[4.8rem]`}
             >
               GALERIA
             </h2>

@@ -34,8 +34,8 @@ const khInterferenceBoldFont = localFont({
 type ActiveCard = "pedidos" | "negocio" | null;
 
 // Reemplaza este nombre cuando subas la imagen final a public/servicios.
-const HERO_IMAGE_SRC = "/servicios/hero-servicio.jpg";
-const HERO_IMAGE_FALLBACK = "/headerser.jpg";
+const HERO_IMAGE_SRC = "/servicios/servicio1.png";
+const HERO_IMAGE_FALLBACK = "/servicios/servicio1.png";
 
 const Header = () => {
   const [active, setActive] = useState<ActiveCard>(null);
@@ -48,24 +48,30 @@ const Header = () => {
   return (
     <section className="w-full bg-white">
       {/* Bloque superior: titulo, subtitulo, descripcion e imagen principal. */}
-      <div className="mx-auto max-w-[1220px] px-4 pt-28 pb-8 sm:px-6 sm:pt-32 lg:px-10 lg:pb-10">
-        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-8">
+      <div className="mx-auto max-w-[1220px] px-4 pt-28 pb-8 sm:px-6 sm:pt-32 lg:px-0 ">
+        <div className="grid items-start gap-2 lg:grid-cols-[max-content_585px] lg:gap-3">
           <div>
             <h1
-              className={`${maratypeFont.className} text-left text-[3.55rem] leading-[0.9] text-black sm:text-[6.2rem] lg:text-[7.4rem]`}
+              className={`${maratypeFont.className} text-left text-[4.55rem] 
+              leading-[0.9] text-black sm:text-[6.2rem] lg:text-[10rem]`}
             >
               EDEN ESTUDIO
             </h1>
 
             <p
-              className={`${khInterferenceBoldFont.className} mt-2 text-left text-[0.92rem] uppercase leading-none tracking-wide text-black sm:text-[1.1rem] lg:text-[1.35rem]`}
+              className={`${khInterferenceRegularFont.className}
+               mt-2 text-left text-[0.92rem] uppercase leading-none pt-3 sm:pb-10
+                tracking-wide
+                text-black sm:text-[1.1rem] lg:text-[1.35rem]`}
             >
               SERVICIO DE IMPRESIÓN Y MODELADO 3D
             </p>
           </div>
 
           <p
-            className={`${khInterferenceLightFont.className} max-w-[300px] pt-2 text-left text-[0.72rem] uppercase leading-[1.15] text-black/70 sm:text-[0.82rem] lg:pt-5`}
+            className={`${khInterferenceLightFont.className} max-w-[300px] lg:max-w-none 
+            pt-2 text-left text-[0.72rem] uppercase leading-[1.20]
+             text-black/60 lg:text-lg lg:pt-25 lg:pl-10`}
           >
             Diseñamos y fabricamos piezas personalizadas mediante impresión 3D,
             combinando funcionalidad y diseño para proyectos reales. Trabajamos
@@ -93,7 +99,7 @@ const Header = () => {
       </div>
 
       {/* Bloques interactivos de servicio. */}
-      <div className="mx-auto grid max-w-[1220px] grid-cols-1 border-t border-black/20 md:grid-cols-2">
+      <div className="mx-auto grid max-w-[1220px] grid-cols-1 border-t border-b border-black/20 md:grid-cols-2">
         <button
           type="button"
           onClick={() => toggle("pedidos")}
@@ -122,7 +128,8 @@ const Header = () => {
               <div className="flex-1 flex items-center sm:justify-center">
                 <p
                   className={`${khInterferenceLightFont.className}
-                    text-sm sm:text-base lg:text-lg 2xl:text-xl sm:text-center
+                    text-sm sm:text-base lg:text-lg 2xl:text-xl 
+                    sm:text-center
                     text-black/60 group-hover:text-white/80
                     transition-colors duration-300
                     max-w-130 uppercase leading-[1.08]
