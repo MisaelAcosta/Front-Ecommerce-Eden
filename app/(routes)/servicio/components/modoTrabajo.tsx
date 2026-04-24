@@ -1,6 +1,8 @@
 "use client";
 
 import localFont from "next/font/local";
+import { motion } from "motion/react";
+import { fadeUp, revealViewport } from "./scrollReveal";
 
 const maratypeFont = localFont({
   src: "../../../../components/fonts/Maratype.otf",
@@ -54,15 +56,25 @@ const ModoTrabajo = () => {
     <section className="w-full bg-white py-12 sm:py-16">
       <div className="mx-auto max-w-[1220px] px-4 sm:px-6 lg:px-0">
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8">
-          <h2
+          <motion.h2
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={revealViewport}
+            custom={0}
             className={`${maratypeFont.className} max-w-[360px] text-left text-[2.8rem] leading-[1.10] text-black sm:text-[4.5rem] lg:text-[5.5rem]`}
           >
             COMO
             <br />
             TRABAJAMOS?
-          </h2>
+          </motion.h2>
 
-          <p
+          <motion.p
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={revealViewport}
+            custom={0.12}
             className={`${khInterferenceLightFont.className} 
             max-w-[280px]  lg:max-w-[880px] pt-1 text-left text-[0.72rem] 
             uppercase leading-[1.15] text-black/70 
@@ -70,10 +82,17 @@ const ModoTrabajo = () => {
           >
             Te acompañamos paso a paso, desde la asesoría inicial hasta la
             entrega, cuidando cada detalle del resultado final.
-          </p>
+          </motion.p>
         </div>
 
-        <div className="mt-8 bg-[#ececec] px-5 py-6 sm:mt-10 sm:px-10 sm:py-10 lg:px-14 lg:py-12">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={revealViewport}
+          custom={0.2}
+          className="mt-8 bg-[#ececec] px-5 py-6 sm:mt-10 sm:px-10 sm:py-10 lg:px-14 lg:py-12"
+        >
           {pasos.map((paso, index) => (
             <div key={paso.numero}>
               <article className="grid gap-4 py-6 sm:gap-6 sm:py-8 lg:grid-cols-[160px_minmax(0,1fr)] lg:items-start lg:gap-10 lg:py-10">
@@ -112,7 +131,7 @@ const ModoTrabajo = () => {
               )}
             </div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -2,6 +2,8 @@
 
 import localFont from "next/font/local";
 import { ArrowRight } from "lucide-react";
+import { motion } from "motion/react";
+import { fadeUp, revealViewport } from "./components/scrollReveal";
 
 const maratypeFont = localFont({
   src: "../../../components/fonts/Maratype.otf",
@@ -46,16 +48,35 @@ const Contacto = () => {
       <div className="mx-auto max-w-[1220px] px-4 sm:px-6 lg:px-10">
         <div className="grid items-start gap-8 md:grid-cols-[170px_1px_minmax(0,1fr)] md:gap-10 lg:grid-cols-[200px_1px_minmax(0,1fr)] lg:gap-12">
           <div>
-            <h2
+            <motion.h2
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={revealViewport}
+              custom={0}
               className={`${maratypeFont.className} text-left text-[2.8rem] leading-[0.88] text-black sm:text-[4.5rem] lg:text-[4.8rem]`}
             >
               CONTACTO
-            </h2>
+            </motion.h2>
           </div>
 
-          <div className="hidden h-full min-h-[130px] bg-black/15 md:block" />
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={revealViewport}
+            custom={0.08}
+            className="hidden h-full min-h-[130px] bg-black/15 md:block"
+          />
 
-          <div className="space-y-1 pt-1">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={revealViewport}
+            custom={0.14}
+            className="space-y-1 pt-1"
+          >
             {links.map((link) => (
               <a
                 key={link.label}
@@ -82,7 +103,7 @@ const Contacto = () => {
                 />
               </a>
             ))}
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

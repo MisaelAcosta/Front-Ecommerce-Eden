@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useState } from "react";
 import localFont from "next/font/local";
+import { motion } from "motion/react";
+import { fadeUp, revealViewport } from "./scrollReveal";
 
 // Tipografias locales del header de servicio.
 const maratypeFont = localFont({
@@ -48,27 +50,42 @@ const Header = () => {
   return (
     <section className="w-full bg-white">
       {/* Bloque superior: titulo, subtitulo, descripcion e imagen principal. */}
-      <div className="mx-auto max-w-[1220px] px-4 pt-28 pb-8 sm:px-6 sm:pt-32 lg:px-0 ">
+      <div className="mx-auto max-w-[1350px] px-4 pt-28 pb-8 sm:px-6 sm:pt-32 lg:px-0 ">
         <div className="grid items-start gap-2 lg:grid-cols-[max-content_585px] lg:gap-3">
           <div>
-            <h1
+            <motion.h1
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={revealViewport}
+              custom={0}
               className={`${maratypeFont.className} text-left text-[4.55rem] 
               leading-[0.9] text-black sm:text-[6.2rem] lg:text-[10rem]`}
             >
               EDEN ESTUDIO
-            </h1>
+            </motion.h1>
 
-            <p
+            <motion.p
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={revealViewport}
+              custom={0.08}
               className={`${khInterferenceRegularFont.className}
                mt-2 text-left text-[0.92rem] uppercase leading-none pt-3 sm:pb-10
                 tracking-wide
                 text-black sm:text-[1.1rem] lg:text-[1.35rem]`}
             >
               SERVICIO DE IMPRESIÓN Y MODELADO 3D
-            </p>
+            </motion.p>
           </div>
 
-          <p
+          <motion.p
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={revealViewport}
+            custom={0.14}
             className={`${khInterferenceLightFont.className} max-w-[300px] lg:max-w-none 
             pt-2 text-left text-[0.72rem] uppercase leading-[1.20]
              text-black/60 lg:text-lg lg:pt-25 lg:pl-10`}
@@ -77,10 +94,17 @@ const Header = () => {
             combinando funcionalidad y diseño para proyectos reales. Trabajamos
             desde la idea inicial hasta la producción final, adaptando cada
             pieza a su uso, material y acabado.
-          </p>
+          </motion.p>
         </div>
 
-        <div className="relative mt-6 overflow-hidden border border-black/10 bg-neutral-100 sm:mt-8">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={revealViewport}
+          custom={0.2}
+          className="relative mt-6 overflow-hidden border border-black/10 bg-neutral-100 sm:mt-8"
+        >
           <div className="relative aspect-[16/10] w-full sm:aspect-[16/8.2]">
             <Image
               src={heroImageSrc}
@@ -95,11 +119,18 @@ const Header = () => {
               }}
             />
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Bloques interactivos de servicio. */}
-      <div className="mx-auto grid max-w-[1220px] grid-cols-1 border-t border-b border-black/20 md:grid-cols-2">
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={revealViewport}
+        custom={0.24}
+        className="mx-auto grid max-w-[1220px] grid-cols-1 border-t border-b border-black/20 md:grid-cols-2"
+      >
         <button
           type="button"
           onClick={() => toggle("pedidos")}
@@ -311,7 +342,7 @@ const Header = () => {
             </div>
           </div>
         </button>
-      </div>
+      </motion.div>
     </section>
   );
 };

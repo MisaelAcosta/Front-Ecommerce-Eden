@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import localFont from "next/font/local";
+import { motion } from "motion/react";
+import { fadeUp, revealViewport } from "./scrollReveal";
 
 const maratypeFont = localFont({
   src: "../../../../components/fonts/Maratype.otf",
@@ -41,18 +43,30 @@ const items = [
 const Galeria = () => {
   return (
     <section id="galeria" className="w-full bg-white py-12 sm:py-16">
-      <div className="mx-auto max-w-[1220px] px-4 sm:px-6 lg:px-10">
-        <div className="grid items-start gap-8 lg:grid-cols-[150px_minmax(0,1fr)] lg:gap-10">
-          <div className="lg:sticky lg:top-24">
-            <h2
+      <div className="mx-auto max-w-[1350px] px-4 sm:px-6 lg:px-10">
+        <div className="grid items-start gap-8 lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-10">
+          <div>
+            <motion.h2
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={revealViewport}
+              custom={0}
               className={`${maratypeFont.className} text-left 
               text-[2.8rem] leading-[0.88] text-black sm:text-[4.5rem] lg:text-[4.8rem]`}
             >
               GALERIA
-            </h2>
+            </motion.h2>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={revealViewport}
+            custom={0.12}
+            className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4"
+          >
             {items.map((item, index) => (
               <article
                 key={`${item.src}-${index}`}
@@ -76,7 +90,7 @@ const Galeria = () => {
                 </div>
               </article>
             ))}
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>
