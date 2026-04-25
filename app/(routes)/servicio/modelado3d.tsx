@@ -18,6 +18,13 @@ const khInterferenceLightFont = localFont({
   display: "swap",
 });
 
+const khInterferenceRegularFont = localFont({
+  src: "../../../components/fonts/KHInterferenceTRIAL-Regular.otf",
+  weight: "400",
+  style: "normal",
+  display: "swap",
+});
+
 const Modelodo3D = () => {
   return (
     <section className="w-full bg-white py-12 sm:py-16">
@@ -53,7 +60,9 @@ const Modelodo3D = () => {
               whileInView="visible"
               viewport={revealViewport}
               custom={0.12}
-              className={`${maratypeFont.className} text-left text-[2.3rem] leading-[0.92] text-black sm:text-[3.4rem] lg:text-[4rem]`}
+              className={`${khInterferenceRegularFont.className} 
+              text-left text-[1.60rem] leading-[0.92] 
+              text-black sm:text-[3.4rem] lg:text-[4rem]`}
             >
               MODELADO 3D
             </motion.h2>

@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import { fadeUp, revealViewport } from "./components/scrollReveal";
+import { Separator } from "@radix-ui/react-separator";
 
 const maratypeFont = localFont({
   src: "../../../components/fonts/Maratype.otf",
@@ -46,7 +47,9 @@ const Contacto = () => {
   return (
     <section id="contacto" className="w-full bg-white py-12 sm:py-16">
       <div className="mx-auto max-w-[1220px] px-4 sm:px-6 lg:px-10">
-        <div className="grid items-start gap-8 md:grid-cols-[170px_1px_minmax(0,1fr)] md:gap-10 lg:grid-cols-[200px_1px_minmax(0,1fr)] lg:gap-12">
+        <div className="grid items-start gap-8 
+        md:grid-cols-[170px_1px_minmax(0,1fr)] md:gap-10 
+        lg:grid-cols-[200px_1px_minmax(0,1fr)] lg:gap-12">
           <div>
             <motion.h2
               variants={fadeUp}
@@ -54,11 +57,18 @@ const Contacto = () => {
               whileInView="visible"
               viewport={revealViewport}
               custom={0}
-              className={`${maratypeFont.className} text-left text-[2.8rem] leading-[0.88] text-black sm:text-[4.5rem] lg:text-[4.8rem]`}
+              className={`${maratypeFont.className} 
+              text-left text-[4rem] leading-[0.88] 
+              text-black sm:text-[4.5rem] lg:text-8xl`}
             >
               CONTACTO
             </motion.h2>
           </div>
+
+          <Separator
+          className="color-black/15 h-full w-px
+           bg-black/25 sm:ml-35">
+          </Separator>
 
           <motion.div
             variants={fadeUp}
@@ -66,7 +76,8 @@ const Contacto = () => {
             whileInView="visible"
             viewport={revealViewport}
             custom={0.08}
-            className="hidden h-full min-h-[130px] bg-black/15 md:block"
+            className="hidden h-full min-h-[130px]
+             bg-black/15 "
           />
 
           <motion.div
@@ -75,7 +86,7 @@ const Contacto = () => {
             whileInView="visible"
             viewport={revealViewport}
             custom={0.14}
-            className="space-y-1 pt-1"
+            className="space-y-1 pt-1 sm:pt-0 " 
           >
             {links.map((link) => (
               <a
@@ -83,23 +94,34 @@ const Contacto = () => {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group grid grid-cols-[54px_minmax(0,1fr)_22px] items-center gap-4 py-4 text-black sm:grid-cols-[64px_minmax(0,1fr)_26px] sm:py-5"
+                className="group grid sm:pl-50
+                 grid-cols-[54px_minmax(0,1fr)_22px]
+                  items-center gap-8 sm:gap-8 py-4 
+                  text-black 
+                  sm:grid-cols-[64px_minmax(0,1fr)_26px] 
+                  sm:py-5 "
               >
                 <span
-                  className={`${khInterferenceLightFont.className} text-[0.68rem] leading-none tracking-[0.04em] text-black/45 sm:text-[0.74rem]`}
+                  className={`${khInterferenceLightFont.className} 
+                  text-[1.30rem] leading-none tracking-[0.04em]
+                   text-black/45 sm:text-3xl`}
                 >
                   {link.number}
                 </span>
 
                 <span
-                  className={`${khInterferenceRegularFont.className} text-[1rem] leading-none tracking-[0.03em] text-black sm:text-[1.15rem]`}
+                  className={`${khInterferenceRegularFont.className} 
+                  text-[1.30rem] leading-none tracking-[0.03em] 
+                  text-black sm:text-3xl`}
                 >
                   {link.label}
                 </span>
 
                 <ArrowRight
                   strokeWidth={1.5}
-                  className="h-4 w-4 justify-self-end text-black transition-transform duration-300 group-hover:translate-x-1 sm:h-[18px] sm:w-[18px]"
+                  className="h-4 w-4 justify-self-end 
+                  text-black transition-transform duration-300
+                   group-hover:translate-x-1 sm:h-[18px] sm:w-[18px]"
                 />
               </a>
             ))}

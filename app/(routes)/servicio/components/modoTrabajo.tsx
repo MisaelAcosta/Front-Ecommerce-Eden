@@ -62,7 +62,9 @@ const ModoTrabajo = () => {
             whileInView="visible"
             viewport={revealViewport}
             custom={0}
-            className={`${maratypeFont.className} max-w-[360px] text-left text-[2.8rem] leading-[1.10] text-black sm:text-[4.5rem] lg:text-[5.5rem]`}
+            className={`${maratypeFont.className} max-w-[360px] 
+            text-left text-[4rem] leading-[1.10] 
+            text-black sm:text-[4.5rem] lg:text-8xl`}
           >
             COMO
             <br />
@@ -86,52 +88,73 @@ const ModoTrabajo = () => {
         </div>
 
         <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={revealViewport}
-          custom={0.2}
-          className="mt-8 bg-[#ececec] px-5 py-6 sm:mt-10 sm:px-10 sm:py-10 lg:px-14 lg:py-12"
+  variants={fadeUp}
+  initial="hidden"
+  whileInView="visible"
+  viewport={revealViewport}
+  custom={0.2}
+  className="mt-8 bg-[#E9E9E9] px-5 py-6 sm:mt-10 sm:px-10 sm:py-10 lg:px-14 lg:py-12"
+>
+  {pasos.map((paso, index) => {
+    const esDerecha = index === 0 || index === 2;
+
+    return (
+      <div key={paso.numero}>
+        <div
+          className={`flex ${
+            esDerecha ? "lg:justify-end" : "lg:justify-start"
+          }`}
         >
-          {pasos.map((paso, index) => (
-            <div key={paso.numero}>
-              <article className="grid gap-4 py-6 sm:gap-6 sm:py-8 lg:grid-cols-[160px_minmax(0,1fr)] lg:items-start lg:gap-10 lg:py-10">
-                <div className="flex justify-start lg:justify-center">
-                  <span
-                    className={`${maratypeFont.className} 
-                    text-[4.8rem] leading-none 
-                    tracking-[-0.02em] text-white
-                     sm:text-[6.4rem] lg:text-[7.7rem]`}
-                  >
-                    {paso.numero}
-                  </span>
-                </div>
-
-                <div className="max-w-[410px] pt-1">
-                  <h3
-                    className={`${khInterferenceBoldFont.className} text-[1.05rem] 
-                    uppercase leading-none tracking-[0.02em] text-black 
-                    sm:text-[1.18rem] lg:text-2xl `}
-                  >
-                    {paso.titulo}
-                  </h3>
-
-                  <p
-                    className={`${khInterferenceLightFont.className} mt-3 
-                    text-[0.72rem] uppercase leading-[1.15]
-                     text-black/70 sm:text-[0.8rem] lg:text-lg`}
-                  >
-                    {paso.descripcion}
-                  </p>
-                </div>
-              </article>
-
-              {index < pasos.length - 1 && (
-                <div className="h-px w-full bg-black/20" aria-hidden="true" />
-              )}
+          <article
+            className="
+              grid w-full gap-4 py-6
+              sm:gap-6 sm:py-8
+              lg:w-[560px]
+              lg:grid-cols-[150px_minmax(0,1fr)]
+              lg:items-start
+              lg:gap-8
+              lg:py-15
+            "
+          >
+            <div className="flex justify-start lg:justify-center">
+              <span
+                className={`${maratypeFont.className} 
+                text-[4.8rem] leading-none 
+                tracking-[-0.02em] text-white
+                sm:text-[6.4rem] lg:text-[13rem]`}
+              >
+                {paso.numero}
+              </span>
             </div>
-          ))}
-        </motion.div>
+
+            <div className="max-w-[330px] pt-1">
+              <h3
+                className={`${khInterferenceBoldFont.className} 
+                text-[1.05rem] uppercase leading-none 
+                tracking-[0.02em] text-black 
+                sm:text-[1.18rem] lg:text-2xl`}
+              >
+                {paso.titulo}
+              </h3>
+
+              <p
+                className={`${khInterferenceLightFont.className} 
+                mt-3 text-[0.72rem] uppercase leading-[1.15]
+                text-black/70 sm:text-[0.8rem] lg:text-lg`}
+              >
+                {paso.descripcion}
+              </p>
+            </div>
+          </article>
+        </div>
+
+        {index < pasos.length - 1 && (
+          <div className="h-px w-full bg-black/20" aria-hidden="true" />
+        )}
+      </div>
+    );
+  })}
+</motion.div>
       </div>
     </section>
   );

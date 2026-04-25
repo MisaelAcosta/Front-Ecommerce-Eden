@@ -50,8 +50,10 @@ const Header = () => {
   return (
     <section className="w-full bg-white">
       {/* Bloque superior: titulo, subtitulo, descripcion e imagen principal. */}
-      <div className="mx-auto max-w-[1350px] px-4 pt-28 pb-8 sm:px-6 sm:pt-32 lg:px-0 ">
-        <div className="grid items-start gap-2 lg:grid-cols-[max-content_585px] lg:gap-3">
+      <div className="mx-auto max-w-[1350px] px-4 
+      pt-33 pb-8 sm:px-6 sm:pt-32 lg:px-0 ">
+        <div className="grid items-start 
+        gap-2 lg:grid-cols-[max-content_585px] lg:gap-3">
           <div>
             <motion.h1
               variants={fadeUp}
@@ -59,8 +61,10 @@ const Header = () => {
               whileInView="visible"
               viewport={revealViewport}
               custom={0}
-              className={`${maratypeFont.className} text-left text-[4.55rem] 
-              leading-[0.9] text-black sm:text-[6.2rem] lg:text-[10rem]`}
+              className={`${maratypeFont.className} text-left 
+              text-[4.55rem] 
+              leading-[0.9] text-black 
+              sm:text-[6.2rem] lg:text-[10rem]`}
             >
               EDEN ESTUDIO
             </motion.h1>
@@ -87,7 +91,7 @@ const Header = () => {
             viewport={revealViewport}
             custom={0.14}
             className={`${khInterferenceLightFont.className} max-w-[300px] lg:max-w-none 
-            pt-2 text-left text-[0.72rem] uppercase leading-[1.20]
+            pt-8 text-left text-[0.72rem] uppercase leading-[1.20]
              text-black/60 lg:text-lg lg:pt-25 lg:pl-10`}
           >
             Diseñamos y fabricamos piezas personalizadas mediante impresión 3D,
@@ -105,7 +109,8 @@ const Header = () => {
           custom={0.2}
           className="relative mt-6 overflow-hidden border border-black/10 bg-neutral-100 sm:mt-8"
         >
-          <div className="relative aspect-[16/10] w-full sm:aspect-[16/8.2]">
+          <div className="relative aspect-[16/15] w-full 
+          sm:aspect-[16/8.2]">
             <Image
               src={heroImageSrc}
               alt="Servicio de impresión y modelado 3D"
