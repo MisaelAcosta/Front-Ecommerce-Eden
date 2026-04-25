@@ -1,33 +1,34 @@
-// components/navbar/navbar.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Heart, ShoppingBag, Smile } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import MenuList from "../menu-list";
-import ItemsMenuMobile from "../items-menu-mobile";
-import { useCart } from "@/hooks/use-cart";
 import { LoginDialog } from "@/components/auth/login-dialog";
+import ItemsMenuMobile from "@/components/items-menu-mobile";
+import MenuList from "@/components/menu-list";
 import { ProfileSheet } from "@/components/profile/profile-sheet";
 import type { CurrentUser, ProfileData } from "@/components/profile/profile-types";
+import { useNavigationTransition } from "@/components/navigation-transition-provider";
+import { useCart } from "@/hooks/use-cart";
+
+const DESKTOP_LOGO_LIGHT = "/icons/logo-eden-white.png";
+const DESKTOP_LOGO_DARK = "/icons/logo-eden-black.png";
+const MOBILE_LOGO_LIGHT = "/icons/logo-eden-white.png";
+const MOBILE_LOGO_DARK = "/icons/logo-eden-black.png";
 
 const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
   const cart = useCart();
+  const { navigateWithTransition } = useNavigationTransition();
 
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
-
-  //  scroll effects logo escritorio
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const lastY = useRef(0);
-  const DESKTOP_LOGO_LIGHT = "/icons/logo-eden-white.png";
-  const DESKTOP_LOGO_DARK = "/icons/logo-eden-black.png";
-
 
   useEffect(() => {
     const onScroll = () => {
@@ -36,8 +37,11 @@ const Navbar = () => {
       setScrolled(y > 40);
 
       const goingDown = y > lastY.current;
-      if (y > 120 && goingDown) setHidden(true);
-      else setHidden(false);
+      if (y > 120 && goingDown) {
+        setHidden(true);
+      } else {
+        setHidden(false);
+      }
 
       lastY.current = y;
     };
@@ -65,7 +69,7 @@ const Navbar = () => {
         setUser(data.user ?? null);
         setProfile(data.profile ?? null);
       } catch (error) {
-        console.error("🔥 Error obteniendo usuario actual:", error);
+        console.error("Error obteniendo usuario actual:", error);
         setUser(null);
         setProfile(null);
       } finally {
@@ -76,26 +80,15 @@ const Navbar = () => {
     fetchUser();
   }, []);
 
-  //  SOLO EN /catalogo (y subrutas) forzamos el navbar en negro desde arriba
   const isCatalog = pathname.startsWith("/category/");
   const isProduct = pathname.startsWith("/product");
   const isCart = pathname.startsWith("/cart");
   const isLoved = pathname.startsWith("/loved-product");
   const isService = pathname.startsWith("/servicio");
 
-  const forceDark = isCatalog || isProduct || isCart || scrolled || isLoved || isService;
-
+  const forceDark =
+    isCatalog || isProduct || isCart || scrolled || isLoved || isService;
   const fg = forceDark ? "text-black" : "text-white";
-
-
-
-
-//  Logos mobile (centrado)
-const MOBILE_LOGO_LIGHT = "/icons/logo-eden-white.png"; 
-const MOBILE_LOGO_DARK = "/icons/logo-eden-black.png";  
-
-
-
 
   return (
     <header
@@ -107,21 +100,17 @@ const MOBILE_LOGO_DARK = "/icons/logo-eden-black.png";
       `}
     >
       <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-3 lg:px-4">
-        {/* Layout general: 3 columnas -> Left / Center / Right */}
         <div className="grid grid-cols-3 items-center py-2">
-          {/* ================= LEFT ================= */}
           <div className="flex items-center justify-start gap-3">
-            {/* Mobile: Hamburguesa a la izquierda */}
             <div className="flex lg:hidden">
               <ItemsMenuMobile scrolled={forceDark} />
             </div>
 
-            {/* Desktop: Logo texto + menú */}
-            <div className="hidden lg:flex items-center gap-10">
+            <div className="hidden items-center gap-10 lg:flex">
               <button
                 type="button"
-                onClick={() => router.push("/")}
-                className="relative h-10 w-[110px] lg:h-9 lg:w-[130px] transition-opacity duration-200 hover:opacity-80"
+                onClick={() => navigateWithTransition("/")}
+                className="relative h-10 w-[110px] transition-opacity duration-200 hover:opacity-80 lg:h-9 lg:w-[130px]"
                 aria-label="Ir al inicio"
               >
                 <Image
@@ -130,15 +119,14 @@ const MOBILE_LOGO_DARK = "/icons/logo-eden-black.png";
                   alt="Eden Logo"
                   fill
                   priority
-                  className="object-contain "
+                  className="object-contain"
                 />
               </button>
               <div className={`text-xl ${fg}`}>
                 <MenuList />
               </div>
-            </div> 
+            </div>
 
-            {/* Mobile: Smile pegadito a la hamburguesa */}
             {!loadingUser && (
               <div className="flex lg:hidden">
                 {user ? (
@@ -160,7 +148,7 @@ const MOBILE_LOGO_DARK = "/icons/logo-eden-black.png";
                   </ProfileSheet>
                 ) : (
                   <LoginDialog>
-                    <button aria-label="Iniciar sesión" className="cursor-pointer">
+                    <button aria-label="Iniciar sesion" className="cursor-pointer">
                       <Smile
                         strokeWidth={1.5}
                         fill="none"
@@ -173,17 +161,10 @@ const MOBILE_LOGO_DARK = "/icons/logo-eden-black.png";
             )}
           </div>
 
-
-
-
-
-
-          {/* ================= CENTER ================= */}
           <div className="flex items-center justify-center">
-            {/* Mobile: logo ícono centrado */}
             <button
               type="button"
-              onClick={() => router.push("/")}
+              onClick={() => navigateWithTransition("/")}
               className="relative h-18 w-20 lg:hidden"
               aria-label="Ir al inicio"
             >
@@ -196,13 +177,9 @@ const MOBILE_LOGO_DARK = "/icons/logo-eden-black.png";
                 priority
               />
             </button>
-
-            {/* Desktop: no centro (porque el menú ya queda con el logo a la izquierda) */}
           </div>
 
-          {/* ================= RIGHT ================= */}
           <div className="flex items-center justify-end gap-5 lg:gap-8">
-            {/* Desktop: Smile (login/perfil) a la derecha */}
             {!loadingUser && (
               <div className="hidden lg:flex">
                 {user ? (
@@ -224,7 +201,7 @@ const MOBILE_LOGO_DARK = "/icons/logo-eden-black.png";
                   </ProfileSheet>
                 ) : (
                   <LoginDialog>
-                    <button aria-label="Iniciar sesión" className="cursor-pointer">
+                    <button aria-label="Iniciar sesion" className="cursor-pointer">
                       <Smile
                         strokeWidth={1.5}
                         fill="none"
@@ -236,18 +213,16 @@ const MOBILE_LOGO_DARK = "/icons/logo-eden-black.png";
               </div>
             )}
 
-            {/* Heart: en desktop y mobile */}
             <Heart
               strokeWidth={1.5}
-              className={`cursor-pointer h-7 w-7 transition-colors duration-300 ${fg}`}
+              className={`h-7 w-7 cursor-pointer transition-colors duration-300 ${fg}`}
               onClick={() => router.push("/loved-product")}
             />
 
-            {/* Cart */}
             {cart.items.length === 0 ? (
               <ShoppingBag
                 strokeWidth={1.5}
-                className={`cursor-pointer h-7 w-7 transition-colors duration-300 ${fg}`}
+                className={`h-7 w-7 cursor-pointer transition-colors duration-300 ${fg}`}
                 onClick={() => router.push("/cart")}
               />
             ) : (
@@ -267,8 +242,3 @@ const MOBILE_LOGO_DARK = "/icons/logo-eden-black.png";
 };
 
 export default Navbar;
-
-
-
-
-

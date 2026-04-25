@@ -1,15 +1,14 @@
 "use client";
 
 import { Menu, X, Instagram, Youtube } from "lucide-react";
-import Link from "next/link";
 import localFont from "next/font/local";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { createPortal } from "react-dom";
-
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { ProfileSheet } from "@/components/profile/profile-sheet";
 import type { CurrentUser, ProfileData } from "@/components/profile/profile-types";
+import TransitionLink from "@/components/transition-link";
 
 const maratypeFont = localFont({
   src: "./fonts/Maratype.otf",
@@ -68,7 +67,6 @@ const itemVariants: Variants = {
   },
 };
 
-// scroller
 type ItemsMenuMobileProps = {
   scrolled: boolean;
 };
@@ -76,19 +74,15 @@ type ItemsMenuMobileProps = {
 export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [originPx, setOriginPx] = useState("100% 0%");
-  const btnRef = useRef<HTMLButtonElement | null>(null);
-
-  // ✅ portal mount
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-
-  // ✅ auth
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loadingUser, setLoadingUser] = useState(false);
+  const btnRef = useRef<HTMLButtonElement | null>(null);
 
   const computeOrigin = () => {
     if (!btnRef.current) return;
+
     const rect = btnRef.current.getBoundingClientRect();
     const x = rect.left + rect.width / 2;
     const y = rect.top + rect.height / 2;
@@ -97,6 +91,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
 
   const fetchUser = async () => {
     setLoadingUser(true);
+
     try {
       const res = await fetch("/api/auth/me", {
         method: "GET",
@@ -121,21 +116,22 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
     }
   };
 
-  // origin init
   useEffect(() => {
+    setMounted(true);
     computeOrigin();
+    fetchUser();
   }, []);
 
-  // recompute origin on open + resize
   useEffect(() => {
     if (!isOpen) return;
+
     computeOrigin();
     const onResize = () => computeOrigin();
     window.addEventListener("resize", onResize);
+
     return () => window.removeEventListener("resize", onResize);
   }, [isOpen]);
 
-  // scroll lock
   useEffect(() => {
     if (isOpen) {
       document.documentElement.style.overflow = "hidden";
@@ -144,23 +140,22 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
       document.documentElement.style.overflow = "";
       document.body.style.overscrollBehavior = "";
     }
+
     return () => {
       document.documentElement.style.overflow = "";
       document.body.style.overscrollBehavior = "";
     };
   }, [isOpen]);
 
-  // 1ra carga
-  useEffect(() => {
-    fetchUser();
-  }, []);
-
   const closeMenu = () => setIsOpen(false);
 
   const handleToggle = () => {
     const next = !isOpen;
     setIsOpen(next);
-    if (next) fetchUser();
+
+    if (next) {
+      fetchUser();
+    }
   };
 
   const overlay = (
@@ -168,7 +163,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
       {isOpen && (
         <motion.div
           key="overlay"
-          className="fixed inset-0 z-3000 bg-white isolate"
+          className="fixed inset-0 z-[3000] isolate bg-white"
           variants={overlayVariants(originPx)}
           initial="initial"
           animate="animate"
@@ -177,96 +172,91 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
         >
           <div
             className="relative h-full w-full"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
           >
-            {/* Top bar */}
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="absolute top-0 left-0 right-0 flex items-center 
-              justify-between px-5 pt-5"
+              className="absolute top-0 left-0 right-0 flex items-center justify-between px-5 pt-5"
             >
-  
-
-              {/* X (arriba izq en el mock, pero acá lo dejo consistente con layout: si lo querís full izq, dime y lo invierto) */}
               <motion.button
                 onClick={closeMenu}
-                aria-label="Cerrar menú"
+                aria-label="Cerrar menu"
                 initial={{ opacity: 0, scale: 0.95, rotate: -10 }}
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 exit={{ opacity: 0, scale: 0.95, rotate: -10 }}
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                className="absolute left-5 top-3 p-2 rounded-md  text-black"
+                className="absolute top-3 left-5 rounded-md p-2 text-black"
               >
-                <X className="w-6 h-6" />
+                <X className="h-6 w-6" />
               </motion.button>
             </motion.div>
 
-            {/* Content */}
             <motion.div
-              className="h-full w-full px-5 pt-24 pb-8 flex flex-col"
+              className="flex h-full w-full flex-col px-5 pt-24 pb-8"
               variants={listVariants}
               initial="hidden"
               animate="show"
             >
-              {/* Menú principal */}
               <div className="flex-1">
                 <motion.div variants={itemVariants} className="space-y-15">
-                  {/* INICIO */}
-                  <div className="relative pt-10 ">
-                    <span className="absolute -top-4 pt-10 right-45 text-red-500 text-xs font-semibold">
+                  <div className="relative pt-10">
+                    <span className="absolute -top-4 right-45 pt-10 text-xs font-semibold text-red-500">
                       01
                     </span>
-                    <Link
+                    <TransitionLink
                       href="/"
-                      className={`${maratypeFont.className} block
-                       text-black tracking-tighter leading-none text-8xl sm:text-6xl`}
+                      className={`${maratypeFont.className} block text-8xl leading-none tracking-tighter text-black sm:text-6xl`}
                       onClick={closeMenu}
                     >
                       INICIO
-                    </Link>
+                    </TransitionLink>
                   </div>
 
-                  {/* CATALOGO */}
                   <div className="relative">
-                    <span className="absolute -top-4  
-                    right-10 text-red-500 text-xs font-semibold">
+                    <span className="absolute -top-4 right-10 text-xs font-semibold text-red-500">
                       02
                     </span>
-                    <Link
+                    <TransitionLink
                       href="/category/todos-los-productos"
-                      className={`${maratypeFont.className} block text-black 
-                      tracking-tighter leading-none text-8xl sm:text-6xl`}
+                      className={`${maratypeFont.className} block text-8xl leading-none tracking-tighter text-black sm:text-6xl`}
                       onClick={closeMenu}
                     >
                       CATALOGO
-                    </Link>
+                    </TransitionLink>
                   </div>
 
-                  {/* SERVICIOS */}
                   <div className="relative">
-                    <span className="absolute -top-4 right-10 text-red-500 text-xs font-semibold">
+                    <span className="absolute -top-4 right-10 text-xs font-semibold text-red-500">
                       03
                     </span>
-                    <Link
+                    <TransitionLink
                       href="/servicio"
-                      className={`${maratypeFont.className} block
-                       text-black tracking-tighter 
-                       leading-none text-8xl sm:text-6xl`}
+                      className={`${maratypeFont.className} block text-8xl leading-none tracking-tighter text-black sm:text-6xl`}
                       onClick={closeMenu}
                     >
                       SERVICIOS
-                    </Link>
+                    </TransitionLink>
                   </div>
 
-                  
+                  <div className="relative">
+                    <span className="absolute -top-4 right-10 text-xs font-semibold text-red-500">
+                      04
+                    </span>
+                    <TransitionLink
+                      href="/cotiza"
+                      className={`${maratypeFont.className} block text-8xl leading-none tracking-tighter text-black sm:text-6xl`}
+                      onClick={closeMenu}
+                    >
+                      COTIZA
+                    </TransitionLink>
+                  </div>
 
-                  {/* Auth (sin romper lógica; queda oculto si no hay texto) */}
                   <div className="hidden">
                     {loadingUser ? (
-                      <span className="block text-black text-3xl font-semibold opacity-40" />
+                      <span className="block text-3xl font-semibold text-black opacity-40" />
                     ) : user ? (
                       <ProfileSheet
                         user={user}
@@ -277,7 +267,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
                         }}
                       >
                         <button
-                          className="block text-black text-3xl font-semibold"
+                          className="block text-3xl font-semibold text-black"
                           type="button"
                           onClick={closeMenu}
                         />
@@ -285,7 +275,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
                     ) : (
                       <LoginDialog>
                         <button
-                          className="block text-black text-3xl font-semibold"
+                          className="block text-3xl font-semibold text-black"
                           type="button"
                           onClick={closeMenu}
                         />
@@ -295,28 +285,27 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
                 </motion.div>
               </div>
 
-              {/* Redes abajo */}
               <motion.div variants={itemVariants} className="pb-10">
-                <div className="text-xs text-black/50 mb-4 pl-3">(REDES)</div>
+                <div className="mb-4 pl-3 text-xs text-black/50">(REDES)</div>
 
-                <div className="flex items-center justify-between text-xl px-3">
-                  <Link
+                <div className="flex items-center justify-between px-3 text-xl">
+                  <TransitionLink
                     href="https://www.instagram.com/eden.3d_/"
                     target="_blank"
-                    className={`${khInterferenceBoldFont.className} inline-flex items-center gap-2 text-black tracking-wide`}
+                    className={`${khInterferenceBoldFont.className} inline-flex items-center gap-2 tracking-wide text-black`}
                   >
-                    <Instagram className="w-4 h-4" />
-                    INSTAGRAM <span className="text-black/60 font-extrabold">↗</span>
-                  </Link>
+                    <Instagram className="h-4 w-4" />
+                    INSTAGRAM <span className="font-extrabold text-black/60">↗</span>
+                  </TransitionLink>
 
-                  <Link
+                  <TransitionLink
                     href="https://youtube.com"
                     target="_blank"
-                    className={`${khInterferenceBoldFont.className} inline-flex items-center gap-2 text-black tracking-wide`}
+                    className={`${khInterferenceBoldFont.className} inline-flex items-center gap-2 tracking-wide text-black`}
                   >
-                    <Youtube className="w-5 h-5" />
-                    YOUTUBE <span className="text-black/90  pb-2 font-extrabold"> ↗</span>
-                  </Link>
+                    <Youtube className="h-5 w-5" />
+                    YOUTUBE <span className="pb-2 font-extrabold text-black/90">↗</span>
+                  </TransitionLink>
                 </div>
               </motion.div>
             </motion.div>
@@ -328,19 +317,14 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
 
   return (
     <>
-      {/* botón */}
       <button
         ref={btnRef}
         onClick={handleToggle}
-        aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
+        aria-label={isOpen ? "Cerrar menu" : "Abrir menu"}
         aria-expanded={isOpen}
         className={`
           relative z-[2100]
-          p-1.5 sm:p-2
-          rounded-md
-          duration-300
-          bg-none
-          shrink-0
+          shrink-0 rounded-md bg-none p-1.5 duration-300 sm:p-2
           ${scrolled ? "text-black" : "text-white"}
         `}
       >
@@ -350,21 +334,14 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
           transition={{ type: "spring", stiffness: 320, damping: 22 }}
         >
           {isOpen ? (
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" />
           ) : (
-            <Menu className="w-6 h-6" strokeWidth={2.5} />
+            <Menu className="h-6 w-6" strokeWidth={2.5} />
           )}
         </motion.div>
       </button>
 
-      {/* portal */}
       {mounted ? createPortal(overlay, document.body) : null}
     </>
   );
 }
-
-
-
-
-
-

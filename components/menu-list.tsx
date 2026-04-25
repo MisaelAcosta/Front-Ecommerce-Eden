@@ -1,10 +1,9 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import localFont from "next/font/local";
+import TransitionLink from "@/components/transition-link";
 import { cn } from "@/lib/utils";
-
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -30,7 +29,9 @@ const MenuList = () => {
               `${maratypeFont.className} text-3xl font-medium tracking-wide`
             )}
           >
-            <Link href="/category/todos-los-productos">CATALOGO</Link>
+            <TransitionLink href="/category/todos-los-productos">
+              CATALOGO
+            </TransitionLink>
           </NavigationMenuLink>
         </NavigationMenuItem>
 
@@ -42,7 +43,7 @@ const MenuList = () => {
               `${maratypeFont.className} text-3xl font-medium tracking-wide`
             )}
           >
-            <Link href="/servicio">SERVICIOS</Link>
+            <TransitionLink href="/servicio">SERVICIOS</TransitionLink>
           </NavigationMenuLink>
         </NavigationMenuItem>
 
@@ -54,7 +55,7 @@ const MenuList = () => {
               `${maratypeFont.className} hidden text-3xl font-medium tracking-wide`
             )}
           >
-            <Link href="/cotiza">COTIZA</Link>
+            <TransitionLink href="/cotiza">COTIZA</TransitionLink>
           </NavigationMenuLink>
         </NavigationMenuItem>
       </NavigationMenuList>

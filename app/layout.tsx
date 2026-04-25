@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/ui/navbar";
 import Footer from "@/components/footer";
+import { NavigationTransitionProvider } from "@/components/navigation-transition-provider";
 import { ThemeProvider } from "@/components/theme.provider";
-const inter = Inter({subsets: ["latin"],});
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from "@/components/ui/sonner";
+import Navbar from "@/components/ui/navbar";
 
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "eden.",
-  description: "Compra productos 3D, figuras, soportes y más en Eden 3D. Envíos a todo Chile.",
+  description: "Compra productos 3D, figuras, soportes y mas en Eden 3D. Envios a todo Chile.",
 };
 
 export default function RootLayout({
@@ -20,18 +21,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} min-h-screen flex flex-col`}>
-
-
+      <body className={`${inter.className} flex min-h-screen flex-col`}>
         <ThemeProvider>
-          <Navbar></Navbar>
-            <main className="flex-1">
-            {children}
-          </main>
-          <Toaster></Toaster>
-          <Footer></Footer>
+          <NavigationTransitionProvider>
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Toaster />
+            <Footer />
+          </NavigationTransitionProvider>
         </ThemeProvider>
-
       </body>
     </html>
   );
