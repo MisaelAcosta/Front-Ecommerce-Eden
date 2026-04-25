@@ -7,6 +7,7 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useState,
   type PropsWithChildren,
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -20,15 +21,22 @@ type NavigationTransitionContextValue = {
 const NavigationTransitionContext =
   createContext<NavigationTransitionContextValue | null>(null);
 
-// Ajusta esta config para cambiar el look de la transicion sin tocar la logica.
+  // Ajusta esta config para cambiar el look de la transicion sin tocar la logica.
 const TRANSITION_CONFIG = {
-  rows: 12,
-  columns: 18,
-  pixelColor: "#111111",
+  desktop: {
+    rows: 12,
+    columns: 18,
+  },
+  mobile: {
+    rows: 14,
+    columns: 6,
+  },
+  pixelColor: "#FF0000",
   exitCellDuration: 0.16,
-  enterCellDuration: 0.2,
-  staggerEach: 0.008,
+  enterCellDuration: 0.16,
+  staggerEach: 0.035,
 };
+
 
 // Deja aqui las secciones que deben participar en la transicion.
 const ROUTE_PREFIXES = ["/", "/category", "/servicio", "/cotiza"] as const;
@@ -57,14 +65,35 @@ export function NavigationTransitionProvider({
   const router = useRouter();
   const pathname = usePathname();
 
+  const [gridConfig, setGridConfig] = useState(TRANSITION_CONFIG.desktop);
+
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const cellRefs = useRef<HTMLDivElement[]>([]);
   const pendingHrefRef = useRef<string | null>(null);
   const isAnimatingRef = useRef(false);
   const hasMountedRef = useRef(false);
 
-  const cellCount = TRANSITION_CONFIG.rows * TRANSITION_CONFIG.columns;
-  const cells = useMemo(() => Array.from({ length: cellCount }), [cellCount]);
+  useEffect(() => {
+    const updateGrid = () => {
+      const isMobile = window.innerWidth < 768;
+
+      setGridConfig(
+        isMobile ? TRANSITION_CONFIG.mobile : TRANSITION_CONFIG.desktop
+      );
+    };
+
+    updateGrid();
+    window.addEventListener("resize", updateGrid);
+
+    return () => window.removeEventListener("resize", updateGrid);
+  }, []);
+
+  const cellCount = gridConfig.rows * gridConfig.columns;
+
+  const cells = useMemo(() => {
+    cellRefs.current = [];
+    return Array.from({ length: cellCount });
+  }, [cellCount]);
 
   const setCellRef = useCallback((element: HTMLDivElement | null, index: number) => {
     if (element) {
@@ -72,7 +101,8 @@ export function NavigationTransitionProvider({
     }
   }, []);
 
-  const animateExit = useCallback((onComplete: () => void) => {
+  const animateExit = useCallback(
+  (onComplete: () => void) => {
     const overlay = overlayRef.current;
     const pixels = cellRefs.current.filter(Boolean);
 
@@ -92,39 +122,41 @@ export function NavigationTransitionProvider({
       stagger: {
         each: TRANSITION_CONFIG.staggerEach,
         from: "random",
-        grid: [TRANSITION_CONFIG.rows, TRANSITION_CONFIG.columns],
+        grid: [gridConfig.rows, gridConfig.columns],
       },
       onComplete,
     });
-  }, []);
+  },
+  [gridConfig]
+);
 
   const animateEnter = useCallback(() => {
-    const overlay = overlayRef.current;
-    const pixels = cellRefs.current.filter(Boolean);
+  const overlay = overlayRef.current;
+  const pixels = cellRefs.current.filter(Boolean);
 
-    if (!overlay || pixels.length === 0) {
+  if (!overlay || pixels.length === 0) {
+    isAnimatingRef.current = false;
+    return;
+  }
+
+  gsap.killTweensOf([overlay, ...pixels]);
+  gsap.set(overlay, { autoAlpha: 1, pointerEvents: "auto" });
+
+  gsap.to(pixels, {
+    autoAlpha: 0,
+    duration: TRANSITION_CONFIG.enterCellDuration,
+    ease: "none",
+    stagger: {
+      each: TRANSITION_CONFIG.staggerEach,
+      from: "random",
+      grid: [gridConfig.rows, gridConfig.columns],
+    },
+    onComplete: () => {
+      gsap.set(overlay, { autoAlpha: 0, pointerEvents: "none" });
       isAnimatingRef.current = false;
-      return;
-    }
-
-    gsap.killTweensOf([overlay, ...pixels]);
-    gsap.set(overlay, { autoAlpha: 1, pointerEvents: "auto" });
-
-    gsap.to(pixels, {
-      autoAlpha: 0,
-      duration: TRANSITION_CONFIG.enterCellDuration,
-      ease: "none",
-      stagger: {
-        each: TRANSITION_CONFIG.staggerEach,
-        from: "random",
-        grid: [TRANSITION_CONFIG.rows, TRANSITION_CONFIG.columns],
-      },
-      onComplete: () => {
-        gsap.set(overlay, { autoAlpha: 0, pointerEvents: "none" });
-        isAnimatingRef.current = false;
-      },
-    });
-  }, []);
+    },
+  });
+}, [gridConfig]);
 
   const shouldAnimateHref = useCallback(
     (href: string) => shouldAnimatePath(pathname) || shouldAnimatePath(normalizeHref(href)),
@@ -211,9 +243,8 @@ export function NavigationTransitionProvider({
         <div
           className="grid h-full w-full"
           style={{
-            gridTemplateColumns: `repeat(${TRANSITION_CONFIG.columns}, minmax(0, 1fr))`,
-            gridTemplateRows: `repeat(${TRANSITION_CONFIG.rows}, minmax(0, 1fr))`,
-          }}
+           gridTemplateColumns: `repeat(${gridConfig.columns}, minmax(0, 1fr))`,
+           gridTemplateRows: `repeat(${gridConfig.rows}, minmax(0, 1fr))`,          }}
         >
           {/* Cada celda es un "pixel" animado por GSAP. */}
           {cells.map((_, index) => (
