@@ -40,22 +40,27 @@ const Paso3 = ({
   onReferenceLinkChange,
 }: Paso3Props) => {
   return (
-    <section className="border-b border-black/10 bg-[#ebe8df] px-4 py-12 sm:px-8 lg:px-12">
-      <div className="mx-auto grid w-full max-w-[1400px] gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+    <section className="border-b border-black/10 bg-[#F3F3F3] px-4 py-12 sm:px-8 lg:px-12">
+      <div className="mx-auto grid w-full max-w-[1400px] 
+      gap-8 lg:grid-cols-[0.95fr_1.05fr]">
         {/* Texto descriptivo del paso. */}
         <div>
           <p
-            className={`${cotizaTextRegularFont.className} text-xs uppercase tracking-[0.35em] text-black/45`}
+            className={`${cotizaTextBoldFont.className} text-base lg:text-2xl
+            uppercase tracking-[0.35em] text-black/65`}
           >
             Paso 03
           </p>
           <h2
-            className={`${cotizaTitleFont.className} mt-3 text-4xl uppercase leading-[0.9] sm:text-5xl lg:text-6xl`}
+            className={`${cotizaTitleFont.className} mt-3 lg:pt-10 pt-5
+            text-4xl 
+            uppercase leading-[0.9] sm:text-5xl lg:text-6xl`}
           >
             Selecciona la calidad y color
           </h2>
           <p
-            className={`${cotizaTextRegularFont.className} mt-5 max-w-lg text-sm leading-6 text-black/70 sm:text-base`}
+            className={`${cotizaTextRegularFont.className} mt-10 lg:mt-15
+            max-w-lg text-sm leading-6 text-black/70 sm:text-base`}
           >
             La cotización actual trabaja con una única configuración de calidad
             estándar. También dejamos visible el flujo multicolor, pero marcado
@@ -64,7 +69,7 @@ const Paso3 = ({
         </div>
 
         {/* Panel derecho con selección visual de color y calidad. */}
-        <div className="rounded-[32px] border border-black/10 bg-white p-5">
+        <div className="rounded-[22px] border border-black/10 bg-white p-5">
           <div className="flex flex-wrap items-center gap-3">
             {colorOptions.map((color) => {
               const selected = color.id === selectedColor;
@@ -74,9 +79,11 @@ const Paso3 = ({
                   key={color.id}
                   type="button"
                   onClick={() => onColorChange(color.id)}
-                  className={`h-9 w-9 rounded-md border transition-transform duration-200 hover:scale-105 ${
+                  className={`h-9 w-9 rounded-md 
+                    border transition-transform duration-200 
+                    hover:scale-105 cursor-pointer ${
                     selected
-                      ? "border-black shadow-[0_0_0_2px_rgba(0,0,0,0.08)]"
+                      ? "border-black ]"
                       : "border-black/10"
                   }`}
                   style={{ backgroundColor: color.hex }}
@@ -90,9 +97,9 @@ const Paso3 = ({
             <button
               type="button"
               onClick={() => onColorModeChange("single")}
-              className={`rounded-[24px] border p-4 text-left ${
+              className={`rounded-[24px] border p-4 cursor-pointer text-left ${
                 colorMode === "single"
-                  ? "border-black bg-[#f5f2ea]"
+                  ? "border-black bg-[#dadada]"
                   : "border-black/10"
               }`}
             >

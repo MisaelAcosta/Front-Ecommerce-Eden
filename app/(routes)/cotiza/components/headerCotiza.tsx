@@ -38,7 +38,8 @@ const heroImages = [
 
 const HeaderCotiza = () => {
   return (
-    <section className="relative overflow-hidden border-b border-black/10 bg-[#ebe8df] pt-24">
+    <section className="relative overflow-hidden border-b border-black/10
+     bg-white pt-24">
       {/* Retícula suave para acercarse al look editorial de la referencia. */}
       <div
         className="absolute inset-0 opacity-60"
@@ -49,12 +50,18 @@ const HeaderCotiza = () => {
         }}
       />
 
-      <div className="relative mx-auto flex min-h-[620px] w-full max-w-[1400px] flex-col justify-between px-4 pb-10 sm:px-8 lg:min-h-[760px] lg:px-12">
-        {/* Collage principal con rutas reemplazables por el usuario más adelante. */}
-        <div className="relative h-[390px] sm:h-[470px] lg:h-[560px]">
+    <div className="relative mx-auto flex min-h-[570px] w-full 
+      max-w-350 
+      flex-col justify-between px-4 pb-7 sm:px-8 
+
+      #Tamaños para pantallas grandes, ajustando altura mínima y padding horizontal
+      lg:min-h-30 lg:px-12">
+        {/* Collage principal con rutas reemplazables */}
+        <div className="relative h-[390px] w-full sm:h-[500px] lg:h-[600px]">
           {heroImages.map((image) => (
             <div key={image.src} className={`absolute ${image.className}`}>
-              <div className="relative h-full w-full overflow-hidden border border-black/10 bg-white p-1 shadow-[10px_10px_0_rgba(0,0,0,0.06)]">
+              <div className="relative h-full w-full overflow-hidden border
+               border-black/10 bg-white p-1 ">
                 <Image
                   src={image.src}
                   alt={image.alt}
@@ -65,9 +72,12 @@ const HeaderCotiza = () => {
             </div>
           ))}
 
-          <div className="absolute inset-x-0 top-[38%] mx-auto max-w-[320px] text-center sm:top-[40%] sm:max-w-[440px] lg:max-w-[560px]">
+          <div className="absolute inset-x-0 top-[38%] 
+          mx-auto max-w-[320px] text-center sm:top-[40%] 
+          sm:max-w-[440px] lg:max-w-[500px]">
             <h1
-              className={`${cotizaTitleFont.className} text-4xl uppercase leading-[0.86] tracking-tight sm:text-6xl lg:text-7xl`}
+              className={`${cotizaTitleFont.className} text-4xl 
+              uppercase leading-[3rem] sm:leading-[5rem] tracking-tight sm:text-6xl lg:text-7xl`}
             >
               Que imprimimos
               <br />
@@ -76,31 +86,6 @@ const HeaderCotiza = () => {
           </div>
         </div>
 
-        {/* Bajada corta para dejar claro de qué trata la página. */}
-        <div className="grid gap-6 border-t border-black/10 pt-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
-          <div>
-            <p
-              className={`${cotizaTextRegularFont.className} text-sm uppercase tracking-[0.25em] text-black/50`}
-            >
-              Impresion 3D bajo demanda
-            </p>
-            <p
-              className={`${cotizaTextRegularFont.className} mt-3 max-w-2xl text-sm leading-6 text-black/70 sm:text-base`}
-            >
-              Sube tu STL, dejamos la laminacion a CloudSlicer y te entregamos
-              una cotizacion lista para agregar al carrito. El flujo ya considera
-              color, calidad y post procesado.
-            </p>
-          </div>
-
-          <div
-            className={`${cotizaTextRegularFont.className} rounded-[24px] border border-black/10 bg-white/80 p-4 text-sm leading-6 text-black/70 backdrop-blur`}
-          >
-            La ruta permanece en <span className="font-semibold">/cotiza</span>,
-            pero la experiencia se presenta como la nueva página{" "}
-            <span className="font-semibold">Imprime</span>.
-          </div>
-        </div>
       </div>
     </section>
   );

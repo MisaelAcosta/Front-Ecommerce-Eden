@@ -57,30 +57,38 @@ const Paso2 = ({
   onFileChange,
 }: Paso2Props) => {
   return (
-    <section className="border-b border-black/10 bg-white px-4 py-12 sm:px-8 lg:px-12">
-      <div className="mx-auto grid w-full max-w-[1400px] gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
+    <section className="border-b border-black/10 bg-white 
+    px-4 py-16 lg:py-25 sm:px-8 lg:px-12">
+      <div className="mx-auto grid w-full max-w-[1400px] gap-8 
+      lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
         {/* Lado izquierdo con instrucciones del paso. */}
         <div>
           <p
-            className={`${cotizaTextRegularFont.className} text-xs uppercase tracking-[0.35em] text-black/45`}
+            className={`${cotizaTextBoldFont.className} text-base lg:text-2xl
+            uppercase tracking-[0.35em] text-black/65`}
           >
             Paso 02
           </p>
           <h2
-            className={`${cotizaTitleFont.className} mt-3 text-4xl uppercase leading-[0.9] sm:text-5xl lg:text-6xl`}
+            className={`${cotizaTitleFont.className} mt-3 lg:pt-10 pt-5 text-4xl 
+            uppercase leading-[0.9] sm:text-5xl lg:text-6xl`}
           >
             Carga tu archivo
           </h2>
           <p
-            className={`${cotizaTextRegularFont.className} mt-5 max-w-lg text-sm leading-6 text-black/70 sm:text-base`}
+            className={`${cotizaTextRegularFont.className} mt-10 lg:mt-15
+            max-w-lg text-sm leading-6 text-black/70 sm:text-base`}
           >
             Sube tu STL y dejamos que CloudSlicer haga la laminación. El
             sistema primero carga el archivo y luego consulta el precio sobre la
             configuración de impresión que tengas definida.
           </p>
 
+
           <div
-            className={`${cotizaTextRegularFont.className} mt-6 rounded-[24px] border border-black/10 bg-[#ece9e1] p-4 text-sm leading-6 text-black/70`}
+            className={`${cotizaTextRegularFont.className} mt-6 
+            rounded-[14px]  
+            bg-[#e4e4e4] p-4 text-xs lg:text-sm leading-6 text-black/70 lg:w-100`}
           >
             Formatos admitidos: <span className="font-semibold">.stl</span>,{" "}
             <span className="font-semibold">.3mf</span> y{" "}
@@ -88,8 +96,10 @@ const Paso2 = ({
           </div>
         </div>
 
+
         {/* Lado derecho con caja de subida y feedback de CloudSlicer. */}
-        <div className="rounded-[32px] border border-black/10 bg-[#111111] p-3 text-white">
+        <div className="rounded-[22px] border border-black/10 
+        bg-[#111111] p-3 text-white">
           <div className="relative overflow-hidden rounded-[26px]">
             <div className="relative h-[250px] sm:h-[320px]">
               <Image
