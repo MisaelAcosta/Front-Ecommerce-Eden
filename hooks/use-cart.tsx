@@ -20,8 +20,18 @@ type CartState = {
   clear: () => void;
 };
 
-const makeLineId = (productId: number, variantId: number) =>
-  `${productId}:${variantId}`;
+const makeLineId = (line: Omit<CartLine, "id">) => {
+  if (line.kind === "print-quote") {
+    const anchor =
+      line.printQuote.quoteId ||
+      line.printQuote.fileId ||
+      line.printQuote.fileName.toLowerCase().replace(/\s+/g, "-");
+
+    return `print-quote:${anchor}`;
+  }
+
+  return `${line.productId}:${line.variantId}`;
+};
 
 export const useCart = create(
   persist<CartState>(
@@ -32,16 +42,19 @@ export const useCart = create(
       clearLastAdded: () => set({ lastAddedItem: null }),
 
       addItem: (line) => {
-        const id = makeLineId(line.productId, line.variantId);
+        const id = makeLineId(line);
         const items = get().items;
 
         const existing = items.find((i) => i.id === id);
 
         if (existing) {
-          const updated = {
-            ...existing,
-            qty: existing.qty + line.qty,
-          };
+          const updated =
+            line.kind === "print-quote"
+              ? { ...line, id, qty: 1 }
+              : {
+                  ...existing,
+                  qty: existing.qty + line.qty,
+                };
 
           set({
             items: items.map((i) => (i.id === id ? updated : i)),
@@ -64,14 +77,18 @@ export const useCart = create(
       incQty: (lineId) =>
         set({
           items: get().items.map((i) =>
-            i.id === lineId ? { ...i, qty: i.qty + 1 } : i
+            i.id === lineId && i.kind !== "print-quote"
+              ? { ...i, qty: i.qty + 1 }
+              : i
           ),
         }),
 
       decQty: (lineId) =>
         set({
           items: get().items.map((i) =>
-            i.id === lineId ? { ...i, qty: Math.max(1, i.qty - 1) } : i
+            i.id === lineId && i.kind !== "print-quote"
+              ? { ...i, qty: Math.max(1, i.qty - 1) }
+              : i
           ),
         }),
 

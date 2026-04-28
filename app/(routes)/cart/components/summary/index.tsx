@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import Step01Order from "./steps/step-01-order";
 import Step02Data from "./steps/step-02-data";
 import Step03Shipping from "./steps/step-03-shipping";
-
 import { useCart } from "@/hooks/use-cart";
 import { useCartWizard } from "@/hooks/use-cart-wizard";
 
@@ -12,6 +11,7 @@ type Step = 1 | 2 | 3;
 
 type CartItem = {
   id: number | string;
+  kind?: "product" | "print-quote";
   variantId?: number | string | null;
   qty: number | string;
   unitPrice: number | string;
@@ -35,24 +35,28 @@ const Summary = () => {
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState<string | null>(null);
 
-  const next = () => setStep((s) => (s === 3 ? 3 : ((s + 1) as Step)));
-  const back = () => setStep((s) => (s === 1 ? 1 : ((s - 1) as Step)));
+  const next = () => setStep((current) => (current === 3 ? 3 : ((current + 1) as Step)));
+  const back = () => setStep((current) => (current === 1 ? 1 : ((current - 1) as Step)));
 
   const { items } = useCart();
   const { step02, step03 } = useCartWizard();
+  const hasPrintQuote = items.some((item) => item.kind === "print-quote");
 
   const cartItems = items as CartItem[];
 
   const subtotal = useMemo(
-    () => cartItems.reduce((acc, it) => acc + Number(it.unitPrice) * Number(it.qty), 0),
+    () =>
+      cartItems.reduce(
+        (accumulator, item) =>
+          accumulator + Number(item.unitPrice) * Number(item.qty),
+        0
+      ),
     [cartItems]
   );
 
   const shippingCost = step03?.shippingCost ?? 0;
   const totalFinal = subtotal + shippingCost;
-
   const payerEmail = (step02?.email ?? "").trim().toLowerCase();
-  console.log("CART ITEMS SUMMARY", cartItems);
 
   const handlePay = async () => {
     setPayError(null);
@@ -62,18 +66,36 @@ const Summary = () => {
       return;
     }
 
+    // Mientras no exista orderImprimir en Strapi, frenamos el pago de esta línea especial.
+    if (hasPrintQuote) {
+      setPayError(
+        "La línea de impresión 3D ya llega bien al carrito, pero su checkout final con Strapi/Flow sigue pendiente de configuración."
+      );
+      return;
+    }
+
     const name = (step02?.name ?? "").trim();
     const email = payerEmail;
-
-    const rutBody = String(step02?.rutBody ?? "").replace(/\D/g, "").slice(0, 8);
-    const rutDv = String(step02?.rutDv ?? "").trim().toUpperCase().slice(0, 1);
-    const phoneRest = String(step02?.phoneRest ?? "").replace(/\D/g, "").slice(0, 8);
+    const rutBody = String(step02?.rutBody ?? "")
+      .replace(/\D/g, "")
+      .slice(0, 8);
+    const rutDv = String(step02?.rutDv ?? "")
+      .trim()
+      .toUpperCase()
+      .slice(0, 1);
+    const phoneRest = String(step02?.phoneRest ?? "")
+      .replace(/\D/g, "")
+      .slice(0, 8);
 
     if (!name) return setPayError("Falta tu nombre.");
-    if (!email || !email.includes("@")) return setPayError("Falta un email válido para el pago.");
+    if (!email || !email.includes("@")) {
+      return setPayError("Falta un email válido para el pago.");
+    }
     if (!rutBody || rutBody.length < 7) return setPayError("RUT incompleto.");
     if (!rutDv) return setPayError("Falta dígito verificador del RUT.");
-    if (!phoneRest || phoneRest.length < 8) return setPayError("Teléfono incompleto.");
+    if (!phoneRest || phoneRest.length < 8) {
+      return setPayError("Teléfono incompleto.");
+    }
 
     if (!step03?.region || !step03?.comuna || !step03?.calle || !step03?.numero) {
       setPayError("Faltan datos de envío (región, comuna, calle y número).");
@@ -92,14 +114,15 @@ const Summary = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: cartItems.map((it) => ({
-            variantId: Number(it.variantId ?? it.variant?.id ?? it.id),
-            qty: Number(it.qty),
-            unitPrice: Number(it.unitPrice),
-            sku: it.sku ?? it.variant?.sku ?? null,
-            variantName: it.variantName ?? it.variant?.variantName ?? null,
-            productName: it.productName ?? it.product?.productName ?? it.product?.name ?? null,
-            imageUrl: it.imageUrl ?? null,
+          items: cartItems.map((item) => ({
+            variantId: Number(item.variantId ?? item.variant?.id ?? item.id),
+            qty: Number(item.qty),
+            unitPrice: Number(item.unitPrice),
+            sku: item.sku ?? item.variant?.sku ?? null,
+            variantName: item.variantName ?? item.variant?.variantName ?? null,
+            productName:
+              item.productName ?? item.product?.productName ?? item.product?.name ?? null,
+            imageUrl: item.imageUrl ?? null,
           })),
           step02: {
             name,
@@ -126,11 +149,11 @@ const Summary = () => {
       const createOrderJson = await createOrderRes.json();
 
       if (!createOrderRes.ok || !createOrderJson?.ok) {
-        const msg =
+        const message =
           createOrderJson?.error ||
           createOrderJson?.detail?.message ||
           "No se pudo crear la orden. Intenta de nuevo.";
-        setPayError(String(msg));
+        setPayError(String(message));
         return;
       }
 
@@ -139,7 +162,9 @@ const Summary = () => {
       const commerceOrder = createOrderJson?.commerceOrder;
 
       if (!orderId || !orderDocumentId || !commerceOrder) {
-        setPayError("La API de órdenes no devolvió orderId/orderDocumentId/commerceOrder.");
+        setPayError(
+          "La API de órdenes no devolvió orderId/orderDocumentId/commerceOrder."
+        );
         return;
       }
 
@@ -171,11 +196,11 @@ const Summary = () => {
       const flowJson = await flowRes.json();
 
       if (!flowRes.ok || !flowJson?.ok) {
-        const msg =
+        const message =
           flowJson?.error ||
           flowJson?.detail?.message ||
           "No se pudo iniciar el pago en Flow. Intenta de nuevo.";
-        setPayError(String(msg));
+        setPayError(String(message));
         return;
       }
 
@@ -200,11 +225,11 @@ const Summary = () => {
       const attachJson = await attachRes.json();
 
       if (!attachRes.ok || !attachJson?.ok) {
-        const msg =
+        const message =
           attachJson?.error ||
           attachJson?.detail?.message ||
           "No se pudo asociar Flow a la orden. Intenta de nuevo.";
-        setPayError(String(msg));
+        setPayError(String(message));
         return;
       }
 
@@ -213,9 +238,11 @@ const Summary = () => {
       } catch {}
 
       window.location.href = paymentUrl;
-    } catch (e: unknown) {
+    } catch (error: unknown) {
       const message =
-        e instanceof Error ? e.message : "Error inesperado al iniciar el pago.";
+        error instanceof Error
+          ? error.message
+          : "Error inesperado al iniciar el pago.";
 
       setPayError(message);
     } finally {
@@ -250,7 +277,3 @@ const Summary = () => {
 };
 
 export default Summary;
-
-
-
-

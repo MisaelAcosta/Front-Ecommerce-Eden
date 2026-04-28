@@ -1,83 +1,207 @@
 "use client";
 
-import { useRef, useState } from "react";
+import type { RefObject } from "react";
 import Image from "next/image";
+import { formatPrice } from "@/lib/formatPrice";
+import {
+  cotizaTextRegularFont,
+  cotizaTitleFont,
+  cotizaTextBoldFont,
+} from "./cotiza-fonts";
 
-const Paso2 = () => {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const [fileName, setFileName] = useState<string>("");
+type Paso2Props = {
+  fileInputRef: RefObject<HTMLInputElement | null>;
+  fileName: string;
+  fileSizeLabel: string;
+  uploadStatus: "idle" | "uploading" | "pricing" | "ready" | "error";
+  uploadError: string | null;
+  quote: {
+    basePrice: number;
+    materialLabel: string;
+    printTimeSeconds: number | null;
+    estimatedWeightGrams: number | null;
+    dimensions: {
+      x: number;
+      y: number;
+      z: number;
+    } | null;
+    fitsPrinter: boolean | null;
+  } | null;
+  onOpenPicker: () => void;
+  onFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+};
 
-  const handleOpenFilePicker = () => {
-    inputRef.current?.click();
-  };
+function formatPrintTime(seconds: number | null) {
+  if (!seconds || seconds <= 0) {
+    return "En cálculo";
+  }
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    setFileName(file.name);
-  };
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.round((seconds % 3600) / 60);
 
+  if (hours <= 0) {
+    return `${minutes} min`;
+  }
+
+  return `${hours} h ${minutes} min`;
+}
+
+const Paso2 = ({
+  fileInputRef,
+  fileName,
+  fileSizeLabel,
+  uploadStatus,
+  uploadError,
+  quote,
+  onOpenPicker,
+  onFileChange,
+}: Paso2Props) => {
   return (
-  <section className="relative h-full w-full overflow-hidden bg-white">
-  <div className="mx-auto grid h-full w-full max-w-[1400px] grid-cols-1 items-start gap-10 px-5 pt-20 md:px-10 md:pt-24 lg:grid-cols-2 lg:gap-14 lg:px-16 lg:pt-28">
-    <div className="flex flex-col justify-start">
-          <div className="space-y-6 md:space-y-8">
-            <div className="space-y-4">
-              <h2 className="max-w-[700px] text-[2rem] font-black uppercase leading-[0.95] tracking-tight text-black md:text-[3rem] lg:text-[3.7rem]">
-                CARGA TU ARCHIVO
-              </h2>
+    <section className="border-b border-black/10 bg-white px-4 py-12 sm:px-8 lg:px-12">
+      <div className="mx-auto grid w-full max-w-[1400px] gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
+        {/* Lado izquierdo con instrucciones del paso. */}
+        <div>
+          <p
+            className={`${cotizaTextRegularFont.className} text-xs uppercase tracking-[0.35em] text-black/45`}
+          >
+            Paso 02
+          </p>
+          <h2
+            className={`${cotizaTitleFont.className} mt-3 text-4xl uppercase leading-[0.9] sm:text-5xl lg:text-6xl`}
+          >
+            Carga tu archivo
+          </h2>
+          <p
+            className={`${cotizaTextRegularFont.className} mt-5 max-w-lg text-sm leading-6 text-black/70 sm:text-base`}
+          >
+            Sube tu STL y dejamos que CloudSlicer haga la laminación. El
+            sistema primero carga el archivo y luego consulta el precio sobre la
+            configuración de impresión que tengas definida.
+          </p>
 
-              <p className="text-[1.5rem] font-extrabold uppercase tracking-tight text-[#4a4a4a] md:text-[2rem]">
-                Paso 2
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <p className="max-w-[260px] text-[1.05rem] leading-[1.1] text-[#8a8a8a] md:text-[1.3rem]">
-                Sube archivos .stl, .3mf y .obj y más.
-              </p>
-
-              {fileName && (
-                <div className="max-w-[320px] rounded-md bg-[#f5f5f5] px-3 py-2 text-[13px] text-black shadow-sm">
-                  <span className="font-semibold">Archivo:</span> {fileName}
-                </div>
-              )}
-            </div>
+          <div
+            className={`${cotizaTextRegularFont.className} mt-6 rounded-[24px] border border-black/10 bg-[#ece9e1] p-4 text-sm leading-6 text-black/70`}
+          >
+            Formatos admitidos: <span className="font-semibold">.stl</span>,{" "}
+            <span className="font-semibold">.3mf</span> y{" "}
+            <span className="font-semibold">.obj</span>.
           </div>
         </div>
 
-        {/* Lado derecho */}
-        <div className="flex justify-center lg:justify-end">
-          <div className="relative h-[240px] w-full max-w-[640px] overflow-hidden rounded-[24px] bg-black md:h-[300px] lg:h-[360px]">
-            <Image
-              src="/gif-upload-preview.gif"
-              alt="Vista previa de subida de archivo"
-              fill
-              priority
-              className="object-cover"
-              unoptimized
-            />
-
-            <div className="absolute inset-0 bg-black/10" />
-
-            <div className="absolute inset-0 flex items-center justify-center">
-              <button
-                type="button"
-                onClick={handleOpenFilePicker}
-                className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-white px-4 py-2 text-[12px] font-medium text-black shadow-md transition hover:scale-[1.02]"
-              >
-                Sube tu archivo
-                <span aria-hidden="true">↑</span>
-              </button>
+        {/* Lado derecho con caja de subida y feedback de CloudSlicer. */}
+        <div className="rounded-[32px] border border-black/10 bg-[#111111] p-3 text-white">
+          <div className="relative overflow-hidden rounded-[26px]">
+            <div className="relative h-[250px] sm:h-[320px]">
+              <Image
+                src="/servicios/img4.jpg"
+                alt="Vista referencial para subir archivos 3D"
+                fill
+                className="object-cover opacity-70"
+              />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.2),rgba(0,0,0,0.72)_60%)]" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <button
+                  type="button"
+                  onClick={onOpenPicker}
+                  className={`${cotizaTextBoldFont.className} rounded-full bg-white px-5 py-3 text-xs uppercase tracking-[0.28em] text-black transition-transform duration-300 hover:scale-[1.03]`}
+                >
+                  Sube tu archivo
+                </button>
+              </div>
             </div>
 
             <input
-              ref={inputRef}
+              ref={fileInputRef}
               type="file"
               accept=".stl,.3mf,.obj"
               className="hidden"
-              onChange={handleFileChange}
+              onChange={onFileChange}
             />
+          </div>
+
+          <div className="grid gap-4 px-2 py-5 sm:grid-cols-2">
+            <div>
+              <p
+                className={`${cotizaTextRegularFont.className} text-[11px] uppercase tracking-[0.3em] text-white/55`}
+              >
+                Estado
+              </p>
+              <p className={`${cotizaTextBoldFont.className} mt-2 text-sm`}>
+                {uploadStatus === "idle" && "Esperando archivo"}
+                {uploadStatus === "uploading" && "Subiendo a CloudSlicer"}
+                {uploadStatus === "pricing" && "Laminando y cotizando"}
+                {uploadStatus === "ready" && "Cotización lista"}
+                {uploadStatus === "error" && "No se pudo cotizar"}
+              </p>
+              {fileName && (
+                <p
+                  className={`${cotizaTextRegularFont.className} mt-3 text-sm text-white/70`}
+                >
+                  {fileName} · {fileSizeLabel}
+                </p>
+              )}
+              {uploadError && (
+                <p
+                  className={`${cotizaTextRegularFont.className} mt-3 text-sm text-[#ff8d8d]`}
+                >
+                  {uploadError}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <p
+                className={`${cotizaTextRegularFont.className} text-[11px] uppercase tracking-[0.3em] text-white/55`}
+              >
+                Resultado
+              </p>
+              {quote ? (
+                <div className="mt-2 space-y-2">
+                  <p className={`${cotizaTextBoldFont.className} text-base`}>
+                    {formatPrice(quote.basePrice)}
+                  </p>
+                  <p
+                    className={`${cotizaTextRegularFont.className} text-sm text-white/70`}
+                  >
+                    Material: {quote.materialLabel}
+                  </p>
+                  <p
+                    className={`${cotizaTextRegularFont.className} text-sm text-white/70`}
+                  >
+                    Tiempo estimado: {formatPrintTime(quote.printTimeSeconds)}
+                  </p>
+                  {quote.estimatedWeightGrams !== null && (
+                    <p
+                      className={`${cotizaTextRegularFont.className} text-sm text-white/70`}
+                    >
+                      Material usado: {Math.round(quote.estimatedWeightGrams)} g
+                    </p>
+                  )}
+                  {quote.dimensions && (
+                    <p
+                      className={`${cotizaTextRegularFont.className} text-sm text-white/70`}
+                    >
+                      Volumen: {quote.dimensions.x.toFixed(1)} ×{" "}
+                      {quote.dimensions.y.toFixed(1)} ×{" "}
+                      {quote.dimensions.z.toFixed(1)} mm
+                    </p>
+                  )}
+                  {quote.fitsPrinter === false && (
+                    <p
+                      className={`${cotizaTextRegularFont.className} text-sm text-[#ff8d8d]`}
+                    >
+                      El modelo no cabe en la impresora configurada.
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p
+                  className={`${cotizaTextRegularFont.className} mt-2 text-sm text-white/70`}
+                >
+                  La cotización aparecerá aquí apenas termine la laminación.
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>

@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { Minus, Plus, X } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
+import type { CartLine } from "@/types/cart";
 import { formatPrice } from "@/lib/formatPrice";
 import { cn } from "@/lib/utils";
-import type { CartLine } from "@/types/cart";
-import { Minus, Plus, X } from "lucide-react";
-import { useRouter } from "next/navigation";
 import {
   khInterferenceLightFont,
   khInterferenceRegularFont,
@@ -19,64 +19,75 @@ interface CartItemProps {
 const CartItem = ({ item }: CartItemProps) => {
   const router = useRouter();
   const { removeItem, incQty, decQty } = useCart();
+  const isPrintQuote = item.kind === "print-quote";
+  const destination = isPrintQuote ? "/cotiza" : `/product/${item.productSlug}`;
 
   return (
-    <li className="flex items-center gap-4 py-6 border-b">
-      {/* Imagen */}
-      <div
-        onClick={() => router.push(`/product/${item.productSlug}`)}
-        className="cursor-pointer"
-      >
+    <li className="flex items-center gap-4 border-b py-6">
+      {/* La cotización 3D navega de vuelta a /cotiza; los productos normales conservan su detalle. */}
+      <div onClick={() => router.push(destination)} className="cursor-pointer">
         <Image
           src={item.imageUrl}
           alt={item.variantName}
           width={80}
           height={80}
-          className="w-20 h-20 rounded-md object-cover"
+          className="h-20 w-20 rounded-md object-cover"
         />
       </div>
 
-      {/* Info */}
-      <div className="flex flex-1 justify-between items-center gap-4">
+      <div className="flex flex-1 items-center justify-between gap-4">
         <div className="min-w-0">
           <h2
-            className={`${khInterferenceRegularFont.className} text-sm truncate`}
+            className={`${khInterferenceRegularFont.className} truncate text-sm`}
           >
             {item.variantName}
           </h2>
 
-          {/* Control cantidad */}
-          <div className="flex items-center gap-2 mt-2">
-            <button
-              onClick={() => decQty(item.id)}
-              className="h-8 w-8 border rounded-md flex items-center justify-center hover:bg-muted"
-              aria-label="Disminuir cantidad"
-              type="button"
-            >
-              <Minus size={14} />
-            </button>
+          {isPrintQuote ? (
+            <div className="mt-2 space-y-1">
+              <p
+                className={`${khInterferenceLightFont.className} text-xs text-muted-foreground`}
+              >
+                Cotización 3D lista para checkout.
+              </p>
+              <p
+                className={`${khInterferenceLightFont.className} text-xs text-muted-foreground`}
+              >
+                {item.printQuote.selectedColor} · {item.printQuote.postProcessLabel}
+              </p>
+            </div>
+          ) : (
+            <div className="mt-2 flex items-center gap-2">
+              <button
+                onClick={() => decQty(item.id)}
+                className="flex h-8 w-8 items-center justify-center rounded-md border hover:bg-muted"
+                aria-label="Disminuir cantidad"
+                type="button"
+              >
+                <Minus size={14} />
+              </button>
 
-            <span
-              className={`${khInterferenceLightFont.className} w-6 text-center text-sm`}
-            >
-              {item.qty}
-            </span>
+              <span
+                className={`${khInterferenceLightFont.className} w-6 text-center text-sm`}
+              >
+                {item.qty}
+              </span>
 
-            <button
-              onClick={() => incQty(item.id)}
-              className="h-8 w-8 border rounded-md flex items-center justify-center hover:bg-muted"
-              aria-label="Aumentar cantidad"
-              type="button"
-            >
-              <Plus size={14} />
-            </button>
-          </div>
+              <button
+                onClick={() => incQty(item.id)}
+                className="flex h-8 w-8 items-center justify-center rounded-md border hover:bg-muted"
+                aria-label="Aumentar cantidad"
+                type="button"
+              >
+                <Plus size={14} />
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Precio + eliminar */}
         <div className="flex items-center gap-4">
           <p
-            className={`${khInterferenceLightFont.className} text-sm whitespace-nowrap`}
+            className={`${khInterferenceLightFont.className} whitespace-nowrap text-sm`}
           >
             {formatPrice(item.unitPrice * item.qty)}
           </p>
@@ -84,7 +95,7 @@ const CartItem = ({ item }: CartItemProps) => {
           <button
             onClick={() => removeItem(item.id)}
             className={cn(
-              "h-8 w-8 rounded-full border flex items-center justify-center hover:bg-muted"
+              "flex h-8 w-8 items-center justify-center rounded-full border hover:bg-muted"
             )}
             aria-label="Eliminar producto"
             type="button"
@@ -98,6 +109,3 @@ const CartItem = ({ item }: CartItemProps) => {
 };
 
 export default CartItem;
-
-
-

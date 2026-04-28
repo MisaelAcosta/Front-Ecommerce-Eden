@@ -156,10 +156,11 @@ const Block2 = () => {
       group
       relative
       mx-auto w-full max-w-7xl
-      px-0
-      sm:px-6
-      lg:px-8
+      px-4
+      sm:px-0 
+      lg:px-0
       cursor-pointer
+      rounded-xl
       shadow-none
     "
   >
@@ -167,8 +168,8 @@ const Block2 = () => {
       className="
         group
         relative
-        mx-auto w-full max-w-7xl
-        px-0 sm:px-6 lg:px-8
+        max-w-7x1
+        px-10 sm:px-6 lg:px-4
         min-h-[75svh]
         max-h-[88svh]
         sm:h-55
@@ -177,7 +178,7 @@ const Block2 = () => {
         overflow-hidden
         cursor-pointer
         bg-white
-        
+        rounded-xl
         shadow-none
       "
     >

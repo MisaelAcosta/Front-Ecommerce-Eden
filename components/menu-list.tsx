@@ -20,13 +20,14 @@ const maratypeFont = localFont({
 const MenuList = () => {
   return (
     <NavigationMenu viewport={false}>
-      <NavigationMenuList className="gap-2">
+      <NavigationMenuList className="gap-2 py-4 ">
         <NavigationMenuItem>
           <NavigationMenuLink
             asChild
             className={cn(
               navigationMenuTriggerStyle(),
-              `${maratypeFont.className} text-3xl font-medium tracking-wide`
+              `${maratypeFont.className} text-3xl font-medium 
+              tracking-wide`
             )}
           >
             <TransitionLink href="/category/todos-los-productos">
@@ -40,7 +41,8 @@ const MenuList = () => {
             asChild
             className={cn(
               navigationMenuTriggerStyle(),
-              `${maratypeFont.className} text-3xl font-medium tracking-wide`
+              `${maratypeFont.className} text-3xl font-medium 
+              tracking-wide`
             )}
           >
             <TransitionLink href="/servicio">SERVICIOS</TransitionLink>
@@ -52,10 +54,11 @@ const MenuList = () => {
             asChild
             className={cn(
               navigationMenuTriggerStyle(),
-              `${maratypeFont.className} hidden text-3xl font-medium tracking-wide`
+              `${maratypeFont.className} text-3xl font-medium 
+              tracking-wide`
             )}
           >
-            <TransitionLink href="/cotiza">COTIZA</TransitionLink>
+            <TransitionLink href="/cotiza">IMPRIME</TransitionLink>
           </NavigationMenuLink>
         </NavigationMenuItem>
       </NavigationMenuList>

@@ -85,9 +85,18 @@ const Navbar = () => {
   const isCart = pathname.startsWith("/cart");
   const isLoved = pathname.startsWith("/loved-product");
   const isService = pathname.startsWith("/servicio");
+  const isCotiza = pathname.startsWith("/cotiza");
+  const isHome = pathname === "/";
 
   const forceDark =
-    isCatalog || isProduct || isCart || scrolled || isLoved || isService;
+    isCatalog ||
+    isProduct ||
+    isCart ||
+    scrolled ||
+    isLoved ||
+    isService ||
+    isCotiza ||
+    isHome;
   const fg = forceDark ? "text-black" : "text-white";
 
   return (
@@ -96,11 +105,12 @@ const Navbar = () => {
         fixed top-0 left-0 z-50 w-full
         transition-all duration-300
         ${hidden ? "-translate-y-full" : "translate-y-0"}
-        ${forceDark ? "bg-white/90 backdrop-blur-md shadow-sm" : "bg-transparent"}
+        ${forceDark ? "bg-white/90 backdrop-blur-md shadow-none" : "bg-transparent"}
       `}
     >
-      <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-3 lg:px-4">
-        <div className="grid grid-cols-3 items-center py-2">
+      <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-3 
+      lg:px-4">
+        <div className="grid grid-cols-3 items-center py-1">
           <div className="flex items-center justify-start gap-3">
             <div className="flex lg:hidden">
               <ItemsMenuMobile scrolled={forceDark} />
@@ -110,7 +120,9 @@ const Navbar = () => {
               <button
                 type="button"
                 onClick={() => navigateWithTransition("/")}
-                className="relative h-10 w-[110px] transition-opacity duration-200 hover:opacity-80 lg:h-9 lg:w-[130px]"
+                className="relative h-10 w-[110px] 
+                transition-opacity duration-200 
+                hover:opacity-80 lg:h-9 lg:w-[130px]"
                 aria-label="Ir al inicio"
               >
                 <Image

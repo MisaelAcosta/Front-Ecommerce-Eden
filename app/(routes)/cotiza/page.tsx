@@ -1,9 +1,5 @@
-import StepsStack from "@/components/stepsStack";
+import CotizaPage from "./components/cotiza-page";
 
-export default function Home() {
-  return (
-    <main>
-      <StepsStack />
-    </main>
-  );
+export default function Page() {
+  return <CotizaPage />;
 }

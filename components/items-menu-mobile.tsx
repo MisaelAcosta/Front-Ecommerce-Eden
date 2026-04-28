@@ -250,7 +250,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
                       className={`${maratypeFont.className} block text-8xl leading-none tracking-tighter text-black sm:text-6xl`}
                       onClick={closeMenu}
                     >
-                      COTIZA
+                      IMPRIME
                     </TransitionLink>
                   </div>
 

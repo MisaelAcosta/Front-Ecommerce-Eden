@@ -206,6 +206,7 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
       : "/no-image.png";
 
     addItem({
+      kind: "product",
       productId: product.id,
       productSlug: product.slug,
 
