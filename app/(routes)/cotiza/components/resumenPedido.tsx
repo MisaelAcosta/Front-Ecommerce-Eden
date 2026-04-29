@@ -33,7 +33,7 @@ const ResumenPedido = ({
   postProcessLabel,
   postProcessPrice,
   basePrice,
-  totalPrice,
+  totalPrice, 
   canCheckout,
   addingToCart,
   fitsPrinter,
@@ -46,7 +46,8 @@ const ResumenPedido = ({
     <section className="bg-[#0d0d0d] px-4 py-12 text-white sm:px-8 lg:px-12">
       <div className="mx-auto w-full max-w-[1400px]">
         <p
-          className={`${cotizaTextRegularFont.className} text-xs uppercase tracking-[0.35em] text-white/45`}
+          className={`${cotizaTextRegularFont.className} text-xs 
+          uppercase tracking-[0.35em] text-white/45`}
         >
           Resumen de pedido
         </p>

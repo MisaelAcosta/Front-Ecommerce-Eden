@@ -5,7 +5,7 @@ import Paso2 from "./paso2";
 
 const StepsPin = () => {
   return (
-    <section className="relative bg-white">
+    <section className="relative bg-black">
       <div className="relative">
         <Paso1 />
 
