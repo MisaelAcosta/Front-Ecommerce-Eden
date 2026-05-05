@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Heart, ShoppingBag, Smile } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import ItemsMenuMobile from "@/components/items-menu-mobile";
 import MenuList from "@/components/menu-list";
@@ -12,13 +12,15 @@ import type { CurrentUser, ProfileData } from "@/components/profile/profile-type
 import { useNavigationTransition } from "@/components/navigation-transition-provider";
 import { useCart } from "@/hooks/use-cart";
 
-const DESKTOP_LOGO_LIGHT = "/icons/logo-eden-white.png";
-const DESKTOP_LOGO_DARK = "/icons/logo-eden-black.png";
+// Assets del desktop inspirados en las referencias: isotipo + wordmark.
+const DESKTOP_ICON = "/icons/op/white_ilust.png";
+const DESKTOP_WORDMARK = "/icons/op/white_eden.png";
+
+// Assets compactos del mobile.
 const MOBILE_LOGO_LIGHT = "/icons/logo-eden-white.png";
 const MOBILE_LOGO_DARK = "/icons/logo-eden-black.png";
 
 const Navbar = () => {
-  const router = useRouter();
   const pathname = usePathname();
   const cart = useCart();
   const { navigateWithTransition } = useNavigationTransition();
@@ -30,6 +32,7 @@ const Navbar = () => {
   const [hidden, setHidden] = useState(false);
   const lastY = useRef(0);
 
+  // Comportamiento de desaparicion/aparicion al hacer scroll.
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
@@ -50,6 +53,7 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Estado de sesion para desktop y mobile.
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -97,7 +101,74 @@ const Navbar = () => {
     isService ||
     isCotiza ||
     isHome;
-  const fg = forceDark ? "text-black" : "text-white";
+  const mobileFg = forceDark ? "text-black" : "text-white";
+
+  const handleGoHome = () => navigateWithTransition("/");
+  const handleGoLoved = () => navigateWithTransition("/loved-product");
+  const handleGoCart = () => navigateWithTransition("/cart");
+
+  // Triggers reutilizables para no duplicar la misma logica de sesion.
+  const renderProfileButton = (iconClassName: string) => {
+    if (loadingUser) {
+      return null;
+    }
+
+    const icon = (
+      <Smile strokeWidth={1.5} fill="none" className={iconClassName} />
+    );
+
+    if (user) {
+      return (
+        <ProfileSheet
+          user={user}
+          profile={profile ?? undefined}
+          onLogout={() => {
+            setUser(null);
+            setProfile(null);
+          }}
+        >
+          <button aria-label="Perfil" className="cursor-pointer">
+            {icon}
+          </button>
+        </ProfileSheet>
+      );
+    }
+
+    return (
+      <LoginDialog>
+        <button aria-label="Iniciar sesion" className="cursor-pointer">
+          {icon}
+        </button>
+      </LoginDialog>
+    );
+  };
+
+  const renderCartButton = (iconClassName: string, countClassName: string) => {
+    if (cart.items.length === 0) {
+      return (
+        <button
+          type="button"
+          aria-label="Ir al carrito"
+          className="cursor-pointer"
+          onClick={handleGoCart}
+        >
+          <ShoppingBag strokeWidth={1.5} className={iconClassName} />
+        </button>
+      );
+    }
+
+    return (
+      <button
+        type="button"
+        aria-label="Ir al carrito"
+        className="inline-flex cursor-pointer items-center gap-2"
+        onClick={handleGoCart}
+      >
+        <ShoppingBag strokeWidth={1.5} className={iconClassName} />
+        <span className={countClassName}>{cart.items.length}</span>
+      </button>
+    );
+  };
 
   return (
     <header
@@ -105,79 +176,92 @@ const Navbar = () => {
         fixed top-0 left-0 z-50 w-full
         transition-all duration-300
         ${hidden ? "-translate-y-full" : "translate-y-0"}
-        ${forceDark ? "bg-white/90 backdrop-blur-md shadow-none" : "bg-transparent"}
       `}
     >
-      <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-3 
-      lg:px-4">
-        <div className="grid grid-cols-3 items-center py-1">
-          <div className="flex items-center justify-start gap-3">
-            <div className="flex lg:hidden">
-              <ItemsMenuMobile scrolled={forceDark} />
+      <div className="mx-auto w-full max-w-[1400px] px-3 sm:px-4 lg:px-6">
+        {/* Desktop: barra flotante tipo capsule inspirada en las referencias. */}
+        <div className="hidden pt-4 lg:block">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6 rounded-[30px] border border-white/10 bg-[rgba(42,42,39,0.76)] px-6 py-3 text-white shadow-[0_18px_60px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+            <div className="min-w-0">
+              <MenuList pathname={pathname} />
             </div>
 
-            <div className="hidden items-center gap-10 lg:flex">
-              <button
-                type="button"
-                onClick={() => navigateWithTransition("/")}
-                className="relative h-10 w-[110px] 
-                transition-opacity duration-200 
-                hover:opacity-80 lg:h-9 lg:w-[130px]"
-                aria-label="Ir al inicio"
-              >
+            <button
+              type="button"
+              onClick={handleGoHome}
+              className="group inline-flex items-center gap-3 rounded-full px-3 py-2 transition-transform duration-300 hover:scale-[1.02]"
+              aria-label="Ir al inicio"
+            >
+              <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/10">
+                <span className="relative h-6 w-6">
+                  <Image
+                    src={DESKTOP_ICON}
+                    alt="Eden icono"
+                    fill
+                    priority
+                    className="object-contain"
+                  />
+                </span>
+              </span>
+
+              <span className="relative h-5 w-[88px]">
                 <Image
-                  key={forceDark ? "dark" : "light"}
-                  src={forceDark ? DESKTOP_LOGO_DARK : DESKTOP_LOGO_LIGHT}
-                  alt="Eden Logo"
+                  src={DESKTOP_WORDMARK}
+                  alt="Eden"
                   fill
                   priority
-                  className="object-contain"
+                  className="object-contain object-left"
                 />
-              </button>
-              <div className={`text-xl ${fg}`}>
-                <MenuList />
+              </span>
+            </button>
+
+            <div className="flex items-center justify-end">
+              <div className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/10 p-1.5">
+                {renderProfileButton(
+                  "h-7 w-7 text-white/90 transition-colors duration-300"
+                )}
+
+                <button
+                  type="button"
+                  aria-label="Ir a favoritos"
+                  className="rounded-full p-2 text-white/80 transition-colors duration-300 hover:bg-white/10 hover:text-white"
+                  onClick={handleGoLoved}
+                >
+                  <Heart strokeWidth={1.5} className="h-6 w-6" />
+                </button>
+
+                <div className="h-5 w-px bg-white/15" />
+
+                <div className="rounded-full px-2 py-1 text-white/90 transition-colors duration-300 hover:bg-white/10 hover:text-white">
+                  {renderCartButton("h-6 w-6", "text-xs font-semibold")}
+                </div>
               </div>
             </div>
+          </div>
+        </div>
 
-            {!loadingUser && (
-              <div className="flex lg:hidden">
-                {user ? (
-                  <ProfileSheet
-                    user={user}
-                    profile={profile ?? undefined}
-                    onLogout={() => {
-                      setUser(null);
-                      setProfile(null);
-                    }}
-                  >
-                    <button aria-label="Perfil" className="cursor-pointer">
-                      <Smile
-                        strokeWidth={1.5}
-                        fill="none"
-                        className={`h-7 w-7 transition-colors duration-300 ${fg}`}
-                      />
-                    </button>
-                  </ProfileSheet>
-                ) : (
-                  <LoginDialog>
-                    <button aria-label="Iniciar sesion" className="cursor-pointer">
-                      <Smile
-                        strokeWidth={1.5}
-                        fill="none"
-                        className={`h-6 w-6 transition-colors duration-300 ${fg}`}
-                      />
-                    </button>
-                  </LoginDialog>
-                )}
-              </div>
-            )}
+        {/* Mobile: conservamos el navbar compacto y solo afinamos la logica visual. */}
+        <div
+          className={`
+            grid grid-cols-3 items-center py-2 lg:hidden
+            transition-colors duration-300
+            ${forceDark ? "bg-white/90 backdrop-blur-md" : "bg-transparent"}
+          `}
+        >
+          <div className="flex items-center justify-start gap-3">
+            <ItemsMenuMobile scrolled={forceDark} />
+            <div className="flex">
+              {renderProfileButton(
+                `h-6 w-6 transition-colors duration-300 ${mobileFg}`
+              )}
+            </div>
           </div>
 
           <div className="flex items-center justify-center">
             <button
               type="button"
-              onClick={() => navigateWithTransition("/")}
-              className="relative h-18 w-20 lg:hidden"
+              onClick={handleGoHome}
+              className="relative h-18 w-20"
               aria-label="Ir al inicio"
             >
               <Image
@@ -191,61 +275,25 @@ const Navbar = () => {
             </button>
           </div>
 
-          <div className="flex items-center justify-end gap-5 lg:gap-8">
-            {!loadingUser && (
-              <div className="hidden lg:flex">
-                {user ? (
-                  <ProfileSheet
-                    user={user}
-                    profile={profile ?? undefined}
-                    onLogout={() => {
-                      setUser(null);
-                      setProfile(null);
-                    }}
-                  >
-                    <button aria-label="Perfil" className="cursor-pointer">
-                      <Smile
-                        strokeWidth={1.5}
-                        fill="none"
-                        className={`h-8 w-8 transition-colors duration-300 ${fg}`}
-                      />
-                    </button>
-                  </ProfileSheet>
-                ) : (
-                  <LoginDialog>
-                    <button aria-label="Iniciar sesion" className="cursor-pointer">
-                      <Smile
-                        strokeWidth={1.5}
-                        fill="none"
-                        className={`h-7 w-7 transition-colors duration-300 ${fg}`}
-                      />
-                    </button>
-                  </LoginDialog>
-                )}
-              </div>
-            )}
-
-            <Heart
-              strokeWidth={1.5}
-              className={`h-7 w-7 cursor-pointer transition-colors duration-300 ${fg}`}
-              onClick={() => router.push("/loved-product")}
-            />
-
-            {cart.items.length === 0 ? (
-              <ShoppingBag
+          <div className="flex items-center justify-end gap-4">
+            <button
+              type="button"
+              aria-label="Ir a favoritos"
+              className={mobileFg}
+              onClick={handleGoLoved}
+            >
+              <Heart
                 strokeWidth={1.5}
-                className={`h-7 w-7 cursor-pointer transition-colors duration-300 ${fg}`}
-                onClick={() => router.push("/cart")}
+                className={`h-6 w-6 transition-colors duration-300 ${mobileFg}`}
               />
-            ) : (
-              <div
-                className={`flex cursor-pointer items-center gap-1 transition-colors duration-300 ${fg}`}
-                onClick={() => router.push("/cart")}
-              >
-                <ShoppingBag strokeWidth={1.5} className="h-7 w-7" />
-                <span className="text-sm font-semibold">{cart.items.length}</span>
-              </div>
-            )}
+            </button>
+
+            <div className={mobileFg}>
+              {renderCartButton(
+                `h-6 w-6 transition-colors duration-300 ${mobileFg}`,
+                "text-xs font-semibold"
+              )}
+            </div>
           </div>
         </div>
       </div>

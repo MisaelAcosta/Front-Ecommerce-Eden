@@ -1,11 +1,13 @@
 "use client";
 
-import { Menu, X, Instagram, Youtube } from "lucide-react";
+import { ArrowUpRight, Instagram, Menu, X, Youtube } from "lucide-react";
 import localFont from "next/font/local";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { createPortal } from "react-dom";
+import { usePathname } from "next/navigation";
 import { LoginDialog } from "@/components/auth/login-dialog";
+import { getVisibleMobileNavItems } from "@/components/navbar-config";
 import { ProfileSheet } from "@/components/profile/profile-sheet";
 import type { CurrentUser, ProfileData } from "@/components/profile/profile-types";
 import TransitionLink from "@/components/transition-link";
@@ -22,6 +24,7 @@ const khInterferenceBoldFont = localFont({
   display: "swap",
 });
 
+// Animacion radial del overlay para mantener el efecto actual del menu.
 const overlayVariants = (originPx: string): Variants => ({
   initial: {
     clipPath: `circle(0px at ${originPx})`,
@@ -72,6 +75,7 @@ type ItemsMenuMobileProps = {
 };
 
 export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [originPx, setOriginPx] = useState("100% 0%");
   const [mounted, setMounted] = useState(false);
@@ -80,6 +84,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
   const [loadingUser, setLoadingUser] = useState(false);
   const btnRef = useRef<HTMLButtonElement | null>(null);
 
+  // Calculamos el origen del clipPath para que la apertura nazca desde el boton.
   const computeOrigin = () => {
     if (!btnRef.current) return;
 
@@ -132,6 +137,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
     return () => window.removeEventListener("resize", onResize);
   }, [isOpen]);
 
+  // Bloqueamos el scroll del documento mientras el menu overlay esta abierto.
   useEffect(() => {
     if (isOpen) {
       document.documentElement.style.overflow = "hidden";
@@ -148,6 +154,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
   }, [isOpen]);
 
   const closeMenu = () => setIsOpen(false);
+  const visibleNavItems = getVisibleMobileNavItems(pathname);
 
   const handleToggle = () => {
     const next = !isOpen;
@@ -200,59 +207,26 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
               initial="hidden"
               animate="show"
             >
+              {/* Navegacion principal mobile: ocultamos la seccion actual para evitar redundancia. */}
               <div className="flex-1">
                 <motion.div variants={itemVariants} className="space-y-15">
-                  <div className="relative pt-10">
-                    <span className="absolute -top-4 right-45 pt-10 text-xs font-semibold text-red-500">
-                      01
-                    </span>
-                    <TransitionLink
-                      href="/"
-                      className={`${maratypeFont.className} block text-8xl leading-none tracking-tighter text-black sm:text-6xl`}
-                      onClick={closeMenu}
+                  {visibleNavItems.map((item, index) => (
+                    <div
+                      key={item.href}
+                      className={index === 0 ? "relative pt-10" : "relative"}
                     >
-                      INICIO
-                    </TransitionLink>
-                  </div>
-
-                  <div className="relative">
-                    <span className="absolute -top-4 right-10 text-xs font-semibold text-red-500">
-                      02
-                    </span>
-                    <TransitionLink
-                      href="/category/todos-los-productos"
-                      className={`${maratypeFont.className} block text-8xl leading-none tracking-tighter text-black sm:text-6xl`}
-                      onClick={closeMenu}
-                    >
-                      CATALOGO
-                    </TransitionLink>
-                  </div>
-
-                  <div className="relative">
-                    <span className="absolute -top-4 right-10 text-xs font-semibold text-red-500">
-                      03
-                    </span>
-                    <TransitionLink
-                      href="/servicio"
-                      className={`${maratypeFont.className} block text-8xl leading-none tracking-tighter text-black sm:text-6xl`}
-                      onClick={closeMenu}
-                    >
-                      SERVICIOS
-                    </TransitionLink>
-                  </div>
-
-                  <div className="relative">
-                    <span className="absolute -top-4 right-10 text-xs font-semibold text-red-500">
-                      04
-                    </span>
-                    <TransitionLink
-                      href="/cotiza"
-                      className={`${maratypeFont.className} block text-8xl leading-none tracking-tighter text-black sm:text-6xl`}
-                      onClick={closeMenu}
-                    >
-                      IMPRIME
-                    </TransitionLink>
-                  </div>
+                      <span className="absolute -top-4 right-0 text-xs font-semibold text-red-500">
+                        {item.mobileNumber}
+                      </span>
+                      <TransitionLink
+                        href={item.href}
+                        className={`${maratypeFont.className} block text-8xl leading-none tracking-tighter text-black sm:text-6xl`}
+                        onClick={closeMenu}
+                      >
+                        {item.label}
+                      </TransitionLink>
+                    </div>
+                  ))}
 
                   <div className="hidden">
                     {loadingUser ? (
@@ -285,17 +259,19 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
                 </motion.div>
               </div>
 
+              {/* Footer del overlay con links externos. */}
               <motion.div variants={itemVariants} className="pb-10">
                 <div className="mb-4 pl-3 text-xs text-black/50">(REDES)</div>
 
-                <div className="flex items-center justify-between px-3 text-xl">
+                <div className="flex items-center justify-between gap-4 px-3 text-xl">
                   <TransitionLink
                     href="https://www.instagram.com/eden.3d_/"
                     target="_blank"
                     className={`${khInterferenceBoldFont.className} inline-flex items-center gap-2 tracking-wide text-black`}
                   >
                     <Instagram className="h-4 w-4" />
-                    INSTAGRAM <span className="font-extrabold text-black/60">↗</span>
+                    INSTAGRAM
+                    <ArrowUpRight className="h-4 w-4 text-black/60" />
                   </TransitionLink>
 
                   <TransitionLink
@@ -304,7 +280,8 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
                     className={`${khInterferenceBoldFont.className} inline-flex items-center gap-2 tracking-wide text-black`}
                   >
                     <Youtube className="h-5 w-5" />
-                    YOUTUBE <span className="pb-2 font-extrabold text-black/90">↗</span>
+                    YOUTUBE
+                    <ArrowUpRight className="h-4 w-4 text-black/90" />
                   </TransitionLink>
                 </div>
               </motion.div>
