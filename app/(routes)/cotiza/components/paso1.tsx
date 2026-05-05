@@ -7,7 +7,8 @@ const Paso1 = () => {
   return (
     <section className="border-b border-black/10 bg-[#F3F3F3] 
     px-4 py-16 lg:py-25 sm:px-8 lg:px-12">
-      <div className="mx-auto grid w-full max-w-[1400px] gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
+      <div className="mx-auto grid w-full max-w-[1400px] gap-8 
+      lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
         {/* Columna editorial con el texto guía del paso. */}
         <div>
           <p
@@ -25,7 +26,8 @@ const Paso1 = () => {
             Principales paginas de modelos 3D
           </h2>
           <p
-            className={`${cotizaTextRegularFont.className} mt-10 lg:mt-15
+            className={`${cotizaTextRegularFont.className} mt-10 
+            lg:mt-15
             max-w-lg text-sm leading-6 text-black/70 
             sm:text-base`}
           >

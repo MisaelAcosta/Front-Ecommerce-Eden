@@ -33,7 +33,7 @@ const ResumenPedido = ({
   postProcessLabel,
   postProcessPrice,
   basePrice,
-  totalPrice, 
+  totalPrice,
   canCheckout,
   addingToCart,
   fitsPrinter,
@@ -43,24 +43,33 @@ const ResumenPedido = ({
   onCheckout,
 }: ResumenPedidoProps) => {
   return (
-    <section className="bg-[#0d0d0d] px-4 py-12 text-white sm:px-8 lg:px-12">
-      <div className="mx-auto w-full max-w-[1400px]">
+    <section className="bg-[#0d0d0d] px-4 py-16 lg:py-25
+    text-white 
+    sm:px-8 lg:px-12">
+      <div className="mx-auto w-full 
+      max-w-[1300px]">
         <p
-          className={`${cotizaTextRegularFont.className} text-xs 
-          uppercase tracking-[0.35em] text-white/45`}
+          className={`${cotizaTextRegularFont.className} 
+          text-base lg:text-2xl uppercase tracking-[0.35em] text-white/65`}
         >
           Resumen de pedido
         </p>
         <h2
-          className={`${cotizaTitleFont.className} mt-3 text-4xl uppercase leading-[0.9] sm:text-5xl`}
+          className={`${cotizaTitleFont.className} 
+          mt-3 lg:pt-10 pt-5
+          text-5xl uppercase leading-[0.9] sm:text-5xl lg:text-6xl`}
         >
           Imprime
         </h2>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_280px] lg:items-end">
+        <div className="grid gap-12 lg:gap-68 
+        lg:grid-cols-[1fr_480px] lg:items-end mt-10 
+            lg:mt-15 ">
           {/* Resumen de la cotización en formato compacto tipo editorial. */}
-          <div className="rounded-[32px] border border-white/10 bg-white/5 p-5 sm:p-6">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="rounded-[22px] border 
+          border-white/10 bg-white/5 p-5 sm:p-6">
+            <div className="grid gap-4 sm:grid-cols-2 
+            lg:grid-cols-3">
               <div>
                 <p
                   className={`${cotizaTextRegularFont.className} text-[11px] uppercase tracking-[0.3em] text-white/45`}
@@ -130,7 +139,8 @@ const ResumenPedido = ({
               </div>
             </div>
 
-            <div className="mt-6 grid gap-3 border-t border-white/10 pt-5 sm:grid-cols-2">
+            <div className="mt-6 grid gap-3 border-t 
+            border-white/10 pt-5 sm:grid-cols-2 ">
               <div>
                 <p
                   className={`${cotizaTextRegularFont.className} text-[11px] uppercase tracking-[0.3em] text-white/45`}
@@ -144,12 +154,15 @@ const ResumenPedido = ({
 
               <div>
                 <p
-                  className={`${cotizaTextRegularFont.className} text-[11px] uppercase tracking-[0.3em] text-white/45`}
+                  className={`${cotizaTextRegularFont.className} t
+                  ext-[11px] uppercase tracking-[0.3em]
+                   text-white/45`}
                 >
                   Total
                 </p>
                 <p
-                  className={`${cotizaTextBoldFont.className} mt-2 text-2xl text-[#ff3b30]`}
+                  className={`${cotizaTextBoldFont.className} 
+                  mt-2 text-2xl text-[#ff3b30]`}
                 >
                   {totalPrice > 0 ? formatPrice(totalPrice) : "Pendiente"}
                 </p>
@@ -158,7 +171,8 @@ const ResumenPedido = ({
 
             {fitsPrinter === false && (
               <p
-                className={`${cotizaTextRegularFont.className} mt-5 text-sm text-[#ff8d8d]`}
+                className={`${cotizaTextRegularFont.className} mt-5 
+                text-sm text-[#ff8d8d]`}
               >
                 El modelo no cabe en la impresora configurada, así que no se
                 puede enviar al carrito.
@@ -188,7 +202,8 @@ const ResumenPedido = ({
           </div>
 
           {/* CTA final: agrega la cotización al carrito y deriva al checkout actual. */}
-          <div className="rounded-[28px] border border-white/10 bg-white/5 p-5">
+          <div className="rounded-[28px] border
+           border-white/10 bg-white/5 p-5">
             <button
               type="button"
               onClick={onCheckout}
@@ -198,12 +213,6 @@ const ResumenPedido = ({
               {addingToCart ? "Agregando..." : "Imprimir"}
             </button>
 
-            <p
-              className={`${cotizaTextRegularFont.className} mt-4 text-sm leading-6 text-white/65`}
-            >
-              Este botón agrega la cotización al carrito actual y te lleva al
-              checkout existente del ecommerce.
-            </p>
 
             {uploadStatus !== "ready" && (
               <p
