@@ -47,7 +47,7 @@ const ResumenPedido = ({
     text-white 
     sm:px-8 lg:px-12">
       <div className="mx-auto w-full 
-      max-w-[1300px]">
+      max-w-[1350px]">
         <p
           className={`${cotizaTextRegularFont.className} 
           text-base lg:text-2xl uppercase tracking-[0.35em] text-white/65`}

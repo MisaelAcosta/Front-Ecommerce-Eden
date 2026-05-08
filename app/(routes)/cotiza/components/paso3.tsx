@@ -27,6 +27,26 @@ type Paso3Props = {
   onReferenceLinkChange: (value: string) => void;
 };
 
+const cardBaseClassName =
+  "relative overflow-hidden rounded-[18px] border border-white/8 bg-[#050505] p-4 text-left shadow-[0_24px_60px_rgba(0,0,0,0.28)]";
+
+const DecorativeMarks = () => (
+  <div className="absolute right-4 top-4 grid grid-cols-2 gap-1 opacity-95">
+    {[0, 1, 2, 3].map((item) => (
+      <span
+        key={item}
+        className="h-4 w-4 rounded-[4px] bg-white"
+        style={{
+          clipPath:
+            item % 2 === 0
+              ? "polygon(0 0, 100% 0, 100% 100%)"
+              : "polygon(0 0, 100% 0, 0 100%)",
+        }}
+      />
+    ))}
+  </div>
+);
+
 const Paso3 = ({
   colorOptions,
   colorMode,
@@ -40,37 +60,31 @@ const Paso3 = ({
   onReferenceLinkChange,
 }: Paso3Props) => {
   return (
-    <section className="border-b border-black/10 bg-[#F3F3F3] px-4 py-12 sm:px-8 lg:px-12">
-      <div className="mx-auto grid w-full max-w-[1400px] 
-      gap-8 lg:grid-cols-[0.95fr_1.05fr]">
-        {/* Texto descriptivo del paso. */}
-        <div>
+    <section className="border-b border-white/10 bg-[#161616] px-4 py-16 text-white sm:px-8 lg:px-12">
+      <div className="mx-auto grid w-full max-w-[1350px] gap-10 lg:grid-cols-[0.78fr_1.22fr] lg:gap-14">
+        <div className="flex min-h-full flex-col">
           <p
-            className={`${cotizaTextBoldFont.className} text-base lg:text-2xl
-            uppercase tracking-[0.35em] text-black/65`}
+            className={`${cotizaTextBoldFont.className} text-sm uppercase tracking-[0.35em] text-white/70 lg:text-xl`}
           >
-            Paso 03
+            Paso 3
           </p>
+
           <h2
-            className={`${cotizaTitleFont.className} mt-3 lg:pt-10 pt-5
-            text-4xl 
-            uppercase leading-[0.9] sm:text-5xl lg:text-6xl`}
+            className={`${cotizaTitleFont.className} mt-5 max-w-[420px] text-4xl uppercase leading-[0.88] text-white sm:text-5xl lg:mt-8 lg:text-6xl`}
           >
             Selecciona la calidad y color
           </h2>
+
           <p
-            className={`${cotizaTextRegularFont.className} mt-10 lg:mt-15
-            max-w-lg text-sm leading-6 text-black/70 sm:text-base`}
+            className={`${cotizaTextRegularFont.className} mt-auto max-w-[320px] pt-12 text-sm uppercase leading-6 tracking-[0.05em] text-white/58 sm:text-base`}
           >
-            La cotización actual trabaja con una única configuración de calidad
-            estándar. También dejamos visible el flujo multicolor, pero marcado
-            como no disponible por el momento.
+            Personaliza el acabado de tu pieza seleccionando calidad y
+            configuracion de color.
           </p>
         </div>
 
-        {/* Panel derecho con selección visual de color y calidad. */}
-        <div className="rounded-[22px] border border-black/10 bg-white p-5">
-          <div className="flex flex-wrap items-center gap-3">
+        <div>
+          <div className="mb-5 flex flex-wrap items-center gap-3">
             {colorOptions.map((color) => {
               const selected = color.id === selectedColor;
 
@@ -79,124 +93,151 @@ const Paso3 = ({
                   key={color.id}
                   type="button"
                   onClick={() => onColorChange(color.id)}
-                  className={`h-9 w-9 rounded-md 
-                    border transition-transform duration-200 
-                    hover:scale-105 cursor-pointer ${
+                  className={`h-6 w-6 rounded-[4px] border transition-all duration-200 hover:scale-110 ${
                     selected
-                      ? "border-black ]"
-                      : "border-black/10"
+                      ? "border-white shadow-[0_0_0_2px_rgba(255,255,255,0.18)]"
+                      : "border-white/12"
                   }`}
                   style={{ backgroundColor: color.hex }}
                   aria-label={`Color ${color.label}`}
+                  aria-pressed={selected}
                 />
               );
             })}
           </div>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <div className="grid gap-3 md:grid-cols-2">
             <button
               type="button"
               onClick={() => onColorModeChange("single")}
-              className={`rounded-[24px] border p-4 cursor-pointer text-left ${
+              className={`${cardBaseClassName} min-h-[240px] transition-transform duration-300 hover:-translate-y-1 ${
                 colorMode === "single"
-                  ? "border-black bg-[#dadada]"
-                  : "border-black/10"
+                  ? "ring-1 ring-white/20"
+                  : "border-white/12"
               }`}
+              aria-pressed={colorMode === "single"}
             >
               <p
-                className={`${cotizaTextBoldFont.className} text-xs uppercase tracking-[0.25em]`}
+                className={`${cotizaTextBoldFont.className} relative z-10 text-lg uppercase tracking-[0.08em] text-white`}
               >
                 Un color
               </p>
-              <div className="relative mt-4 h-48 overflow-hidden rounded-[18px] border border-black/10">
+
+              <p
+                className={`${cotizaTextRegularFont.className} absolute bottom-4 left-4 max-w-[220px] text-[10px] uppercase leading-4 tracking-[0.08em] text-white/60`}
+              >
+                Elige uno de nuestros colores disponibles para fabricar tu
+                modelo utilizando la configuracion seleccionada.
+              </p>
+
+              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black via-black/60 to-transparent" />
+
+              <div className="absolute bottom-0 right-2 h-[170px] w-[165px]">
                 <Image
                   src="/servicios/servicio1.png"
-                  alt="Vista referencial de impresión a un color"
+                  alt="Vista referencial de impresion a un color"
                   fill
-                  className="object-cover"
+                  className="object-contain object-bottom grayscale"
                 />
               </div>
-              <p
-                className={`${cotizaTextRegularFont.className} mt-3 text-sm leading-6 text-black/70`}
-              >
-                Disponible ahora y listo para sumarse al precio base de la
-                laminación.
-              </p>
             </button>
 
-            <div className="rounded-[24px] border border-dashed border-black/15 bg-black/[0.03] p-4 opacity-65">
-              <p
-                className={`${cotizaTextBoldFont.className} text-xs uppercase tracking-[0.25em]`}
-              >
-                Multicolor
-              </p>
-              <div className="relative mt-4 h-48 overflow-hidden rounded-[18px] border border-black/10">
-                <Image
-                  src="/servicios/img2.png"
-                  alt="Vista referencial de impresión multicolor"
-                  fill
-                  className="object-cover"
-                />
+            <div
+              className={`${cardBaseClassName} min-h-[240px] border-dashed border-white/10 bg-[#080808] opacity-80`}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <p
+                  className={`${cotizaTextBoldFont.className} max-w-[180px] text-lg uppercase leading-[0.9] tracking-[0.08em] text-white`}
+                >
+                  Multi color (AMS)
+                </p>
+
+                <span
+                  className={`${cotizaTextBoldFont.className} rounded-full border border-white/12 bg-white/6 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-white/70`}
+                >
+                  No disponible
+                </span>
               </div>
+
               <p
-                className={`${cotizaTextRegularFont.className} mt-3 text-sm leading-6 text-black/70`}
+                className={`${cotizaTextRegularFont.className} mt-12 max-w-[225px] text-[10px] uppercase leading-4 tracking-[0.08em] text-white/50`}
               >
-                No disponible por el momento. Cuando habilites esta opción, ya
-                queda preparado el campo para enlazar una referencia visual.
+                Impresion multicolor mediante sistema AMS. En la etapa actual se
+                mantiene visible solo como referencia para una futura
+                distribucion de colores.
               </p>
+
               <input
                 value={referenceLink}
                 onChange={(event) => onReferenceLinkChange(event.target.value)}
                 placeholder="https://referencia-colores.com/tu-imagen"
                 disabled
-                className="mt-3 h-11 w-full rounded-xl border border-black/10 bg-white px-4 text-sm text-black/60 outline-none disabled:cursor-not-allowed"
+                className="mt-5 h-12 w-[70%] rounded-md border border-white/10 bg-white/10 px-4 text-sm text-white/45 outline-none disabled:cursor-not-allowed"
               />
-            </div>
-          </div>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <div className="absolute bottom-0 right-2 h-[160px] w-[140px] opacity-75">
+                <Image
+                  src="/servicios/img2.png"
+                  alt="Vista referencial de impresion multicolor"
+                  fill
+                  className="object-contain object-bottom"
+                />
+              </div>
+            </div>
+
             <button
               type="button"
               onClick={() => onQualityChange("standard")}
-              className={`rounded-[22px] border p-4 text-left ${
+              className={`${cardBaseClassName} min-h-[160px] transition-transform duration-300 hover:-translate-y-1 ${
                 quality === "standard"
-                  ? "border-black bg-[#f5f2ea]"
-                  : "border-black/10"
+                  ? "ring-1 ring-white/20"
+                  : "border-white/12"
               }`}
+              aria-pressed={quality === "standard"}
             >
               <p
-                className={`${cotizaTextBoldFont.className} text-xs uppercase tracking-[0.25em]`}
+                className={`${cotizaTextBoldFont.className} text-lg uppercase tracking-[0.08em] text-white`}
               >
-                Calidad estándar
+                Calidad estandar
               </p>
+
               <p
-                className={`${cotizaTextRegularFont.className} mt-3 text-sm leading-6 text-black/70`}
+                className={`${cotizaTextRegularFont.className} mt-6 max-w-[250px] text-[10px] uppercase leading-4 tracking-[0.08em] text-white/55`}
               >
-                Corresponde a la configuración actual que tienes activa en
-                CloudSlicer.
+                Corresponde a la configuracion activa de impresion. Es la base
+                disponible hoy y entrega un buen equilibrio entre detalle y
+                tiempo de fabricacion.
               </p>
+
+              <DecorativeMarks />
             </button>
 
-            <div className="rounded-[22px] border border-dashed border-black/15 bg-black/[0.03] p-4 opacity-65">
+            <div
+              className={`${cardBaseClassName} min-h-[160px] border-dashed border-white/10 bg-[#080808] opacity-80`}
+            >
               <p
-                className={`${cotizaTextBoldFont.className} text-xs uppercase tracking-[0.25em]`}
+                className={`${cotizaTextBoldFont.className} max-w-[220px] text-lg uppercase tracking-[0.08em] text-white`}
               >
-                Calidad rápida
+                Calidad optimizada
               </p>
+
               <p
-                className={`${cotizaTextRegularFont.className} mt-3 text-sm leading-6 text-black/70`}
+                className={`${cotizaTextRegularFont.className} mt-6 max-w-[250px] text-[10px] uppercase leading-4 tracking-[0.08em] text-white/50`}
               >
-                No disponible por el momento. Este espacio queda listo para
-                futuras configuraciones pagadas de impresora.
+                Esta configuracion todavia no esta disponible. El bloque queda
+                visible para integrar una variante futura con mayor detalle o
+                parametros premium.
               </p>
+
+              <DecorativeMarks />
             </div>
           </div>
 
           {!quoteReady && (
             <p
-              className={`${cotizaTextRegularFont.className} mt-5 text-sm text-black/55`}
+              className={`${cotizaTextRegularFont.className} mt-5 text-sm text-white/45`}
             >
-              Sube un archivo primero para continuar con una cotización real.
+              Sube un archivo primero para continuar con una cotizacion real.
             </p>
           )}
         </div>

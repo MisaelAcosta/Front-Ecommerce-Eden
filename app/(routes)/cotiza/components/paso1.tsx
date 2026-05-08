@@ -7,7 +7,7 @@ const Paso1 = () => {
   return (
     <section className="border-b border-black/10 bg-[#F3F3F3] 
     px-4 py-16 lg:py-25 sm:px-8 lg:px-12">
-      <div className="mx-auto grid w-full max-w-[1400px] gap-8 
+      <div className="mx-auto grid w-full max-w-[1350px] gap-8 
       lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
         {/* Columna editorial con el texto guía del paso. */}
         <div>

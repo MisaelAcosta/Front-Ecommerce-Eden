@@ -35,7 +35,7 @@ const Paso4 = ({ postProcess, onPostProcessChange }: Paso4Props) => {
 
   return (
     <section className="border-b border-black/10 bg-white px-4 py-16 lg:py-25 sm:px-8 lg:px-12">
-      <div className="mx-auto grid w-full max-w-[1400px] gap-8 lg:grid-cols-[0.75fr_1.25fr]">
+      <div className="mx-auto grid w-full max-w-[1350px] gap-8 lg:grid-cols-[0.75fr_1.25fr]">
         {/* Columna izquierda */}
         <div>
           <p

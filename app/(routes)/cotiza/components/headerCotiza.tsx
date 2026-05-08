@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { cotizaTextRegularFont, cotizaTitleFont } from "./cotiza-fonts";
+import { cotizaTitleFont } from "./cotiza-fonts";
 
 const heroImages = [
   {
@@ -51,7 +51,7 @@ const HeaderCotiza = () => {
       />
 
     <div className="relative mx-auto flex min-h-[570px] w-full 
-      max-w-350 
+      max-w-[1350px] 
       flex-col justify-between px-4 pb-7 sm:px-8 
 
       #Tamaños para pantallas grandes, ajustando altura mínima y padding horizontal
