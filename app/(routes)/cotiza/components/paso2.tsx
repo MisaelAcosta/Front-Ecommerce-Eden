@@ -70,8 +70,10 @@ const Paso2 = ({
             Paso 02
           </p>
           <h2
-            className={`${cotizaTitleFont.className} mt-3 lg:pt-10 pt-5 text-4xl 
-            uppercase leading-[0.9] sm:text-5xl lg:text-6xl`}
+            className={`${cotizaTitleFont.className} mt-3 max-w-xl 
+            text-4xl uppercase leading-[1.30] 
+            lg:leading-[1.20] sm:text-5xl lg:text-6xl
+            lg:pt-10 pt-5`}
           >
             Carga tu archivo
           </h2>
