@@ -3,7 +3,7 @@
 import localFont from "next/font/local";
 import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
-import { fadeUp, revealViewport } from "./components/scrollReveal";
+import { fadeUp, revealViewport } from "@/components/animation_page/scroll-reveal";
 import { Separator } from "@radix-ui/react-separator";
 
 const maratypeFont = localFont({
@@ -46,7 +46,7 @@ const links = [
 const Contacto = () => {
   return (
     <section id="contacto" className="w-full bg-white py-12 sm:py-16">
-      <div className="mx-auto max-w-[1220px] px-4 sm:px-6 lg:px-10">
+      <div className="mx-auto max-w-[1350px] px-4 sm:px-6 lg:px-10">
         <div className="grid items-start gap-8 
         md:grid-cols-[170px_1px_minmax(0,1fr)] md:gap-10 
         lg:grid-cols-[200px_1px_minmax(0,1fr)] lg:gap-12">

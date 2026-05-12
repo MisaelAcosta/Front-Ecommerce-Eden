@@ -1,4 +1,3 @@
-// api/useGetCategoryProducts.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,8 +10,12 @@ type UseGetCategoryProductProps = {
   subSlug?: string | null;
   page?: number;
   pageSize?: number;
-  /** 🔎 término de búsqueda (opcional) */
   searchTerm?: string;
+};
+
+type StrapiProductResponse = {
+  id: number;
+  [key: string]: unknown;
 };
 
 export const useGetCategoryProduct = ({
@@ -28,6 +31,8 @@ export const useGetCategoryProduct = ({
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchProducts = async () => {
       try {
         setLoading(true);
@@ -35,78 +40,70 @@ export const useGetCategoryProduct = ({
 
         if (!base) throw new Error("Falta NEXT_PUBLIC_BACKEND_URL");
 
-        // base
-        let url = `${base}/api/products`;
+        const params = new URLSearchParams();
 
-        // filtros categoría/sub
         if (categorySlug !== "todos-los-productos") {
-          url += `?filters[category][slug][$eq]=${encodeURIComponent(categorySlug)}`;
+          params.set("filters[category][slug][$eq]", categorySlug);
 
           if (subSlug) {
-            url += `&filters[sub_category][slug][$eq]=${encodeURIComponent(subSlug)}`;
+            params.set("filters[sub_category][slug][$eq]", subSlug);
           }
-        } else {
-          url += `?`;
         }
 
-        // 🔎 búsqueda (server-side) — plano, sin 'attributes'
-        const term = (searchTerm ?? "").trim();
-        if (term !== "") {
-          const enc = encodeURIComponent(term);
-          url += `&filters[$or][0][productName][$containsi]=${enc}`;
-          url += `&filters[$or][1][productName2][$containsi]=${enc}`;
-          // si quieres incluir descripción:
-          // url += `&filters[$or][2][description][$containsi]=${enc}`;
+        const term = searchTerm.trim();
+        if (term) {
+          params.set("filters[$or][0][productName][$containsi]", term);
+          params.set("filters[$or][1][productName2][$containsi]", term);
         }
 
-        // paginación + populate
-        url += `&pagination[page]=${page}&pagination[pageSize]=${pageSize}&populate=*`;
+        params.set("pagination[page]", String(page));
+        params.set("pagination[pageSize]", String(pageSize));
+        params.set("populate", "*");
 
-        console.log("📡 Fetch URL =>", url);
+        const res = await fetch(`${base}/api/products?${params.toString()}`, {
+          cache: "no-store",
+          signal: controller.signal,
+        });
 
-        const res = await fetch(url, { cache: "no-store" });
         if (!res.ok) {
           throw new Error(`Error fetching products: ${res.status}`);
         }
 
         const json = await res.json();
-        console.log("🐉 RAW item 0 de Strapi:", json.data?.[0]);
-
-        // ✅ normalizamos conservando tu shape { id, attributes: {...rest} }
-        const normalized: ProductType[] = (json.data || []).map((item: any) => {
-          const { id, ...rest } = item; // v5: todo viene plano (incluye imágenes/relaciones dentro de 'rest')
+        const normalized: ProductType[] = (
+          (json.data || []) as StrapiProductResponse[]
+        ).map((item) => {
+          const { id, ...rest } = item;
           return {
             id,
             attributes: {
               ...rest,
             },
-          };
+          } as unknown as ProductType;
         });
 
         setProducts(normalized);
 
-        // pageCount de Strapi = total de páginas
         const pageCount = json?.meta?.pagination?.pageCount ?? 1;
         setTotalPages(pageCount > 0 ? pageCount : 1);
-      } catch (err: any) {
-        console.error("❌ useGetCategoryProduct error:", err);
-        setError(err.message || "Unknown error");
+      } catch (err: unknown) {
+        if (err instanceof DOMException && err.name === "AbortError") return;
+
+        console.error("useGetCategoryProduct error:", err);
+        setError(err instanceof Error ? err.message : "Unknown error");
         setProducts([]);
         setTotalPages(1);
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchProducts();
+
+    return () => controller.abort();
   }, [categorySlug, subSlug, page, pageSize, searchTerm]);
 
   return { products, loading, error, totalPages };
 };
-
-
-
-
-
-
-

@@ -9,7 +9,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "./ui/carousel";
-import SkeletonSchema from "./skeletonSchema";
 import type { ResponseType } from "@/types/response";
 import type { ProductType } from "@/types/product";
 import type { PromotionType } from "@/types/promotion";
@@ -21,6 +20,7 @@ import { toAbsUrl } from "@/lib/media";
 import Image from "next/image";
 import { motion } from "motion/react";
 import { fadeUp } from "@/lib/fade-up";
+import { ProductCardSkeleton } from "@/components/skeleton-product";
 
 // Local fonts used only by the featured products section.
 const maratypeFont = localFont({
@@ -257,7 +257,7 @@ function FeaturedProductCard({
   return (
     <CarouselItem
       key={id}
-      className="basis-[85%] sm:basis-1/2 lg:basis-1/3 
+      className="basis-[85%] sm:basis-1/2 lg:basis-1/4
       px-3 md:px-4"
     >
       <Card
@@ -418,7 +418,7 @@ const FeaturedProducts = () => {
   };
 
   return (
-    <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-8 sm:py-14">
+    <section className="mx-auto max-w-[1350px] px-4 py-8 sm:px-6 sm:py-14 lg:px-0">
       <div>
         <motion.h3
           variants={fadeUp}
@@ -452,15 +452,24 @@ const FeaturedProducts = () => {
       >
         <Carousel>
         <CarouselContent className="ml-1 md:-ml-4">
-          {loading && <SkeletonSchema grid={1} />}
+          {loading &&
+            Array.from({ length: 4 }).map((_, index) => (
+              <CarouselItem
+                key={`featured-product-skeleton-${index}`}
+                className="basis-[85%] sm:basis-1/2 lg:basis-1/4 px-3 md:px-4"
+              >
+                <ProductCardSkeleton />
+              </CarouselItem>
+            ))}
 
-          {featuredProducts.map((product) => (
-            <FeaturedProductCard
-              key={product.id}
-              product={product}
-              onOpenProduct={handleOpenProduct}
-            />
-          ))}
+          {!loading &&
+            featuredProducts.map((product) => (
+              <FeaturedProductCard
+                key={product.id}
+                product={product}
+                onOpenProduct={handleOpenProduct}
+              />
+            ))}
         </CarouselContent>
 
         <CarouselPrevious />

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import localFont from "next/font/local";
 import { motion } from "motion/react";
-import { fadeUp, revealViewport } from "./scrollReveal";
+import { fadeUp, revealViewport } from "@/components/animation_page/scroll-reveal";
 
 // Tipografias locales del header de servicio.
 const maratypeFont = localFont({
@@ -22,13 +22,6 @@ const khInterferenceLightFont = localFont({
 const khInterferenceRegularFont = localFont({
   src: "../../../../components/fonts/KHInterferenceTRIAL-Regular.otf",
   weight: "400",
-  style: "normal",
-  display: "swap",
-});
-
-const khInterferenceBoldFont = localFont({
-  src: "../../../../components/fonts/KHInterferenceTRIAL-Bold.otf",
-  weight: "700",
   style: "normal",
   display: "swap",
 });
@@ -134,7 +127,7 @@ const Header = () => {
         whileInView="visible"
         viewport={revealViewport}
         custom={0.24}
-        className="mx-auto grid max-w-[1220px] grid-cols-1 border-t border-b border-black/20 md:grid-cols-2"
+        className="mx-auto grid max-w-[1350px] grid-cols-1 border-t border-b border-black/20 md:grid-cols-2"
       >
         <button
           type="button"

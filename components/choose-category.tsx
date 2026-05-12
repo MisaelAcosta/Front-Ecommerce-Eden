@@ -16,13 +16,6 @@ const maratypeFont = localFont({
   display: "swap",
 });
 
-const khInterferenceLightFont = localFont({
-  src: "./fonts/KHInterferenceTRIAL-Light.otf",
-  weight: "300",
-  style: "normal",
-  display: "swap",
-});
-
 const khInterferenceRegularFont = localFont({
   src: "./fonts/KHInterferenceTRIAL-Regular.otf",
   weight: "400",
@@ -199,8 +192,10 @@ function CategoryImageTile({
 
 const ChooseCategory = () => {
   const { result, loading, error }: ResponseType = useGetCategories();
-  const categories = Array.isArray(result) ? (result as CategoryType[]) : [];
-  const categoryCards = useMemo(() => buildCategoryCards(categories), [categories]);
+  const categoryCards = useMemo(() => {
+    const categories = Array.isArray(result) ? (result as CategoryType[]) : [];
+    return buildCategoryCards(categories);
+  }, [result]);
   const [activeCategoryKey, setActiveCategoryKey] = useState<CategoryKey>("libros");
 
   // Mantiene una categoria visible aunque Strapi falle o aun no responda.
@@ -210,7 +205,7 @@ const ChooseCategory = () => {
 
   return (
     <section className="w-full bg-white py-8 sm:py-14">
-      <div className="mx-auto max-w-6xl px-4 sm:px-8 lg:px-0">
+      <div className="mx-auto max-w-[1350px] px-4 sm:px-6 lg:px-0">
         <motion.h3
           variants={fadeUp}
           initial="hidden"

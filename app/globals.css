@@ -7,6 +7,38 @@
   .text-balance{
     text-wrap: balance;
   }
+
+  .eden-toast[data-mounted="true"] {
+    animation: eden-toast-in 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .eden-toast[data-removed="true"] {
+    animation: eden-toast-out 180ms ease-in forwards;
+  }
+}
+
+@keyframes eden-toast-in {
+  from {
+    opacity: 0;
+    transform: translate3d(28px, 0, 0) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes eden-toast-out {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(28px, 0, 0) scale(0.98);
+  }
 }
 
 @theme inline {

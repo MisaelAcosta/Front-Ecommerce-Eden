@@ -3,7 +3,7 @@
 import Image from "next/image";
 import localFont from "next/font/local";
 import { motion } from "motion/react";
-import { fadeUp, revealViewport } from "./scrollReveal";
+import { fadeUp, revealViewport } from "@/components/animation_page/scroll-reveal";
 
 const maratypeFont = localFont({
   src: "../../../../components/fonts/Maratype.otf",

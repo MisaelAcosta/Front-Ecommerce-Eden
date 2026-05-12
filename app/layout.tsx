@@ -5,7 +5,7 @@ import Footer from "@/components/footer";
 import { NavigationTransitionProvider } from "@/components/navigation-transition-provider";
 import { ThemeProvider } from "@/components/theme.provider";
 import { Toaster } from "@/components/ui/sonner";
-import Navbar from "@/components/ui/navbar";
+import Navbar from "@/components/navbar/navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 

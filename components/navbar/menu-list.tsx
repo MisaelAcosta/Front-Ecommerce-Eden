@@ -5,11 +5,11 @@ import TransitionLink from "@/components/transition-link";
 import {
   PRIMARY_NAV_ITEMS,
   isNavItemCurrent,
-} from "@/components/navbar-config";
+} from "@/components/navbar/navbar-config";
 import { cn } from "@/lib/utils";
 
 const desktopNavFont = localFont({
-  src: "./fonts/KHInterferenceTRIAL-Regular.otf",
+  src: "../fonts/KHInterferenceTRIAL-Light.otf",
   display: "swap",
 });
 
@@ -37,14 +37,6 @@ const MenuList = ({ pathname }: MenuListProps) => {
                 )}
               >
                 {item.label}
-                <span
-                  className={cn(
-                    "absolute inset-x-3 bottom-1 h-px origin-left bg-white/70 transition-transform duration-300",
-                    isCurrent
-                      ? "scale-x-100"
-                      : "scale-x-0 group-hover:scale-x-100"
-                  )}
-                />
               </TransitionLink>
             </li>
           );

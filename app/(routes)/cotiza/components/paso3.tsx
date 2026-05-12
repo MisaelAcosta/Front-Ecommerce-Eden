@@ -9,6 +9,7 @@ import {
   cotizaTextLightFont,
 } from "./cotiza-fonts";
 
+// ===== # Paso 3 | Tipos y props =====
 // ---- Tipos base del selector de color ----
 type ColorOption = {
   id: string;
@@ -30,6 +31,7 @@ type Paso3Props = {
   onReferenceLinkChange: (value: string) => void;
 };
 
+// ===== # Paso 3 | Utilidades visuales =====
 // ---- Clase base compartida por las tarjetas del paso 3 ----
 const cardBaseClassName = [
   "relative",
@@ -96,6 +98,7 @@ const Paso3 = ({
   onReferenceLinkChange,
 }: Paso3Props) => {
   return (
+    // ===== # Paso 3 | Estructura principal =====
     // ---- Seccion principal del paso 3 ----
     <section
       className={[
@@ -121,6 +124,7 @@ const Paso3 = ({
           "lg:gap-14",
         ].join(" ")}
       >
+        {/* ===== # Paso 3 | Columna editorial ===== */}
         {/* ---- Columna editorial izquierda: paso, titulo y descripcion ---- */}
         <div>
           <p
@@ -177,8 +181,10 @@ const Paso3 = ({
           </p>
         </div>
 
+        {/* ===== # Paso 3 | Columna interactiva ===== */}
         {/* ---- Columna interactiva derecha: selector y tarjetas ---- */}
         <div>
+          {/* ===== # Paso 3 | Selector de colores ===== */}
           {/* ---- Selector visual de colores disponibles ---- */}
           <div className="mb-5 flex flex-wrap items-center gap-2 sm:gap-3">
             {colorOptions.map((color) => {
@@ -212,6 +218,7 @@ const Paso3 = ({
             })}
           </div>
 
+          {/* ===== # Paso 3 | Tarjetas de color y calidad ===== */}
           {/* ---- Grilla principal con tarjetas de color y calidad ---- */}
           <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
             {/* ---- Tarjeta de color unico disponible ---- */}

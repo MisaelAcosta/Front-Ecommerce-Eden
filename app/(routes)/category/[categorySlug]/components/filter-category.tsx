@@ -3,24 +3,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import localFont from "next/font/local";
-
-import { useGetCategories } from "@/api/useGetCategories";
-
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Accordion,
+  AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  AccordionContent,
 } from "@/components/ui/accordion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import type { CategoryType } from "@/types/category";
 
 // Tipografias locales usadas en el filtro de categorias.
-const maratypeFont = localFont({
-  src: "../../../../../components/fonts/Maratype.otf",
-  display: "swap",
-});
-
 const khInterferenceRegularFont = localFont({
   src: "../../../../../components/fonts/KHInterferenceTRIAL-Regular.otf",
   weight: "400",
@@ -28,9 +22,19 @@ const khInterferenceRegularFont = localFont({
   display: "swap",
 });
 
+const khInterferenceBoldFont = localFont({
+  src: "../../../../../components/fonts/KHInterferenceTRIAL-Bold.otf",
+  weight: "700",
+  style: "normal",
+  display: "swap",
+});
+
 type FilterCategoryProps = {
   categorySlug: string;
   activeSubSlug: string | null;
+  categories: CategoryType[];
+  loading?: boolean;
+  error?: boolean;
   onSelectSubcategory: (slugSub: string | null) => void;
 };
 
@@ -45,32 +49,56 @@ const allProductsCategory = {
   }[],
 };
 
+const FilterCategorySkeleton = () => {
+  return (
+    <aside
+      className="my-5 space-y-3 bg-white text-black"
+      aria-hidden="true"
+    >
+      <Skeleton className="h-9 w-full rounded-md bg-black/8 sm:h-10" />
+
+      <div className="space-y-2 rounded-md px-2 py-2">
+        <Skeleton className="h-5 w-4/5 rounded-none bg-black/8 sm:h-6" />
+        <div className="space-y-2 pl-1 pt-1">
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-4 w-4 rounded-full bg-black/8" />
+            <Skeleton className="h-4 w-24 rounded-none bg-black/8" />
+          </div>
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-4 w-4 rounded-full bg-black/8" />
+            <Skeleton className="h-4 w-28 rounded-none bg-black/8" />
+          </div>
+        </div>
+      </div>
+
+      <Skeleton className="h-9 w-11/12 rounded-md bg-black/8 sm:h-10" />
+      <Skeleton className="h-9 w-4/5 rounded-md bg-black/8 sm:h-10" />
+      <Skeleton className="h-9 w-full rounded-md bg-black/8 sm:h-10" />
+    </aside>
+  );
+};
+
 const FilterCategory = ({
   categorySlug,
   activeSubSlug,
+  categories,
+  loading = false,
+  error = false,
   onSelectSubcategory,
 }: FilterCategoryProps) => {
   const router = useRouter();
-
-
-  const { categories, loading, error } = useGetCategories();
-
-  //  acordeón abierto
   const [openSlug, setOpenSlug] = useState<string | undefined>(undefined);
 
-  //  mantener abierto el acordeón según la categoría actual
   useEffect(() => {
     setOpenSlug(categorySlug ?? undefined);
   }, [categorySlug]);
 
-  //  navegar a categoría
   const goCategory = (slugCat: string) => {
     setOpenSlug(slugCat);
     onSelectSubcategory(null);
     router.push(`/category/${slugCat}`);
   };
 
-  //  seleccionar subcategoría (sin navegar)
   const goSubcategory = (slugSub: string) => {
     onSelectSubcategory(slugSub);
   };
@@ -80,59 +108,69 @@ const FilterCategory = ({
     [categories]
   );
 
-  if (loading) return <p>Cargando...</p>;
-  if (error) return <p>Error cargando categorías</p>;
+  if (loading && categories.length === 0) {
+    return <FilterCategorySkeleton />;
+  }
+
+  if (error) {
+    return (
+      <p className={`${khInterferenceRegularFont.className} uppercase`}>
+        Error cargando categorias
+      </p>
+    );
+  }
 
   return (
-    <aside className="my-5 bg-white text-black text-lg space-y-4 font-light">
+    <aside
+      className={`${khInterferenceRegularFont.className} my-5 space-y-4 bg-white text-lg text-black`}
+    >
       <Accordion
         type="single"
         collapsible
         value={openSlug}
-        onValueChange={(val) => setOpenSlug(val || undefined)}
+        onValueChange={(value) => setOpenSlug(value || undefined)}
         className="space-y-2 shadow-none"
       >
-        {allCategories.map((cat) => {
-          const hasSubs = cat.subcategories && cat.subcategories.length > 0;
-          const isCategoryActive = categorySlug === cat.slug;
+        {allCategories.map((category) => {
+          const hasSubs =
+            category.subcategories && category.subcategories.length > 0;
+          const isCategoryActive = categorySlug === category.slug;
 
-          //  categoría sin subcategorías
           if (!hasSubs) {
             return (
               <button
-                key={cat.id}
-                onClick={() => goCategory(cat.slug)}
+                key={category.id}
+                onClick={() => goCategory(category.slug)}
                 className={`
-                  ${maratypeFont.className}
-                  w-full text-left px-2 py-2 
-                  text-xl  sm:text-2xl
-                  tracking-normal sm:tracking-wide
-                  rounded-md transition
+                  ${khInterferenceBoldFont.className}
+                  w-full rounded-md px-2 py-2 text-left
+                  text-base uppercase tracking-normal transition
+                  sm:text-lg sm:tracking-wide
                   ${isCategoryActive ? "bg-black text-white" : "hover:bg-muted"}
                 `}
               >
-                {cat.categoryName}
+                {category.categoryName}
               </button>
             );
           }
 
-          //  categoría con subcategorías
           return (
             <AccordionItem
-              key={cat.id}
-              value={cat.slug}
-              className="rounded-md overflow-hidden"
+              key={category.id}
+              value={category.slug}
+              className="overflow-hidden rounded-md"
             >
               <AccordionTrigger
-                onClick={() => goCategory(cat.slug)}
+                onClick={() => goCategory(category.slug)}
                 className={`
-                  ${maratypeFont.className}
-                  px-2 py-2 text-left cursor-pointer 
-                  text-xl  sm:text-2xl
+                  ${khInterferenceBoldFont.className}
+                  cursor-pointer px-2 py-2 text-left
+                  text-base uppercase tracking-normal
+                  sm:text-lg sm:tracking-wide
                   ${isCategoryActive ? "text-black" : ""}
                 `}
               >
-                {cat.categoryName}
+                {category.categoryName}
               </AccordionTrigger>
 
               <AccordionContent className="px-2 pb-2">
@@ -140,22 +178,22 @@ const FilterCategory = ({
                   value={activeSubSlug ?? ""}
                   className="flex flex-col space-y-2"
                 >
-                  {(cat.subcategories ?? []).map((sub) => (
+                  {(category.subcategories ?? []).map((subcategory) => (
                     <Label
-                      key={sub.id}
-                      htmlFor={`sub-${sub.slug}`}
-                      className={`${khInterferenceRegularFont.className} cursor-pointer flex items-center gap-2 rounded-md px-2 py-1 hover:bg-gray-100`}
-                      onClick={() => goSubcategory(sub.slug)}
+                      key={subcategory.id}
+                      htmlFor={`sub-${subcategory.slug}`}
+                      className={`${khInterferenceRegularFont.className} flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-sm uppercase tracking-wide hover:bg-gray-100`}
+                      onClick={() => goSubcategory(subcategory.slug)}
                     >
                       <RadioGroupItem
-                        value={sub.slug}
-                        id={`sub-${sub.slug}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          goSubcategory(sub.slug);
+                        value={subcategory.slug}
+                        id={`sub-${subcategory.slug}`}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          goSubcategory(subcategory.slug);
                         }}
                       />
-                      {sub.categoryName}
+                      {subcategory.categoryName}
                     </Label>
                   ))}
                 </RadioGroup>
@@ -169,3 +207,4 @@ const FilterCategory = ({
 };
 
 export default FilterCategory;
+export { FilterCategorySkeleton };

@@ -3,7 +3,7 @@ import ModoTrabajo from "./components/modoTrabajo"
 import Contacto from "@/app/(routes)/servicio/contacto"
 import Galeria from "./components/galeria"
 import Modelodo3D from "./modelado3d"
-import SmoothScroll from "@/components/smooth-scroll"
+import SmoothScroll from "@/components/animation_page/smooth-scroll"
  
 
 

@@ -8,6 +8,8 @@ import Paso2 from "./paso2";
 import Paso3 from "./paso3";
 import Paso4 from "./paso4";
 import ResumenPedido from "./resumenPedido";
+import ScrollReveal from "@/components/animation_page/scroll-reveal";
+import SmoothScroll from "@/components/animation_page/smooth-scroll";
 import { useCart } from "@/hooks/use-cart";
 import type {
   PrintColorMode,
@@ -280,52 +282,71 @@ export default function CotizaPage() {
   };
 
   return (
-    <main className="bg-[#ece9e1] text-black">
-      <HeaderCotiza />
-      <Paso1 />
-      <Paso2
-        fileInputRef={fileInputRef}
-        fileName={fileName}
-        fileSizeLabel={formatFileSize(fileSize)}
-        quote={quote}
-        uploadStatus={uploadStatus}
-        uploadError={uploadError}
-        onFileChange={handleFileChange}
-        onOpenPicker={openPicker}
-      />
-      <Paso3
-        colorOptions={COLOR_OPTIONS}
-        colorMode={colorMode}
-        selectedColor={selectedColor}
-        quality={quality}
-        referenceLink={referenceLink}
-        quoteReady={uploadStatus === "ready"}
-        onColorModeChange={setColorMode}
-        onColorChange={setSelectedColor}
-        onQualityChange={setQuality}
-        onReferenceLinkChange={setReferenceLink}
-      />
-      <Paso4
-        postProcess={postProcess}
-        onPostProcessChange={setPostProcess}
-      />
-      <ResumenPedido
-        fileName={quote?.fileName ?? fileName}
-        materialLabel={quote?.materialLabel ?? "PLA"}
-        selectedColorLabel={selectedColorOption.label}
-        qualityLabel={QUALITY_LABELS[quality]}
-        postProcessLabel={POST_PROCESS_LABELS[postProcess]}
-        postProcessPrice={postProcessPrice}
-        basePrice={quote?.basePrice ?? 0}
-        totalPrice={totalPrice}
-        canCheckout={canCheckout}
-        addingToCart={addingToCart}
-        fitsPrinter={quote?.fitsPrinter ?? null}
-        uploadStatus={uploadStatus}
-        uploadError={uploadError}
-        notes={quote?.notes ?? []}
-        onCheckout={handleCheckout}
-      />
-    </main>
+    <SmoothScroll>
+      <main className="bg-[#ece9e1] text-black">
+        <ScrollReveal>
+          <HeaderCotiza />
+        </ScrollReveal>
+
+        <ScrollReveal>
+          <Paso1 />
+        </ScrollReveal>
+
+        <ScrollReveal>
+          <Paso2
+            fileInputRef={fileInputRef}
+            fileName={fileName}
+            fileSizeLabel={formatFileSize(fileSize)}
+            quote={quote}
+            uploadStatus={uploadStatus}
+            uploadError={uploadError}
+            onFileChange={handleFileChange}
+            onOpenPicker={openPicker}
+          />
+        </ScrollReveal>
+
+        <ScrollReveal>
+          <Paso3
+            colorOptions={COLOR_OPTIONS}
+            colorMode={colorMode}
+            selectedColor={selectedColor}
+            quality={quality}
+            referenceLink={referenceLink}
+            quoteReady={uploadStatus === "ready"}
+            onColorModeChange={setColorMode}
+            onColorChange={setSelectedColor}
+            onQualityChange={setQuality}
+            onReferenceLinkChange={setReferenceLink}
+          />
+        </ScrollReveal>
+
+        <ScrollReveal>
+          <Paso4
+            postProcess={postProcess}
+            onPostProcessChange={setPostProcess}
+          />
+        </ScrollReveal>
+
+        <ScrollReveal>
+          <ResumenPedido
+            fileName={quote?.fileName ?? fileName}
+            materialLabel={quote?.materialLabel ?? "PLA"}
+            selectedColorLabel={selectedColorOption.label}
+            qualityLabel={QUALITY_LABELS[quality]}
+            postProcessLabel={POST_PROCESS_LABELS[postProcess]}
+            postProcessPrice={postProcessPrice}
+            basePrice={quote?.basePrice ?? 0}
+            totalPrice={totalPrice}
+            canCheckout={canCheckout}
+            addingToCart={addingToCart}
+            fitsPrinter={quote?.fitsPrinter ?? null}
+            uploadStatus={uploadStatus}
+            uploadError={uploadError}
+            notes={quote?.notes ?? []}
+            onCheckout={handleCheckout}
+          />
+        </ScrollReveal>
+      </main>
+    </SmoothScroll>
   );
 }

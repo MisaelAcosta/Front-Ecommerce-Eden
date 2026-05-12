@@ -8,7 +8,7 @@ import { useGSAP } from "@gsap/react";
 import HeaderCotiza from "@/app/(routes)/cotiza/components/headerCotiza";
 import Paso1 from "@/app/(routes)/cotiza/components/paso1";
 import Paso2 from "@/app/(routes)/cotiza/components/paso2";
-import SmoothScroll from "@/components/smooth-scroll";
+import SmoothScroll from "@/components/animation_page/smooth-scroll";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 

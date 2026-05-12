@@ -2,14 +2,9 @@
 
 import localFont from "next/font/local";
 import { motion } from "motion/react";
-import { fadeUp, revealViewport } from "./components/scrollReveal";
+import { fadeUp, revealViewport } from "@/components/animation_page/scroll-reveal";
 
 const VIDEO_3D = "/servicios/video3d.mp4";
-
-const maratypeFont = localFont({
-  src: "../../../components/fonts/Maratype.otf",
-  display: "swap",
-});
 
 const khInterferenceLightFont = localFont({
   src: "../../../components/fonts/KHInterferenceTRIAL-Light.otf",

@@ -2,7 +2,7 @@
 
 import localFont from "next/font/local";
 import { motion } from "motion/react";
-import { fadeUp, revealViewport } from "./scrollReveal";
+import { fadeUp, revealViewport } from "@/components/animation_page/scroll-reveal";
 
 const maratypeFont = localFont({
   src: "../../../../components/fonts/Maratype.otf",
@@ -12,13 +12,6 @@ const maratypeFont = localFont({
 const khInterferenceLightFont = localFont({
   src: "../../../../components/fonts/KHInterferenceTRIAL-Light.otf",
   weight: "300",
-  style: "normal",
-  display: "swap",
-});
-
-const khInterferenceRegularFont = localFont({
-  src: "../../../../components/fonts/KHInterferenceTRIAL-Regular.otf",
-  weight: "400",
   style: "normal",
   display: "swap",
 });
@@ -54,7 +47,7 @@ const pasos = [
 const ModoTrabajo = () => {
   return (
     <section className="w-full bg-white py-12 sm:py-16">
-      <div className="mx-auto max-w-[1220px] px-4 sm:px-6 lg:px-0">
+      <div className="mx-auto max-w-[1350px] px-4 sm:px-6 lg:px-0">
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8">
           <motion.h2
             variants={fadeUp}

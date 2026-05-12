@@ -248,7 +248,7 @@ function NewProductCard({
   return (
     <CarouselItem
       key={id}
-      className="basis-[85%] sm:basis-1/2 lg:basis-1/3 px-3 md:px-4"
+      className="basis-[85%] sm:basis-1/2 lg:basis-1/4 px-3 md:px-4"
     >
       <Card
         className="
@@ -401,7 +401,7 @@ const NewProducts = () => {
   };
 
   return (
-    <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-8 sm:py-14">
+    <section className="mx-auto max-w-[1350px] px-4 py-8 sm:px-6 sm:py-14 lg:px-0">
       <div>
         <motion.h3
           variants={fadeUp}

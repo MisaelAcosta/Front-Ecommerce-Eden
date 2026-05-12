@@ -7,18 +7,21 @@ import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import { LoginDialog } from "@/components/auth/login-dialog";
-import { getVisibleMobileNavItems } from "@/components/navbar-config";
+import { getVisibleMobileNavItems } from "@/components/navbar/navbar-config";
 import { ProfileSheet } from "@/components/profile/profile-sheet";
-import type { CurrentUser, ProfileData } from "@/components/profile/profile-types";
+import type {
+  CurrentUser,
+  ProfileData,
+} from "@/components/profile/profile-types";
 import TransitionLink from "@/components/transition-link";
 
 const maratypeFont = localFont({
-  src: "./fonts/Maratype.otf",
+  src: "../fonts/Maratype.otf",
   display: "swap",
 });
 
 const khInterferenceBoldFont = localFont({
-  src: "./fonts/KHInterferenceTRIAL-Bold.otf",
+  src: "../fonts/KHInterferenceTRIAL-Bold.otf",
   weight: "700",
   style: "normal",
   display: "swap",

@@ -2,7 +2,16 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { CartLine } from "@/types/cart";
+import { toast } from "sonner";
+import type {
+  CartLine,
+  PrintQuoteCartLine,
+  ProductCartLine,
+} from "@/types/cart";
+
+type CartLineInput =
+  | Omit<ProductCartLine, "id">
+  | Omit<PrintQuoteCartLine, "id">;
 
 type CartState = {
   items: CartLine[];
@@ -11,7 +20,7 @@ type CartState = {
   lastAddedItem: CartLine | null;
   clearLastAdded: () => void;
 
-  addItem: (line: Omit<CartLine, "id">) => void;
+  addItem: (line: CartLineInput) => void;
   removeItem: (lineId: string) => void;
 
   incQty: (lineId: string) => void;
@@ -20,7 +29,7 @@ type CartState = {
   clear: () => void;
 };
 
-const makeLineId = (line: Omit<CartLine, "id">) => {
+const makeLineId = (line: CartLineInput) => {
   if (line.kind === "print-quote") {
     const anchor =
       line.printQuote.quoteId ||
@@ -31,6 +40,29 @@ const makeLineId = (line: Omit<CartLine, "id">) => {
   }
 
   return `${line.productId}:${line.variantId}`;
+};
+
+const getCartToastDescription = (line: CartLine) => {
+  if (line.kind === "print-quote") {
+    return line.printQuote.fileName;
+  }
+
+  return line.variantName;
+};
+
+const notifyCartItemAdded = (line: CartLine, mode: "added" | "updated") => {
+  const title =
+    mode === "updated" ? "Cantidad actualizada" : "Agregado al carrito";
+
+  toast.success(title, {
+    description: getCartToastDescription(line),
+    action: {
+      label: "Ver carrito",
+      onClick: () => {
+        window.location.href = "/cart";
+      },
+    },
+  });
 };
 
 export const useCart = create(
@@ -48,7 +80,7 @@ export const useCart = create(
         const existing = items.find((i) => i.id === id);
 
         if (existing) {
-          const updated =
+          const updated: CartLine =
             line.kind === "print-quote"
               ? { ...line, id, qty: 1 }
               : {
@@ -60,15 +92,19 @@ export const useCart = create(
             items: items.map((i) => (i.id === id ? updated : i)),
             lastAddedItem: updated,
           });
+
+          notifyCartItemAdded(updated, "updated");
           return;
         }
 
-        const newItem = { ...line, id };
+        const newItem: CartLine = { ...line, id };
 
         set({
           items: [...items, newItem],
           lastAddedItem: newItem,
         });
+
+        notifyCartItemAdded(newItem, "added");
       },
 
       removeItem: (lineId) =>
