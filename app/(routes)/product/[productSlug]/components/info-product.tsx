@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
+import { useCartNotification } from "@/hooks/use-cart-notification";
 import { formatPrice } from "@/lib/formatPrice";
 import { ProductType } from "@/types/product";
 import { VariantType } from "@/types/variant";
@@ -90,6 +91,8 @@ function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
 
 const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
   const { addItem } = useCart();
+  const { notifySelectVariant, notifyProductWithoutVariants } =
+    useCartNotification();
   const [qty, setQty] = useState<number>(1);
 
   const toggleLoved = useLoved((s) => s.toggleLoved);
@@ -186,12 +189,12 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
 
   const handleAddToCart = () => {
     if (variants.length > 0 && !currentVariant) {
-      alert("Selecciona una variante primero 🙏");
+      notifySelectVariant();
       return;
     }
 
     if (!currentVariant) {
-      alert("Este producto no tiene variantes configuradas.");
+      notifyProductWithoutVariants();
       return;
     }
 
@@ -430,7 +433,7 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
 
             <div className="flex items-start justify-between gap-5 md:gap-3">
               <Button
-                disabled={!product.active || (variants.length > 0 && !currentVariant)}
+                disabled={!product.active}
                 onClick={handleAddToCart}
                 className="h-10 flex-1 sm:flex-none sm:w-auto cursor-pointer"
               >
@@ -458,4 +461,3 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
 };
 
 export default InfoProduct;
-
