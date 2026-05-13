@@ -14,7 +14,7 @@ export default function Home() {
       <Header />
       <FeaturedProducts />
       <TempProducts/>
-      <Block2 />
+      
       <NewProduct />
       <ChooseCategory />
     </main>

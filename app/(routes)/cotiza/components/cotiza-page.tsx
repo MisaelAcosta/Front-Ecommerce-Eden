@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import HeaderCotiza from "./headerCotiza";
 import Paso1 from "./paso1";
 import Paso2 from "./paso2";
@@ -16,6 +15,7 @@ import type {
   PrintPostProcess,
   PrintQuality,
 } from "@/types/print-quote";
+import { useNavigationTransition } from "@/components/navigation-transition-provider";
 
 type QuoteResult = {
   fileId: string;
@@ -79,7 +79,7 @@ function formatFileSize(bytes: number) {
 }
 
 export default function CotizaPage() {
-  const router = useRouter();
+  const { navigateWithTransition } = useNavigationTransition();
   const { addItem } = useCart();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -275,7 +275,7 @@ export default function CotizaPage() {
         },
       });
 
-      router.push("/cart");
+      navigateWithTransition("/cart");
     } finally {
       setAddingToCart(false);
     }

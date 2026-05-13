@@ -11,6 +11,7 @@ type UseGetCategoryProductProps = {
   page?: number;
   pageSize?: number;
   searchTerm?: string;
+  sortBy?: "default" | "price-asc" | "price-desc" | "recent";
 };
 
 type StrapiProductResponse = {
@@ -24,6 +25,7 @@ export const useGetCategoryProduct = ({
   page = 1,
   pageSize = 12,
   searchTerm = "",
+  sortBy = "default",
 }: UseGetCategoryProductProps) => {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,6 +61,18 @@ export const useGetCategoryProduct = ({
         params.set("pagination[page]", String(page));
         params.set("pagination[pageSize]", String(pageSize));
         params.set("populate", "*");
+
+        if (sortBy === "price-asc") {
+          params.set("sort[0]", "price:asc");
+        }
+
+        if (sortBy === "price-desc") {
+          params.set("sort[0]", "price:desc");
+        }
+
+        if (sortBy === "recent") {
+          params.set("sort[0]", "createdAt:desc");
+        }
 
         const res = await fetch(`${base}/api/products?${params.toString()}`, {
           cache: "no-store",
@@ -103,7 +117,7 @@ export const useGetCategoryProduct = ({
     fetchProducts();
 
     return () => controller.abort();
-  }, [categorySlug, subSlug, page, pageSize, searchTerm]);
+  }, [categorySlug, subSlug, page, pageSize, searchTerm, sortBy]);
 
   return { products, loading, error, totalPages };
 };

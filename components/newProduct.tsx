@@ -14,13 +14,13 @@ import type { ResponseType } from "@/types/response";
 import type { ProductType } from "@/types/product";
 import type { PromotionType } from "@/types/promotion";
 import { Card, CardContent } from "./ui/card";
-import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/formatPrice";
 import { LovedButton } from "./loved-button";
 import { toAbsUrl } from "@/lib/media";
 import Image from "next/image";
 import { motion } from "motion/react";
 import { fadeUp } from "@/lib/fade-up";
+import { useNavigationTransition } from "@/components/navigation-transition-provider";
 
 // Local fonts used only by the new products section.
 const maratypeFont = localFont({
@@ -389,7 +389,7 @@ function NewProductCard({
 
 const NewProducts = () => {
   const { result, loading }: ResponseType = useGetNewProducts();
-  const router = useRouter();
+  const { navigateWithTransition } = useNavigationTransition();
   const newProducts = Array.isArray(result)
     ? result.map(buildNewProductCardData)
     : [];
@@ -397,7 +397,7 @@ const NewProducts = () => {
   // Keep navigation logic in one place instead of repeating it in the JSX.
   const handleOpenProduct = (slug: string) => {
     if (!slug) return;
-    router.push(`/product/${slug}`);
+    navigateWithTransition(`/product/${slug}`);
   };
 
   return (

@@ -9,8 +9,8 @@ import {
   CarouselPrevious,
 } from "./ui/carousel";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import Autoplay from "embla-carousel-autoplay";
+import { useNavigationTransition } from "@/components/navigation-transition-provider";
 
 type MediaItem = {
   url?: string | null;
@@ -35,7 +35,7 @@ type Block1Item = {
 
 const Block1 = () => {
   const { result, loading, error } = useGetFeaturedBlock1();
-  const router = useRouter();
+  const { navigateWithTransition } = useNavigationTransition();
 
   const toAbsUrl = (url?: string | null) => {
     if (!url) return null;
@@ -135,11 +135,11 @@ const Block1 = () => {
 
             const handleClick = () => {
               if (productSlug) {
-                router.push(`/product/${productSlug}`);
+                navigateWithTransition(`/product/${productSlug}`);
               } else if (categorySlug) {
-                router.push(`/category/${categorySlug}`);
+                navigateWithTransition(`/category/${categorySlug}`);
               } else if (blockSlug) {
-                router.push(`/${blockSlug}`);
+                navigateWithTransition(`/${blockSlug}`);
               }
             };
 

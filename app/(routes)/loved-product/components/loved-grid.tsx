@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { Heart } from "lucide-react";
 import { useLoved } from "@/hooks/use-loved";
+import TransitionLink from "@/components/transition-link";
 
 const LovedGrid = () => {
   const items = useLoved((s) => s.items);
@@ -61,7 +61,7 @@ const LovedGrid = () => {
               />
             </button>
 
-            <Link
+            <TransitionLink
               href={`/product/${product.slug}`}
               className="block"
             >
@@ -97,7 +97,7 @@ const LovedGrid = () => {
                   ${Number(product.price).toLocaleString("es-CL")}
                 </p>
               </div>
-            </Link>
+            </TransitionLink>
           </div>
         ))}
       </div>

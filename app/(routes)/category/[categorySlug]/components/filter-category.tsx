@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import localFont from "next/font/local";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,6 +12,7 @@ import {
 } from "@/components/ui/accordion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import type { CategoryType } from "@/types/category";
+import { useNavigationTransition } from "@/components/navigation-transition-provider";
 
 // Tipografias locales usadas en el filtro de categorias.
 const khInterferenceRegularFont = localFont({
@@ -86,7 +86,7 @@ const FilterCategory = ({
   error = false,
   onSelectSubcategory,
 }: FilterCategoryProps) => {
-  const router = useRouter();
+  const { navigateWithTransition } = useNavigationTransition();
   const [openSlug, setOpenSlug] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -96,7 +96,7 @@ const FilterCategory = ({
   const goCategory = (slugCat: string) => {
     setOpenSlug(slugCat);
     onSelectSubcategory(null);
-    router.push(`/category/${slugCat}`);
+    navigateWithTransition(`/category/${slugCat}`);
   };
 
   const goSubcategory = (slugSub: string) => {

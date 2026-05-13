@@ -3,12 +3,12 @@
 import Image from "next/image";
 import localFont from "next/font/local";
 import { Card, CardContent } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
 import type { ProductType } from "@/types/product";
 import { formatPrice } from "@/lib/formatPrice";
 import type { PromotionType } from "@/types/promotion";
 import { LovedButton } from "@/components/loved-button";
 import { toAbsUrl } from "@/lib/media";
+import { useNavigationTransition } from "@/components/navigation-transition-provider";
 
 // Tipografias locales usadas en la tarjeta del catalogo.
 const khInterferenceLightFont = localFont({
@@ -207,7 +207,7 @@ function buildProductCardData(product: ProductType): ProductCardData {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const router = useRouter();
+  const { navigateWithTransition } = useNavigationTransition();
   const productCard = buildProductCardData(product);
   const {
     id,
@@ -247,7 +247,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
             relative mt-0 mb-3 flex w-full cursor-pointer items-center
             justify-center overflow-hidden bg-white pt-1 pb-1 sm:mb-4
           "
-          onClick={() => productSlug && router.push(`/product/${productSlug}`)}
+          onClick={() =>
+            productSlug && navigateWithTransition(`/product/${productSlug}`)
+          }
         >
           <div className="absolute top-2 right-2 z-20 sm:top-4 sm:right-5">
             <LovedButton

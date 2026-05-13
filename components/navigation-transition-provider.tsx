@@ -12,6 +12,19 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import gsap from "gsap";
+import localFont from "next/font/local";
+
+const maratypeFont = localFont({
+  src: "./fonts/Maratype.otf",
+  display: "swap",
+});
+
+const khInterferenceLightFont = localFont({
+  src: "./fonts/KHInterferenceTRIAL-Light.otf",
+  weight: "300",
+  style: "normal",
+  display: "swap",
+});
 
 type NavigationTransitionContextValue = {
   navigateWithTransition: (href: string) => void;
@@ -35,11 +48,20 @@ const TRANSITION_CONFIG = {
   exitCellDuration: 0.16,
   enterCellDuration: 0.16,
   staggerEach: 0.035,
+  initialCountDuration: 1.55,
 };
 
 
 // Deja aqui las secciones que deben participar en la transicion.
-const ROUTE_PREFIXES = ["/", "/category", "/servicio", "/cotiza"] as const;
+const ROUTE_PREFIXES = [
+  "/",
+  "/category",
+  "/product",
+  "/cart",
+  "/servicio",
+  "/cotiza",
+  "/loved-product",
+] as const;
 
 function normalizeHref(href: string) {
   if (!href) return href;
@@ -66,12 +88,17 @@ export function NavigationTransitionProvider({
   const pathname = usePathname();
 
   const [gridConfig, setGridConfig] = useState(TRANSITION_CONFIG.desktop);
+  const [initialProgress, setInitialProgress] = useState(0);
+  const [showInitialLoader, setShowInitialLoader] = useState(true);
 
   const overlayRef = useRef<HTMLDivElement | null>(null);
+  const initialLoaderRef = useRef<HTMLDivElement | null>(null);
+  const initialCounterRef = useRef<HTMLDivElement | null>(null);
   const cellRefs = useRef<HTMLDivElement[]>([]);
   const pendingHrefRef = useRef<string | null>(null);
   const isAnimatingRef = useRef(false);
   const hasMountedRef = useRef(false);
+  const initialLoaderStartedRef = useRef(false);
 
   useEffect(() => {
     const updateGrid = () => {
@@ -158,6 +185,64 @@ export function NavigationTransitionProvider({
   });
 }, [gridConfig]);
 
+  const animateInitialLoader = useCallback(() => {
+    const overlay = overlayRef.current;
+    const loader = initialLoaderRef.current;
+    const counter = initialCounterRef.current;
+    const pixels = cellRefs.current.filter(Boolean);
+
+    if (!loader || !counter || !overlay || pixels.length === 0) {
+      setShowInitialLoader(false);
+      return;
+    }
+
+    const progress = { value: 0 };
+    const timeline = gsap.timeline();
+
+    gsap.killTweensOf([loader, counter, overlay, ...pixels]);
+    gsap.set(loader, { autoAlpha: 1, pointerEvents: "auto" });
+    gsap.set(counter, { autoAlpha: 1, y: 0 });
+    gsap.set(overlay, { autoAlpha: 0, pointerEvents: "none" });
+    gsap.set(pixels, { autoAlpha: 0, scale: 1 });
+
+    timeline.to(progress, {
+      value: 100,
+      duration: TRANSITION_CONFIG.initialCountDuration,
+      ease: "power2.out",
+      snap: { value: 1 },
+      onUpdate: () => setInitialProgress(progress.value),
+    });
+
+    timeline.to(counter, {
+      autoAlpha: 0,
+      y: -12,
+      duration: 0.18,
+      ease: "power2.out",
+    });
+
+    timeline.set(overlay, { autoAlpha: 1, pointerEvents: "auto" });
+    timeline.set(pixels, { autoAlpha: 1 });
+    timeline.to(loader, {
+      autoAlpha: 0,
+      duration: 0.1,
+      ease: "none",
+      onComplete: () => setShowInitialLoader(false),
+    });
+    timeline.to(pixels, {
+      autoAlpha: 0,
+      duration: TRANSITION_CONFIG.enterCellDuration,
+      ease: "none",
+      stagger: {
+        each: TRANSITION_CONFIG.staggerEach,
+        from: "random",
+        grid: [gridConfig.rows, gridConfig.columns],
+      },
+      onComplete: () => {
+        gsap.set(overlay, { autoAlpha: 0, pointerEvents: "none" });
+      },
+    });
+  }, [gridConfig]);
+
   const shouldAnimateHref = useCallback(
     (href: string) => shouldAnimatePath(pathname) || shouldAnimatePath(normalizeHref(href)),
     [pathname]
@@ -210,6 +295,28 @@ export function NavigationTransitionProvider({
   }, []);
 
   useEffect(() => {
+    if (initialLoaderStartedRef.current) {
+      return;
+    }
+
+    initialLoaderStartedRef.current = true;
+    animateInitialLoader();
+  }, [animateInitialLoader]);
+
+  useEffect(() => {
+    if (!showInitialLoader) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [showInitialLoader]);
+
+  useEffect(() => {
     if (!hasMountedRef.current) {
       hasMountedRef.current = true;
       return;
@@ -234,6 +341,29 @@ export function NavigationTransitionProvider({
   return (
     <NavigationTransitionContext.Provider value={value}>
       {children}
+
+      {showInitialLoader && (
+        <div
+          ref={initialLoaderRef}
+          className="fixed inset-0 z-[130] grid place-items-center bg-black text-white"
+          aria-label="Cargando"
+          aria-live="polite"
+        >
+          <div ref={initialCounterRef} className="text-center">
+            <div
+              className={`${maratypeFont.className} text-[clamp(5rem,18vw,15rem)] leading-none tracking-normal`}
+            >
+              {Math.round(initialProgress)}
+              <span className="text-[0.36em] align-top">%</span>
+            </div>
+            <p
+              className={`${khInterferenceLightFont.className} mt-2 text-xs uppercase tracking-[0.28em] text-white/55 sm:text-sm`}
+            >
+              Cargando
+            </p>
+          </div>
+        </div>
+      )}
 
       <div
         ref={overlayRef}

@@ -16,9 +16,9 @@ import type { ProductType } from "@/types/product";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatPrice } from "@/lib/formatPrice";
 import type { PromotionType } from "@/types/promotion";
-import { useRouter } from "next/navigation";
 import { LovedButton } from "@/components/loved-button";
 import { toAbsUrl } from "@/lib/media";
+import { useNavigationTransition } from "@/components/navigation-transition-provider";
 
 /* ----------------------- types auxiliares ----------------------- */
 
@@ -166,7 +166,7 @@ const Recommmended = ({
   currentProductId,
   categorySlug,
 }: RecommendedProps) => {
-  const router = useRouter();
+  const { navigateWithTransition } = useNavigationTransition();
 
   const {
     result: featuredResult,
@@ -308,7 +308,8 @@ const Recommmended = ({
                         min-h-[260px]
                       "
                       onClick={() =>
-                        productSlug && router.push(`/product/${productSlug}`)
+                        productSlug &&
+                        navigateWithTransition(`/product/${productSlug}`)
                       }
                     >
                       <div className="absolute top-3 right-3 z-20">

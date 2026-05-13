@@ -2,25 +2,16 @@
 
 import { useGetTempProducts } from "@/api/useGetTempProducts";
 import localFont from "next/font/local";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "./ui/carousel";
 import SkeletonSchema from "./skeletonSchema";
 import type { ResponseType } from "@/types/response";
-import { Card, CardContent } from "./ui/card";
-import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/formatPrice";
 import type { PromotionType } from "@/types/promotion";
-import { LovedButton } from "./loved-button";
 import { toAbsUrl } from "@/lib/media";
 import Image from "next/image";
 import type { ProductType } from "@/types/product";
 import { motion } from "motion/react";
 import { fadeUp } from "@/lib/fade-up";
+import { useNavigationTransition } from "@/components/navigation-transition-provider";
 
 // Local fonts used only by the temp products section.
 const maratypeFont = localFont({
@@ -225,7 +216,7 @@ function buildTempProductCardData(product: ProductType): TempProductCardData {
   };
 }
 
-// Product card renderer used by the carousel to keep the main section compact.
+// Product card renderer used by the promotions grid.
 function TempProductCard({
   product,
   onOpenProduct,
@@ -242,166 +233,107 @@ function TempProductCard({
     finalPrice,
     hasDiscount,
     image1,
-    image2,
   } = product;
 
   return (
-    <CarouselItem
-      key={id}
-      className="basis-[85%] sm:basis-1/2 lg:basis-1/3 px-3 md:px-4"
-    >
-      <Card
+    <article key={id} className="group w-full">
+      <button
+        type="button"
         className="
-          shadow-none
-          group relative
-          w-full
-          h-auto
-          pt-4
-          pb-4
-          overflow-hidden
-          border-none
-          bg-[#ffffff]
-          flex flex-col
-          justify-between
+          relative block w-full overflow-hidden bg-neutral-100
+          aspect-[1.08/1] cursor-pointer text-left
         "
+        onClick={() => onOpenProduct(productSlug)}
+        aria-label={`Ver ${displayName}`}
       >
         {hasDiscount && (
-          <div
+          <span
             className="
-              absolute left-4 top-4 z-10
-              rounded-full px-3 py-1
-              text-[11px] font-black tracking-wide
-              bg-green-500 text-white
+              absolute left-4 top-4 z-10 bg-black px-3 py-1
+              text-[11px] font-black tracking-wide text-white
             "
           >
             OFERTA
-          </div>
+          </span>
         )}
 
-        <CardContent className="flex flex-col justify-around px-3 md:px-3 pt-0 pb-0">
-          <div
-            className="
-              relative mb-3 sm:mb-4
-              mt-0 w-full
-              bg-white
-              flex items-center justify-center overflow-hidden
-              pt-1 pb-1 cursor-pointer
-            "
-            onClick={() => onOpenProduct(productSlug)}
-          >
-            <div className="absolute top-3 right-3 z-20">
-              <LovedButton
-                product={{
-                  id,
-                  title: displayName,
-                  secondaryName,
-                  price: basePrice,
-                  slug: productSlug,
-                  imageUrl: image1,
-                }}
-              />
-            </div>
+        {image1 ? (
+          <Image
+            src={image1}
+            alt={displayName}
+            fill
+            sizes="(min-width: 768px) 50vw, 100vw"
+            unoptimized
+            className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+          />
+        ) : (
+          <span className="flex h-full items-center justify-center text-sm text-muted-foreground">
+            Sin imagen
+          </span>
+        )}
+      </button>
 
-            {image1 && (
-              <Image
-                src={image1}
-                alt={displayName}
-                width={700}
-                height={700}
-                unoptimized
-                className="
-                  sm:max-h-[410px] h-auto w-auto object-contain
-                  transition-all duration-300 ease-out
-                  opacity-100 group-hover:opacity-0
-                "
-              />
-            )}
+      <div className="pt-2 text-left">
+        <h3
+          className={`${khInterferenceRegularFont.className}
+            text-2xl leading-none text-black sm:text-[26px]
+            uppercase
+          `}
+        >
+          {displayName}
+        </h3>
 
-            {image2 && (
-              <Image
-                src={image2}
-                alt={displayName}
-                fill
-                unoptimized
-                className="
-                  absolute inset-0
-                  object-cover
-                  transition-all duration-300 ease-out
-                  opacity-0 group-hover:opacity-100
-                "
-              />
-            )}
-
-            {!image1 && (
-              <span className="text-sm text-muted-foreground">Sin imagen</span>
-            )}
-          </div>
-
-          <h3
-            className={`${khInterferenceRegularFont.className}
-              text-lg
-              leading-none
-              text-left sm:text-2xl
-              uppercase pt-0
-              pb-0
+        {secondaryName && (
+          <p
+            className={`${khInterferenceLightFont.className}
+              text-[17px] leading-none text-black sm:text-[18px]
+              uppercase
             `}
           >
-            {displayName}
-          </h3>
+            {secondaryName}
+          </p>
+        )}
 
-          <div className="flex justify-start gap-2">
-            <div className="flex items-center gap-2 text-left">
-              <p
-                className={`${khInterferenceLightFont.className} text-lg font-normal text-left text-black`}
-              >
-                {secondaryName}
-              </p>
-            </div>
+        {hasDiscount ? (
+          <div className="pt-1 leading-none">
+            <p
+              className={`${khInterferenceLightFont.className} text-[15px] text-black/40 line-through`}
+            >
+              {formatPrice(basePrice)}
+            </p>
+            <p
+              className={`${khInterferenceLightFont.className} text-[18px] text-black tabular-nums`}
+            >
+              {formatPrice(finalPrice)}
+            </p>
           </div>
-
-          <div className="flex items-center justify-start gap-2">
-            {hasDiscount ? (
-              <div className="leading-tight text-left">
-                <p
-                  className={`${khInterferenceLightFont.className} text-[12px] font-semibold text-black/40 line-through`}
-                >
-                  {formatPrice(basePrice)}
-                </p>
-                <p
-                  className={`${khInterferenceLightFont.className} text-[17px] sm:text-[17px] font-extrabold text-red-500 tabular-nums`}
-                >
-                  {formatPrice(finalPrice)}
-                </p>
-              </div>
-            ) : (
-              <p
-                className={`${khInterferenceLightFont.className} text-[15px] sm:inline-flex items-center justify-start font-semibold text-left`}
-              >
-                {formatPrice(basePrice)}
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </CarouselItem>
+        ) : (
+          <p
+            className={`${khInterferenceLightFont.className} pt-1 text-[18px] leading-none text-black tabular-nums`}
+          >
+            {formatPrice(basePrice)}
+          </p>
+        )}
+      </div>
+    </article>
   );
 }
 
 const TempProducts = () => {
   const { result, loading }: ResponseType = useGetTempProducts("halloween");
-  const router = useRouter();
+  const { navigateWithTransition } = useNavigationTransition();
   const tempProducts = Array.isArray(result)
-    ? result.map(buildTempProductCardData)
+    ? result.map(buildTempProductCardData).slice(0, 2)
     : [];
 
   // Keep navigation logic in one place instead of repeating it in the JSX.
   const handleOpenProduct = (slug: string) => {
     if (!slug) return;
-    router.push(`/product/${slug}`);
+    navigateWithTransition(`/product/${slug}`);
   };
 
   return (
-    <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-8 sm:py-14">
+    <section className="mx-auto max-w-[1350px] px-6 py-8 sm:px-8 sm:py-14 lg:px-0">
       <div>
         <motion.h3
           variants={fadeUp}
@@ -420,10 +352,9 @@ const TempProducts = () => {
           whileInView="visible"
           viewport={{ once: true, amount: 0.25 }}
           custom={0.12}
-          className={`${khInterferenceLightFont.className} text-black/35 text-left leading-none tracking-normal mb-6 text-base sm:text-base`}
+          className={`${khInterferenceLightFont.className} text-black/55 text-left leading-none tracking-normal mb-6 text-base sm:text-base uppercase`}
         >
-          Disfruta de las mejores promociones y ofertas exclusivas en nuestros
-          productos seleccionados
+          Disfruta promociones y ofertas exclusivas en productos seleccionados.
         </motion.p>
       </div>
 
@@ -434,23 +365,19 @@ const TempProducts = () => {
         viewport={{ once: true, amount: 0.15 }}
         custom={0.2}
       >
-        <Carousel>
-          <CarouselContent className="ml-1 md:-ml-4">
-            {loading && <SkeletonSchema grid={1} />}
+        {loading && <SkeletonSchema grid={2} />}
 
-            {!loading &&
-              tempProducts.map((product) => (
-                <TempProductCard
-                  key={product.id}
-                  product={product}
-                  onOpenProduct={handleOpenProduct}
-                />
-              ))}
-          </CarouselContent>
-
-          <CarouselPrevious />
-          <CarouselNext className="hidden sm:flex" />
-        </Carousel>
+        {!loading && (
+          <div className="grid gap-1 md:grid-cols-2">
+            {tempProducts.map((product) => (
+              <TempProductCard
+                key={product.id}
+                product={product}
+                onOpenProduct={handleOpenProduct}
+              />
+            ))}
+          </div>
+        )}
       </motion.div>
     </section>
   );

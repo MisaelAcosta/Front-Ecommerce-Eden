@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
-import { SlidersHorizontal } from "lucide-react";
+import { ArrowUpDown, SlidersHorizontal } from "lucide-react";
 import CarouselTextBanner from "@/components/carousel-text-banner";
 import ScrollReveal from "@/components/animation_page/scroll-reveal";
 import SmoothScroll from "@/components/animation_page/smooth-scroll";
@@ -33,12 +33,22 @@ type ProductWithOptionalAttributes = ProductType & {
   productName2?: string | null;
 };
 
+type SortOption = "default" | "price-asc" | "price-desc" | "recent";
+
+const sortOptions: { value: SortOption; label: string }[] = [
+  { value: "default", label: "Relevancia" },
+  { value: "price-asc", label: "Menor precio" },
+  { value: "price-desc", label: "Mayor precio" },
+  { value: "recent", label: "Mas reciente" },
+];
+
 export default function Page() {
   const params = useParams();
   const { categorySlug } = params as { categorySlug: string };
 
   const [activeSubSlug, setActiveSubSlug] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState<SortOption>("default");
   const [currentPage, setCurrentPage] = useState(1);
   const [showFiltersMobile, setShowFiltersMobile] = useState(true);
   const {
@@ -50,6 +60,7 @@ export default function Page() {
   useEffect(() => {
     setActiveSubSlug(null);
     setSearchTerm("");
+    setSortBy("default");
     setCurrentPage(1);
     setShowFiltersMobile(true);
   }, [categorySlug]);
@@ -60,6 +71,7 @@ export default function Page() {
     page: currentPage,
     pageSize: 8,
     searchTerm,
+    sortBy,
   });
   const showInitialProductsLoading = loading && products.length === 0;
   const showProducts = products.length > 0 || (!loading && !error);
@@ -98,6 +110,38 @@ export default function Page() {
   const handlePrev = () => goToPage(currentPage - 1);
   const handleNext = () => goToPage(currentPage + 1);
 
+  const handleSortChange = (value: string) => {
+    setSortBy(value as SortOption);
+    setCurrentPage(1);
+  };
+
+  const SortControl = ({ compact = false }: { compact?: boolean }) => (
+    <label
+      className={`flex items-center gap-2 text-black ${
+        compact ? "w-full" : "justify-end"
+      }`}
+    >
+      <ArrowUpDown className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+      <span className="sr-only">Ordenar por</span>
+      <select
+        value={sortBy}
+        onChange={(event) => handleSortChange(event.target.value)}
+        className={`
+          h-10 cursor-pointer rounded-none border border-black/10 bg-white px-3
+          text-xs uppercase tracking-[0.16em] outline-none transition
+          hover:border-black/30 focus:border-black
+          ${compact ? "w-full" : "min-w-[210px]"}
+        `}
+      >
+        {sortOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+
   return (
     <SmoothScroll>
       <section className="pt-15 w-full px-1 md:px-8 lg:px-12 pb-28 md:pb-0">
@@ -134,6 +178,10 @@ export default function Page() {
         {showFiltersMobile && (
           <ScrollReveal delay={0.12}>
             <div className="md:hidden px-10 items-center text-center content-center justify-center max-h-[105vh] bg-white">
+              <div className="pt-4">
+                <SortControl compact />
+              </div>
+
               <div className="p-1">
                 <FilterCategory
                   categorySlug={categorySlug}
@@ -177,6 +225,10 @@ export default function Page() {
             </aside>
 
             <main className="w-auto px-0 shadow-none md:p-8">
+              <div className="mb-5 hidden items-center justify-end md:flex">
+                <SortControl />
+              </div>
+
               {showInitialProductsLoading && (
                 <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 md:gap-1">
                   {Array.from({ length: 8 }).map((_, index) => (

@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { Minus, Plus, X } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import type { CartLine } from "@/types/cart";
 import { formatPrice } from "@/lib/formatPrice";
 import { cn } from "@/lib/utils";
+import { useNavigationTransition } from "@/components/navigation-transition-provider";
 import {
   khInterferenceLightFont,
   khInterferenceRegularFont,
@@ -17,7 +17,7 @@ interface CartItemProps {
 }
 
 const CartItem = ({ item }: CartItemProps) => {
-  const router = useRouter();
+  const { navigateWithTransition } = useNavigationTransition();
   const { removeItem, incQty, decQty } = useCart();
   const isPrintQuote = item.kind === "print-quote";
   const destination = isPrintQuote ? "/cotiza" : `/product/${item.productSlug}`;
@@ -25,7 +25,10 @@ const CartItem = ({ item }: CartItemProps) => {
   return (
     <li className="flex items-center gap-4 border-b py-6">
       {/* La cotización 3D navega de vuelta a /cotiza; los productos normales conservan su detalle. */}
-      <div onClick={() => router.push(destination)} className="cursor-pointer">
+      <div
+        onClick={() => navigateWithTransition(destination)}
+        className="cursor-pointer"
+      >
         <Image
           src={item.imageUrl}
           alt={item.variantName}

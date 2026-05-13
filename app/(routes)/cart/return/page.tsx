@@ -1,11 +1,12 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
 import { useCartWizard } from "@/hooks/use-cart-wizard";
+import { useNavigationTransition } from "@/components/navigation-transition-provider";
 
 type UiStatus = "loading" | "paid" | "rejected" | "pending" | "error";
 
@@ -26,7 +27,7 @@ type OrderStatusData = {
 
 function FlowReturnContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const { navigateWithTransition } = useNavigationTransition();
 
   const tokenFromUrl = useMemo(() => searchParams.get("token"), [searchParams]);
 
@@ -327,7 +328,7 @@ function FlowReturnContent() {
             </p>
 
             <div className="pt-3">
-              <Button className="w-full" onClick={() => router.push("/")}>
+              <Button className="w-full" onClick={() => navigateWithTransition("/")}>
                 Volver al inicio
               </Button>
             </div>
@@ -342,7 +343,10 @@ function FlowReturnContent() {
             </p>
 
             <div className="flex gap-2 pt-2">
-              <Button className="w-full" onClick={() => router.push("/cart")}>
+              <Button
+                className="w-full"
+                onClick={() => navigateWithTransition("/cart")}
+              >
                 Volver al carrito
               </Button>
             </div>
@@ -364,7 +368,10 @@ function FlowReturnContent() {
               >
                 Reintentar
               </Button>
-              <Button className="w-full" onClick={() => router.push("/cart")}>
+              <Button
+                className="w-full"
+                onClick={() => navigateWithTransition("/cart")}
+              >
                 Ir al carrito
               </Button>
             </div>
