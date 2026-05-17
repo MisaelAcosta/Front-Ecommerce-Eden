@@ -325,13 +325,15 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
           <div className="flex items-start justify-between gap-2 px-5 md:px-0">
             <div className="min-w-0 mr-3">
               <h1
-                className={`${khInterferenceRegularFont.className} text-3xl leading-none tracking-[0] sm:text-5xl`}
+                className={`${khInterferenceRegularFont.className} text-3xl 
+                leading-none tracking-[0] sm:text-5xl`}
               >
                 {product.productName}
               </h1>
               {product.productName2 ? (
                 <h2
-                  className={`${khInterferenceLightFont.className} text-xl leading-tight text-black/55 sm:text-2xl`}
+                  className={`${khInterferenceLightFont.className} text-xl 
+                  leading-tight text-black/55 sm:text-2xl`}
                 >
                   {product.productName2}
                 </h2>

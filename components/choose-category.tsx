@@ -7,8 +7,9 @@ import localFont from "next/font/local";
 import { useGetCategories } from "@/api/getProducts";
 import type { ResponseType } from "@/types/response";
 import type { CategoryType } from "@/types/category";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { fadeUp } from "@/lib/fade-up";
+import { khInterferenceLightFont } from "@/app/(routes)/cart/components/cart-fonts";
 
 // Tipografias locales de la seccion categorias.
 const maratypeFont = localFont({
@@ -93,6 +94,32 @@ const CATEGORY_VISUALS: CategoryVisualConfig[] = [
     },
   },
 ];
+
+const categorySwapVariants = {
+  initial: {
+    opacity: 0,
+    y: 8,
+    filter: "blur(6px)",
+  },
+  animate: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: {
+      duration: 0.72,
+      ease: [0.22, 1, 0.36, 1] as const,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -4,
+    filter: "blur(4px)",
+    transition: {
+      duration: 0.62,
+      ease: [0.42, 0, 0.58, 1] as const,
+    },
+  },
+};
 
 // Normaliza textos para comparar nombres y slugs sin depender de acentos.
 function normalizeText(value: string | null | undefined) {
@@ -210,9 +237,10 @@ const ChooseCategory = () => {
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.25 }}
+          viewport={{ once: true, amount: 1 }}
           custom={0}
-          className={`${maratypeFont.className} mb-4 text-left text-4xl leading-none text-black sm:mb-8 sm:text-6xl`}
+          className={`${maratypeFont.className} mb-4 text-left 
+          text-4xl leading-none text-black sm:mb-8 sm:text-6xl`}
         >
           CATEGORIAS
         </motion.h3>
@@ -250,30 +278,40 @@ const ChooseCategory = () => {
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.15 }}
-            custom={0.15}
+            viewport={{ once: true, amount: 1 }}
+            custom={1}
           >
             {/* Vista escritorio y tablet. */}
-            <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start lg:gap-8">
-              <div className="grid grid-cols-[0.36fr_0.64fr] gap-3">
-                <CategoryImageTile
-                  src={activeCategory.images.primary}
-                  alt={`${activeCategory.label} imagen principal`}
-                  className="h-[380px]"
-                  priority
-                />
-                <CategoryImageTile
-                  src={activeCategory.images.secondary}
-                  alt={`${activeCategory.label} imagen secundaria`}
-                  className="h-[380px]"
-                  priority
-                />
-                <CategoryImageTile
-                  src={activeCategory.images.bottom}
-                  alt={`${activeCategory.label} imagen inferior`}
-                  className="col-span-2 h-[255px]"
-                />
-              </div>
+            <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_320px] 
+            lg:items-start lg:gap-8">
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={`desktop-images-${activeCategory.key}`}
+                  variants={categorySwapVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  className="grid grid-cols-[0.36fr_0.64fr] gap-3"
+                >
+                  <CategoryImageTile
+                    src={activeCategory.images.primary}
+                    alt={`${activeCategory.label} imagen principal`}
+                    className="h-[380px]"
+                    priority
+                  />
+                  <CategoryImageTile
+                    src={activeCategory.images.secondary}
+                    alt={`${activeCategory.label} imagen secundaria`}
+                    className="h-[380px]"
+                    priority
+                  />
+                  <CategoryImageTile
+                    src={activeCategory.images.bottom}
+                    alt={`${activeCategory.label} imagen inferior`}
+                    className="col-span-2 h-[520px]"
+                  />
+                </motion.div>
+              </AnimatePresence>
 
               <div className="flex min-h-full flex-col items-center pt-0">
                 <div className="mb-14 flex w-full justify-center gap-3">
@@ -287,80 +325,112 @@ const ChooseCategory = () => {
                   ))}
                 </div>
 
-                <p
-                  className={`${khInterferenceRegularFont.className} max-w-[280px] 
-                  text-center text-[18px] sm:uppercase leading-[1.15] text-black`}
-                >
-                  {activeCategory.description}
-                </p>
-
-                <Link
-                  href={activeCategory.href}
-                  className="mt-14 inline-flex min-h-[86px] min-w-[156px] 
-                  items-start justify-between rounded-[10px] bg-[#d2ff00] px-5 
-                  py-4 text-black transition-transform duration-200 hover:scale-[1.02]"
-                >
-                  <span
-                    className={`${khInterferenceRegularFont.className} text-left 
-                    text-[17px] uppercase leading-[0.95]`}
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    key={`desktop-copy-${activeCategory.key}`}
+                    variants={categorySwapVariants}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    className="flex w-full max-w-[280px] flex-col items-end"
                   >
-                    VER
-                    <br />
-                    CATEGORIAS
-                  </span>
-                  <span className="text-xl leading-none">-&gt;</span>
-                </Link>
+                    <p
+                      className={`${khInterferenceLightFont.className} 
+                      max-w-[280px] 
+                      text-right text-[18px] sm:uppercase leading-[1.15]
+                      text-black`}
+                    >
+                      {activeCategory.description}
+                    </p>
+
+                    <Link
+                      href={activeCategory.href}
+                      className="mt-14 min-h-[86px] min-w-[156px] items-right 
+                      rounded-[10px] 
+                      bg-[#111111] px-5 pl-6 py-4 text-white 
+                      transition-transform 
+                      duration-200 hover:scale-[1.02]"
+                    >
+                      <span
+                        className={`${khInterferenceRegularFont.className} 
+                        text-left text-[17px] uppercase leading-[0.95]`}
+                      >
+                        VER
+                        <br />
+                        CATEGORIAS
+                      </span>
+                    </Link>
+                  </motion.div>
+                </AnimatePresence>
               </div>
             </div>
 
             {/* Vista movil. */}
             <div className="lg:hidden">
-              <div className="grid grid-cols-2 gap-3">
-                <CategoryImageTile
-                  src={activeCategory.images.primary}
-                  alt={`${activeCategory.label} imagen principal`}
-                  className="h-[252px]"
-                  priority
-                />
-                <CategoryImageTile
-                  src={activeCategory.images.secondary}
-                  alt={`${activeCategory.label} imagen secundaria`}
-                  className="h-[252px]"
-                  priority
-                />
-                <CategoryImageTile
-                  src={activeCategory.images.bottom}
-                  alt={`${activeCategory.label} imagen inferior`}
-                  className="col-span-2 h-[132px]"
-                />
-              </div>
-
-              <div className="mt-6 flex items-end justify-between gap-4">
-                <p
-                  className={`${khInterferenceRegularFont.className} max-w-[175px] 
-                  text-left text-[12px] tracking-widest 
-                  sm:text-right sm:leading-[1.05] text-black`}
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={`mobile-images-${activeCategory.key}`}
+                  variants={categorySwapVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  className="grid grid-cols-2 gap-3"
                 >
-                  {activeCategory.description}
-                </p>
+                  <CategoryImageTile
+                    src={activeCategory.images.primary}
+                    alt={`${activeCategory.label} imagen principal`}
+                    className="h-[252px]"
+                    priority
+                  />
+                  <CategoryImageTile
+                    src={activeCategory.images.secondary}
+                    alt={`${activeCategory.label} imagen secundaria`}
+                    className="h-[252px]"
+                    priority
+                  />
+                  <CategoryImageTile
+                    src={activeCategory.images.bottom}
+                    alt={`${activeCategory.label} imagen inferior`}
+                    className="col-span-2 h-[132px]"
+                  />
+                </motion.div>
+              </AnimatePresence>
 
-                <Link
-                  href={activeCategory.href}
-                  className="inline-flex min-h-[82px] min-w-[118px] 
-                  items-start justify-between rounded-[10px] bg-[#d2ff00] 
-                  px-4 py-3 text-black transition-transform duration-200 
-                  hover:scale-[1.02]"
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={`mobile-copy-${activeCategory.key}`}
+                  variants={categorySwapVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  className="mt-6 flex items-end justify-between gap-4"
                 >
-                  <span
-                    className={`${khInterferenceRegularFont.className} text-left text-[16px] uppercase leading-[0.95]`}
+                  <p
+                    className={`${khInterferenceRegularFont.className} max-w-[175px] 
+                    text-left text-[12px] tracking-widest 
+                    sm:text-right sm:leading-[1.05] text-black`}
                   >
-                    VER
-                    <br />
-                    CATEGORIAS
-                  </span>
-                  <span className="text-lg leading-none">-&gt;</span>
-                </Link>
-              </div>
+                    {activeCategory.description}
+                  </p>
+
+                  <Link
+                    href={activeCategory.href}
+                    className="inline-flex min-h-[82px] min-w-[118px] 
+                    items-start justify-between rounded-[10px] bg-[#d2ff00] 
+                    px-4 py-3 text-black transition-transform duration-200 
+                    hover:scale-[1.02]"
+                  >
+                    <span
+                      className={`${khInterferenceRegularFont.className} text-left text-[16px] uppercase leading-[0.95]`}
+                    >
+                      VER
+                      <br />
+                      CATEGORIAS
+                    </span>
+                    <span className="text-lg leading-none">-&gt;</span>
+                  </Link>
+                </motion.div>
+              </AnimatePresence>
 
               <div className="mt-6 grid grid-cols-3 gap-3">
                 {categoryCards.map((category) => (
