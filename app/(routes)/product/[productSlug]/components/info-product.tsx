@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import localFont from "next/font/local";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
@@ -12,6 +13,7 @@ import { VariantType } from "@/types/variant";
 import { PromotionType } from "@/types/promotion";
 import { Heart, Minus, Plus } from "lucide-react";
 import { useLoved } from "@/hooks/use-loved";
+import { toast } from "sonner";
 
 import { ImageZoom } from "@/components/ui/shadcn-io/image-zoom";
 import {
@@ -22,6 +24,20 @@ import {
   CarouselNext,
   type CarouselApi,
 } from "@/components/ui/carousel";
+
+const khInterferenceLightFont = localFont({
+  src: "../../../../../components/fonts/KHInterferenceTRIAL-Light.otf",
+  weight: "300",
+  style: "normal",
+  display: "swap",
+});
+
+const khInterferenceRegularFont = localFont({
+  src: "../../../../../components/fonts/KHInterferenceTRIAL-Regular.otf",
+  weight: "400",
+  style: "normal",
+  display: "swap",
+});
 
 export type InfoProductProps = {
   product: ProductType;
@@ -189,12 +205,12 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
 
   const handleAddToCart = () => {
     if (variants.length > 0 && !currentVariant) {
-      notifySelectVariant();
+      alert("Selecciona una variante primero 🙏");
       return;
     }
 
     if (!currentVariant) {
-      notifyProductWithoutVariants();
+      alert("Este producto no tiene variantes configuradas.");
       return;
     }
 
@@ -308,11 +324,15 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
         <div className="w-full max-w-180 md:max-w-none md:pl-16 pt-1 md:pt-0">
           <div className="flex items-start justify-between gap-2 px-5 md:px-0">
             <div className="min-w-0 mr-3">
-              <h1 className="text-2xl font-extrabold leading-tight tracking-tight">
+              <h1
+                className={`${khInterferenceRegularFont.className} text-3xl leading-none tracking-[0] sm:text-5xl`}
+              >
                 {product.productName}
               </h1>
               {product.productName2 ? (
-                <h2 className="text-xl font-semibold text-muted-foreground leading-tight">
+                <h2
+                  className={`${khInterferenceLightFont.className} text-xl leading-tight text-black/55 sm:text-2xl`}
+                >
                   {product.productName2}
                 </h2>
               ) : null}
@@ -320,7 +340,7 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
 
             <div className="shrink-0 flex flex-col items-end gap-1">
               <span
-                className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wide ${
+                className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${
                   product.active
                     ? "border-emerald-500/40 bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400"
                     : "border-zinc-300/40 bg-zinc-50 text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400"
@@ -331,15 +351,21 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
 
               {hasDiscount ? (
                 <div className="flex flex-col items-end leading-tight">
-                  <p className="text-sm line-through text-muted-foreground">
+                  <p
+                    className={`${khInterferenceLightFont.className} text-sm line-through text-muted-foreground`}
+                  >
                     {formatPrice(basePrice)}
                   </p>
-                  <p className="text-2xl font-extrabold tabular-nums text-red-500">
+                  <p
+                    className={`${khInterferenceLightFont.className} text-2xl tabular-nums text-red-500`}
+                  >
                     {formatPrice(finalPrice)}
                   </p>
                 </div>
               ) : (
-                <p className="text-2xl font-extrabold tabular-nums">
+                <p
+                  className={`${khInterferenceLightFont.className} text-2xl tabular-nums`}
+                >
                   {formatPrice(basePrice)}
                 </p>
               )}
@@ -349,14 +375,22 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
           <Separator className="my-4" />
 
           <section className="space-y-2 px-5 md:px-0">
-            <h3 className="text-xl font-black">DESCRIPCION</h3>
+            <h3
+              className={`${khInterferenceRegularFont.className} text-2xl leading-none tracking-[0]`}
+            >
+              DESCRIPCION
+            </h3>
             <p className="text-sm leading-relaxed text-muted-foreground">
               {product.description}
             </p>
           </section>
 
           <section className="mt-6 space-y-2 px-5 md:px-0">
-            <h3 className="text-xl font-black">ESPECIFICACIONES</h3>
+            <h3
+              className={`${khInterferenceRegularFont.className} text-2xl leading-none tracking-[0]`}
+            >
+              ESPECIFICACIONES
+            </h3>
             <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
               {specsToShow}
             </p>
@@ -393,7 +427,9 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
                             unoptimized
                           />
                         ) : (
-                          <span className="text-xs font-semibold text-muted-foreground text-center px-1">
+                          <span
+                            className={`${khInterferenceLightFont.className} px-1 text-center text-xs text-muted-foreground`}
+                          >
                             {v.variantName}
                           </span>
                         )}
@@ -418,7 +454,9 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
               >
                 <Minus size={18} strokeWidth={1.5} />
               </button>
-              <span className="w-8 text-center text-sm font-semibold tabular-nums">
+              <span
+                className={`${khInterferenceLightFont.className} w-8 text-center text-sm tabular-nums`}
+              >
                 {qty}
               </span>
               <button

@@ -2,26 +2,18 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import {
-  Sheet,
-  SheetTrigger,
-  SheetContent,
-} from "@/components/ui/sheet";
-
+import { toast } from "sonner";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ProfileMenu } from "./profile-menu";
 import { ProfileOrdersView } from "./profile-orders-view";
 import { ProfileInfoForm } from "./profile-info-form";
-import type {
-  CurrentUser,
-  ProfileView,
-  ProfileData,
-} from "./profile-types";
+import type { CurrentUser, ProfileData, ProfileView } from "./profile-types";
 
 type ProfileSheetProps = {
   user: CurrentUser;
   profile?: ProfileData | null;
   onLogout?: () => void;
-  children?: React.ReactNode; // ✅ CLAVE
+  children?: React.ReactNode;
 };
 
 export function ProfileSheet({
@@ -37,15 +29,29 @@ export function ProfileSheet({
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/auth/logout", {
+      const res = await fetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });
-    } catch (err) {
-      console.error("Error al cerrar sesión:", err);
-    } finally {
+
+      if (!res.ok) {
+        toast.error("No se pudo cerrar sesion", {
+          description: "Intentalo nuevamente en un momento.",
+        });
+        return;
+      }
+
+      toast.success("Sesion cerrada", {
+        description: "Te esperamos de vuelta en Eden.",
+      });
+
       onLogout?.();
       router.refresh();
+    } catch (err) {
+      console.error("Error al cerrar sesion:", err);
+      toast.error("No se pudo cerrar sesion", {
+        description: "Revisa tu conexion e intentalo otra vez.",
+      });
     }
   };
 
@@ -55,28 +61,11 @@ export function ProfileSheet({
         if (!open) setView("menu");
       }}
     >
-      {/* ✅ TRIGGER UNIVERSAL (desktop texto / mobile icono) */}
       <SheetTrigger asChild>
         {children ? (
           children
         ) : (
-          <button
-            className="
-              hidden md:flex
-              cursor-pointer
-              rounded-2xl
-              border
-              border-black
-              px-4
-              py-1
-              font-bold
-              hover:bg-black
-              hover:text-white
-              transition
-              duration-200
-              ease-in-out
-            "
-          >
+          <button className="hidden cursor-pointer rounded-2xl border border-black px-4 py-1 font-bold transition duration-200 ease-in-out hover:bg-black hover:text-white md:flex">
             Perfil
           </button>
         )}
@@ -84,10 +73,7 @@ export function ProfileSheet({
 
       <SheetContent side="right" className="w-full p-0 sm:w-[380px]">
         {view === "menu" && (
-          <ProfileMenu
-            onChangeView={setView}
-            onLogout={handleLogout}
-          />
+          <ProfileMenu onChangeView={setView} onLogout={handleLogout} />
         )}
 
         {view === "compras" && (
@@ -105,5 +91,3 @@ export function ProfileSheet({
     </Sheet>
   );
 }
-
-

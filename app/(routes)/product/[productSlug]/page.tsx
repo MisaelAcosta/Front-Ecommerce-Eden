@@ -7,6 +7,8 @@ import InfoProduct from "./components/info-product";
 import { ArrowLeft } from "lucide-react";
 import Recommmended from "./components/recommended";
 import type { ProductType } from "@/types/product";
+import SmoothScroll from "@/components/animation_page/smooth-scroll";
+import ScrollReveal from "@/components/animation_page/scroll-reveal";
 
 type ProductPageItem = ProductType & {
   id: number;
@@ -34,32 +36,36 @@ export default function Page() {
   const product = products[0];
 
   return (
-    <div className="mx-auto max-w-7xl py-4 sm:py-22 sm:px-14 md:pr-0">
-      <button
-        onClick={() => router.back()}
-        className="
-          mb-2 flex items-center gap-2
-          text-sm font-medium text-muted-foreground
-          cursor-pointer
-          transition hover:text-foreground
-          pl-4 md:pl-0
-          md:-ml-15 lg:-ml-8 xl:-ml-16
-        "
-      >
-        <ArrowLeft size={23} strokeWidth={2} />
-      </button>
+    <SmoothScroll>
+      <div className="mx-auto max-w-7xl py-4 sm:py-22 sm:px-14 md:pr-0">
+        <ScrollReveal delay={0.02}>
+          <button
+            onClick={() => router.back()}
+            className="
+              mb-2 flex items-center gap-2
+              text-sm font-medium text-muted-foreground
+              cursor-pointer
+              transition hover:text-foreground
+              pl-4 md:pl-0
+              md:-ml-15 lg:-ml-8 xl:-ml-16
+            "
+          >
+            <ArrowLeft size={23} strokeWidth={2} />
+          </button>
+        </ScrollReveal>
 
-      <div>
-        <InfoProduct product={product} variantsData={variantsResult ?? []} />
-      </div>
+        <ScrollReveal delay={0.08}>
+          <InfoProduct product={product} variantsData={variantsResult ?? []} />
+        </ScrollReveal>
 
-      <div className="pt-30">
-        <Recommmended
-          currentProductId={product.id}
-          categorySlug={product.category?.slug ?? ""}
-        />
+        <ScrollReveal delay={0.12} className="pt-30">
+          <Recommmended
+            currentProductId={product.id}
+            categorySlug={product.category?.slug ?? ""}
+          />
+        </ScrollReveal>
       </div>
-    </div>
+    </SmoothScroll>
   );
 }
 

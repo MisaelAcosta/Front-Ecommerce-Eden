@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Heart, ShoppingBag, Smile } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { toast } from "sonner";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import ItemsMenuMobile from "@/components/navbar/items-menu-mobile";
 import MenuList from "@/components/navbar/menu-list";
@@ -14,6 +15,7 @@ import type {
 } from "@/components/profile/profile-types";
 import { useNavigationTransition } from "@/components/navigation-transition-provider";
 import { useCart } from "@/hooks/use-cart";
+import { cn } from "@/lib/utils";
 
 // ===== # Navbar | Assets =====
 // Assets del desktop inspirados en las referencias: wordmark principal.
@@ -73,6 +75,13 @@ const Navbar = () => {
         const data = await res.json();
         setUser(data.user ?? null);
         setProfile(data.profile ?? null);
+
+        if (data.user && window.localStorage.getItem("eden-auth-event") === "login") {
+          window.localStorage.removeItem("eden-auth-event");
+          toast.success("Sesion iniciada", {
+            description: "Bienvenido de vuelta a Eden.",
+          });
+        }
       } catch (error) {
         console.error("Error obteniendo usuario actual:", error);
         setUser(null);
@@ -97,11 +106,15 @@ const Navbar = () => {
       return null;
     }
 
-    const icon = (
-      <Smile strokeWidth={1.5} fill="none" className={iconClassName} />
-    );
-
     if (user) {
+      const icon = (
+        <Smile
+          strokeWidth={1.7}
+          fill="none"
+          className={cn(iconClassName, "text-black")}
+        />
+      );
+
       return (
         <ProfileSheet
           user={user}
@@ -113,13 +126,18 @@ const Navbar = () => {
         >
           <button
             aria-label="Perfil"
-            className="cursor-pointer rounded-full p-2 transition-colors duration-300 hover:bg-white/10"
+            className="relative cursor-pointer rounded-full bg-white p-2 text-black shadow-[0_0_22px_rgba(255,255,255,0.28)] ring-1 ring-white/70 transition duration-300 hover:scale-105 hover:bg-white"
           >
             {icon}
+            <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full border border-[#1A1A1A] bg-emerald-400" />
           </button>
         </ProfileSheet>
       );
     }
+
+    const icon = (
+      <Smile strokeWidth={1.5} fill="none" className={iconClassName} />
+    );
 
     return (
       <LoginDialog>

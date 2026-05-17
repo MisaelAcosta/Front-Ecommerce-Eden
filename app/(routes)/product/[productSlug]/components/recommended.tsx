@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import localFont from "next/font/local";
 import { useGetFeaturedProducts } from "@/api/useGetFeaturedProducts";
 import { getCategoryRecommended } from "@/api/getCategoryRecommend";
 import {
@@ -19,6 +20,20 @@ import type { PromotionType } from "@/types/promotion";
 import { LovedButton } from "@/components/loved-button";
 import { toAbsUrl } from "@/lib/media";
 import { useNavigationTransition } from "@/components/navigation-transition-provider";
+
+const khInterferenceLightFont = localFont({
+  src: "../../../../../components/fonts/KHInterferenceTRIAL-Light.otf",
+  weight: "300",
+  style: "normal",
+  display: "swap",
+});
+
+const khInterferenceRegularFont = localFont({
+  src: "../../../../../components/fonts/KHInterferenceTRIAL-Regular.otf",
+  weight: "400",
+  style: "normal",
+  display: "swap",
+});
 
 /* ----------------------- types auxiliares ----------------------- */
 
@@ -199,8 +214,12 @@ const Recommmended = ({
 
   if (loading) {
     return (
-      <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-10">
-        <h3 className="text-2xl font-bold mb-4">Te puede interesar</h3>
+      <section className="mx-auto max-w-[1350px] px-4 py-10 sm:px-6 lg:px-0">
+        <h3
+          className={`${khInterferenceRegularFont.className} mb-6 text-4xl uppercase leading-none tracking-[0] text-black sm:text-6xl`}
+        >
+          TE PUEDE INTERESAR
+        </h3>
         <SkeletonSchema grid={3} />
       </section>
     );
@@ -209,15 +228,9 @@ const Recommmended = ({
   if (!products || products.length === 0) return null;
 
   return (
-    <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-0 py-10">
+    <section className="mx-auto max-w-[1350px] px-4 py-10 sm:px-6 lg:px-0">
       <h3
-        className="
-          text-3xl
-          sm:text-4xl
-          text-center sm:text-left
-          font-black
-          mb-8
-        "
+        className={`${khInterferenceRegularFont.className} mb-8 text-4xl uppercase leading-none tracking-[0] text-black sm:mb-12 sm:text-6xl`}
       >
         TE PUEDE INTERESAR
       </h3>
@@ -266,47 +279,22 @@ const Recommmended = ({
             return (
               <CarouselItem
                 key={raw.id ?? productSlug}
-                className="basis-[85%] sm:basis-1/2 lg:basis-1/3 px-3 md:px-4"
+                className="basis-[82%] px-3 sm:basis-1/2 md:px-4 lg:basis-1/4"
               >
                 <Card
-                  className="
-                    shadow-none
-                    group relative
-                    w-full
-                    h-auto
-                    pt-4
-                    pb-4
-                    px-5
-                    overflow-hidden
-                    border-none
-                    bg-[#ffffff]
-                    flex flex-col
-                    justify-between
-                  "
+                  className="group relative flex w-full flex-col justify-between rounded-none border-none bg-white pb-6 shadow-none sm:overflow-hidden sm:py-4"
                 >
                   {hasDiscount && (
                     <div
-                      className="
-                        absolute left-4 top-4 z-10
-                        rounded-full px-3 py-1
-                        text-[11px] font-black tracking-wide
-                        bg-green-500 text-white
-                      "
+                      className="absolute left-3 top-3 z-10 rounded-full bg-green-500 px-3 py-1 text-[11px] font-black tracking-wide text-white"
                     >
                       OFERTA
                     </div>
                   )}
 
-                  <CardContent className="flex flex-col justify-around px-3 md:px-3 pt-0 pb-0">
+                  <CardContent className="flex flex-col px-0 pb-0 pt-0 sm:px-0">
                     <div
-                      className="
-                        relative mb-3 sm:mb-4
-                        mt-0 w-full
-                        bg-white
-                        flex items-center justify-center overflow-hidden
-                        pt-1 pb-1 cursor-pointer
-                        min-h-[260px]
-                      "
+                      className="relative mb-3 mt-0 flex w-full cursor-pointer items-center justify-center overflow-hidden bg-white pb-1 pt-1 sm:mb-4"
                       onClick={() =>
                         productSlug &&
                         navigateWithTransition(`/product/${productSlug}`)
@@ -325,73 +313,73 @@ const Recommmended = ({
                         />
                       </div>
 
-                      {image1 && (
-                        <Image
-                          src={image1}
-                          alt={displayName}
-                          width={500}
-                          height={500}
-                          className="
-                            sm:max-h-[410px] h-auto w-auto object-contain
-                            transition-all duration-300 ease-out
-                            opacity-100 group-hover:opacity-0
-                          "
-                        />
-                      )}
+                      <div className="relative aspect-4/5 w-full">
+                        {image1 && (
+                          <Image
+                            src={image1}
+                            alt={displayName}
+                            fill
+                            sizes="(max-width: 480px) 82vw, (max-width: 768px) 45vw, (max-width: 1024px) 33vw, 25vw"
+                            unoptimized
+                            className="object-contain opacity-100 transition-all duration-300 ease-out group-hover:opacity-0"
+                          />
+                        )}
 
-                      {image2 && (
-                        <Image
-                          src={image2}
-                          alt={displayName}
-                          fill
-                          sizes="(max-width: 640px) 85vw, (max-width: 1024px) 50vw, 33vw"
-                          className="
-                            absolute inset-0 object-cover
-                            transition-all duration-300 ease-out
-                            opacity-0 group-hover:opacity-100
-                          "
-                        />
-                      )}
+                        {image2 && (
+                          <Image
+                            src={image2}
+                            alt={displayName}
+                            fill
+                            sizes="(max-width: 480px) 82vw, (max-width: 768px) 45vw, (max-width: 1024px) 33vw, 25vw"
+                            unoptimized
+                            className="object-contain opacity-0 transition-all duration-500 ease-out group-hover:opacity-100"
+                          />
+                        )}
 
-                      {!image1 && (
-                        <span className="text-sm text-muted-foreground">
-                          Sin imagen
-                        </span>
-                      )}
+                        {!image1 && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-sm text-muted-foreground">
+                              Sin imagen
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <h3
-                      className="
-                        text-xl
-                        leading-none
-                        text-center sm:text-3xl
-                        font-black uppercase pt-0
-                        pb-2
-                      "
+                      className={`${khInterferenceRegularFont.className} line-clamp-1 text-left text-[15px] uppercase leading-tight tracking-wide text-black sm:text-xl sm:tracking-tight`}
                     >
                       {displayName}
                     </h3>
 
-                    <div className="flex justify-center py-1 gap-2">
-                      <div className="flex items-center gap-2 text-center">
-                        <p className="text-lg font-normal text-black">
+                    <div className="flex justify-start">
+                      <div className="flex items-center gap-2 text-left">
+                        <p
+                          className={`${khInterferenceLightFont.className} line-clamp-1 text-left text-[14px] tracking-wide text-black sm:text-lg sm:tracking-tight`}
+                        >
                           {secondaryName}
                         </p>
                       </div>
                     </div>
 
-                    <div className="mt-1 flex items-center justify-center gap-2">
+                    <div className="flex items-center justify-start text-left">
                       {hasDiscount ? (
-                        <div className="leading-tight text-center">
-                          <p className="text-[12px] font-semibold text-black/40 line-through">
+                        <div className="text-left leading-tight">
+                          <p
+                            className={`${khInterferenceLightFont.className} text-[12px] text-black/40 line-through sm:text-[13px]`}
+                          >
                             {formatPrice(basePrice)}
                           </p>
-                          <p className="text-[17px] sm:text-[17px] font-extrabold text-red-500 tabular-nums">
+                          <p
+                            className={`${khInterferenceLightFont.className} whitespace-nowrap text-[13px] text-red-500 tabular-nums sm:text-[18px]`}
+                          >
                             {formatPrice(finalPrice)}
                           </p>
                         </div>
                       ) : (
-                        <p className="text-[15px] sm:inline-flex items-center justify-center font-semibold text-center">
+                        <p
+                          className={`${khInterferenceLightFont.className} whitespace-nowrap text-left text-[13px] sm:text-[18px]`}
+                        >
                           {formatPrice(basePrice)}
                         </p>
                       )}

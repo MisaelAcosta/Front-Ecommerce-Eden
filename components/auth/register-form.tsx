@@ -1,16 +1,17 @@
-// components/auth/register-form.tsx
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { DialogClose } from "@/components/ui/dialog";
-import { X, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { registerUserAction } from "@/components/data/actions/auth-actions";
+import { type RegisterState } from "@/components/data/actions/auth-state";
 import {
-  type RegisterState,
-} from "@/components/data/actions/auth-state";
-
+  AuthCard,
+  authInputClassName,
+  authLinkClassName,
+  authPrimaryButtonClassName,
+} from "./auth-card";
 
 type RegisterFormProps = {
   onSwitchToLogin: () => void;
@@ -20,17 +21,13 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  // 🔹 useActionState (nuevo nombre de useFormState en React 19)
-  // 🔹 useActionState (nuevo nombre de useFormState en React 19)
-  // state: RegisterState | undefined
   const [state, formAction, isPending] = useActionState<
     RegisterState,
     FormData
   >(registerUserAction, { message: "", ok: false });
 
-  // Usamos una versión "segura" del estado
   const safeState: RegisterState = state ?? { message: "", ok: false };
-  // Si el registro fue OK, pasamos a login luego de un ratito
+
   useEffect(() => {
     if (safeState.ok) {
       const t = setTimeout(() => {
@@ -41,125 +38,103 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
   }, [safeState.ok, onSwitchToLogin]);
 
   return (
-    <div className="relative w-full max-w-md rounded-3xl bg-white p-8 shadow-lg sm:p-10">
+    <AuthCard title="REGISTRATE">
       <form action={formAction}>
-        {/* X */}
-        <DialogClose asChild>
-          <button
-            className="
-            absolute right-5 top-4
-            inline-flex cursor-pointer items-center justify-center
-            rounded-full border border-neutral-300 p-1.5
-            text-black
-            hover:bg-black hover:text-white
-          "
-          >
-            <X className="h-5 w-5" />
-            <span className="sr-only">Cerrar</span>
-          </button>
-        </DialogClose>
-
-        {/* Título */}
-        <h1 className="mb-8 text-center text-3xl font-black tracking-tight sm:text-4xl">
-          REGISTRO
-        </h1>
-
-        {/* Correo + contraseñas */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <Input
             id="email"
             name="email"
             type="email"
-            placeholder="Correo"
-            className="h-11 rounded-xl bg-neutral-100 text-sm placeholder:text-neutral-400"
+            placeholder="CORREO"
+            className={authInputClassName}
           />
 
-          {/* Contraseña */}
-          <div className="relative">
-            <Input
-              id="password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="Contraseña"
-              className="h-11 rounded-xl bg-neutral-100 text-sm placeholder:text-neutral-400 pr-10"
-            />
-            <button
-              type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500"
-              onClick={() => setShowPassword((v) => !v)}
-            >
-              {showPassword ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-            </button>
-          </div>
+          <PasswordInput
+            id="password"
+            name="password"
+            placeholder="CONTRASEÑA"
+            visible={showPassword}
+            onToggle={() => setShowPassword((value) => !value)}
+          />
 
-          {/* Confirmar contraseña */}
-          <div className="relative">
-            <Input
-              id="confirm_password"
-              name="confirm_password"
-              type={showConfirm ? "text" : "password"}
-              placeholder="Confirmar Contraseña"
-              className="h-11 rounded-xl bg-neutral-100 text-sm placeholder:text-neutral-400 pr-10"
-            />
-            <button
-              type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500"
-              onClick={() => setShowConfirm((v) => !v)}
-            >
-              {showConfirm ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-            </button>
-          </div>
+          <PasswordInput
+            id="confirm_password"
+            name="confirm_password"
+            placeholder="CONFIRMA CONTRASEÑA"
+            visible={showConfirm}
+            onToggle={() => setShowConfirm((value) => !value)}
+          />
         </div>
 
-        {/* Mensaje de estado */}
         {safeState.message && (
           <p
-            className={`mt-4 text-center text-[11px] ${
-              safeState.ok ? "text-emerald-600" : "text-red-600"
+            className={`mt-4 text-center text-[12px] uppercase ${
+              safeState.ok ? "text-emerald-300" : "text-red-300"
             }`}
           >
             {safeState.message}
           </p>
         )}
 
-        {/* Botón REGISTRAR */}
         <Button
           type="submit"
-          className="mt-6 h-11 w-full rounded-xl bg-black text-sm font-semibold tracking-wide text-white hover:bg-black/90"
+          className={`mt-4 w-full ${authPrimaryButtonClassName}`}
           disabled={isPending}
         >
-          {isPending ? "Registrando..." : "REGISTRAR"}
+          {isPending ? "REGISTRANDO..." : "CONTINUAR"}
         </Button>
-
-        {/* Texto inferior */}
-        <p className="mt-6 text-center text-[11px] leading-relaxed text-neutral-500">
-          Crea tu cuenta para comprar más rápido,
-          <br />
-          ver tus pedidos y guardar tus datos de envío.
-        </p>
-
-        {/* Volver a login */}
-        <div className="mt-4 text-center text-[11px] text-neutral-500">
-          <button
-            type="button"
-            className="font-medium hover:underline"
-            onClick={onSwitchToLogin}
-          >
-            ¿Ya tienes cuenta? Inicia sesión
-          </button>
-        </div>
       </form>
-    </div>
+
+      <p className="mt-5 max-w-[300px] text-[12px] uppercase leading-snug text-white/70">
+        CREA TU CUENTA PARA COMPRAR MAS RAPIDO, VER TUS PEDIDOS Y GUARDAR TUS
+        DATOS DE ENVIO.
+      </p>
+
+      <button
+        type="button"
+        className={`mt-4 ${authLinkClassName}`}
+        onClick={onSwitchToLogin}
+      >
+        YA TENGO CUENTA
+      </button>
+    </AuthCard>
   );
 }
 
+type PasswordInputProps = {
+  id: string;
+  name: string;
+  placeholder: string;
+  visible: boolean;
+  onToggle: () => void;
+};
 
-
+function PasswordInput({
+  id,
+  name,
+  placeholder,
+  visible,
+  onToggle,
+}: PasswordInputProps) {
+  return (
+    <div className="relative">
+      <Input
+        id={id}
+        name={name}
+        type={visible ? "text" : "password"}
+        placeholder={placeholder}
+        className={`${authInputClassName} pr-12`}
+      />
+      <button
+        type="button"
+        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/45 transition hover:text-white"
+        onClick={onToggle}
+      >
+        {visible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+        <span className="sr-only">
+          {visible ? "Ocultar contraseña" : "Mostrar contraseña"}
+        </span>
+      </button>
+    </div>
+  );
+}

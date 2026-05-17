@@ -1,15 +1,18 @@
-// components/auth/recover-form.tsx
 "use client";
 
 import { useActionState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { DialogClose } from "@/components/ui/dialog";
-import { X } from "lucide-react";
 import {
   forgotPasswordAction,
   type ForgotState,
 } from "@/components/data/actions/password-actions";
+import {
+  AuthCard,
+  authInputClassName,
+  authLinkClassName,
+  authPrimaryButtonClassName,
+} from "./auth-card";
 
 type RecoverFormProps = {
   onSwitchToLogin: () => void;
@@ -29,73 +32,52 @@ export function RecoverForm({ onSwitchToLogin }: RecoverFormProps) {
   const safeState = state ?? initialForgotState;
 
   return (
-    <div className="relative w-full max-w-md rounded-3xl bg-white p-8 shadow-lg sm:p-10">
-      {/* X */}
-      <DialogClose asChild>
-        <button
-          className="
-            absolute right-5 top-4
-            inline-flex cursor-pointer items-center justify-center
-            rounded-full border border-neutral-300 p-1.5
-            text-black
-            hover:bg-black hover:text-white
-          "
-        >
-          <X className="h-5 w-5" />
-          <span className="sr-only">Cerrar</span>
-        </button>
-      </DialogClose>
+    <AuthCard compact>
+      <div className="mt-4 sm:mt-8">
+        <p className="mb-5 max-w-[330px] text-[16px] uppercase leading-tight text-white/80">
+          INGRESA TU CORREO PARA RECUPERAR TU CONTRASEÑA
+        </p>
 
-      <h1 className="mb-2 mt-4 text-center text-3xl font-black tracking-tight sm:text-4xl">
-        RECUPERA
-      </h1>
+        <form action={formAction}>
+          <Input
+            name="email"
+            type="email"
+            placeholder="CORREO"
+            className={authInputClassName}
+          />
 
-      <p className="mb-8 text-center text-sm text-neutral-500">
-        Ingresa tu correo para recuperar tu contraseña
-      </p>
+          {safeState.message && (
+            <p
+              className={`mt-4 text-center text-[12px] uppercase ${
+                safeState.ok ? "text-emerald-300" : "text-red-300"
+              }`}
+            >
+              {safeState.message}
+            </p>
+          )}
 
-      <form action={formAction}>
-        <Input
-          name="email"
-          type="email"
-          placeholder="Correo"
-          className="h-11 rounded-xl bg-neutral-100 text-sm placeholder:text-neutral-400"
-        />
-
-        {safeState.message && (
-          <p
-            className={`mt-4 text-center text-[11px] ${
-              safeState.ok ? "text-emerald-600" : "text-red-600"
-            }`}
+          <Button
+            type="submit"
+            disabled={isPending}
+            className={`mt-4 w-full ${authPrimaryButtonClassName}`}
           >
-            {safeState.message}
-          </p>
-        )}
+            {isPending ? "ENVIANDO..." : "CONTINUAR"}
+          </Button>
+        </form>
+      </div>
 
-        <Button
-          type="submit"
-          disabled={isPending}
-          className="mt-6 h-11 w-full rounded-xl bg-black text-sm font-semibold tracking-wide text-white hover:bg-black/90"
-        >
-          {isPending ? "Enviando..." : "ENVIAR"}
-        </Button>
-      </form>
-
-      <p className="mt-8 text-center text-[11px] leading-relaxed text-neutral-500">
-        Te enviaremos un enlace de recuperación
-        <br />
-        con el que podrás actualizar tu contraseña.
+      <p className="mt-16 max-w-[360px] text-[16px] uppercase leading-tight text-white/80">
+        TE ENVIAREMOS UN CODIGO DE RECUPERACION CON EL QUE PODRAS ACTUALIZAR TU
+        CONTRASEÑA
       </p>
 
-      <div className="mt-4 text-center text-[11px] text-neutral-500">
-        <button
-          type="button"
-          className="font-medium hover:underline"
-          onClick={onSwitchToLogin}
-        >
-          Volver a iniciar sesión
-        </button>
-      </div>
-    </div>
+      <button
+        type="button"
+        className={`mt-5 ${authLinkClassName}`}
+        onClick={onSwitchToLogin}
+      >
+        VOLVER A INICIAR SESION
+      </button>
+    </AuthCard>
   );
 }
