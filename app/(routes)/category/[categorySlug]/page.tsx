@@ -144,12 +144,8 @@ export default function Page() {
 
   return (
     <SmoothScroll>
-      <section className="pt-15 w-full px-1 md:px-8 lg:px-12 pb-28 md:pb-0">
-        <ScrollReveal>
-          <div className="pt-6">
-            <CarouselTextBanner />
-          </div>
-        </ScrollReveal>
+      <section className="pt-25 w-full px-1 md:px-8 lg:px-12 pb-28 md:pb-0">
+        
 
         <ScrollReveal delay={0.08}>
           <div className="md:hidden flex left-0 right-0 z-50 bg-white/90 px-5 pt-10 pb-3">

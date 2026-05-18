@@ -49,9 +49,9 @@ export const dataCarouselTop = [
 
 const CarouselTextBanner = () => {
     return (
-        <div className="bg-[#f3f3f3] mt-5 sm:mt-0 dark:bg-primary">
+        <div className="bg-[#f3f3f3] mt-5 dark:bg-primary">
             <Carousel
-                className="w-full max-w-4x1 mx-auto"
+                className="w-full max-w-sm mx-auto"
                 plugins={[
                     Autoplay({
                         delay: 3500 //ms
@@ -62,14 +62,17 @@ const CarouselTextBanner = () => {
                 <CarouselItem key={id} onClick={() => {}} className="">
                     <div>
                         <Card className="shadow-none border-none bg-transparent">
-                            <CardContent className="flex flex-col items-center leading-none justify-center gap-1 sm:gap-none py-0">
+                            <CardContent className="flex flex-col items-center leading-none justify-center 
+                            gap-1 sm:gap-none ">
                                 
 
-                                <p className={`${khInterferenceBoldFont.className} sm:text-lg text-wrap tracking-wide text-red-600`}>
+                                <p className={`${khInterferenceBoldFont.className} sm:text-sm text-wrap 
+                                tracking-wide text-red-600`}>
                                     {title}
                                 </p>
 
-                                <p className={`${khInterferenceRegularFont.className} text-xs sm:text-sm dark:text-secondary text-center max-w-xs`}>
+                                <p className={`${khInterferenceRegularFont.className} text-xs sm:text-xs 
+                                dark:text-secondary text-center max-w-xs`}>
                                     {description}
                                 </p>
 
