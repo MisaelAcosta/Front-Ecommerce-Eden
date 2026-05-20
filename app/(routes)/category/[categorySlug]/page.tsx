@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
+import localFont from "next/font/local";
 import { ArrowUpDown, SlidersHorizontal } from "lucide-react";
-import CarouselTextBanner from "@/components/carousel-text-banner";
 import ScrollReveal from "@/components/animation_page/scroll-reveal";
 import SmoothScroll from "@/components/animation_page/smooth-scroll";
 import { Separator } from "@/components/ui/separator";
@@ -34,6 +34,20 @@ type ProductWithOptionalAttributes = ProductType & {
 };
 
 type SortOption = "default" | "price-asc" | "price-desc" | "recent";
+type CollectionKey = "lord-of-the-rings";
+
+type CollectionOption = {
+  key: CollectionKey;
+  label: string;
+  query: string;
+};
+
+const khInterferenceRegularFont = localFont({
+  src: "../../../../components/fonts/KHInterferenceTRIAL-Regular.otf",
+  weight: "400",
+  style: "normal",
+  display: "swap",
+});
 
 const sortOptions: { value: SortOption; label: string }[] = [
   { value: "default", label: "Relevancia" },
@@ -42,12 +56,30 @@ const sortOptions: { value: SortOption; label: string }[] = [
   { value: "recent", label: "Mas reciente" },
 ];
 
+const collectionOptions: CollectionOption[] = [
+  {
+    key: "lord-of-the-rings",
+    label: "EL SEÑOR DE LOS ANILLOS",
+    query: "el señor de los anillos",
+  },
+];
+
+function normalizeFilterText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
+}
+
 export default function Page() {
   const params = useParams();
   const { categorySlug } = params as { categorySlug: string };
 
   const [activeSubSlug, setActiveSubSlug] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeCollectionKey, setActiveCollectionKey] =
+    useState<CollectionKey | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>("default");
   const [currentPage, setCurrentPage] = useState(1);
   const [showFiltersMobile, setShowFiltersMobile] = useState(true);
@@ -60,17 +92,24 @@ export default function Page() {
   useEffect(() => {
     setActiveSubSlug(null);
     setSearchTerm("");
+    setActiveCollectionKey(null);
     setSortBy("default");
     setCurrentPage(1);
     setShowFiltersMobile(true);
   }, [categorySlug]);
+
+  const activeCollection =
+    collectionOptions.find((collection) => collection.key === activeCollectionKey) ??
+    null;
+
+  const fetchSearchTerm = activeCollection?.query ?? searchTerm;
 
   const { products, loading, error, totalPages } = useGetCategoryProduct({
     categorySlug,
     subSlug: activeSubSlug,
     page: currentPage,
     pageSize: 8,
-    searchTerm,
+    searchTerm: fetchSearchTerm,
     sortBy,
   });
   const showInitialProductsLoading = loading && products.length === 0;
@@ -79,6 +118,7 @@ export default function Page() {
   const handleSelectSubcategory = (slugSub: string | null) => {
     setActiveSubSlug(slugSub);
     setSearchTerm("");
+    setActiveCollectionKey(null);
     setCurrentPage(1);
     setShowFiltersMobile(true);
   };
@@ -87,18 +127,25 @@ export default function Page() {
     if (!products) return [];
 
     const typedProducts = products as ProductWithOptionalAttributes[];
-    const term = searchTerm.trim().toLowerCase();
+    const term = normalizeFilterText(searchTerm);
+    const collectionTerm = normalizeFilterText(activeCollection?.query ?? "");
 
-    if (term === "") return typedProducts;
+    if (term === "" && collectionTerm === "") return typedProducts;
 
     return typedProducts.filter((product) => {
       const attributes = product.attributes ?? product;
-      const name = String(attributes.productName ?? "").toLowerCase();
-      const name2 = String(attributes.productName2 ?? "").toLowerCase();
+      const name = normalizeFilterText(String(attributes.productName ?? ""));
+      const name2 = normalizeFilterText(String(attributes.productName2 ?? ""));
+      const matchesSearch =
+        term === "" || name.includes(term) || name2.includes(term);
+      const matchesCollection =
+        collectionTerm === "" ||
+        name.includes(collectionTerm) ||
+        name2.includes(collectionTerm);
 
-      return name.includes(term) || name2.includes(term);
+      return matchesSearch && matchesCollection;
     });
-  }, [products, searchTerm]);
+  }, [products, searchTerm, activeCollection]);
 
   const goToPage = (page: number) => {
     if (page < 1) return;
@@ -114,6 +161,46 @@ export default function Page() {
     setSortBy(value as SortOption);
     setCurrentPage(1);
   };
+
+  const handleCollectionToggle = (key: CollectionKey) => {
+    setActiveCollectionKey((current) => (current === key ? null : key));
+    setCurrentPage(1);
+  };
+
+  const CollectionControl = ({ compact = false }: { compact?: boolean }) => (
+    <div
+      className={`flex items-center gap-4 text-black ${
+        compact ? "w-full flex-col items-start" : ""
+      }`}
+    >
+      <span
+        className={`${khInterferenceRegularFont.className} text-xl uppercase leading-none tracking-[0] sm:text-2xl`}
+      >
+        COLECCIONES
+      </span>
+
+      <div className="flex flex-wrap gap-2">
+        {collectionOptions.map((collection) => {
+          const isActive = activeCollectionKey === collection.key;
+
+          return (
+            <button
+              key={collection.key}
+              type="button"
+              onClick={() => handleCollectionToggle(collection.key)}
+              className={`${khInterferenceRegularFont.className} h-10 rounded-full border px-5 text-sm uppercase leading-none tracking-[0] transition ${
+                isActive
+                  ? "border-black bg-black text-white"
+                  : "border-black/70 bg-white text-black hover:border-black hover:bg-black hover:text-white"
+              } ${compact ? "w-full justify-center" : ""}`}
+            >
+              {collection.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
 
   const SortControl = ({ compact = false }: { compact?: boolean }) => (
     <label
@@ -178,6 +265,10 @@ export default function Page() {
                 <SortControl compact />
               </div>
 
+              <div className="pt-4">
+                <CollectionControl compact />
+              </div>
+
               <div className="p-1">
                 <FilterCategory
                   categorySlug={categorySlug}
@@ -221,7 +312,8 @@ export default function Page() {
             </aside>
 
             <main className="w-auto px-0 shadow-none md:p-8">
-              <div className="mb-5 hidden items-center justify-end md:flex">
+              <div className="mb-5 hidden items-center justify-between gap-6 md:flex">
+                <CollectionControl />
                 <SortControl />
               </div>
 
@@ -268,7 +360,8 @@ export default function Page() {
                       ))
                     ) : (
                       <p className="text-muted-foreground text-sm">
-                        No encontramos productos que coincidan con {searchTerm}.
+                        No encontramos productos que coincidan con{" "}
+                        {activeCollection?.label ?? searchTerm}.
                       </p>
                     )}
                   </div>
