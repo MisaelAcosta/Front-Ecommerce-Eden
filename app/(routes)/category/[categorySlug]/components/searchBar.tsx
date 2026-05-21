@@ -17,7 +17,6 @@ const SearchBar = ({ value, onChange }: SearchBarProps) => {
       className="
         w-full
         bg-neutral-100
-        
         px-6
         py-2
         md:py-3
@@ -28,7 +27,7 @@ const SearchBar = ({ value, onChange }: SearchBarProps) => {
         placeholder:text-neutral-400
         text-black
       "
-      placeholder="Buscar producto"
+      placeholder="Buscar"
       value={value}
       onChange={handleInput}
     />

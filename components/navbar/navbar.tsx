@@ -126,7 +126,7 @@ const Navbar = () => {
         >
           <button
             aria-label="Perfil"
-            className="relative cursor-pointer rounded-full bg-white p-2 text-black shadow-[0_0_22px_rgba(255,255,255,0.28)] ring-1 ring-white/70 transition duration-300 hover:scale-105 hover:bg-white"
+            className="relative cursor-pointer rounded-full bg-white p-2 text-black  ring-1 ring-white/70 transition duration-300 hover:scale-105 hover:bg-white"
           >
             {icon}
             <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full border border-[#1A1A1A] bg-emerald-400" />
@@ -152,32 +152,40 @@ const Navbar = () => {
   };
 
   // Renderiza el boton de carrito con o sin contador segun la cantidad de items.
-  const renderCartButton = (iconClassName: string, countClassName: string) => {
-    if (cart.items.length === 0) {
-      return (
-        <button
-          type="button"
-          aria-label="Ir al carrito"
-          className="cursor-pointer"
-          onClick={handleGoCart}
-        >
-          <ShoppingBag strokeWidth={1.5} className={iconClassName} />
-        </button>
-      );
-    }
+ const renderCartButton = (iconClassName: string, countClassName: string) => {
+  const hasItems = cart.items.length > 0;
 
-    return (
-      <button
-        type="button"
-        aria-label="Ir al carrito"
-        className="inline-flex cursor-pointer items-center gap-2"
-        onClick={handleGoCart}
-      >
-        <ShoppingBag strokeWidth={1.5} className={iconClassName} />
-        <span className={countClassName}>{cart.items.length}</span>
-      </button>
-    );
-  };
+  return (
+    <button
+      type="button"
+      aria-label="Ir al carrito"
+      className="
+        inline-flex
+        h-8
+        min-w-8
+        cursor-pointer
+        items-center
+        justify-center
+        gap-1.5
+        rounded-full
+        px-1
+        leading-none
+      "
+      onClick={handleGoCart}
+    >
+      <ShoppingBag
+        strokeWidth={1.5}
+        className={cn(iconClassName, "shrink-0 translate-y-[0.5px]")}
+      />
+
+      {hasItems && (
+        <span className={cn(countClassName, "leading-none tabular-nums")}>
+          {cart.items.length}
+        </span>
+      )}
+    </button>
+  );
+};
 
   return (
     // ===== # Navbar | Estructura principal =====
@@ -192,7 +200,8 @@ const Navbar = () => {
         {/* ===== # Navbar Desktop ===== */}
         {/* Desktop: barra flotante tipo capsule inspirada en las referencias. */}
         <div className="hidden pt-4 lg:block">
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6 rounded-[30px] border border-white/10 bg-[rgba(42,42,39,0.76)] px-6 py-3 text-white shadow-[0_18px_60px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6 rounded-[30px] border border-white/10 
+          bg-[rgba(82,82,82,0.76)] px-6 py-3 text-white backdrop-blur-xs">
             {/* ---- Columna izquierda desktop: enlaces de navegacion ---- */}
             <div className="min-w-0">
               <MenuList pathname={pathname} />
@@ -278,19 +287,34 @@ const Navbar = () => {
             transition-all duration-300
           `}
         >
-          <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-full border border-white/10 bg-[rgba(26,26,26,0.94)] px-3 py-2 text-white shadow-[0_18px_50px_rgba(0,0,0,0.26)] backdrop-blur-xl">
+          <div
+            className="
+              grid
+              grid-cols-[auto_1fr_auto]
+              items-center
+              gap-3
+              rounded-full
+              border
+              border-white/10
+              bg-[rgba(82,82,82,0.76)]
+              px-3
+              py-2
+              text-white
+              backdrop-blur-xs
+            "
+          >
             {/* ---- Columna izquierda mobile: boton menu y acceso a perfil ---- */}
             <div className="flex items-center gap-1">
-              <div className="rounded-full border border-white/10 bg-white/6 p-1">
-                <ItemsMenuMobile scrolled={false} />
-              </div>
+              <div className="rounded-full p-1">
+              <ItemsMenuMobile scrolled={false} />
+            </div>
 
               <div className="rounded-full border border-white/10 bg-white/6 p-1">
                 {renderProfileButton(
                   [
                     "h-5",
                     "w-5",
-                    "text-white/90",
+                    "text-whit/90",
                     "transition-colors",
                     "duration-300",
                   ].join(" ")
@@ -298,7 +322,7 @@ const Navbar = () => {
               </div>
             </div>
 
-            {/* ---- Columna central mobile: wordmark alineado al nuevo estilo ---- */}
+            {/* ---- Columna central mobile: Logo ilustracion ---- */}
             <div className="flex items-center justify-center">
               <button
                 type="button"
@@ -306,26 +330,28 @@ const Navbar = () => {
                 className="group inline-flex items-center justify-center rounded-full px-2 py-1"
                 aria-label="Ir al inicio"
               >
-                <span className="relative block h-9 w-[100px] overflow-visible  
-                sm:h-11 sm:w-11">
-                  <Image
-                    src={MOBILE_CENTER_LOGO}
-                    alt="Eden"
-                    fill
-                    priority
-                    className="object-contain"
-                  />
-                </span>
+                <span className="relative block h-10 w-[80px] overflow-visible">
+                <Image
+                  src={MOBILE_CENTER_LOGO}
+                  alt="Eden"
+                  fill
+                  priority
+                  className="object-contain scale-[1.7] cursor-pointer"
+                />
+              </span>
               </button>
             </div>
 
             {/* ---- Columna derecha mobile: favoritos y carrito dentro de capsule ---- */}
             <div className="flex items-center justify-end">
-              <div className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/6 p-1">
+              <div className="inline-flex items-center gap-1 rounded-full 
+              border border-black/40 bg-black/80 p-1">
                 <button
                   type="button"
                   aria-label="Ir a favoritos"
-                  className="rounded-full p-2 text-white/80 transition-colors duration-300 hover:bg-white/10 hover:text-white"
+                  className="rounded-full p-2 text-white/80 
+                  transition-colors duration-300 hover:bg-white/10
+                   hover:text-white"
                   onClick={handleGoLoved}
                 >
                   <Heart strokeWidth={1.5} className="h-5 w-5" />
@@ -333,8 +359,18 @@ const Navbar = () => {
 
                 <div className="h-4 w-px bg-white/15" />
 
-                <div className="rounded-full px-2 py-1 text-white/90 transition-colors duration-300 hover:bg-white/10 hover:text-white">
-                  {renderCartButton("h-5 w-5", "text-[11px] font-semibold")}
+                <div
+                  className="
+                    rounded-full
+                    text-white/90
+                    transition-colors
+                    duration-300
+                    hover:bg-white/10
+                    hover:text-white
+
+                  "
+                >
+                  {renderCartButton("h-6 w-6", "text-xs font-semibold")}
                 </div>
               </div>
             </div>

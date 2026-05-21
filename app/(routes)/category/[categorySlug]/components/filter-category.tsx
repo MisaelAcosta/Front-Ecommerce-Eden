@@ -12,19 +12,12 @@ import {
 } from "@/components/ui/accordion";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import type { CategoryType } from "@/types/category";
-import { useNavigationTransition } from "@/components/navigation-transition-provider";
+import { useRouter } from "next/navigation";
 
 // Tipografias locales usadas en el filtro de categorias.
 const khInterferenceRegularFont = localFont({
   src: "../../../../../components/fonts/KHInterferenceTRIAL-Regular.otf",
   weight: "400",
-  style: "normal",
-  display: "swap",
-});
-
-const khInterferenceBoldFont = localFont({
-  src: "../../../../../components/fonts/KHInterferenceTRIAL-Bold.otf",
-  weight: "700",
   style: "normal",
   display: "swap",
 });
@@ -86,7 +79,7 @@ const FilterCategory = ({
   error = false,
   onSelectSubcategory,
 }: FilterCategoryProps) => {
-  const { navigateWithTransition } = useNavigationTransition();
+  const router = useRouter();
   const [openSlug, setOpenSlug] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -96,7 +89,7 @@ const FilterCategory = ({
   const goCategory = (slugCat: string) => {
     setOpenSlug(slugCat);
     onSelectSubcategory(null);
-    navigateWithTransition(`/category/${slugCat}`);
+    router.push(`/category/${slugCat}`);
   };
 
   const goSubcategory = (slugSub: string) => {
@@ -142,7 +135,7 @@ const FilterCategory = ({
                 key={category.id}
                 onClick={() => goCategory(category.slug)}
                 className={`
-                  ${khInterferenceBoldFont.className}
+                  ${khInterferenceRegularFont.className}
                   w-full rounded-md px-2 py-2 text-left
                   text-base uppercase tracking-normal transition
                   sm:text-lg sm:tracking-wide
@@ -163,7 +156,7 @@ const FilterCategory = ({
               <AccordionTrigger
                 onClick={() => goCategory(category.slug)}
                 className={`
-                  ${khInterferenceBoldFont.className}
+                  ${khInterferenceRegularFont.className}
                   cursor-pointer px-2 py-2 text-left
                   text-base uppercase tracking-normal
                   sm:text-lg sm:tracking-wide

@@ -17,7 +17,7 @@ const khInterferenceLight = localFont({
 
 export default function Footer() {
   return (
-    <footer className="mt-10 border-t border-gray-200 bg-[#111111]">
+    <footer className="border-t border-gray-200 bg-[#111111]">
       <div className="mx-auto max-w-7xl px-8 py-5 md:px-10 md:py-8">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5 lg:gap-12">
           <div className="md:col-span-2 lg:col-span-2">

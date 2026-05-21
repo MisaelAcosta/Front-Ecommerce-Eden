@@ -46,6 +46,22 @@ function formatPrintTime(seconds: number | null) {
   return `${hours} h ${minutes} min`;
 }
 
+const uploadProgressByStatus = {
+  idle: 0,
+  uploading: 38,
+  pricing: 76,
+  ready: 100,
+  error: 100,
+} satisfies Record<Paso2Props["uploadStatus"], number>;
+
+const uploadProgressLabel = {
+  idle: "0%",
+  uploading: "38%",
+  pricing: "76%",
+  ready: "100%",
+  error: "Error",
+} satisfies Record<Paso2Props["uploadStatus"], string>;
+
 const Paso2 = ({
   fileInputRef,
   fileName,
@@ -56,6 +72,9 @@ const Paso2 = ({
   onOpenPicker,
   onFileChange,
 }: Paso2Props) => {
+  const uploadProgress = uploadProgressByStatus[uploadStatus];
+  const isProcessing = uploadStatus === "uploading" || uploadStatus === "pricing";
+
   return (
     <section className="border-b border-black/10 bg-white 
     px-4 py-16 lg:py-25 sm:px-8 lg:px-12">
@@ -214,6 +233,49 @@ const Paso2 = ({
                 </p>
               )}
             </div>
+          </div>
+
+          <div className="px-2 pb-4">
+            <div className="mb-2 flex items-center justify-between gap-4">
+              <p
+                className={`${cotizaTextRegularFont.className} text-[11px] uppercase tracking-[0.3em] text-white/55`}
+              >
+                Progreso
+              </p>
+              <p
+                className={`${cotizaTextBoldFont.className} text-xs uppercase text-white/75`}
+              >
+                {uploadProgressLabel[uploadStatus]}
+              </p>
+            </div>
+
+            <div className="h-2 overflow-hidden rounded-full bg-white/15">
+              <div
+                className={`relative h-full rounded-full transition-all duration-700 ease-out ${
+                  uploadStatus === "error" ? "bg-[#ff6b6b]" : "bg-white"
+                }`}
+                style={{ width: `${uploadProgress}%` }}
+              >
+                {isProcessing && (
+                  <span className="absolute inset-0 animate-pulse bg-white/40" />
+                )}
+              </div>
+            </div>
+
+            <p
+              className={`${cotizaTextRegularFont.className} mt-3 text-xs text-white/55`}
+            >
+              {uploadStatus === "idle" &&
+                "Selecciona un archivo para iniciar la cotizacion."}
+              {uploadStatus === "uploading" &&
+                "Estamos subiendo tu modelo 3D a CloudSlicer."}
+              {uploadStatus === "pricing" &&
+                "Archivo cargado. Estamos laminando y calculando el precio."}
+              {uploadStatus === "ready" &&
+                "Listo. Ya puedes revisar el resumen y agregarlo al carrito."}
+              {uploadStatus === "error" &&
+                "La cotizacion se detuvo. Intenta subir el archivo nuevamente."}
+            </p>
           </div>
         </div>
       </div>

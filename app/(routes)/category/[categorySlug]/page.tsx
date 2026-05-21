@@ -214,7 +214,7 @@ export default function Page() {
         value={sortBy}
         onChange={(event) => handleSortChange(event.target.value)}
         className={`
-          h-10 cursor-pointer rounded-none border border-black/10 bg-white px-3
+          h-10 cursor-pointer border rounded-2xl border-black/10 bg-white px-3
           text-xs uppercase tracking-[0.16em] outline-none transition
           hover:border-black/30 focus:border-black
           ${compact ? "w-full" : "min-w-[210px]"}
@@ -231,9 +231,8 @@ export default function Page() {
 
   return (
     <SmoothScroll>
-      <section className="pt-25 w-full px-1 md:px-8 lg:px-12 pb-28 md:pb-0">
+      <section className="pt-25 lg:pt-30 w-full px-1 md:px-8 lg:px-12 pb-28 md:pb-0">
         
-
         <ScrollReveal delay={0.08}>
           <div className="md:hidden flex left-0 right-0 z-50 bg-white/90 px-5 pt-10 pb-3">
             <div className="flex items-center justify-between w-full bg-[#f5f5f5] px-4 py-2 pt-3">
@@ -286,7 +285,7 @@ export default function Page() {
           </ScrollReveal>
         )}
 
-        <Separator className="my-2" />
+       
 
         <ScrollReveal delay={0.16}>
           <div className="grid grid-cols-1 md:grid-cols-[205px_1fr] shadow-none gap-4">
@@ -374,7 +373,7 @@ export default function Page() {
                             <button
                               onClick={handlePrev}
                               disabled={currentPage === 1}
-                              className={`px-3 py-2 rounded-md border text-sm ${
+                              className={`px-3 py-2 rounded-md text-sm ${
                                 currentPage === 1
                                   ? "cursor-not-allowed opacity-50"
                                   : "hover:bg-accent hover:text-accent-foreground"

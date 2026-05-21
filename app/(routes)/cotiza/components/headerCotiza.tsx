@@ -1,91 +1,103 @@
 "use client";
 
 import Image from "next/image";
-import { cotizaTitleFont } from "./cotiza-fonts";
+import Typewriter from "@/components/fancy/text/typewriter";
+import {
+  cotizaTextBoldFont,
+  cotizaTextLightFont,
+} from "./cotiza-fonts";
 
-const heroImages = [
-  {
-    src: "/utils/img2.png",
-    alt: "Referencia de impresión 3D uno",
-    className:
-      "left-4 top-6 h-28 w-20 sm:left-10 sm:top-8 sm:h-40 sm:w-28 lg:left-12 lg:top-10 lg:h-56 lg:w-40",
-  },
-  {
-    src: "/utils/img1.png",
-    alt: "Referencia de impresión 3D dos",
-    className:
-      "left-[38%] top-0 h-36 w-24 -translate-x-1/2 sm:h-48 sm:w-32 lg:h-64 lg:w-44",
-  },
-  {
-    src: "/utils/img3.png",
-    alt: "Referencia de impresión 3D tres",
-    className:
-      "right-2 top-5 h-24 w-24 sm:right-8 sm:top-8 sm:h-36 sm:w-36 lg:right-10 lg:top-10 lg:h-52 lg:w-52",
-  },
-  {
-    src: "/utils/img4.png",
-    alt: "Referencia de impresión 3D cuatro",
-    className:
-      "left-10 bottom-4 h-28 w-20 sm:left-20 sm:bottom-8 sm:h-40 sm:w-28 lg:left-16 lg:bottom-10 lg:h-52 lg:w-38",
-  },
-  {
-    src: "/utils/img5.jpg",
-    alt: "Referencia de impresión 3D cinco",
-    className:
-      "right-2 bottom-4 h-20 w-28 sm:right-10 sm:bottom-8 sm:h-28 sm:w-40 lg:right-16 lg:bottom-12 lg:h-36 lg:w-52",
-  },
+const HERO_TITLE_OPTIONS = [
+  "IMPRIMIMOS\nHOY?",
+  "IMPRIMIMOS\nHOY?",
 ];
 
 const HeaderCotiza = () => {
   return (
-    <section className="relative overflow-hidden border-b border-black/10
-     bg-white pt-24">
-      {/* Retícula suave para acercarse al look editorial de la referencia. */}
+    <section className="relative isolate overflow-hidden bg-[#050505]
+     text-white">
+      <div className="absolute inset-0 z-0 bg-[#050505]" />
       <div
-        className="absolute inset-0 opacity-60"
+        className="absolute inset-0 z-0 opacity-200"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, rgba(255,255,255,0.18) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,255,255,0.18) 1px, transparent 1px)
+          `,
+          backgroundPosition: "center -10px",
+          backgroundSize: "220px 220px",
+        }}
+      />
+      <div
+        className="absolute inset-0 z-0 opacity-0"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px)",
-          backgroundSize: "42px 42px",
+            "radial-gradient(circle at 0 0, transparent 0 18px, rgba(0,0,0,0.36) 19px 100%)",
+          backgroundPosition: "center -10px",
+          backgroundSize: "220px 220px",
+        }}
+      />
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `
+            radial-gradient(circle at center, rgba(255,255,255,0.04), transparent 34%),
+            linear-gradient(to bottom, rgba(0,0,0,0.08), rgba(0,0,0,0.72))
+          `,
         }}
       />
 
-    <div className="relative mx-auto flex min-h-[570px] w-full 
-      max-w-[1350px] 
-      flex-col justify-between px-4 pb-7 sm:px-8 
+      <div className="relative z-10 mx-auto flex min-h-[820px] w-full 
+      max-w-[1680px] flex-col justify-between px-6 pb-12 pt-32 sm:px-10 
+      lg:min-h-[980px] lg:px-28 lg:pb-24 lg:pt-40">
+        <p
+          className={`${cotizaTextLightFont.className} text-sm uppercase 
+          tracking-[0.08em] text-white/85 sm:text-xl`}
+        >
+          IMPRIME EN SOLO 4 PASOS
+        </p>
 
-      #Tamaños para pantallas grandes, ajustando altura mínima y padding horizontal
-      lg:min-h-30 lg:px-12">
-        {/* Collage principal con rutas reemplazables */}
-        <div className="relative h-[390px] w-full sm:h-[500px] lg:h-[600px]">
-          {heroImages.map((image) => (
-            <div key={image.src} className={`absolute ${image.className}`}>
-              <div className="relative h-full w-full overflow-hidden border
-               border-black/10 bg-white p-1 ">
-                <Image
-                  src={image.src}
-                  alt={image.alt}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            </div>
-          ))}
-
-          <div className="absolute inset-x-0 top-[38%] 
-          mx-auto max-w-[320px] text-center sm:top-[40%] 
-          sm:max-w-[440px] lg:max-w-[500px]">
-            <h1
-              className={`${cotizaTitleFont.className} text-4xl 
-              uppercase leading-[3rem] sm:leading-[5rem] tracking-tight sm:text-6xl lg:text-7xl`}
-            >
-              Que imprimimos
-              <br />
-              hoy?
-            </h1>
-          </div>
+        <div className="absolute left-1/2 top-[52%] z-10 aspect-[0.8] w-[70vw]
+         max-w-[430px] -translate-x-1/2 -translate-y-1/2 sm:w-[48vw] 
+         lg:max-w-[540px]">
+          <Image
+            src="/cotiza/img_header.png"
+            alt="Modelo 3D impreso sostenido a mano"
+            fill
+            priority
+            sizes="(max-width: 640px) 70vw, (max-width: 1024px) 48vw, 540px"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-black/22 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-black/18" />
         </div>
 
+        <div className="pointer-events-none absolute inset-x-0 
+        top-[52%] z-20 -translate-y-1/2 px-4 text-center">
+          <h1
+            className={`${cotizaTextBoldFont.className} mx-auto max-w-[800px] 
+            text-[clamp(3.2rem,6vw,6.5rem)] uppercase leading-[0.86] 
+            tracking-[0] text-white`}
+          >
+            <span>{"¿QUE "}</span>
+            <Typewriter
+              text={HERO_TITLE_OPTIONS}
+              speed={150}
+              waitTime={1900}
+              deleteSpeed={90}
+              cursorChar="_"
+              cursorClassName="ml-2 align-baseline"
+              className="text-white"
+            />
+          </h1>
+        </div>
+
+        <p
+          className={`${cotizaTextLightFont.className} max-w-[360px] text-sm uppercase leading-relaxed tracking-[0.06em] text-white/85 sm:text-xl lg:mt-auto`}
+        >
+          IMPRIME TUS MODELOS 3D DE FORMA RAPIDA, PERSONALIZADA Y CON
+          COTIZACION INSTANTANEA EN POCOS PASOS.
+        </p>
       </div>
     </section>
   );

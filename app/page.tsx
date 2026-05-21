@@ -14,8 +14,6 @@ export default function Home() {
       <Header />
       <FeaturedProducts />
       <TempProducts/>
-
-
       <ChooseCategory />
     </main>
   </SmoothScroll>

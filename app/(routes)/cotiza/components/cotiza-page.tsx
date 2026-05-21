@@ -97,6 +97,12 @@ export default function CotizaPage() {
   const [postProcess, setPostProcess] = useState<PrintPostProcess>("none");
   const [addingToCart, setAddingToCart] = useState(false);
 
+  const handleColorChange = (value: string) => {
+    if (COLOR_OPTIONS.some((option) => option.id === value)) {
+      setSelectedColor(value as (typeof COLOR_OPTIONS)[number]["id"]);
+    }
+  };
+
   const selectedColorOption = useMemo(
     () =>
       COLOR_OPTIONS.find((option) => option.id === selectedColor) ??
