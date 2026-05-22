@@ -14,6 +14,14 @@ type ResumenPedidoProps = {
   qualityLabel: string;
   postProcessLabel: string;
   postProcessPrice: number;
+  totalPrice: number;
+  printTimeSeconds: number | null;
+  dimensions: {
+    x: number;
+    y: number;
+    z: number;
+  } | null;
+  attachedLinksCount: number;
   canCheckout: boolean;
   addingToCart: boolean;
   fitsPrinter: boolean | null;
@@ -23,6 +31,25 @@ type ResumenPedidoProps = {
   onCheckout: () => void;
 };
 
+function formatPrintTime(seconds: number | null) {
+  if (!seconds || seconds <= 0) {
+    return "Pendiente";
+  }
+
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.round((seconds % 3600) / 60);
+
+  if (hours <= 0) {
+    return `${minutes} min`;
+  }
+
+  return `${hours} h ${minutes} min`;
+}
+
+function formatCm(mm: number) {
+  return (mm / 10).toFixed(1);
+}
+
 const ResumenPedido = ({
   fileName,
   materialLabel,
@@ -30,6 +57,10 @@ const ResumenPedido = ({
   qualityLabel,
   postProcessLabel,
   postProcessPrice,
+  totalPrice,
+  printTimeSeconds,
+  dimensions,
+  attachedLinksCount,
   canCheckout,
   addingToCart,
   fitsPrinter,
@@ -38,156 +69,136 @@ const ResumenPedido = ({
   notes,
   onCheckout,
 }: ResumenPedidoProps) => {
+  const summaryRows = [
+    ["Material", materialLabel || "Pendiente"],
+    ["Tiempo", formatPrintTime(printTimeSeconds)],
+    [
+      "Medidas",
+      dimensions
+        ? `${formatCm(dimensions.x)} x ${formatCm(dimensions.y)} x ${formatCm(
+            dimensions.z
+          )} cm`
+        : "Pendiente",
+    ],
+    ["Color", selectedColorLabel || "Pendiente"],
+    ["Calidad", qualityLabel || "Pendiente"],
+    ["Post procesado", postProcessPrice > 0 ? postProcessLabel : "No"],
+    ["Enlaces adjuntados", String(attachedLinksCount)],
+    ["Total", totalPrice > 0 ? formatPrice(totalPrice) : "Pendiente"],
+  ];
+
   return (
-    <section className="bg-[#0d0d0d] px-4 py-16 lg:py-25
-    text-white 
-    sm:px-8 lg:px-12">
-      <div className="mx-auto w-full 
-      max-w-[1350px]">
-        <p
-          className={`${cotizaTextRegularFont.className} 
-          text-base lg:text-2xl uppercase tracking-[0.35em] text-white/65`}
-        >
-          Resumen de pedido
-        </p>
+    <section className="relative isolate overflow-hidden bg-[#050505] 
+    px-4 py-16 text-white sm:px-8 lg:px-12 lg:py-60">
+      <div className="absolute inset-0 z-0 bg-[#050505]" />
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, rgba(255,255,255,0.18) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,255,255,0.18) 1px, transparent 1px)
+          `,
+          backgroundPosition: "center -10px",
+          backgroundSize: "220px 220px",
+        }}
+      />
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(to bottom, rgba(0,0,0,0.18), rgba(0,0,0,0.82))",
+        }}
+      />
+
+      <div className="relative z-10 mx-auto grid min-h-[390px] w-full max-w-[1350px] gap-10 lg:grid-cols-[0.8fr_1.45fr_0.85fr] lg:items-center">
         <h2
           className={`${cotizaTitleFont.className} 
-          mt-3 lg:pt-10 pt-5
-          text-5xl uppercase leading-[0.9] sm:text-5xl lg:text-6xl`}
+          max-w-[260px] text-5xl uppercase leading-[0.9] lg:leading-[1.20] 
+          sm:text-6xl lg:text-7xl`}
         >
-          Imprime
+          Resumen de pedido
         </h2>
 
-        <div className="grid gap-12 lg:gap-68 
-        lg:grid-cols-[1fr_480px] lg:items-end mt-10 
-            lg:mt-15 ">
-          {/* Resumen de la cotización en formato compacto tipo editorial. */}
-          <div className="rounded-[22px] border 
-          border-white/10 bg-white/5 p-5 sm:p-6">
-            <div className="grid gap-4 sm:grid-cols-2 
-            lg:grid-cols-3">
-              <div>
-                <p
-                  className={`${cotizaTextRegularFont.className} text-[11px] uppercase tracking-[0.3em] text-white/45`}
-                >
-                  Modelo 3D
-                </p>
-                <p className={`${cotizaTextBoldFont.className} mt-2 text-sm`}>
-                  {fileName || "Pendiente"}
-                </p>
-              </div>
+        <div className="max-w-[560px]">
+          <p
+            className={`${cotizaTextBoldFont.className} mb-3 text-lg uppercase tracking-[0.04em] text-white`}
+          >
+            Resumen
+          </p>
 
-              <div>
-                <p
-                  className={`${cotizaTextRegularFont.className} text-[11px] uppercase tracking-[0.3em] text-white/45`}
-                >
-                  Filamento
-                </p>
-                <p className={`${cotizaTextBoldFont.className} mt-2 text-sm`}>
-                  {materialLabel}
-                </p>
-              </div>
-
-              <div>
-                <p
-                  className={`${cotizaTextRegularFont.className} text-[11px] uppercase tracking-[0.3em] text-white/45`}
-                >
-                  Color
-                </p>
-                <p className={`${cotizaTextBoldFont.className} mt-2 text-sm`}>
-                  {selectedColorLabel}
-                </p>
-              </div>
-
-              <div>
-                <p
-                  className={`${cotizaTextRegularFont.className} text-[11px] uppercase tracking-[0.3em] text-white/45`}
-                >
-                  Calidad
-                </p>
-                <p className={`${cotizaTextBoldFont.className} mt-2 text-sm`}>
-                  {qualityLabel}
-                </p>
-              </div>
-
-              <div>
-                <p
-                  className={`${cotizaTextRegularFont.className} text-[11px] uppercase tracking-[0.3em] text-white/45`}
-                >
-                  Post procesado
-                </p>
-                <p className={`${cotizaTextBoldFont.className} mt-2 text-sm`}>
-                  {postProcessLabel}
-                </p>
-              </div>
-
-              <div>
-                <p
-                  className={`${cotizaTextRegularFont.className} text-[11px] uppercase tracking-[0.3em] text-white/45`}
-                >
-                  Extra
-                </p>
-                <p className={`${cotizaTextBoldFont.className} mt-2 text-sm`}>
-                  {postProcessPrice > 0
-                    ? formatPrice(postProcessPrice)
-                    : "Sin extra"}
-                </p>
-              </div>
-            </div>
-
-            {fitsPrinter === false && (
-              <p
-                className={`${cotizaTextRegularFont.className} mt-5 
-                text-sm text-[#ff8d8d]`}
+          <div className="space-y-1">
+            {summaryRows.map(([label, value]) => (
+              <div
+                key={label}
+                className="grid grid-cols-[minmax(145px,0.9fr)_minmax(130px,1fr)] gap-4"
               >
-                El modelo no cabe en la impresora configurada, así que no se
-                puede enviar al carrito.
-              </p>
-            )}
-
-            {uploadError && (
-              <p
-                className={`${cotizaTextRegularFont.className} mt-5 text-sm text-[#ff8d8d]`}
-              >
-                {uploadError}
-              </p>
-            )}
-
-            {notes.length > 0 && (
-              <div className="mt-5 space-y-2">
-                {notes.map((note) => (
-                  <p
-                    key={note}
-                    className={`${cotizaTextRegularFont.className} text-sm text-white/60`}
-                  >
-                    {note}
-                  </p>
-                ))}
+                <p
+                  className={`${cotizaTextRegularFont.className} text-base uppercase leading-5 tracking-[0.04em] text-white sm:text-lg`}
+                >
+                  {label}
+                </p>
+                <p
+                  className={`${cotizaTextRegularFont.className} text-right text-base uppercase leading-5 tracking-[0.04em] text-white/62 sm:text-lg`}
+                >
+                  {value}
+                </p>
               </div>
-            )}
+            ))}
           </div>
 
-          {/* CTA final: agrega la cotización al carrito y deriva al checkout actual. */}
-          <div className="rounded-[28px] border
-           border-white/10 bg-white/5 p-5">
-            <button
-              type="button"
-              onClick={onCheckout}
-              disabled={!canCheckout || addingToCart}
-              className={`${cotizaTextBoldFont.className} w-full rounded-full bg-[#ff2a17] px-5 py-4 text-xs uppercase tracking-[0.32em] text-black transition-opacity duration-300 disabled:cursor-not-allowed disabled:opacity-45`}
+          {fitsPrinter === false && (
+            <p
+              className={`${cotizaTextRegularFont.className} mt-5 text-sm uppercase leading-5 text-[#ff8d8d]`}
             >
-              {addingToCart ? "Agregando..." : "Imprimir"}
-            </button>
+              El modelo no cabe en la impresora configurada.
+            </p>
+          )}
 
+          {uploadError && (
+            <p
+              className={`${cotizaTextRegularFont.className} mt-5 text-sm uppercase leading-5 text-[#ff8d8d]`}
+            >
+              {uploadError}
+            </p>
+          )}
 
-            {uploadStatus !== "ready" && (
-              <p
-                className={`${cotizaTextRegularFont.className} mt-4 text-sm text-white/45`}
-              >
-                Primero necesitas subir el archivo y esperar la cotización.
-              </p>
-            )}
-          </div>
+          {notes.length > 0 && (
+            <div className="mt-5 space-y-2">
+              {notes.map((note) => (
+                <p
+                  key={note}
+                  className={`${cotizaTextRegularFont.className} text-sm uppercase leading-5 text-white/50`}
+                >
+                  {note}
+                </p>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-col items-start gap-5 lg:items-end">
+          <p
+            className={`${cotizaTextRegularFont.className} max-w-[230px] text-left text-xs uppercase leading-4 tracking-[0.08em] text-white/45 lg:text-right`}
+          >
+            Recibe tu pedido con la mejor calidad
+          </p>
+
+          <button
+            type="button"
+            onClick={onCheckout}
+            disabled={!canCheckout || addingToCart}
+            className={`${cotizaTextBoldFont.className} w-full max-w-[170px] bg-[#67dd00] px-5 py-4 text-center text-xl uppercase tracking-[0.04em] text-black transition-opacity duration-300 disabled:cursor-not-allowed disabled:opacity-45`}
+          >
+            {addingToCart ? "..." : "Imprimir"}
+          </button>
+
+          {uploadStatus !== "ready" && (
+            <p
+              className={`${cotizaTextRegularFont.className} max-w-[240px] text-xs uppercase leading-4 text-white/45 lg:text-right`}
+            >
+              Primero necesitas subir el archivo y esperar la cotizacion.
+            </p>
+          )}
         </div>
       </div>
     </section>

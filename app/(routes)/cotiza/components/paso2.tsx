@@ -1,6 +1,7 @@
 "use client";
 
 import type { RefObject } from "react";
+import Image from "next/image";
 import { ModelViewer } from "./model-viewer";
 import {
   cotizaTextRegularFont,
@@ -164,13 +165,21 @@ const Paso2 = ({
                 <ModelViewer file={modelFile} scalePercent={scalePercent} />
               ) : (
                 <div className="absolute inset-0 bg-[#bfbfbf]">
+                  <Image
+                    src="/cotiza/portada_paso2_lenta.gif"
+                    alt="Portada animada para cargar modelo 3D"
+                    fill
+                    unoptimized
+                    className="scale-[1.04] object-cover blur-[1.5px]"
+                  />
+                  <div className="absolute inset-0 bg-black/15 backdrop-blur-[1px]" />
                   <p
-                    className={`${cotizaTextRegularFont.className} pointer-events-none absolute left-4 top-4 text-[10px] uppercase tracking-[0.08em] text-black/65`}
+                    className={`${cotizaTextRegularFont.className} pointer-events-none absolute left-4 top-4 text-[10px] uppercase tracking-[0.08em] text-white/80`}
                   >
                     Vista 3D
                   </p>
                   <p
-                    className={`${cotizaTextRegularFont.className} pointer-events-none absolute right-4 top-4 text-[10px] uppercase tracking-[0.08em] text-black/65`}
+                    className={`${cotizaTextRegularFont.className} pointer-events-none absolute right-4 top-4 text-[10px] uppercase tracking-[0.08em] text-white/80`}
                   >
                     Arrastra para rotar
                   </p>

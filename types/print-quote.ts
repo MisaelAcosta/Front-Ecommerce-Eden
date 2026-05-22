@@ -24,6 +24,7 @@ export type PrintQuoteSnapshot = {
   referenceLink: string | null;
   postProcess: PrintPostProcess;
   postProcessLabel: string;
+  postProcessReferenceLink: string | null;
   postProcessPrice: number;
   scalePercent: number;
   basePrice: number;

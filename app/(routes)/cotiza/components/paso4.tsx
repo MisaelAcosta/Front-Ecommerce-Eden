@@ -10,7 +10,9 @@ import {
 
 type Paso4Props = {
   postProcess: PrintPostProcess;
+  referenceLink: string;
   onPostProcessChange: (value: PrintPostProcess) => void;
+  onReferenceLinkChange: (value: string) => void;
 };
 
 const options = [
@@ -19,22 +21,28 @@ const options = [
     title: "Básico",
     description:
       "Acabado simple de hasta 2 colores con efecto desgastado (brocha seca). Perfecto para dar carácter a la pieza sin procesos adicionales como pulido o barnizado.",
-    image: "/servicios/img3.png",
+    image: "/cotiza/basico.jpg",
   },
   {
     id: "advanced" as const,
     title: "Avanzado",
     description:
       "Trabajo completo de acabado con múltiples colores, masillado, lijado, pulido y barnizado. Ideal para lograr piezas con apariencia profesional y terminación premium.",
-    image: "/servicios/img4.jpg",
+    image: "/cotiza/avanzado.jpg",
   },
 ];
 
-const Paso4 = ({ postProcess, onPostProcessChange }: Paso4Props) => {
+const Paso4 = ({
+  postProcess,
+  referenceLink,
+  onPostProcessChange,
+  onReferenceLinkChange,
+}: Paso4Props) => {
   const hasPostProcess = postProcess !== "none";
 
   return (
-    <section className="border-b border-black/10 bg-white px-4 py-16 lg:py-25 sm:px-8 lg:px-12">
+    <section className="border-b border-black/10 bg-white 
+    px-4 py-16 lg:py-25 sm:px-8 lg:px-12">
       <div className="mx-auto grid w-full max-w-[1350px] gap-8 lg:grid-cols-[0.75fr_1.25fr]">
         {/* Columna izquierda */}
         <div>
@@ -63,12 +71,19 @@ const Paso4 = ({ postProcess, onPostProcessChange }: Paso4Props) => {
 
           {/* Input referencia */}
           <p
-            className={`${cotizaTextRegularFont.className} mt-10 max-w-[260px] text-sm leading-6 text-black/45 sm:text-base`}
+            className={`${cotizaTextRegularFont.className} mt-10 max-w-[260px] 
+            text-sm leading-6 text-black/45 sm:text-base`}
           >
             Adjunta el link de la imagen o video referencial.
           </p>
 
-          <div className="mt-3 h-12 max-w-[390px] rounded-md bg-black/5" />
+          <input
+            type="url"
+            value={referenceLink}
+            onChange={(event) => onReferenceLinkChange(event.target.value)}
+            placeholder="https://tu-referencia.com/imagen-o-video"
+            className={`${cotizaTextRegularFont.className} mt-3 h-12 w-full max-w-[390px] rounded-md border border-black/10 bg-black/5 px-4 text-sm text-black outline-none transition-colors placeholder:text-black/35 focus:border-black/35 focus:bg-white`}
+          />
         </div>
 
         {/* Columna derecha */}
@@ -127,22 +142,21 @@ const Paso4 = ({ postProcess, onPostProcessChange }: Paso4Props) => {
 
                   <div className="absolute inset-0 bg-black/20" />
 
-                  <div className="absolute left-4 top-5 right-4 flex items-start justify-between">
+                  <div className="absolute left-4 top-5 right-4 flex items-start 
+                  justify-between">
                     <p
-                      className={`${cotizaTextBoldFont.className} text-2xl uppercase tracking-[0.05em] text-white`}
+                      className={`${cotizaTextBoldFont.className} text-2xl 
+                      uppercase tracking-[0.05em] text-white`}
                     >
                       {option.title}
                     </p>
 
-                    <span
-                      className={`${cotizaTextBoldFont.className} flex h-7 w-7 items-center justify-center bg-black text-xl leading-none text-white`}
-                    >
-                      +
-                    </span>
                   </div>
 
                   <p
-                    className={`${cotizaTextBoldFont.className} absolute bottom-6 left-6 right-6 text-center text-sm uppercase leading-4 tracking-[0.05em] text-white`}
+                    className={`${cotizaTextRegularFont.className} absolute 
+                    bottom-6 left-6 right-6 text-center text-sm uppercase 
+                    leading-4 tracking-[0.05em] text-white`}
                   >
                     {option.description}
                   </p>

@@ -216,6 +216,7 @@ export default function CotizaPage() {
   >("blanco");
   const [colorMode, setColorMode] = useState<PrintColorMode>("single");
   const [referenceLink, setReferenceLink] = useState("");
+  const [postProcessReferenceLink, setPostProcessReferenceLink] = useState("");
   const [quality, setQuality] = useState<PrintQuality>("standard");
   const [postProcess, setPostProcess] = useState<PrintPostProcess>("none");
   const [addingToCart, setAddingToCart] = useState(false);
@@ -235,6 +236,9 @@ export default function CotizaPage() {
 
   const postProcessPrice = POST_PROCESS_PRICES[postProcess];
   const totalPrice = (quote?.basePrice ?? 0) + postProcessPrice;
+  const attachedLinksCount = [referenceLink, postProcessReferenceLink].filter(
+    (link) => link.trim().length > 0
+  ).length;
   const canCheckout =
     uploadStatus === "ready" &&
     !!quote &&
@@ -421,6 +425,7 @@ export default function CotizaPage() {
           referenceLink: referenceLink.trim() || null,
           postProcess,
           postProcessLabel: POST_PROCESS_LABELS[postProcess],
+          postProcessReferenceLink: postProcessReferenceLink.trim() || null,
           postProcessPrice,
           scalePercent,
           basePrice: quote.basePrice,
@@ -491,7 +496,9 @@ export default function CotizaPage() {
         <ScrollReveal>
           <Paso4
             postProcess={postProcess}
+            referenceLink={postProcessReferenceLink}
             onPostProcessChange={setPostProcess}
+            onReferenceLinkChange={setPostProcessReferenceLink}
           />
         </ScrollReveal>
 
@@ -503,6 +510,10 @@ export default function CotizaPage() {
             qualityLabel={QUALITY_LABELS[quality]}
             postProcessLabel={POST_PROCESS_LABELS[postProcess]}
             postProcessPrice={postProcessPrice}
+            totalPrice={totalPrice}
+            printTimeSeconds={quote?.printTimeSeconds ?? null}
+            dimensions={quote?.dimensions ?? null}
+            attachedLinksCount={attachedLinksCount}
             canCheckout={canCheckout}
             addingToCart={addingToCart}
             fitsPrinter={quote?.fitsPrinter ?? null}
