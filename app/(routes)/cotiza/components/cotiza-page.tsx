@@ -23,6 +23,10 @@ type QuoteResult = {
   quoteId: string | null;
   currency: string;
   basePrice: number;
+  filamentCost: number | null;
+  electricityCost: number | null;
+  electricityCostPerKwh: number | null;
+  printerPowerWatts: number | null;
   materialLabel: string;
   printTimeSeconds: number | null;
   estimatedWeightGrams: number | null;
@@ -58,13 +62,16 @@ const COLOR_OPTIONS = [
 
 const POST_PROCESS_LABELS: Record<PrintPostProcess, string> = {
   none: "Sin post procesado",
-  basic: "Básico",
+  basic: "Basico",
   advanced: "Avanzado",
 };
 
 const QUALITY_LABELS: Record<PrintQuality, string> = {
-  standard: "Calidad estándar",
+  standard: "Calidad estandar",
 };
+
+const MIN_SCALE_PERCENT = 20;
+const MAX_SCALE_PERCENT = 300;
 
 function formatFileSize(bytes: number) {
   if (!Number.isFinite(bytes) || bytes <= 0) {
@@ -78,6 +85,117 @@ function formatFileSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function sanitizeCloudSlicerFileName(fileName: string) {
+  const trimmed = fileName.trim();
+  const dotIndex = trimmed.lastIndexOf(".");
+  const rawBaseName = dotIndex > 0 ? trimmed.slice(0, dotIndex) : trimmed;
+  const rawExtension = dotIndex > 0 ? trimmed.slice(dotIndex + 1) : "stl";
+  const extension = rawExtension.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const baseName =
+    rawBaseName
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9._-]/g, "_")
+      .replace(/_+/g, "_")
+      .replace(/^[_ .-]+|[_ .-]+$/g, "") || "modelo";
+
+  return `${baseName}.${extension || "stl"}`;
+}
+
+function clampScalePercent(value: number) {
+  if (!Number.isFinite(value)) {
+    return 100;
+  }
+
+  return Math.min(MAX_SCALE_PERCENT, Math.max(MIN_SCALE_PERCENT, value));
+}
+
+function scaleAsciiStl(text: string, scale: number) {
+  return text.replace(
+    /(vertex\s+)([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)(\s+)([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)(\s+)([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)/g,
+    (_match, prefix, x, spaceA, y, spaceB, z) =>
+      `${prefix}${Number(x) * scale}${spaceA}${Number(y) * scale}${spaceB}${
+        Number(z) * scale
+      }`
+  );
+}
+
+function scaleBinaryStl(buffer: ArrayBuffer, scale: number) {
+  const output = buffer.slice(0);
+  const view = new DataView(output);
+  const triangleCount = view.getUint32(80, true);
+  const expectedLength = 84 + triangleCount * 50;
+
+  if (expectedLength !== output.byteLength) {
+    return null;
+  }
+
+  for (let triangle = 0; triangle < triangleCount; triangle += 1) {
+    const triangleOffset = 84 + triangle * 50;
+
+    for (let vertex = 0; vertex < 3; vertex += 1) {
+      const vertexOffset = triangleOffset + 12 + vertex * 12;
+
+      for (let axis = 0; axis < 3; axis += 1) {
+        const valueOffset = vertexOffset + axis * 4;
+        view.setFloat32(
+          valueOffset,
+          view.getFloat32(valueOffset, true) * scale,
+          true
+        );
+      }
+    }
+  }
+
+  return output;
+}
+
+async function createScaledPrintFile(file: File, scalePercent: number) {
+  const scale = scalePercent / 100;
+
+  if (scalePercent === 100) {
+    return file;
+  }
+
+  const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
+
+  if (extension === "obj") {
+    const text = await file.text();
+    const scaledText = text.replace(
+      /^(v\s+)([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)(\s+)([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)(\s+)([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)(.*)$/gm,
+      (_match, prefix, x, spaceA, y, spaceB, z, rest) =>
+        `${prefix}${Number(x) * scale}${spaceA}${Number(y) * scale}${spaceB}${
+          Number(z) * scale
+        }${rest}`
+    );
+
+    return new File([scaledText], file.name, {
+      type: file.type || "text/plain",
+    });
+  }
+
+  if (extension === "stl") {
+    const buffer = await file.arrayBuffer();
+    const binary = scaleBinaryStl(buffer, scale);
+
+    if (binary) {
+      return new File([binary], file.name, {
+        type: file.type || "model/stl",
+      });
+    }
+
+    const text = new TextDecoder().decode(buffer);
+
+    return new File([scaleAsciiStl(text, scale)], file.name, {
+      type: file.type || "model/stl",
+    });
+  }
+
+  throw new Error(
+    "Por ahora el cambio de escala automatico esta disponible para archivos .stl y .obj."
+  );
+}
+
 export default function CotizaPage() {
   const { navigateWithTransition } = useNavigationTransition();
   const { addItem } = useCart();
@@ -87,6 +205,11 @@ export default function CotizaPage() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [fileName, setFileName] = useState("");
   const [fileSize, setFileSize] = useState(0);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [scalePercent, setScalePercent] = useState(100);
+  const [quotedScalePercent, setQuotedScalePercent] = useState<number | null>(
+    null
+  );
   const [quote, setQuote] = useState<QuoteResult | null>(null);
   const [selectedColor, setSelectedColor] = useState<
     (typeof COLOR_OPTIONS)[number]["id"]
@@ -115,6 +238,7 @@ export default function CotizaPage() {
   const canCheckout =
     uploadStatus === "ready" &&
     !!quote &&
+    quotedScalePercent === scalePercent &&
     quote.basePrice > 0 &&
     quote.fitsPrinter !== false;
 
@@ -122,32 +246,16 @@ export default function CotizaPage() {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
-
-    if (!["stl", "3mf", "obj"].includes(extension)) {
-      setUploadStatus("error");
-      setUploadError("Solo se permiten archivos .stl, .3mf o .obj.");
-      setQuote(null);
-      return;
-    }
-
+  const uploadAndQuoteFile = async (file: File, scale: number) => {
     setFileName(file.name);
     setFileSize(file.size);
     setUploadError(null);
     setQuote(null);
+    setQuotedScalePercent(null);
     setUploadStatus("uploading");
 
     try {
-      // Pedimos el upload_id a nuestro backend antes de subir desde el navegador.
+      const fileForCloudSlicer = await createScaledPrintFile(file, scale);
       const uploadIdRes = await fetch("/api/cloudslicer/upload-id", {
         method: "GET",
         cache: "no-store",
@@ -166,9 +274,12 @@ export default function CotizaPage() {
       }
 
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append(
+        "file",
+        fileForCloudSlicer,
+        sanitizeCloudSlicerFileName(fileForCloudSlicer.name)
+      );
 
-      // La subida pública es browser-compatible según la documentación de CloudSlicer.
       const publicUploadRes = await fetch(
         `https://api.cloudslicer3d.com/v1/file/public/${uploadIdJson.uploadId}`,
         {
@@ -188,7 +299,7 @@ export default function CotizaPage() {
         throw new Error(
           publicUploadJson?.detail ||
             publicUploadJson?.message ||
-            "CloudSlicer rechazó la subida del archivo."
+            "CloudSlicer rechazo la subida del archivo."
         );
       }
 
@@ -196,7 +307,7 @@ export default function CotizaPage() {
         publicUploadJson.file_id || String(publicUploadJson.id ?? "").trim();
 
       if (!cloudFileId) {
-        throw new Error("CloudSlicer no devolvió file_id después de la subida.");
+        throw new Error("CloudSlicer no devolvio file_id despues de la subida.");
       }
 
       setUploadStatus("pricing");
@@ -220,18 +331,59 @@ export default function CotizaPage() {
 
       if (!quoteRes.ok || !quoteJson?.ok || !quoteJson.quote) {
         throw new Error(
-          quoteJson?.error ?? "No se pudo generar la cotización del archivo."
+          quoteJson?.error ?? "No se pudo generar la cotizacion del archivo."
         );
       }
 
       setQuote(quoteJson.quote);
+      setQuotedScalePercent(scale);
       setUploadStatus("ready");
     } catch (error: unknown) {
       setUploadStatus("error");
       setQuote(null);
+      setQuotedScalePercent(null);
       setUploadError(
-        error instanceof Error ? error.message : "Ocurrió un error inesperado."
+        error instanceof Error ? error.message : "Ocurrio un error inesperado."
       );
+    }
+  };
+
+  const handleScaleChange = (value: number) => {
+    setScalePercent(clampScalePercent(value));
+  };
+
+  const handleRequote = async () => {
+    if (!selectedFile) {
+      return;
+    }
+
+    await uploadAndQuoteFile(selectedFile, scalePercent);
+  };
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
+
+    if (!["stl", "3mf", "obj"].includes(extension)) {
+      setUploadStatus("error");
+      setUploadError("Solo se permiten archivos .stl, .3mf o .obj.");
+      setQuote(null);
+      setSelectedFile(null);
+      event.target.value = "";
+      return;
+    }
+
+    setSelectedFile(file);
+
+    try {
+      await uploadAndQuoteFile(file, scalePercent);
     } finally {
       event.target.value = "";
     }
@@ -245,13 +397,12 @@ export default function CotizaPage() {
     setAddingToCart(true);
 
     try {
-      // Guardamos la cotización como una línea especial para no mezclarla con variantes de catálogo.
       addItem({
         kind: "print-quote",
         productId: 0,
         productSlug: "cotiza",
         variantId: -1,
-        variantName: `Imprime · ${quote.fileName ?? fileName}`,
+        variantName: `Imprime - ${quote.fileName ?? fileName}`,
         imageUrl: "/servicios/servicio1.png",
         sku: null,
         unitPrice: totalPrice,
@@ -271,7 +422,12 @@ export default function CotizaPage() {
           postProcess,
           postProcessLabel: POST_PROCESS_LABELS[postProcess],
           postProcessPrice,
+          scalePercent,
           basePrice: quote.basePrice,
+          filamentCost: quote.filamentCost,
+          electricityCost: quote.electricityCost,
+          electricityCostPerKwh: quote.electricityCostPerKwh,
+          printerPowerWatts: quote.printerPowerWatts,
           totalPrice,
           fitsPrinter: quote.fitsPrinter,
           dimensions: quote.dimensions,
@@ -303,11 +459,17 @@ export default function CotizaPage() {
             fileInputRef={fileInputRef}
             fileName={fileName}
             fileSizeLabel={formatFileSize(fileSize)}
+            modelFile={selectedFile}
             quote={quote}
             uploadStatus={uploadStatus}
             uploadError={uploadError}
+            scalePercent={scalePercent}
+            quoteScalePercent={quotedScalePercent}
+            canRequote={!!selectedFile && quotedScalePercent !== scalePercent}
             onFileChange={handleFileChange}
             onOpenPicker={openPicker}
+            onScaleChange={handleScaleChange}
+            onRequote={handleRequote}
           />
         </ScrollReveal>
 
@@ -318,9 +480,9 @@ export default function CotizaPage() {
             selectedColor={selectedColor}
             quality={quality}
             referenceLink={referenceLink}
-            quoteReady={uploadStatus === "ready"}
+            quoteReady={uploadStatus === "ready" && quotedScalePercent === scalePercent}
             onColorModeChange={setColorMode}
-            onColorChange={setSelectedColor}
+            onColorChange={handleColorChange}
             onQualityChange={setQuality}
             onReferenceLinkChange={setReferenceLink}
           />
@@ -341,8 +503,6 @@ export default function CotizaPage() {
             qualityLabel={QUALITY_LABELS[quality]}
             postProcessLabel={POST_PROCESS_LABELS[postProcess]}
             postProcessPrice={postProcessPrice}
-            basePrice={quote?.basePrice ?? 0}
-            totalPrice={totalPrice}
             canCheckout={canCheckout}
             addingToCart={addingToCart}
             fitsPrinter={quote?.fitsPrinter ?? null}

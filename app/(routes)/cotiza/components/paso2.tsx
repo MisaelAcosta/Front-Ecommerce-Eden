@@ -2,7 +2,7 @@
 
 import type { RefObject } from "react";
 import Image from "next/image";
-import { formatPrice } from "@/lib/formatPrice";
+import { ModelViewer } from "./model-viewer";
 import {
   cotizaTextRegularFont,
   cotizaTitleFont,
@@ -15,8 +15,11 @@ type Paso2Props = {
   fileSizeLabel: string;
   uploadStatus: "idle" | "uploading" | "pricing" | "ready" | "error";
   uploadError: string | null;
+  modelFile: File | null;
   quote: {
     basePrice: number;
+    filamentCost: number | null;
+    electricityCost: number | null;
     materialLabel: string;
     printTimeSeconds: number | null;
     estimatedWeightGrams: number | null;
@@ -29,6 +32,11 @@ type Paso2Props = {
   } | null;
   onOpenPicker: () => void;
   onFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  scalePercent: number;
+  quoteScalePercent: number | null;
+  canRequote: boolean;
+  onScaleChange: (value: number) => void;
+  onRequote: () => void;
 };
 
 function formatPrintTime(seconds: number | null) {
@@ -44,6 +52,10 @@ function formatPrintTime(seconds: number | null) {
   }
 
   return `${hours} h ${minutes} min`;
+}
+
+function formatCm(mm: number) {
+  return (mm / 10).toFixed(1);
 }
 
 const uploadProgressByStatus = {
@@ -68,12 +80,19 @@ const Paso2 = ({
   fileSizeLabel,
   uploadStatus,
   uploadError,
+  modelFile,
   quote,
   onOpenPicker,
   onFileChange,
+  scalePercent,
+  quoteScalePercent,
+  canRequote,
+  onScaleChange,
+  onRequote,
 }: Paso2Props) => {
   const uploadProgress = uploadProgressByStatus[uploadStatus];
   const isProcessing = uploadStatus === "uploading" || uploadStatus === "pricing";
+  const scaleNeedsUpdate = quoteScalePercent !== null && quoteScalePercent !== scalePercent;
 
   return (
     <section className="border-b border-black/10 bg-white 
@@ -114,6 +133,8 @@ const Paso2 = ({
             Formatos admitidos: <span className="font-semibold">.stl</span>,{" "}
             <span className="font-semibold">.3mf</span> y{" "}
             <span className="font-semibold">.obj</span>.
+            <br />
+            El cambio de escala automatico se aplica a .stl y .obj.
           </div>
         </div>
 
@@ -123,13 +144,19 @@ const Paso2 = ({
         bg-[#111111] p-3 text-white">
           <div className="relative overflow-hidden rounded-[26px]">
             <div className="relative h-[250px] sm:h-[320px]">
-              <Image
-                src="/servicios/img4.jpg"
-                alt="Vista referencial para subir archivos 3D"
-                fill
-                className="object-cover opacity-70"
-              />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.2),rgba(0,0,0,0.72)_60%)]" />
+              {modelFile && quote && quoteScalePercent === scalePercent ? (
+                <ModelViewer file={modelFile} scalePercent={scalePercent} />
+              ) : (
+                <>
+                  <Image
+                    src="/servicios/img4.jpg"
+                    alt="Vista referencial para subir archivos 3D"
+                    fill
+                    className="object-cover opacity-70"
+                  />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.2),rgba(0,0,0,0.72)_60%)]" />
+                </>
+              )}
               <div className="absolute inset-0 flex items-center justify-center">
                 <button
                   type="button"
@@ -148,6 +175,56 @@ const Paso2 = ({
               className="hidden"
               onChange={onFileChange}
             />
+          </div>
+
+          <div className="px-2 pt-5">
+            <div className="grid gap-3">
+              <div>
+                <p
+                  className={`${cotizaTextRegularFont.className} text-[11px] uppercase tracking-[0.3em] text-white/55`}
+                >
+                  Escala
+                </p>
+                <p
+                  className={`${cotizaTextBoldFont.className} mt-1 text-sm text-white`}
+                >
+                  {scalePercent}%
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={onRequote}
+                disabled={!canRequote || isProcessing}
+                className={`${cotizaTextBoldFont.className} w-fit rounded-full border border-white/20 px-3 py-2 text-[11px] uppercase tracking-[0.08em] text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-40`}
+              >
+                Recalc
+              </button>
+            </div>
+
+            <input
+              type="range"
+              min={20}
+              max={300}
+              step={5}
+              value={scalePercent}
+              disabled={isProcessing}
+              onChange={(event) => onScaleChange(Number(event.target.value))}
+              className="mt-3 w-full accent-white"
+            />
+
+            <div className="mt-2 flex gap-10 text-xs text-white/45">
+              <span>20%</span>
+              <span>100%</span>
+            </div>
+
+            {scaleNeedsUpdate && (
+              <p
+                className={`${cotizaTextRegularFont.className} mt-3 text-xs text-[#ffd18a]`}
+              >
+                Cambiaste la escala. Actualiza la cotizacion para recalcular precio y medidas.
+              </p>
+            )}
           </div>
 
           <div className="grid gap-4 px-2 py-5 sm:grid-cols-2">
@@ -188,9 +265,6 @@ const Paso2 = ({
               </p>
               {quote ? (
                 <div className="mt-2 space-y-2">
-                  <p className={`${cotizaTextBoldFont.className} text-base`}>
-                    {formatPrice(quote.basePrice)}
-                  </p>
                   <p
                     className={`${cotizaTextRegularFont.className} text-sm text-white/70`}
                   >
@@ -201,20 +275,13 @@ const Paso2 = ({
                   >
                     Tiempo estimado: {formatPrintTime(quote.printTimeSeconds)}
                   </p>
-                  {quote.estimatedWeightGrams !== null && (
-                    <p
-                      className={`${cotizaTextRegularFont.className} text-sm text-white/70`}
-                    >
-                      Material usado: {Math.round(quote.estimatedWeightGrams)} g
-                    </p>
-                  )}
                   {quote.dimensions && (
                     <p
                       className={`${cotizaTextRegularFont.className} text-sm text-white/70`}
                     >
-                      Volumen: {quote.dimensions.x.toFixed(1)} ×{" "}
-                      {quote.dimensions.y.toFixed(1)} ×{" "}
-                      {quote.dimensions.z.toFixed(1)} mm
+                      Medidas: {formatCm(quote.dimensions.x)} x{" "}
+                      {formatCm(quote.dimensions.y)} x{" "}
+                      {formatCm(quote.dimensions.z)} cm
                     </p>
                   )}
                   {quote.fitsPrinter === false && (
@@ -284,3 +351,5 @@ const Paso2 = ({
 };
 
 export default Paso2;
+
+

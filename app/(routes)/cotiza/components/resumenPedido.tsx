@@ -14,8 +14,6 @@ type ResumenPedidoProps = {
   qualityLabel: string;
   postProcessLabel: string;
   postProcessPrice: number;
-  basePrice: number;
-  totalPrice: number;
   canCheckout: boolean;
   addingToCart: boolean;
   fitsPrinter: boolean | null;
@@ -32,8 +30,6 @@ const ResumenPedido = ({
   qualityLabel,
   postProcessLabel,
   postProcessPrice,
-  basePrice,
-  totalPrice,
   canCheckout,
   addingToCart,
   fitsPrinter,
@@ -135,36 +131,6 @@ const ResumenPedido = ({
                   {postProcessPrice > 0
                     ? formatPrice(postProcessPrice)
                     : "Sin extra"}
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-6 grid gap-3 border-t 
-            border-white/10 pt-5 sm:grid-cols-2 ">
-              <div>
-                <p
-                  className={`${cotizaTextRegularFont.className} text-[11px] uppercase tracking-[0.3em] text-white/45`}
-                >
-                  Base CloudSlicer
-                </p>
-                <p className={`${cotizaTextBoldFont.className} mt-2 text-lg`}>
-                  {basePrice > 0 ? formatPrice(basePrice) : "Pendiente"}
-                </p>
-              </div>
-
-              <div>
-                <p
-                  className={`${cotizaTextRegularFont.className} t
-                  ext-[11px] uppercase tracking-[0.3em]
-                   text-white/45`}
-                >
-                  Total
-                </p>
-                <p
-                  className={`${cotizaTextBoldFont.className} 
-                  mt-2 text-2xl text-[#ff3b30]`}
-                >
-                  {totalPrice > 0 ? formatPrice(totalPrice) : "Pendiente"}
                 </p>
               </div>
             </div>

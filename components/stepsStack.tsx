@@ -14,6 +14,7 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const StepsStack = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useGSAP(
     () => {
@@ -125,7 +126,22 @@ const StepsStack = () => {
 
         <section className="step-section relative overflow-hidden md:h-screen">
           <div className="step-inner relative h-full">
-            <Paso2 />
+            <Paso2
+              fileInputRef={fileInputRef}
+              fileName=""
+              fileSizeLabel="0 KB"
+              modelFile={null}
+              quote={null}
+              uploadStatus="idle"
+              uploadError={null}
+              scalePercent={100}
+              quoteScalePercent={null}
+              canRequote={false}
+              onFileChange={() => undefined}
+              onOpenPicker={() => undefined}
+              onScaleChange={() => undefined}
+              onRequote={() => undefined}
+            />
           </div>
         </section>
 

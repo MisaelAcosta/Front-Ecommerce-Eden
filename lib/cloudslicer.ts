@@ -6,7 +6,11 @@ type NumberLike = number | string | null | undefined;
 
 type QuoteSummary = {
   quoteId: string | null;
+  status: string | null;
+  errorMessage: string | null;
   basePrice: number | null;
+  filamentCost: number | null;
+  electricityCost: number | null;
   currency: string | null;
   materialLabel: string | null;
   printTimeSeconds: number | null;
@@ -30,6 +34,16 @@ function toNumber(value: NumberLike) {
       : Number.NaN;
 
   return Number.isFinite(numeric) ? numeric : null;
+}
+
+function optionalEnvId(value: string | undefined) {
+  const normalized = value?.trim();
+
+  if (!normalized || normalized.startsWith("...")) {
+    return null;
+  }
+
+  return normalized;
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -121,7 +135,7 @@ export function getCloudSlicerConfig(): CloudSlicerConfig {
     token,
     printerId,
     filamentId,
-    quoteConfigId: process.env.CLOUDSLICER_QUOTE_CONFIG_ID?.trim() || null,
+    quoteConfigId: optionalEnvId(process.env.CLOUDSLICER_QUOTE_CONFIG_ID),
     printerDimensions: {
       x: toNumber(process.env.CLOUDSLICER_PRINTER_X) ?? 210,
       y: toNumber(process.env.CLOUDSLICER_PRINTER_Y) ?? 210,
@@ -180,7 +194,10 @@ export function parseQuoteSummary(source: unknown): QuoteSummary {
   return {
     quoteId:
       findStringByPaths(source, [["quote_id"], ["quoteId"], ["id"]]) ?? null,
+    status: findStringByPaths(source, [["status"]]) ?? null,
+    errorMessage: findStringByPaths(source, [["error_message"]]) ?? null,
     basePrice: findNumberByPaths(source, [
+      ["pricing", "total_price"],
       ["price_total"],
       ["total_price"],
       ["quote_total"],
@@ -189,17 +206,28 @@ export function parseQuoteSummary(source: unknown): QuoteSummary {
       ["price"],
       ["total"],
     ]),
+    filamentCost: findNumberByPaths(source, [["pricing", "filament_cost"]]),
+    electricityCost: findNumberByPaths(source, [
+      ["pricing", "electricity_cost"],
+    ]),
     currency:
-      findStringByPaths(source, [["currency"], ["quote_config", "currency"]]) ??
-      null,
+      findStringByPaths(source, [
+        ["pricing", "currency"],
+        ["currency"],
+        ["quote_config", "currency"],
+        ["configurations", "quote_config", "currency"],
+      ]) ?? null,
     materialLabel:
       findStringByPaths(source, [
+        ["configurations", "filament_config", "name"],
+        ["filament_config", "name"],
         ["filament_name"],
         ["material_name"],
         ["filament_type"],
         ["material"],
       ]) ?? null,
     printTimeSeconds: findNumberByPaths(source, [
+      ["time", "estimated_time_seconds"],
       ["print_time_seconds"],
       ["estimated_print_time_seconds"],
       ["print_time"],
@@ -207,6 +235,7 @@ export function parseQuoteSummary(source: unknown): QuoteSummary {
       ["time_seconds"],
     ]),
     estimatedWeightGrams: findNumberByPaths(source, [
+      ["pricing", "filament_weight"],
       ["filament_used_g"],
       ["filament_weight_g"],
       ["material_used_g"],

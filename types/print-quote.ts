@@ -25,7 +25,12 @@ export type PrintQuoteSnapshot = {
   postProcess: PrintPostProcess;
   postProcessLabel: string;
   postProcessPrice: number;
+  scalePercent: number;
   basePrice: number;
+  filamentCost: number | null;
+  electricityCost: number | null;
+  electricityCostPerKwh: number | null;
+  printerPowerWatts: number | null;
   totalPrice: number;
   fitsPrinter: boolean | null;
   dimensions: PrintDimensions | null;
