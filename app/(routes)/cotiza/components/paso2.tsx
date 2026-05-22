@@ -1,7 +1,6 @@
 "use client";
 
 import type { RefObject } from "react";
-import Image from "next/image";
 import { ModelViewer } from "./model-viewer";
 import {
   cotizaTextRegularFont,
@@ -41,7 +40,7 @@ type Paso2Props = {
 
 function formatPrintTime(seconds: number | null) {
   if (!seconds || seconds <= 0) {
-    return "En cálculo";
+    return "En calculo";
   }
 
   const hours = Math.floor(seconds / 3600);
@@ -56,6 +55,28 @@ function formatPrintTime(seconds: number | null) {
 
 function formatCm(mm: number) {
   return (mm / 10).toFixed(1);
+}
+
+function scaleDimensions(
+  dimensions: Paso2Props["quote"] extends infer Quote
+    ? Quote extends { dimensions: infer Dimensions }
+      ? Dimensions
+      : never
+    : never,
+  fromScalePercent: number | null,
+  toScalePercent: number
+) {
+  if (!dimensions || !fromScalePercent || fromScalePercent <= 0) {
+    return dimensions;
+  }
+
+  const scaleFactor = toScalePercent / fromScalePercent;
+
+  return {
+    x: dimensions.x * scaleFactor,
+    y: dimensions.y * scaleFactor,
+    z: dimensions.z * scaleFactor,
+  };
 }
 
 const uploadProgressByStatus = {
@@ -73,6 +94,8 @@ const uploadProgressLabel = {
   ready: "100%",
   error: "Error",
 } satisfies Record<Paso2Props["uploadStatus"], string>;
+
+const progressSegments = Array.from({ length: 32 }, (_, index) => index);
 
 const Paso2 = ({
   fileInputRef,
@@ -93,42 +116,38 @@ const Paso2 = ({
   const uploadProgress = uploadProgressByStatus[uploadStatus];
   const isProcessing = uploadStatus === "uploading" || uploadStatus === "pricing";
   const scaleNeedsUpdate = quoteScalePercent !== null && quoteScalePercent !== scalePercent;
+  const showModelViewer = Boolean(modelFile && quote && quoteScalePercent === scalePercent);
+  const filledSegments = Math.round((uploadProgress / 100) * progressSegments.length);
+  const displayDimensions = scaleDimensions(
+    quote?.dimensions ?? null,
+    quoteScalePercent,
+    scalePercent
+  );
 
   return (
-    <section className="border-b border-black/10 bg-white 
-    px-4 py-16 lg:py-25 sm:px-8 lg:px-12">
-      <div className="mx-auto grid w-full max-w-[1350px] gap-8 
-      lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
-        {/* Lado izquierdo con instrucciones del paso. */}
+    <section className="border-b border-black/10 bg-white px-4 py-16 sm:px-8 lg:px-12 lg:py-25">
+      <div className="mx-auto grid w-full max-w-[1350px] gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
         <div>
           <p
-            className={`${cotizaTextBoldFont.className} text-base lg:text-2xl
-            uppercase tracking-[0.35em] text-black/65`}
+            className={`${cotizaTextBoldFont.className} text-base uppercase tracking-[0.35em] text-black/65 lg:text-2xl`}
           >
             Paso 02
           </p>
           <h2
-            className={`${cotizaTitleFont.className} mt-3 max-w-xl 
-            text-4xl uppercase leading-[1.30] 
-            lg:leading-[1.20] sm:text-5xl lg:text-6xl
-            lg:pt-10 pt-5`}
+            className={`${cotizaTitleFont.className} mt-3 max-w-xl pt-5 text-4xl uppercase leading-[1.30] sm:text-5xl lg:pt-10 lg:text-6xl lg:leading-[1.20]`}
           >
             Carga tu archivo
           </h2>
           <p
-            className={`${cotizaTextRegularFont.className} mt-10 lg:mt-15
-            max-w-lg text-sm leading-6 text-black/70 sm:text-base`}
+            className={`${cotizaTextRegularFont.className} mt-10 max-w-lg text-sm leading-6 text-black/70 sm:text-base lg:mt-15`}
           >
-            Sube tu STL y dejamos que CloudSlicer haga la laminación. El
+            Sube tu STL y dejamos que CloudSlicer haga la laminacion. El
             sistema primero carga el archivo y luego consulta el precio sobre la
-            configuración de impresión que tengas definida.
+            configuracion de impresion que tengas definida.
           </p>
 
-
           <div
-            className={`${cotizaTextRegularFont.className} mt-6 
-            rounded-[14px]  
-            bg-[#e4e4e4] p-4 text-xs lg:text-sm leading-6 text-black/70 lg:w-100`}
+            className={`${cotizaTextRegularFont.className} mt-6 rounded-[14px] bg-[#e4e4e4] p-4 text-xs leading-6 text-black/70 lg:w-100 lg:text-sm`}
           >
             Formatos admitidos: <span className="font-semibold">.stl</span>,{" "}
             <span className="font-semibold">.3mf</span> y{" "}
@@ -138,30 +157,35 @@ const Paso2 = ({
           </div>
         </div>
 
-
-        {/* Lado derecho con caja de subida y feedback de CloudSlicer. */}
-        <div className="rounded-[22px] border border-black/10 
-        bg-[#111111] p-3 text-white">
-          <div className="relative overflow-hidden rounded-[26px]">
-            <div className="relative h-[250px] sm:h-[320px]">
-              {modelFile && quote && quoteScalePercent === scalePercent ? (
+        <div className="rounded-[18px] border border-black/10 bg-[#111111] p-4 text-white shadow-[0_16px_40px_rgba(0,0,0,0.16)]">
+          <div className="relative overflow-hidden rounded-[14px] bg-[#bfbfbf]">
+            <div className="relative h-[260px] sm:h-[295px]">
+              {showModelViewer && modelFile ? (
                 <ModelViewer file={modelFile} scalePercent={scalePercent} />
               ) : (
-                <>
-                  <Image
-                    src="/servicios/img4.jpg"
-                    alt="Vista referencial para subir archivos 3D"
-                    fill
-                    className="object-cover opacity-70"
-                  />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.2),rgba(0,0,0,0.72)_60%)]" />
-                </>
+                <div className="absolute inset-0 bg-[#bfbfbf]">
+                  <p
+                    className={`${cotizaTextRegularFont.className} pointer-events-none absolute left-4 top-4 text-[10px] uppercase tracking-[0.08em] text-black/65`}
+                  >
+                    Vista 3D
+                  </p>
+                  <p
+                    className={`${cotizaTextRegularFont.className} pointer-events-none absolute right-4 top-4 text-[10px] uppercase tracking-[0.08em] text-black/65`}
+                  >
+                    Arrastra para rotar
+                  </p>
+                </div>
               )}
-              <div className="absolute inset-0 flex items-center justify-center">
+
+              <div
+                className={`absolute inset-0 flex items-center justify-center ${
+                  showModelViewer ? "pointer-events-none opacity-0" : ""
+                }`}
+              >
                 <button
                   type="button"
                   onClick={onOpenPicker}
-                  className={`${cotizaTextBoldFont.className} rounded-full bg-white px-5 py-3 text-xs uppercase tracking-[0.28em] text-black transition-transform duration-300 hover:scale-[1.03]`}
+                  className={`${cotizaTextBoldFont.className} rounded-full bg-white px-5 py-3 text-xs uppercase tracking-[0.22em] text-black shadow-sm transition-transform duration-300 hover:scale-[1.03]`}
                 >
                   Sube tu archivo
                 </button>
@@ -177,172 +201,163 @@ const Paso2 = ({
             />
           </div>
 
-          <div className="px-2 pt-5">
-            <div className="grid gap-3">
-              <div>
-                <p
-                  className={`${cotizaTextRegularFont.className} text-[11px] uppercase tracking-[0.3em] text-white/55`}
+          <div className="grid gap-8 px-4 py-8 sm:grid-cols-2 sm:px-5">
+            <div>
+              <p
+                className={`${cotizaTextBoldFont.className} text-[11px] uppercase tracking-[0.08em] text-white`}
+              >
+                Escala
+              </p>
+              <p className={`${cotizaTextBoldFont.className} mt-1 text-xs text-white`}>
+                {scalePercent}%
+              </p>
+
+              <div className="mt-3 max-w-[220px]">
+                <div
+                  className={`${cotizaTextRegularFont.className} mb-1 flex items-center justify-between px-1 text-[8px] text-white/45`}
                 >
-                  Escala
-                </p>
-                <p
-                  className={`${cotizaTextBoldFont.className} mt-1 text-sm text-white`}
-                >
-                  {scalePercent}%
-                </p>
+                  <span>20%</span>
+                  <span>100%</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-white/55">v</span>
+                  <input
+                    type="range"
+                    min={20}
+                    max={300}
+                    step={5}
+                    value={scalePercent}
+                    disabled={isProcessing}
+                    onChange={(event) => onScaleChange(Number(event.target.value))}
+                    className="h-1 flex-1 accent-white"
+                  />
+                  <span className="text-xs text-white/55">^</span>
+                </div>
               </div>
 
               <button
                 type="button"
                 onClick={onRequote}
                 disabled={!canRequote || isProcessing}
-                className={`${cotizaTextBoldFont.className} w-fit rounded-full border border-white/20 px-3 py-2 text-[11px] uppercase tracking-[0.08em] text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-40`}
+                className={`${cotizaTextBoldFont.className} mt-3 rounded-full border border-white/45 px-4 py-2 text-[10px] uppercase tracking-[0.08em] text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-40`}
               >
-                Recalc
+                Recalcular
               </button>
-            </div>
 
-            <input
-              type="range"
-              min={20}
-              max={300}
-              step={5}
-              value={scalePercent}
-              disabled={isProcessing}
-              onChange={(event) => onScaleChange(Number(event.target.value))}
-              className="mt-3 w-full accent-white"
-            />
-
-            <div className="mt-2 flex gap-10 text-xs text-white/45">
-              <span>20%</span>
-              <span>100%</span>
-            </div>
-
-            {scaleNeedsUpdate && (
-              <p
-                className={`${cotizaTextRegularFont.className} mt-3 text-xs text-[#ffd18a]`}
-              >
-                Cambiaste la escala. Actualiza la cotizacion para recalcular precio y medidas.
-              </p>
-            )}
-          </div>
-
-          <div className="grid gap-4 px-2 py-5 sm:grid-cols-2">
-            <div>
-              <p
-                className={`${cotizaTextRegularFont.className} text-[11px] uppercase tracking-[0.3em] text-white/55`}
-              >
-                Estado
-              </p>
-              <p className={`${cotizaTextBoldFont.className} mt-2 text-sm`}>
-                {uploadStatus === "idle" && "Esperando archivo"}
-                {uploadStatus === "uploading" && "Subiendo a CloudSlicer"}
-                {uploadStatus === "pricing" && "Laminando y cotizando"}
-                {uploadStatus === "ready" && "Cotización lista"}
-                {uploadStatus === "error" && "No se pudo cotizar"}
-              </p>
-              {fileName && (
+              {scaleNeedsUpdate && (
                 <p
-                  className={`${cotizaTextRegularFont.className} mt-3 text-sm text-white/70`}
+                  className={`${cotizaTextRegularFont.className} mt-3 max-w-[260px] text-[11px] leading-4 text-[#ffd18a]`}
                 >
-                  {fileName} · {fileSizeLabel}
-                </p>
-              )}
-              {uploadError && (
-                <p
-                  className={`${cotizaTextRegularFont.className} mt-3 text-sm text-[#ff8d8d]`}
-                >
-                  {uploadError}
+                  Cambiaste la escala. Recalcula para actualizar medidas.
                 </p>
               )}
             </div>
 
             <div>
               <p
-                className={`${cotizaTextRegularFont.className} text-[11px] uppercase tracking-[0.3em] text-white/55`}
+                className={`${cotizaTextBoldFont.className} text-[11px] uppercase tracking-[0.08em] text-white`}
               >
                 Resultado
               </p>
               {quote ? (
-                <div className="mt-2 space-y-2">
-                  <p
-                    className={`${cotizaTextRegularFont.className} text-sm text-white/70`}
-                  >
+                <div className="mt-2 space-y-1">
+                  <p className={`${cotizaTextRegularFont.className} text-xs uppercase text-white/55`}>
                     Material: {quote.materialLabel}
                   </p>
-                  <p
-                    className={`${cotizaTextRegularFont.className} text-sm text-white/70`}
-                  >
-                    Tiempo estimado: {formatPrintTime(quote.printTimeSeconds)}
+                  <p className={`${cotizaTextRegularFont.className} text-xs uppercase text-white/55`}>
+                    Tiempo: {formatPrintTime(quote.printTimeSeconds)}
                   </p>
-                  {quote.dimensions && (
-                    <p
-                      className={`${cotizaTextRegularFont.className} text-sm text-white/70`}
-                    >
-                      Medidas: {formatCm(quote.dimensions.x)} x{" "}
-                      {formatCm(quote.dimensions.y)} x{" "}
-                      {formatCm(quote.dimensions.z)} cm
+                  {displayDimensions && (
+                    <p className={`${cotizaTextRegularFont.className} text-xs uppercase text-white/55`}>
+                      Medidas: {formatCm(displayDimensions.x)} x{" "}
+                      {formatCm(displayDimensions.y)} x{" "}
+                      {formatCm(displayDimensions.z)} cm
+                    </p>
+                  )}
+                  {scaleNeedsUpdate && displayDimensions && (
+                    <p className={`${cotizaTextRegularFont.className} text-[10px] uppercase leading-4 text-[#ffd18a]`}>
+                      Vista previa segun la escala actual.
                     </p>
                   )}
                   {quote.fitsPrinter === false && (
-                    <p
-                      className={`${cotizaTextRegularFont.className} text-sm text-[#ff8d8d]`}
-                    >
+                    <p className={`${cotizaTextRegularFont.className} text-xs uppercase text-[#ff8d8d]`}>
                       El modelo no cabe en la impresora configurada.
                     </p>
                   )}
                 </div>
               ) : (
                 <p
-                  className={`${cotizaTextRegularFont.className} mt-2 text-sm text-white/70`}
+                  className={`${cotizaTextRegularFont.className} mt-2 max-w-[260px] text-xs uppercase leading-4 text-white/55`}
                 >
-                  La cotización aparecerá aquí apenas termine la laminación.
+                  La cotizacion aparecera aqui apenas termine la laminacion.
                 </p>
               )}
             </div>
           </div>
 
-          <div className="px-2 pb-4">
-            <div className="mb-2 flex items-center justify-between gap-4">
-              <p
-                className={`${cotizaTextRegularFont.className} text-[11px] uppercase tracking-[0.3em] text-white/55`}
-              >
-                Progreso
-              </p>
-              <p
-                className={`${cotizaTextBoldFont.className} text-xs uppercase text-white/75`}
-              >
-                {uploadProgressLabel[uploadStatus]}
-              </p>
-            </div>
+          <div className="grid gap-6 px-4 pb-5 sm:grid-cols-[1fr_0.95fr] sm:px-5">
+            <div>
+              <div className="mb-2 flex items-center justify-between gap-4">
+                <p
+                  className={`${cotizaTextBoldFont.className} text-[11px] uppercase tracking-[0.08em] text-white`}
+                >
+                  Progreso
+                </p>
+                <p
+                  className={`${cotizaTextRegularFont.className} text-[10px] uppercase text-white/45`}
+                >
+                  {uploadProgressLabel[uploadStatus]}
+                </p>
+              </div>
 
-            <div className="h-2 overflow-hidden rounded-full bg-white/15">
-              <div
-                className={`relative h-full rounded-full transition-all duration-700 ease-out ${
-                  uploadStatus === "error" ? "bg-[#ff6b6b]" : "bg-white"
-                }`}
-                style={{ width: `${uploadProgress}%` }}
-              >
-                {isProcessing && (
-                  <span className="absolute inset-0 animate-pulse bg-white/40" />
-                )}
+              <div className="grid grid-cols-[repeat(16,minmax(0,1fr))] gap-[3px] sm:grid-cols-[repeat(32,minmax(0,1fr))]">
+                {progressSegments.map((segment) => {
+                  const isFilled = segment < filledSegments;
+
+                  return (
+                    <span
+                      key={segment}
+                      className={`h-5 transition-colors duration-300 ${
+                        uploadStatus === "error" && isFilled
+                          ? "bg-[#ff6b6b]"
+                          : isFilled
+                            ? "bg-white"
+                            : "bg-white/16"
+                      }`}
+                    />
+                  );
+                })}
               </div>
             </div>
 
-            <p
-              className={`${cotizaTextRegularFont.className} mt-3 text-xs text-white/55`}
-            >
-              {uploadStatus === "idle" &&
-                "Selecciona un archivo para iniciar la cotizacion."}
-              {uploadStatus === "uploading" &&
-                "Estamos subiendo tu modelo 3D a CloudSlicer."}
-              {uploadStatus === "pricing" &&
-                "Archivo cargado. Estamos laminando y calculando el precio."}
-              {uploadStatus === "ready" &&
-                "Listo. Ya puedes revisar el resumen y agregarlo al carrito."}
-              {uploadStatus === "error" &&
-                "La cotizacion se detuvo. Intenta subir el archivo nuevamente."}
-            </p>
+            <div>
+              <p
+                className={`${cotizaTextBoldFont.className} text-[11px] uppercase tracking-[0.08em] text-white`}
+              >
+                Estado
+              </p>
+              <p
+                className={`${cotizaTextRegularFont.className} mt-1 text-xs uppercase leading-4 text-white/55`}
+              >
+                {uploadStatus === "idle" && "Selecciona un archivo para iniciar."}
+                {uploadStatus === "uploading" && "Estamos subiendo tu modelo 3D."}
+                {uploadStatus === "pricing" && "Archivo cargado. Laminando."}
+                {uploadStatus === "ready" &&
+                  "Listo. Ya puedes revisar y seguir avanzando."}
+                {uploadStatus === "error" &&
+                  "La cotizacion se detuvo. Intenta nuevamente."}
+              </p>
+              {fileName && (
+                <p className={`${cotizaTextBoldFont.className} mt-2 text-xs uppercase text-white/85`}>
+                  {fileName} {fileSizeLabel && `- ${fileSizeLabel}`}
+                </p>
+              )}
+              {uploadError && (
+                <p className={`${cotizaTextRegularFont.className} mt-2 text-xs text-[#ff8d8d]`}>
+                  {uploadError}
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -351,5 +366,3 @@ const Paso2 = ({
 };
 
 export default Paso2;
-
-
