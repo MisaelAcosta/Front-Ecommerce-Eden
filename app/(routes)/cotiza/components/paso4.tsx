@@ -130,7 +130,9 @@ const Paso4 = ({
                   type="button"
                   onClick={() => onPostProcessChange(option.id)}
                   className={`group relative h-[545px] overflow-hidden rounded-md text-left transition-transform duration-300 hover:-translate-y-1 ${
-                    selected ? "ring-4 ring-black" : ""
+                    selected
+                      ? "ring-4 ring-[#67dd00] shadow-[0_0_0_6px_rgba(103,221,0,0.22)]"
+                      : ""
                   }`}
                 >
                   <Image
@@ -141,6 +143,13 @@ const Paso4 = ({
                   />
 
                   <div className="absolute inset-0 bg-black/20" />
+                  {selected && (
+                    <div
+                      className={`${cotizaTextBoldFont.className} absolute right-4 top-4 rounded-full bg-[#67dd00] px-3 py-2 text-[10px] uppercase tracking-[0.12em] text-black`}
+                    >
+                      Seleccionado
+                    </div>
+                  )}
 
                   <div className="absolute left-4 top-5 right-4 flex items-start 
                   justify-between">

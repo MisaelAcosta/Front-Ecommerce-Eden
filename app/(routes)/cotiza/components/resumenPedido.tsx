@@ -14,6 +14,7 @@ type ResumenPedidoProps = {
   qualityLabel: string;
   postProcessLabel: string;
   postProcessPrice: number;
+  modelPrice: number;
   totalPrice: number;
   printTimeSeconds: number | null;
   dimensions: {
@@ -57,6 +58,7 @@ const ResumenPedido = ({
   qualityLabel,
   postProcessLabel,
   postProcessPrice,
+  modelPrice,
   totalPrice,
   printTimeSeconds,
   dimensions,
@@ -80,6 +82,7 @@ const ResumenPedido = ({
           )} cm`
         : "Pendiente",
     ],
+    ["Modelo", modelPrice > 0 ? formatPrice(modelPrice) : "Pendiente"],
     ["Color", selectedColorLabel || "Pendiente"],
     ["Calidad", qualityLabel || "Pendiente"],
     ["Post procesado", postProcessPrice > 0 ? postProcessLabel : "No"],

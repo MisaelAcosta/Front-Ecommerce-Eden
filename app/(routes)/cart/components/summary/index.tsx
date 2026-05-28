@@ -6,6 +6,7 @@ import Step02Data from "./steps/step-02-data";
 import Step03Shipping from "./steps/step-03-shipping";
 import { useCart } from "@/hooks/use-cart";
 import { useCartWizard } from "@/hooks/use-cart-wizard";
+import type { PrintQuoteSnapshot } from "@/types/print-quote";
 
 type Step = 1 | 2 | 3;
 
@@ -28,6 +29,7 @@ type CartItem = {
     productName?: string | null;
     name?: string | null;
   } | null;
+  printQuote?: PrintQuoteSnapshot;
 };
 
 const Summary = () => {
@@ -40,7 +42,6 @@ const Summary = () => {
 
   const { items } = useCart();
   const { step02, step03 } = useCartWizard();
-  const hasPrintQuote = items.some((item) => item.kind === "print-quote");
 
   const cartItems = items as CartItem[];
 
@@ -63,14 +64,6 @@ const Summary = () => {
 
     if (cartItems.length === 0) {
       setPayError("Tu carrito está vacío.");
-      return;
-    }
-
-    // Mientras no exista orderImprimir en Strapi, frenamos el pago de esta línea especial.
-    if (hasPrintQuote) {
-      setPayError(
-        "La línea de impresión 3D ya llega bien al carrito, pero su checkout final con Strapi/Flow sigue pendiente de configuración."
-      );
       return;
     }
 
@@ -123,6 +116,7 @@ const Summary = () => {
             productName:
               item.productName ?? item.product?.productName ?? item.product?.name ?? null,
             imageUrl: item.imageUrl ?? null,
+            printQuote: item.printQuote ?? null,
           })),
           step02: {
             name,

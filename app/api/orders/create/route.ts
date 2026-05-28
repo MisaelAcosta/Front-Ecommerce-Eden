@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { strapiAdminFetch } from "@/lib/strapi-admin";
+import type { PrintQuoteSnapshot } from "@/types/print-quote";
 
 type CreateOrderBody = {
   items: Array<{
@@ -12,6 +13,7 @@ type CreateOrderBody = {
     variantName?: string | null;
     productName?: string | null;
     imageUrl?: string | null;
+    printQuote?: PrintQuoteSnapshot | null;
   }>;
   step02: {
     name: string;
@@ -52,6 +54,11 @@ type CreatedOrderItemData = {
   documentId?: string;
 };
 
+type CreatedOrderImprimeData = {
+  id: number;
+  documentId?: string;
+};
+
 type OrderPayload = {
   data: {
     orderName: string;
@@ -80,7 +87,7 @@ type OrderItemPayload = {
   data: {
     orderItemName: string;
     order: string;
-    variant: number;
+    variant?: number;
     qty: number;
     unitPrice: number;
     lineTotal: number;
@@ -91,8 +98,65 @@ type OrderItemPayload = {
   };
 };
 
+type OrderImprimePayload = {
+  data: {
+    orderImprimeNumber: string;
+    order: string;
+    order_item: string | number;
+    fileName: string;
+    fileId: string;
+    quoteId: string;
+    printerId: string;
+    filamentId: string;
+    material: string;
+    color: string;
+    colorMode: string;
+    quality: string;
+    qualityLabel: string;
+    scalePercent: number;
+    widthCm: number | null;
+    heightCm: number | null;
+    depthCm: number | null;
+    printTimeSeconds: number | null;
+    weightGrams: number | null;
+    rawPrintCost: number;
+    filamentCost: number | null;
+    electricityCost: number | null;
+    electricityCostPerKwh: number | null;
+    printerPowerWatts: number | null;
+    markupMultiplier: number;
+    profit: number;
+    modelPrice: number;
+    postProcess: string;
+    postProcessLabel: string;
+    postProcessPrice: number;
+    postProcessReferenceLink: string;
+    amsReferenceLink: string;
+    total: number;
+    fitsPrinter: boolean | null;
+    notes: string[];
+    status: string;
+  };
+};
+
 function nowCommerceOrder() {
   return `EDEN-${Date.now()}`;
+}
+
+function getMarkupMultiplier(rawPrintCost: number) {
+  if (rawPrintCost <= 3000) {
+    return 4;
+  }
+
+  return 3;
+}
+
+function cmFromMm(value: number | null | undefined) {
+  if (!Number.isFinite(value)) {
+    return null;
+  }
+
+  return Number((Number(value) / 10).toFixed(2));
 }
 
 async function getCustomerIdFromJwtCookie(): Promise<number | null> {
@@ -209,6 +273,7 @@ export async function POST(req: Request) {
       const lineTotal = Math.round(unitPrice * qty);
 
       const variantName = (it.variantName ?? "").trim();
+      const variantId = Number(it.variantId);
 
       const friendlyOrderItemName = variantName
         ? `${variantName} x${qty}`
@@ -218,7 +283,6 @@ export async function POST(req: Request) {
         data: {
           orderItemName: friendlyOrderItemName,
           order: orderDocumentId,
-          variant: Number(it.variantId),
           qty,
           unitPrice,
           lineTotal,
@@ -228,6 +292,10 @@ export async function POST(req: Request) {
           imageUrlSnapshot: it.imageUrl ?? "",
         },
       };
+
+      if (Number.isFinite(variantId) && variantId > 0) {
+        itemPayload.data.variant = variantId;
+      }
 
       console.log(
         `ORDER ITEM PAYLOAD [${i}]`,
@@ -253,6 +321,79 @@ export async function POST(req: Request) {
       }
 
       createdItemIds.push(createdItemId);
+
+      if (it.printQuote) {
+        const printQuote = it.printQuote;
+        const orderItemRelation = createdItem?.data?.documentId ?? createdItemId;
+        const rawPrintCost = Math.round(Number(printQuote.basePrice || 0));
+        const modelPrice = Math.round(Number(printQuote.modelPrice || 0));
+        const total = Math.round(Number(printQuote.totalPrice || unitPrice));
+        const profit = Math.max(0, modelPrice - rawPrintCost);
+        const markupMultiplier = getMarkupMultiplier(rawPrintCost);
+
+        const orderImprimePayload: OrderImprimePayload = {
+          data: {
+            orderImprimeNumber: `${commerceOrder}-IMP-${i + 1}`,
+            order: orderDocumentId,
+            order_item: orderItemRelation,
+            fileName: printQuote.fileName,
+            fileId: printQuote.fileId,
+            quoteId: printQuote.quoteId ?? "",
+            printerId: printQuote.printerId ?? "",
+            filamentId: printQuote.filamentId ?? "",
+            material: printQuote.materialLabel,
+            color: printQuote.selectedColor,
+            colorMode: printQuote.colorMode,
+            quality: printQuote.quality,
+            qualityLabel: printQuote.qualityLabel,
+            scalePercent: printQuote.scalePercent,
+            widthCm: cmFromMm(printQuote.dimensions?.x),
+            heightCm: cmFromMm(printQuote.dimensions?.y),
+            depthCm: cmFromMm(printQuote.dimensions?.z),
+            printTimeSeconds: printQuote.printTimeSeconds,
+            weightGrams: printQuote.estimatedWeightGrams,
+            rawPrintCost,
+            filamentCost: printQuote.filamentCost,
+            electricityCost: printQuote.electricityCost,
+            electricityCostPerKwh: printQuote.electricityCostPerKwh,
+            printerPowerWatts: printQuote.printerPowerWatts,
+            markupMultiplier,
+            profit,
+            modelPrice,
+            postProcess: printQuote.postProcess,
+            postProcessLabel: printQuote.postProcessLabel,
+            postProcessPrice: printQuote.postProcessPrice,
+            postProcessReferenceLink:
+              printQuote.postProcessReferenceLink ?? "",
+            amsReferenceLink: printQuote.referenceLink ?? "",
+            total,
+            fitsPrinter: printQuote.fitsPrinter,
+            notes: printQuote.notes,
+            status: "quoted",
+          },
+        };
+
+        console.log(
+          `ORDER IMPRIME PAYLOAD [${i}]`,
+          JSON.stringify(orderImprimePayload, null, 2)
+        );
+
+        const createdOrderImprime = await strapiAdminFetch<
+          StrapiSingleResponse<CreatedOrderImprimeData>
+        >("/api/order-imprimes", {
+          method: "POST",
+          body: JSON.stringify(orderImprimePayload),
+        });
+
+        console.log(
+          `ORDER IMPRIME CREATED [${i}]`,
+          JSON.stringify(createdOrderImprime, null, 2)
+        );
+
+        if (!createdOrderImprime?.data?.id) {
+          throw new Error(`No se pudo crear OrderImprime en indice ${i}`);
+        }
+      }
     }
 
     console.log("ORDER ITEM IDS", createdItemIds);

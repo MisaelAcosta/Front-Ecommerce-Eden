@@ -28,6 +28,7 @@ export type PrintQuoteSnapshot = {
   postProcessPrice: number;
   scalePercent: number;
   basePrice: number;
+  modelPrice: number;
   filamentCost: number | null;
   electricityCost: number | null;
   electricityCostPerKwh: number | null;

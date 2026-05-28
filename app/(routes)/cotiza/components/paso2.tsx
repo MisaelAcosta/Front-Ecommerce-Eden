@@ -142,9 +142,9 @@ const Paso2 = ({
           <p
             className={`${cotizaTextRegularFont.className} mt-10 max-w-lg text-sm leading-6 text-black/70 sm:text-base lg:mt-15`}
           >
-            Sube tu STL y dejamos que CloudSlicer haga la laminacion. El
-            sistema primero carga el archivo y luego consulta el precio sobre la
-            configuracion de impresion que tengas definida.
+            Sube tu modelo 3D, revisa la vista previa y ajusta su tamano antes
+            de recalcular. Las medidas se muestran en centimetros como ancho x
+            alto x profundidad.
           </p>
 
           <div
@@ -154,7 +154,7 @@ const Paso2 = ({
             <span className="font-semibold">.3mf</span> y{" "}
             <span className="font-semibold">.obj</span>.
             <br />
-            El cambio de escala automatico se aplica a .stl y .obj.
+            
           </div>
         </div>
 
@@ -278,7 +278,7 @@ const Paso2 = ({
                   </p>
                   {displayDimensions && (
                     <p className={`${cotizaTextRegularFont.className} text-xs uppercase text-white/55`}>
-                      Medidas: {formatCm(displayDimensions.x)} x{" "}
+                      Medidas (ancho x alto x prof.): {formatCm(displayDimensions.x)} x{" "}
                       {formatCm(displayDimensions.y)} x{" "}
                       {formatCm(displayDimensions.z)} cm
                     </p>

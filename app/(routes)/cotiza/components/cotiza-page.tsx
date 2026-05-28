@@ -53,6 +53,8 @@ const COLOR_OPTIONS = [
   { id: "blanco", label: "Blanco", hex: "#f6f6f6" },
   { id: "gris", label: "Gris", hex: "#909090" },
   { id: "naranjo", label: "Naranjo", hex: "#ff6900" },
+  { id: "rojo", label: "Rojo", hex: "#ef233c" },
+  { id: "rosado", label: "Rosado", hex: "#ff6fb1" },
   { id: "amarillo", label: "Amarillo", hex: "#facc15" },
   { id: "verde", label: "Verde", hex: "#22c55e" },
   { id: "azul", label: "Azul", hex: "#2563eb" },
@@ -108,6 +110,26 @@ function clampScalePercent(value: number) {
   }
 
   return Math.min(MAX_SCALE_PERCENT, Math.max(MIN_SCALE_PERCENT, value));
+}
+
+function getModelMarkupMultiplier(rawPrintCost: number) {
+  if (rawPrintCost <= 3000) {
+    return 4;
+  }
+
+  if (rawPrintCost <= 10000) {
+    return 3;
+  }
+
+  return 3;
+}
+
+function getModelPrice(rawPrintCost: number) {
+  if (!Number.isFinite(rawPrintCost) || rawPrintCost <= 0) {
+    return 0;
+  }
+
+  return Math.round(rawPrintCost * getModelMarkupMultiplier(rawPrintCost));
 }
 
 function scaleAsciiStl(text: string, scale: number) {
@@ -235,7 +257,8 @@ export default function CotizaPage() {
   );
 
   const postProcessPrice = POST_PROCESS_PRICES[postProcess];
-  const totalPrice = (quote?.basePrice ?? 0) + postProcessPrice;
+  const modelPrice = quote ? getModelPrice(quote.basePrice) : 0;
+  const totalPrice = modelPrice + postProcessPrice;
   const attachedLinksCount = [referenceLink, postProcessReferenceLink].filter(
     (link) => link.trim().length > 0
   ).length;
@@ -429,6 +452,7 @@ export default function CotizaPage() {
           postProcessPrice,
           scalePercent,
           basePrice: quote.basePrice,
+          modelPrice,
           filamentCost: quote.filamentCost,
           electricityCost: quote.electricityCost,
           electricityCostPerKwh: quote.electricityCostPerKwh,
@@ -510,6 +534,7 @@ export default function CotizaPage() {
             qualityLabel={QUALITY_LABELS[quality]}
             postProcessLabel={POST_PROCESS_LABELS[postProcess]}
             postProcessPrice={postProcessPrice}
+            modelPrice={modelPrice}
             totalPrice={totalPrice}
             printTimeSeconds={quote?.printTimeSeconds ?? null}
             dimensions={quote?.dimensions ?? null}
