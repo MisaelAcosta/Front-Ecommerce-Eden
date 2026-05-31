@@ -112,7 +112,6 @@ type OrderImprimePayload = {
     color: string;
     colorMode: string;
     quality: string;
-    qualityLabel: string;
     scalePercent: number;
     widthCm: number | null;
     heightCm: number | null;
@@ -122,10 +121,7 @@ type OrderImprimePayload = {
     rawPrintCost: number;
     filamentCost: number | null;
     electricityCost: number | null;
-    electricityCostPerKwh: number | null;
-    printerPowerWatts: number | null;
     markupMultiplier: number;
-    profit: number;
     modelPrice: number;
     postProcess: string;
     postProcessLabel: string;
@@ -328,7 +324,6 @@ export async function POST(req: Request) {
         const rawPrintCost = Math.round(Number(printQuote.basePrice || 0));
         const modelPrice = Math.round(Number(printQuote.modelPrice || 0));
         const total = Math.round(Number(printQuote.totalPrice || unitPrice));
-        const profit = Math.max(0, modelPrice - rawPrintCost);
         const markupMultiplier = getMarkupMultiplier(rawPrintCost);
 
         const orderImprimePayload: OrderImprimePayload = {
@@ -345,7 +340,6 @@ export async function POST(req: Request) {
             color: printQuote.selectedColor,
             colorMode: printQuote.colorMode,
             quality: printQuote.quality,
-            qualityLabel: printQuote.qualityLabel,
             scalePercent: printQuote.scalePercent,
             widthCm: cmFromMm(printQuote.dimensions?.x),
             heightCm: cmFromMm(printQuote.dimensions?.y),
@@ -355,10 +349,7 @@ export async function POST(req: Request) {
             rawPrintCost,
             filamentCost: printQuote.filamentCost,
             electricityCost: printQuote.electricityCost,
-            electricityCostPerKwh: printQuote.electricityCostPerKwh,
-            printerPowerWatts: printQuote.printerPowerWatts,
             markupMultiplier,
-            profit,
             modelPrice,
             postProcess: printQuote.postProcess,
             postProcessLabel: printQuote.postProcessLabel,

@@ -80,10 +80,11 @@ export async function POST(req: Request) {
       const orderDocumentId = orderSearch?.data?.[0]?.documentId;
 
       if (orderDocumentId) {
+        const isPaid = isPaidStatus(flowJson?.status);
         const payload = {
           data: {
-            statusOrder: isPaidStatus(flowJson?.status) ? "PAID" : "PENDING_PAYMENT",
-            paidAt: isPaidStatus(flowJson?.status) ? new Date().toISOString() : null,
+            statusOrder: isPaid ? "PAID" : "PENDING_PAYMENT",
+            paidAt: isPaid ? new Date().toISOString() : null,
           },
         };
 
@@ -91,6 +92,17 @@ export async function POST(req: Request) {
           method: "PUT",
           body: JSON.stringify(payload),
         });
+
+        if (isPaid) {
+          try {
+            await strapiAdminFetch(
+              `/api/orders/${orderDocumentId}/send-sale-email`,
+              { method: "POST" }
+            );
+          } catch (emailError) {
+            console.error("Sale email notification error:", emailError);
+          }
+        }
       }
     }
 

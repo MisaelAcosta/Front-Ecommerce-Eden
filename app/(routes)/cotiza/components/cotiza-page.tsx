@@ -430,7 +430,7 @@ export default function CotizaPage() {
         productSlug: "cotiza",
         variantId: -1,
         variantName: `Imprime - ${quote.fileName ?? fileName}`,
-        imageUrl: "/servicios/servicio1.png",
+        imageUrl: "/cotiza/miniatura.png",
         sku: null,
         unitPrice: totalPrice,
         qty: 1,

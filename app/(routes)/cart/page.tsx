@@ -35,7 +35,7 @@ export default function Page() {
           )}
         </div>
 
-        {/* RIGHT: Summary sticky */}
+        {/* RIGHT: Summary checkout steps */}
         <div className="lg:sticky lg:top-24">
           <Summary />
         </div>

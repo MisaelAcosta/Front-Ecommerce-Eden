@@ -6,6 +6,7 @@ import { Heart, ShoppingBag, Smile } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { LoginDialog } from "@/components/auth/login-dialog";
+import { CartSummaryPanel } from "@/app/(routes)/cart/components/cart-summary-panel";
 import ItemsMenuMobile from "@/components/navbar/items-menu-mobile";
 import MenuList from "@/components/navbar/menu-list";
 import { ProfileSheet } from "@/components/profile/profile-sheet";
@@ -97,7 +98,6 @@ const Navbar = () => {
   // ===== # Navbar | Navegacion reutilizable =====
   const handleGoHome = () => navigateWithTransition("/");
   const handleGoLoved = () => navigateWithTransition("/loved-product");
-  const handleGoCart = () => navigateWithTransition("/cart");
 
   // ===== # Navbar | Helpers de acciones =====
   // Triggers reutilizables para no duplicar la misma logica de sesion.
@@ -156,34 +156,35 @@ const Navbar = () => {
   const hasItems = cart.items.length > 0;
 
   return (
-    <button
-      type="button"
-      aria-label="Ir al carrito"
-      className="
-        inline-flex
-        h-8
-        min-w-8
-        cursor-pointer
-        items-center
-        justify-center
-        gap-1.5
-        rounded-full
-        px-1
-        leading-none
-      "
-      onClick={handleGoCart}
-    >
-      <ShoppingBag
-        strokeWidth={1.5}
-        className={cn(iconClassName, "shrink-0 translate-y-[0.5px]")}
-      />
+    <CartSummaryPanel>
+      <button
+        type="button"
+        aria-label="Ver resumen del carrito"
+        className="
+          inline-flex
+          h-8
+          min-w-8
+          cursor-pointer
+          items-center
+          justify-center
+          gap-1.5
+          rounded-full
+          px-1
+          leading-none
+        "
+      >
+        <ShoppingBag
+          strokeWidth={1.5}
+          className={cn(iconClassName, "shrink-0 translate-y-[0.5px]")}
+        />
 
-      {hasItems && (
-        <span className={cn(countClassName, "leading-none tabular-nums")}>
-          {cart.items.length}
-        </span>
-      )}
-    </button>
+        {hasItems && (
+          <span className={cn(countClassName, "leading-none tabular-nums")}>
+            {cart.items.length}
+          </span>
+        )}
+      </button>
+    </CartSummaryPanel>
   );
 };
 

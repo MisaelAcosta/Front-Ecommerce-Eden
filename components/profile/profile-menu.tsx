@@ -18,9 +18,9 @@ export function ProfileMenu({ onChangeView, onLogout }: ProfileMenuProps) {
           className="flex w-full items-center justify-between px-6 py-8 text-left"
         >
           <div>
-            <h2 className="text-3xl font-black tracking-tight">COMPRAS</h2>
+            <h2 className="text-3xl font-black tracking-tight">PEDIDOS</h2>
             <p className="mt-2 max-w-xs text-xs text-neutral-600">
-              Revisa el historial completo de tus pedidos y su estado en un solo lugar.
+              Revisa tus pedidos recientes y el resumen de cada compra.
             </p>
           </div>
           <ChevronRight className="h-5 w-5" />

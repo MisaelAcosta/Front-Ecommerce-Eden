@@ -16,6 +16,20 @@ interface CartItemProps {
   item: CartLine;
 }
 
+function formatCm(mm: number) {
+  return (mm / 10).toFixed(1);
+}
+
+function getPrintQuoteDimensionsLabel(item: CartLine) {
+  if (item.kind !== "print-quote" || !item.printQuote.dimensions) {
+    return "Medidas pendientes";
+  }
+
+  const { x, y, z } = item.printQuote.dimensions;
+
+  return `${formatCm(x)} x ${formatCm(y)} x ${formatCm(z)} cm`;
+}
+
 const CartItem = ({ item }: CartItemProps) => {
   const { navigateWithTransition } = useNavigationTransition();
   const { removeItem, incQty, decQty } = useCart();
@@ -51,7 +65,7 @@ const CartItem = ({ item }: CartItemProps) => {
               <p
                 className={`${khInterferenceLightFont.className} text-xs text-muted-foreground`}
               >
-                Cotización 3D lista para checkout.
+                {getPrintQuoteDimensionsLabel(item)}
               </p>
               <p
                 className={`${khInterferenceLightFont.className} text-xs text-muted-foreground`}
