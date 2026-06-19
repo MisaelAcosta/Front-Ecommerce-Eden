@@ -248,7 +248,7 @@ function NewProductCard({
   return (
     <CarouselItem
       key={id}
-      className="basis-[85%] sm:basis-1/2 lg:basis-1/4 px-3 md:px-4"
+      className="basis-[85%] sm:basis-1/2 lg:basis-1/4 px-2 md:px-4"
     >
       <Card
         className="

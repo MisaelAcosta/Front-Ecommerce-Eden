@@ -41,10 +41,10 @@ const TRANSITION_CONFIG = {
     columns: 18,
   },
   mobile: {
-    rows: 14,
-    columns: 6,
+    rows: 10,
+    columns: 5,
   },
-  pixelColor: "#000000",
+  pixelColor: "#C0FF01",
   exitCellDuration: 0.16,
   enterCellDuration: 0.16,
   staggerEach: 0.035,

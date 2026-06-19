@@ -241,7 +241,7 @@ function TempProductCard({
         type="button"
         className="
           relative block w-full overflow-hidden bg-neutral-100
-          aspect-[1.08/1] cursor-pointer text-left
+          lg:aspect-[1.08/1]  aspect-[1.08/1.20] cursor-pointer text-left
         "
         onClick={() => onOpenProduct(productSlug)}
         aria-label={`Ver ${displayName}`}
@@ -264,7 +264,8 @@ function TempProductCard({
             fill
             sizes="(min-width: 768px) 50vw, 100vw"
             unoptimized
-            className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+            className="object-cover transition-transform 
+            duration-300 ease-out group-hover:scale-[1.02]"
           />
         ) : (
           <span className="flex h-full items-center justify-center text-sm text-muted-foreground">
@@ -333,7 +334,7 @@ const TempProducts = () => {
   };
 
   return (
-    <section className="mx-auto max-w-[1350px] px-6 py-8 sm:px-8 sm:py-14 lg:px-0">
+    <section className="mx-auto max-w-[1350px]  px-3 py-8 sm:px-8 sm:py-14 lg:px-0">
       <div>
         <motion.h3
           variants={fadeUp}
@@ -368,7 +369,7 @@ const TempProducts = () => {
         {loading && <SkeletonSchema grid={2} />}
 
         {!loading && (
-          <div className="grid gap-1 md:grid-cols-2">
+          <div className="grid gap-8 lg:gap-1 md:grid-cols-2">
             {tempProducts.map((product) => (
               <TempProductCard
                 key={product.id}
