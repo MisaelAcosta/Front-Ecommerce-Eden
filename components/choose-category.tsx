@@ -1,26 +1,21 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import localFont from "next/font/local";
-import { useGetCategories } from "@/api/getProducts";
-import type { ResponseType } from "@/types/response";
-import type { CategoryType } from "@/types/category";
 import { AnimatePresence, motion } from "motion/react";
+import { useGetCategories } from "@/api/useGetCategories";
+import type { CategoryType } from "@/types/category";
+import { toAbsUrl } from "@/lib/media";
 import { fadeUp } from "@/lib/fade-up";
-import { khInterferenceLightFont } from "@/app/(routes)/cart/components/cart-fonts";
+import {
+  khInterferenceLightFont,
+  khInterferenceRegularFont,
+} from "@/app/(routes)/cart/components/cart-fonts";
 
-// Tipografias locales de la seccion categorias.
 const maratypeFont = localFont({
   src: "./fonts/Maratype.otf",
-  display: "swap",
-});
-
-const khInterferenceRegularFont = localFont({
-  src: "./fonts/KHInterferenceTRIAL-Regular.otf",
-  weight: "400",
-  style: "normal",
   display: "swap",
 });
 
@@ -32,27 +27,20 @@ type CategoryVisualConfig = {
   fallbackSlug: string;
   matches: string[];
   description: string;
-  images: {
-    primary: string;
-    secondary: string;
-    bottom: string;
-  };
+  fallbackImages: string[];
 };
 
 type CategoryCardData = {
   key: CategoryKey;
   label: string;
-  slug: string;
   href: string;
   description: string;
-  images: {
-    primary: string;
-    secondary: string;
-    bottom: string;
-  };
+  images: Array<{
+    src: string;
+    alt: string;
+  }>;
 };
 
-// Rutas locales faciles de reemplazar cuando quieras cambiar las imagenes.
 const CATEGORY_VISUALS: CategoryVisualConfig[] = [
   {
     key: "libros",
@@ -60,12 +48,8 @@ const CATEGORY_VISUALS: CategoryVisualConfig[] = [
     fallbackSlug: "libros",
     matches: ["libros", "libro"],
     description:
-      "Encuentra una amplia variedad de productos para tus libros, desde separadores hasta accesorios.",
-    images: {
-      primary: "/01.jpg",
-      secondary: "/03.png",
-      bottom: "/02.jpg",
-    },
+      "Encuentra una amplia variedad de productos para tus libros, desde separadores hasta accesorios. Descubre articulos de tus series favoritas.",
+    fallbackImages: ["/01.jpg", "/03.png", "/02.jpg"],
   },
   {
     key: "soporte",
@@ -74,11 +58,7 @@ const CATEGORY_VISUALS: CategoryVisualConfig[] = [
     matches: ["soporte", "soportes"],
     description:
       "Descubre soportes y accesorios funcionales para organizar, exhibir y aprovechar mejor tus espacios.",
-    images: {
-      primary: "/soporte.png",
-      secondary: "/dispensador.png",
-      bottom: "/imagen2.png",
-    },
+    fallbackImages: ["/soporte.png", "/dispensador.png", "/imagen2.png"],
   },
   {
     key: "geek",
@@ -87,11 +67,7 @@ const CATEGORY_VISUALS: CategoryVisualConfig[] = [
     matches: ["geek"],
     description:
       "Descubre articulos de tus series favoritas con piezas decorativas, figuras y detalles para coleccionar.",
-    images: {
-      primary: "/ss.jfif",
-      secondary: "/culst.png",
-      bottom: "/545864729_781082927834530_93935471925152915_n.webp",
-    },
+    fallbackImages: ["/ss.jfif", "/culst.png", "/545864729_781082927834530_93935471925152915_n.webp"],
   },
 ];
 
@@ -106,7 +82,7 @@ const categorySwapVariants = {
     y: 0,
     filter: "blur(0px)",
     transition: {
-      duration: 0.72,
+      duration: 0.55,
       ease: [0.22, 1, 0.36, 1] as const,
     },
   },
@@ -115,13 +91,12 @@ const categorySwapVariants = {
     y: -4,
     filter: "blur(4px)",
     transition: {
-      duration: 0.62,
+      duration: 0.35,
       ease: [0.42, 0, 0.58, 1] as const,
     },
   },
 };
 
-// Normaliza textos para comparar nombres y slugs sin depender de acentos.
 function normalizeText(value: string | null | undefined) {
   return (value ?? "")
     .normalize("NFD")
@@ -130,7 +105,6 @@ function normalizeText(value: string | null | undefined) {
     .toLowerCase();
 }
 
-// Busca la categoria real en Strapi para conservar el slug correcto del catalogo.
 function findCategoryByConfig(
   config: CategoryVisualConfig,
   categories: CategoryType[]
@@ -141,6 +115,7 @@ function findCategoryByConfig(
 
     return config.matches.some((match) => {
       const normalizedMatch = normalizeText(match);
+
       return (
         normalizedName.includes(normalizedMatch) ||
         normalizedSlug.includes(normalizedMatch)
@@ -149,7 +124,40 @@ function findCategoryByConfig(
   });
 }
 
-// Convierte la configuracion visual en los datos finales que usa la interfaz.
+function getCategoryImages(
+  config: CategoryVisualConfig,
+  category?: CategoryType
+): CategoryCardData["images"] {
+  const strapiImages =
+    category?.mainImages
+      ?.map((image) => {
+        const src = toAbsUrl(image.url);
+        if (!src) return null;
+
+        return {
+          src,
+          alt: image.alternativeText || `${category.categoryName} categoria`,
+        };
+      })
+      .filter(Boolean) ?? [];
+
+  const images = strapiImages.length
+    ? (strapiImages as CategoryCardData["images"])
+    : config.fallbackImages.map((src) => ({
+        src,
+        alt: `${config.label} categoria`,
+      }));
+
+  while (images.length < 3) {
+    images.push(images[images.length - 1] ?? {
+      src: config.fallbackImages[0],
+      alt: `${config.label} categoria`,
+    });
+  }
+
+  return images;
+}
+
 function buildCategoryCards(categories: CategoryType[]): CategoryCardData[] {
   return CATEGORY_VISUALS.map((config) => {
     const matchedCategory = findCategoryByConfig(config, categories);
@@ -158,15 +166,13 @@ function buildCategoryCards(categories: CategoryType[]): CategoryCardData[] {
     return {
       key: config.key,
       label: config.label,
-      slug,
       href: `/category/${slug}`,
-      description: config.description,
-      images: config.images,
+      description: matchedCategory?.description || config.description,
+      images: getCategoryImages(config, matchedCategory),
     };
   });
 }
 
-// Boton de seleccion para cambiar la categoria activa.
 function CategoryTab({
   label,
   isActive,
@@ -180,10 +186,8 @@ function CategoryTab({
     <button
       type="button"
       onClick={onClick}
-      className={`${khInterferenceRegularFont.className} rounded-xl px-5 py-3 text-base leading-none transition-colors duration-200 ${
-        isActive
-          ? "bg-black text-white"
-          : "bg-[#efefef] text-black hover:bg-[#e4e4e4]"
+      className={`${khInterferenceRegularFont.className} h-[22px] min-w-[56px] bg-[#e7e7e7] px-3 text-[10px] uppercase leading-[22px] text-black transition-colors hover:bg-[#dcdcdc] md:h-[30px] md:min-w-[74px] md:px-4 md:text-[12px] md:leading-[30px] ${
+        isActive ? "bg-black text-white hover:bg-black" : ""
       }`}
     >
       {label}
@@ -191,7 +195,6 @@ function CategoryTab({
   );
 }
 
-// Tarjeta visual para cada imagen del mosaico.
 function CategoryImageTile({
   src,
   alt,
@@ -204,247 +207,214 @@ function CategoryImageTile({
   priority?: boolean;
 }) {
   return (
-    <div className={`relative overflow-hidden rounded-[14px] ${className}`}>
+    <div className={`relative overflow-hidden bg-zinc-100 ${className}`}>
       <Image
         src={src}
         alt={alt}
         fill
         priority={priority}
-        sizes="(max-width: 640px) 100vw, 50vw"
+        sizes="(max-width: 768px) 100vw, 33vw"
         className="object-cover"
       />
     </div>
   );
 }
 
-const ChooseCategory = () => {
-  const { result, loading, error }: ResponseType = useGetCategories();
-  const categoryCards = useMemo(() => {
-    const categories = Array.isArray(result) ? (result as CategoryType[]) : [];
-    return buildCategoryCards(categories);
-  }, [result]);
-  const [activeCategoryKey, setActiveCategoryKey] = useState<CategoryKey>("libros");
+function CategoriesSkeleton() {
+  return (
+    <div className="mt-9 grid grid-cols-[1.45fr_1.35fr_0.9fr] gap-3">
+      {Array.from({ length: 3 }).map((_, index) => (
+        <div
+          key={index}
+          className="h-[clamp(285px,32vw,430px)] animate-pulse bg-zinc-200"
+        />
+      ))}
+    </div>
+  );
+}
 
-  // Mantiene una categoria visible aunque Strapi falle o aun no responda.
+const ChooseCategory = () => {
+  const { categories, loading, error } = useGetCategories();
+  const categoryCards = useMemo(
+    () => buildCategoryCards(categories),
+    [categories]
+  );
+  const [activeCategoryKey, setActiveCategoryKey] =
+    useState<CategoryKey>("libros");
+
   const activeCategory =
     categoryCards.find((category) => category.key === activeCategoryKey) ??
     categoryCards[0];
 
   return (
-    <section className="w-full bg-white py-8 sm:py-14">
-      <div className="mx-auto max-w-[1350px] px-4 sm:px-6 lg:px-0">
-        <motion.h3
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 1 }}
-          custom={0}
-          className={`${maratypeFont.className} mb-4 text-left 
-          text-4xl leading-none text-black sm:mb-8 sm:text-6xl`}
-        >
-          CATEGORIAS
-        </motion.h3>
-
+    <section className="mx-auto max-w-[1350px] bg-white px-4 py-10 sm:px-6 sm:py-14 lg:px-0">
+      <div className="w-full">
         {error && (
-          <p className="mb-5 text-sm text-red-600">
+          <p className="mb-4 text-xs text-red-600">
             Ocurrio un problema cargando las categorias.
           </p>
         )}
 
-        {loading && (
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="animate-pulse rounded-[14px] bg-zinc-200 h-[252px] sm:h-[380px]" />
-              <div className="animate-pulse rounded-[14px] bg-zinc-200 h-[252px] sm:h-[380px]" />
-              <div className="col-span-2 animate-pulse rounded-[14px] bg-zinc-200 h-[132px] sm:h-[255px]" />
-            </div>
-            <div className="space-y-4">
-              <div className="flex gap-3">
-                {Array.from({ length: 3 }).map((_, index) => (
-                  <div
-                    key={`tab-skeleton-${index}`}
-                    className="h-12 w-24 animate-pulse rounded-xl bg-zinc-200"
-                  />
-                ))}
-              </div>
-              <div className="h-28 animate-pulse rounded-[14px] bg-zinc-200" />
-              <div className="h-16 w-40 animate-pulse rounded-[14px] bg-zinc-200" />
-            </div>
-          </div>
-        )}
-
-        {!loading && activeCategory && (
-          <motion.div
+        <div className="hidden md:block">
+          <motion.h3
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 1 }}
-            custom={1}
+            viewport={{ once: true, amount: 0.85 }}
+            className={`${maratypeFont.className} text-[64px] leading-none text-black`}
           >
-            {/* Vista escritorio y tablet. */}
-            <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_320px] 
-            lg:items-start lg:gap-8">
+            CATEGORIAS
+          </motion.h3>
+
+          <div className="mt-5 flex gap-8">
+            <div className="w-[320px]">
+              <div className="flex gap-2">
+                {categoryCards.map((category) => (
+                  <CategoryTab
+                    key={category.key}
+                    label={category.label}
+                    isActive={category.key === activeCategory?.key}
+                    onClick={() => setActiveCategoryKey(category.key)}
+                  />
+                ))}
+              </div>
+
               <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={`desktop-images-${activeCategory.key}`}
-                  variants={categorySwapVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  className="grid grid-cols-[0.36fr_0.64fr] gap-3"
-                >
-                  <CategoryImageTile
-                    src={activeCategory.images.primary}
-                    alt={`${activeCategory.label} imagen principal`}
-                    className="h-[380px]"
-                    priority
-                  />
-                  <CategoryImageTile
-                    src={activeCategory.images.secondary}
-                    alt={`${activeCategory.label} imagen secundaria`}
-                    className="h-[380px]"
-                    priority
-                  />
-                  <CategoryImageTile
-                    src={activeCategory.images.bottom}
-                    alt={`${activeCategory.label} imagen inferior`}
-                    className="col-span-2 h-[520px]"
-                  />
-                </motion.div>
-              </AnimatePresence>
-
-              <div className="flex min-h-full flex-col items-center pt-0">
-                <div className="mb-14 flex w-full justify-center gap-3">
-                  {categoryCards.map((category) => (
-                    <CategoryTab
-                      key={category.key}
-                      label={category.label}
-                      isActive={category.key === activeCategory.key}
-                      onClick={() => setActiveCategoryKey(category.key)}
-                    />
-                  ))}
-                </div>
-
-                <AnimatePresence mode="wait" initial={false}>
-                  <motion.div
+                {activeCategory && (
+                  <motion.p
                     key={`desktop-copy-${activeCategory.key}`}
                     variants={categorySwapVariants}
                     initial="initial"
                     animate="animate"
                     exit="exit"
-                    className="flex w-full max-w-[280px] flex-col items-end"
-                  >
-                    <p
-                      className={`${khInterferenceLightFont.className} 
-                      max-w-[280px] 
-                      text-right text-[18px] sm:uppercase leading-[1.15]
-                      text-black`}
-                    >
-                      {activeCategory.description}
-                    </p>
-
-                    <Link
-                      href={activeCategory.href}
-                      className="mt-14 min-h-[86px] min-w-[156px] items-right 
-                      rounded-[10px] 
-                      bg-[#111111] px-5 pl-6 py-4 text-white 
-                      transition-transform 
-                      duration-200 hover:scale-[1.02]"
-                    >
-                      <span
-                        className={`${khInterferenceRegularFont.className} 
-                        text-left text-[17px] uppercase leading-[0.95]`}
-                      >
-                        VER
-                        <br />
-                        CATEGORIAS
-                      </span>
-                    </Link>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            </div>
-
-            {/* Vista movil. */}
-            <div className="lg:hidden">
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={`mobile-images-${activeCategory.key}`}
-                  variants={categorySwapVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  className="grid grid-cols-2 gap-3"
-                >
-                  <CategoryImageTile
-                    src={activeCategory.images.primary}
-                    alt={`${activeCategory.label} imagen principal`}
-                    className="h-[252px]"
-                    priority
-                  />
-                  <CategoryImageTile
-                    src={activeCategory.images.secondary}
-                    alt={`${activeCategory.label} imagen secundaria`}
-                    className="h-[252px]"
-                    priority
-                  />
-                  <CategoryImageTile
-                    src={activeCategory.images.bottom}
-                    alt={`${activeCategory.label} imagen inferior`}
-                    className="col-span-2 h-[132px]"
-                  />
-                </motion.div>
-              </AnimatePresence>
-
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={`mobile-copy-${activeCategory.key}`}
-                  variants={categorySwapVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  className="mt-6 flex items-end justify-between gap-4"
-                >
-                  <p
-                    className={`${khInterferenceRegularFont.className} max-w-[175px] 
-                    text-left text-[12px] tracking-widest 
-                    sm:text-right sm:leading-[1.05] text-black`}
+                    className={`${khInterferenceLightFont.className} mt-10 max-w-[260px] text-[15px] uppercase leading-[1.08] text-black/65`}
                   >
                     {activeCategory.description}
-                  </p>
-
-                  <Link
-                    href={activeCategory.href}
-                    className="inline-flex min-h-[82px] min-w-[118px] 
-                    items-start justify-between rounded-[10px] bg-[#d2ff00] 
-                    px-4 py-3 text-black transition-transform duration-200 
-                    hover:scale-[1.02]"
-                  >
-                    <span
-                      className={`${khInterferenceRegularFont.className} text-left text-[16px] uppercase leading-[0.95]`}
-                    >
-                      VER
-                      <br />
-                      CATEGORIAS
-                    </span>
-                    <span className="text-lg leading-none">-&gt;</span>
-                  </Link>
-                </motion.div>
+                  </motion.p>
+                )}
               </AnimatePresence>
+            </div>
 
-              <div className="mt-6 grid grid-cols-3 gap-3">
-                {categoryCards.map((category) => (
-                  <CategoryTab
-                    key={category.key}
-                    label={category.label}
-                    isActive={category.key === activeCategory.key}
-                    onClick={() => setActiveCategoryKey(category.key)}
+            {activeCategory && (
+              <div className="ml-auto flex items-end pb-1">
+                <Link
+                  href={activeCategory.href}
+                  className={`${khInterferenceRegularFont.className} flex h-[58px] w-[135px] items-center bg-[#b7ff00] px-6 text-[13px] uppercase leading-[1.05] text-black transition-transform hover:scale-[1.02]`}
+                >
+                  VER
+                  <br />
+                  CATEGORIAS
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {loading && <CategoriesSkeleton />}
+
+          {!loading && activeCategory && (
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={`desktop-images-${activeCategory.key}`}
+                variants={categorySwapVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="mt-9 grid grid-cols-[1.45fr_1.35fr_0.9fr] gap-3"
+              >
+                {activeCategory.images.slice(0, 3).map((image, index) => (
+                  <CategoryImageTile
+                    key={`${activeCategory.key}-${image.src}-${index}`}
+                    src={image.src}
+                    alt={image.alt}
+                    className="h-[clamp(285px,32vw,430px)]"
+                    priority={index === 0}
                   />
                 ))}
-              </div>
+              </motion.div>
+            </AnimatePresence>
+          )}
+        </div>
+
+        <div className="md:hidden">
+          <div className="flex items-start justify-between gap-4">
+            <motion.h3
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.85 }}
+              className={`${maratypeFont.className} text-[34px] leading-none text-black`}
+            >
+              CATEGORIAS
+            </motion.h3>
+
+            {activeCategory && (
+              <Link
+                href={activeCategory.href}
+                className={`${khInterferenceRegularFont.className} mt-0 flex h-[28px] w-[64px] items-center bg-[#b7ff00] px-2 text-[8px] uppercase leading-[0.95] text-black`}
+              >
+                VER
+                <br />
+                CATEGORIAS
+              </Link>
+            )}
+          </div>
+
+          <div className="mt-4 flex gap-2">
+            {categoryCards.map((category) => (
+              <CategoryTab
+                key={category.key}
+                label={category.label}
+                isActive={category.key === activeCategory?.key}
+                onClick={() => setActiveCategoryKey(category.key)}
+              />
+            ))}
+          </div>
+
+          <AnimatePresence mode="wait" initial={false}>
+            {activeCategory && (
+              <motion.p
+                key={`mobile-copy-${activeCategory.key}`}
+                variants={categorySwapVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className={`${khInterferenceLightFont.className} mt-5 max-w-[190px] text-[8px] uppercase leading-[1.1] text-black/65`}
+              >
+                {activeCategory.description}
+              </motion.p>
+            )}
+          </AnimatePresence>
+
+          {loading && (
+            <div className="mt-3 space-y-1">
+              <div className="h-[107px] animate-pulse bg-zinc-200" />
+              <div className="h-[180px] animate-pulse bg-zinc-200" />
             </div>
-          </motion.div>
-        )}
+          )}
+
+          {!loading && activeCategory && (
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={`mobile-images-${activeCategory.key}`}
+                variants={categorySwapVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="mt-3 space-y-1"
+              >
+                {activeCategory.images.slice(0, 2).map((image, index) => (
+                  <CategoryImageTile
+                    key={`${activeCategory.key}-${image.src}-${index}`}
+                    src={image.src}
+                    alt={image.alt}
+                    className={index === 0 ? "h-[107px]" : "h-[180px]"}
+                    priority={index === 0}
+                  />
+                ))}
+              </motion.div>
+            </AnimatePresence>
+          )}
+        </div>
       </div>
     </section>
   );

@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import HeaderCotiza from "./headerCotiza";
 import Paso1 from "./paso1";
 import Paso2 from "./paso2";
 import Paso3 from "./paso3";
 import Paso4 from "./paso4";
 import ResumenPedido from "./resumenPedido";
+import { LoginDialog } from "@/components/auth/login-dialog";
 import ScrollReveal from "@/components/animation_page/scroll-reveal";
 import SmoothScroll from "@/components/animation_page/smooth-scroll";
 import { useCart } from "@/hooks/use-cart";
@@ -222,6 +223,7 @@ export default function CotizaPage() {
   const { navigateWithTransition } = useNavigationTransition();
   const { addItem } = useCart();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const loginDialogTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   const [uploadStatus, setUploadStatus] = useState<UploadStatus>("idle");
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -242,6 +244,42 @@ export default function CotizaPage() {
   const [quality, setQuality] = useState<PrintQuality>("standard");
   const [postProcess, setPostProcess] = useState<PrintPostProcess>("none");
   const [addingToCart, setAddingToCart] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [showAuthNotice, setShowAuthNotice] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadAuthState() {
+      try {
+        const res = await fetch("/api/auth/me", {
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
+        });
+
+        if (!mounted) return;
+
+        if (!res.ok) {
+          setIsAuthenticated(false);
+          return;
+        }
+
+        const data = await res.json();
+        setIsAuthenticated(Boolean(data?.user));
+      } catch {
+        if (mounted) {
+          setIsAuthenticated(false);
+        }
+      }
+    }
+
+    loadAuthState();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const handleColorChange = (value: string) => {
     if (COLOR_OPTIONS.some((option) => option.id === value)) {
@@ -270,7 +308,17 @@ export default function CotizaPage() {
     quote.fitsPrinter !== false;
 
   const openPicker = () => {
+    if (!isAuthenticated) {
+      setShowAuthNotice(true);
+      return;
+    }
+
     fileInputRef.current?.click();
+  };
+
+  const openLoginFromAuthNotice = () => {
+    setShowAuthNotice(false);
+    window.setTimeout(() => loginDialogTriggerRef.current?.click(), 0);
   };
 
   const uploadAndQuoteFile = async (file: File, scale: number) => {
@@ -390,6 +438,12 @@ export default function CotizaPage() {
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    if (!isAuthenticated) {
+      setShowAuthNotice(true);
+      event.target.value = "";
+      return;
+    }
+
     const file = event.target.files?.[0];
 
     if (!file) {
@@ -475,6 +529,62 @@ export default function CotizaPage() {
   return (
     <SmoothScroll>
       <main className="bg-[#ece9e1] text-black">
+        <LoginDialog>
+          <button
+            ref={loginDialogTriggerRef}
+            type="button"
+            className="hidden"
+            tabIndex={-1}
+            aria-hidden="true"
+          >
+            Abrir login
+          </button>
+        </LoginDialog>
+
+        {showAuthNotice && (
+          <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/65 px-4 backdrop-blur-sm">
+            <div className="relative w-full max-w-[430px] rounded-[18px] bg-[#111111] p-6 text-white shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
+              <button
+                type="button"
+                onClick={() => setShowAuthNotice(false)}
+                className="absolute right-4 top-4 text-white/55 transition-colors hover:text-white"
+                aria-label="Cerrar aviso"
+              >
+                x
+              </button>
+
+              <p className="text-xs uppercase tracking-[0.28em] text-white/45">
+                Cotizacion protegida
+              </p>
+              <h3 className="mt-4 text-2xl font-black uppercase leading-none">
+                Inicia sesion para subir tu modelo
+              </h3>
+              <p className="mt-4 text-sm leading-6 text-white/65">
+                Para usar la cotizacion 3D debes iniciar sesion o crear una
+                cuenta. Asi podremos guardar tu pedido y asociarlo correctamente
+                al checkout.
+              </p>
+
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={openLoginFromAuthNotice}
+                  className="w-full rounded-full bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-black transition-transform hover:scale-[1.02]"
+                >
+                  Iniciar sesion / registrarse
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAuthNotice(false)}
+                  className="w-full rounded-full border border-white/20 px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-white/70 transition-colors hover:border-white/55 hover:text-white"
+                >
+                  Volver
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <ScrollReveal>
           <HeaderCotiza />
         </ScrollReveal>
