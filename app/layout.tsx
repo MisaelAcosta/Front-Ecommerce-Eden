@@ -10,8 +10,11 @@ import Navbar from "@/components/navbar/navbar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "eden.",
-  description: "Compra productos 3D, figuras, soportes y mas en Eden 3D. Envios a todo Chile.",
+  title: "Eden 3D",
+  description: "Figuras, soportes y mas en Eden 3D. Envios a todo Chile.",
+  icons: {
+    icon: "/icons/favicon.png",
+  },
 };
 
 export default function RootLayout({
