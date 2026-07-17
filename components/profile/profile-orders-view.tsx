@@ -18,6 +18,7 @@ type ProfileOrder = {
   date: string | null;
   total: number;
   items: ProfileOrderItem[];
+  trackingNumber: string | null;
 };
 
 function formatOrderDate(value: string | null) {
@@ -155,6 +156,22 @@ export function ProfileOrdersView({ onBack }: ProfileOrdersViewProps) {
                     Fecha: {formatOrderDate(order.date)}
                   </p>
                   <OrderItemsText items={order.items} />
+                  {order.trackingNumber ? (
+                    <div className="mt-3 border-l-2 border-emerald-500 pl-3">
+                      <p className="text-xs font-semibold text-emerald-700">
+                        TU PEDIDO FUE ENVIADO
+                      </p>
+                      <p className="mt-1 text-xs text-neutral-600">
+                        Número de seguimiento: {order.trackingNumber}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="mt-3 border-l-2 border-amber-400 pl-3">
+                      <p className="text-xs font-semibold text-amber-700">
+                        ESTAMOS PREPARANDO TU PEDIDO
+                      </p>
+                    </div>
+                  )}
                 </div>
               </article>
             ))}

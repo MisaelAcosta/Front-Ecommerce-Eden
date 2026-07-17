@@ -1,9 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import localFont from "next/font/local";
-import { ArrowUpDown, SlidersHorizontal } from "lucide-react";
+import {
+  ArrowDownNarrowWide,
+  ArrowUpDown,
+  Search,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 import ScrollReveal from "@/components/animation_page/scroll-reveal";
 import SmoothScroll from "@/components/animation_page/smooth-scroll";
 import { Separator } from "@/components/ui/separator";
@@ -14,6 +20,11 @@ import type { ProductType } from "@/types/product";
 import FilterCategory from "./components/filter-category";
 import SearchBar from "./components/searchBar";
 import ProductCard from "./components/product-card";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+} from "@/components/ui/drawer";
 import {
   Pagination,
   PaginationContent,
@@ -74,6 +85,7 @@ function normalizeFilterText(value: string) {
 
 export default function Page() {
   const params = useParams();
+  const router = useRouter();
   const { categorySlug } = params as { categorySlug: string };
 
   const [activeSubSlug, setActiveSubSlug] = useState<string | null>(null);
@@ -82,7 +94,15 @@ export default function Page() {
     useState<CollectionKey | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>("default");
   const [currentPage, setCurrentPage] = useState(1);
-  const [showFiltersMobile, setShowFiltersMobile] = useState(true);
+  const [mobileCategoryDrawerOpen, setMobileCategoryDrawerOpen] = useState(false);
+  const [mobileSortDrawerOpen, setMobileSortDrawerOpen] = useState(false);
+  const [expandedMobileCategorySlug, setExpandedMobileCategorySlug] =
+    useState<string | null>(categorySlug);
+  const [showSearchMobile, setShowSearchMobile] = useState(false);
+  const pendingMobileSubcategoryRef = useRef<{
+    categorySlug: string;
+    subcategorySlug: string;
+  } | null>(null);
   const {
     categories,
     loading: loadingCategories,
@@ -90,23 +110,37 @@ export default function Page() {
   } = useGetCategories();
 
   useEffect(() => {
-    setActiveSubSlug(null);
+    const pendingSubcategory = pendingMobileSubcategoryRef.current;
+    const nextSubcategorySlug =
+      pendingSubcategory?.categorySlug === categorySlug
+        ? pendingSubcategory.subcategorySlug
+        : null;
+
+    setActiveSubSlug(nextSubcategorySlug);
     setSearchTerm("");
     setActiveCollectionKey(null);
     setSortBy("default");
     setCurrentPage(1);
-    setShowFiltersMobile(true);
+    setMobileCategoryDrawerOpen(false);
+    setMobileSortDrawerOpen(false);
+    setExpandedMobileCategorySlug(categorySlug);
+    setShowSearchMobile(false);
+
+    if (nextSubcategorySlug) {
+      pendingMobileSubcategoryRef.current = null;
+    }
   }, [categorySlug]);
 
   const activeCollection =
     collectionOptions.find((collection) => collection.key === activeCollectionKey) ??
     null;
 
-  const fetchSearchTerm = activeCollection?.query ?? searchTerm;
+  const isGlobalSearch = searchTerm.trim().length > 0;
+  const fetchSearchTerm = isGlobalSearch ? searchTerm : activeCollection?.query ?? "";
 
   const { products, loading, error, totalPages } = useGetCategoryProduct({
-    categorySlug,
-    subSlug: activeSubSlug,
+    categorySlug: isGlobalSearch ? "todos-los-productos" : categorySlug,
+    subSlug: isGlobalSearch ? null : activeSubSlug,
     page: currentPage,
     pageSize: 8,
     searchTerm: fetchSearchTerm,
@@ -120,8 +154,24 @@ export default function Page() {
     setSearchTerm("");
     setActiveCollectionKey(null);
     setCurrentPage(1);
-    setShowFiltersMobile(true);
   };
+
+  const mobileCategoryLabel = useMemo(() => {
+    if (activeSubSlug) {
+      for (const category of categories) {
+        const subcategory = category.subcategories?.find(
+          (item) => item.slug === activeSubSlug
+        );
+
+        if (subcategory) return subcategory.categoryName;
+      }
+    }
+
+    return (
+      categories.find((category) => category.slug === categorySlug)?.categoryName ??
+      "TODOS LOS PRODUCTOS"
+    );
+  }, [activeSubSlug, categories, categorySlug]);
 
   const filteredProducts = useMemo(() => {
     if (!products) return [];
@@ -229,61 +279,291 @@ export default function Page() {
     </label>
   );
 
+  const MobileCollectionControl = () => (
+    <div className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {collectionOptions.map((collection) => {
+        const isActive = activeCollectionKey === collection.key;
+
+        return (
+          <button
+            key={collection.key}
+            type="button"
+            onClick={() => handleCollectionToggle(collection.key)}
+            className={`${khInterferenceRegularFont.className} h-10 shrink-0 rounded-xl border border-black bg-black px-5 text-xs uppercase leading-none text-white transition hover:bg-white hover:text-black ${
+              isActive ? "ring-2 ring-black ring-offset-2" : ""
+            }`}
+          >
+            {collection.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  const selectMobileCategory = (slug: string) => {
+    setMobileCategoryDrawerOpen(false);
+    setExpandedMobileCategorySlug(slug);
+    setActiveSubSlug(null);
+    setSearchTerm("");
+    setActiveCollectionKey(null);
+    setCurrentPage(1);
+    router.push(`/category/${slug}`);
+  };
+
+  const selectMobileSubcategory = (
+    selectedCategorySlug: string,
+    selectedSubcategorySlug: string
+  ) => {
+    setMobileCategoryDrawerOpen(false);
+
+    if (selectedCategorySlug === categorySlug) {
+      handleSelectSubcategory(selectedSubcategorySlug);
+      return;
+    }
+
+    pendingMobileSubcategoryRef.current = {
+      categorySlug: selectedCategorySlug,
+      subcategorySlug: selectedSubcategorySlug,
+    };
+    router.push(`/category/${selectedCategorySlug}`);
+  };
+
   return (
     <SmoothScroll>
-      <section className="pt-25 lg:pt-30 w-full px-1 md:px-8 lg:px-12 pb-28 md:pb-0">
+      <section className="w-full px-0 pb-28 pt-25 md:px-8 md:pb-0 lg:px-12 lg:pt-30">
         
         <ScrollReveal delay={0.08}>
-          <div className="md:hidden flex left-0 right-0 z-50 bg-white/90 px-5 pt-10 pb-3">
-            <div className="flex items-center justify-between w-full bg-[#f5f5f5] px-4 py-2 pt-3">
-              <div className="flex-1">
-                <SearchBar
-                  value={searchTerm}
-                  onChange={(value) => {
-                    setSearchTerm(value);
-                    setCurrentPage(1);
-                  }}
-                />
-              </div>
+          <div className="bg-white px-5 pb-5 pt-6 md:hidden">
+            <div className="grid grid-cols-[56px_minmax(0,1fr)_56px] items-center gap-3">
+              <button
+                type="button"
+                aria-label={showSearchMobile ? "Cerrar buscador" : "Buscar productos"}
+                aria-expanded={showSearchMobile}
+                className="flex h-14 w-14 items-center justify-center rounded-full bg-neutral-200 text-black transition hover:bg-neutral-300"
+                onClick={() => {
+                  setShowSearchMobile((value) => !value);
+                  setMobileCategoryDrawerOpen(false);
+                  setMobileSortDrawerOpen(false);
+                }}
+              >
+                {showSearchMobile ? (
+                  <X className="h-6 w-6" strokeWidth={2} />
+                ) : (
+                  <Search className="h-6 w-6" strokeWidth={2} />
+                )}
+              </button>
+
+              {showSearchMobile ? (
+                <label
+                  className={`${khInterferenceRegularFont.className} flex h-14 min-w-0 items-center rounded-[18px] border border-black px-3 text-xs uppercase text-black`}
+                  htmlFor="catalog-mobile-search"
+                >
+                  <span className="sr-only">Buscar productos</span>
+                  <input
+                    id="catalog-mobile-search"
+                    autoFocus
+                    value={searchTerm}
+                    onChange={(event) => {
+                      setSearchTerm(event.target.value);
+                      setActiveCollectionKey(null);
+                      setCurrentPage(1);
+                    }}
+                    placeholder="BUSCAR"
+                    className="min-w-0 flex-1 bg-transparent text-xs uppercase outline-none placeholder:text-black/45"
+                  />
+                </label>
+              ) : (
+                <div
+                  className={`${khInterferenceRegularFont.className} flex h-14 min-w-0 items-center justify-center rounded-[18px] border border-black/20 px-3 text-center text-xs uppercase leading-none text-black`}
+                >
+                  <span className="line-clamp-2">{mobileCategoryLabel}</span>
+                </div>
+              )}
 
               <button
-                aria-label="Abrir filtros"
-                className="ml-3 flex-shrink-10 text-black"
-                onClick={() => setShowFiltersMobile((value) => !value)}
+                type="button"
+                aria-label="Filtrar por categoria"
+                aria-expanded={mobileCategoryDrawerOpen}
+                className="flex h-14 w-14 items-center justify-center rounded-full bg-neutral-200 text-black transition hover:bg-neutral-300"
+                onClick={() => {
+                  setMobileCategoryDrawerOpen(true);
+                  setMobileSortDrawerOpen(false);
+                }}
               >
-                <SlidersHorizontal className="w-6 h-6" />
+                <SlidersHorizontal className="h-6 w-6" strokeWidth={2} />
+              </button>
+            </div>
+
+            <div className="mt-5 flex items-center gap-3">
+              <MobileCollectionControl />
+              <button
+                type="button"
+                aria-label="Ordenar productos"
+                aria-expanded={mobileSortDrawerOpen}
+                className="flex h-9 w-9 shrink-0 items-center justify-center text-black"
+                onClick={() => {
+                  setMobileSortDrawerOpen(true);
+                  setMobileCategoryDrawerOpen(false);
+                }}
+              >
+                <ArrowDownNarrowWide className="h-6 w-6" strokeWidth={1.8} />
               </button>
             </div>
           </div>
         </ScrollReveal>
 
-        {showFiltersMobile && (
-          <ScrollReveal delay={0.12}>
-            <div className="md:hidden px-10 items-center text-center content-center justify-center max-h-[105vh] bg-white">
-              <div className="pt-4">
-                <SortControl compact />
-              </div>
+        <Drawer
+          open={mobileCategoryDrawerOpen}
+          onOpenChange={setMobileCategoryDrawerOpen}
+          direction="bottom"
+        >
+          <DrawerContent className="max-h-[82vh] overflow-y-auto rounded-t-[18px] border-t-0 bg-[#090909] p-0 text-white md:hidden [&>div:first-child]:hidden">
+            <DrawerClose className="absolute right-5 top-5 z-10 text-white/80 transition-colors hover:text-white">
+              <X className="h-5 w-5" />
+              <span className="sr-only">Cerrar categorias</span>
+            </DrawerClose>
 
-              <div className="pt-4">
-                <CollectionControl compact />
-              </div>
+            <div className="px-6 pb-9 pt-10">
+              <h2 className={`${khInterferenceRegularFont.className} text-2xl uppercase`}>
+                Categorias
+              </h2>
 
-              <div className="p-1">
-                <FilterCategory
-                  categorySlug={categorySlug}
-                  activeSubSlug={activeSubSlug}
-                  categories={categories}
-                  loading={loadingCategories}
-                  error={categoriesError}
-                  onSelectSubcategory={(slug) => {
-                    handleSelectSubcategory(slug);
-                    setShowFiltersMobile(true);
-                  }}
-                />
+              <div className="mt-7 space-y-2">
+                <div className="border-b border-white/15 pb-2">
+                  <button
+                    type="button"
+                    onClick={() => selectMobileCategory("todos-los-productos")}
+                    className={`${khInterferenceRegularFont.className} flex w-full items-center justify-between py-3 text-left text-sm uppercase transition ${
+                      categorySlug === "todos-los-productos"
+                        ? "text-[#adff00]"
+                        : "text-white hover:text-white/60"
+                    }`}
+                  >
+                    Todos los productos
+                    <span className="text-white/45">
+                      {categorySlug === "todos-los-productos" ? "ACTIVA" : ""}
+                    </span>
+                  </button>
+                </div>
+
+                {loadingCategories && (
+                  <p className={`${khInterferenceRegularFont.className} py-4 text-xs uppercase text-white/50`}>
+                    Cargando categorias...
+                  </p>
+                )}
+
+                {!loadingCategories && categoriesError && (
+                  <p className={`${khInterferenceRegularFont.className} py-4 text-xs uppercase text-red-300`}>
+                    No se pudieron cargar las categorias.
+                  </p>
+                )}
+
+                {!loadingCategories && !categoriesError && categories.map((category) => {
+                  const isCurrentCategory = category.slug === categorySlug;
+                  const hasSubcategories = Boolean(category.subcategories?.length);
+                  const isExpanded = expandedMobileCategorySlug === category.slug;
+
+                  return (
+                    <div key={category.id} className="border-b border-white/15 pb-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!hasSubcategories) {
+                            selectMobileCategory(category.slug);
+                            return;
+                          }
+
+                          setExpandedMobileCategorySlug((current) =>
+                            current === category.slug ? null : category.slug
+                          );
+                        }}
+                        className={`${khInterferenceRegularFont.className} flex w-full items-center justify-between py-3 text-left text-sm uppercase transition ${
+                          isCurrentCategory ? "text-[#adff00]" : "text-white hover:text-white/60"
+                        }`}
+                      >
+                        {category.categoryName}
+                        <span className="text-white/45">
+                          {hasSubcategories ? (isExpanded ? "-" : "+") : isCurrentCategory ? "ACTIVA" : ""}
+                        </span>
+                      </button>
+
+                      {isExpanded && category.subcategories?.length ? (
+                        <div className="pb-2 pl-3">
+                          <button
+                            type="button"
+                            onClick={() => selectMobileCategory(category.slug)}
+                            className={`${khInterferenceRegularFont.className} block w-full py-2 text-left text-xs uppercase text-white/80 transition hover:text-[#adff00]`}
+                          >
+                            Ver todo en {category.categoryName}
+                          </button>
+
+                          {category.subcategories.map((subcategory) => (
+                            <button
+                              key={subcategory.id}
+                              type="button"
+                              onClick={() => selectMobileSubcategory(category.slug, subcategory.slug)}
+                              className={`${khInterferenceRegularFont.className} block w-full py-2 text-left text-xs uppercase transition ${
+                                isCurrentCategory && activeSubSlug === subcategory.slug
+                                  ? "text-[#adff00]"
+                                  : "text-white/55 hover:text-white"
+                              }`}
+                            >
+                              {subcategory.categoryName}
+                            </button>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  );
+                })}
               </div>
             </div>
-          </ScrollReveal>
-        )}
+          </DrawerContent>
+        </Drawer>
+
+        <Drawer
+          open={mobileSortDrawerOpen}
+          onOpenChange={setMobileSortDrawerOpen}
+          direction="bottom"
+        >
+          <DrawerContent className="max-h-[62vh] overflow-y-auto rounded-t-[18px] border-t-0 bg-[#090909] p-0 text-white md:hidden [&>div:first-child]:hidden">
+            <DrawerClose className="absolute right-5 top-5 z-10 text-white/80 transition-colors hover:text-white">
+              <X className="h-5 w-5" />
+              <span className="sr-only">Cerrar ordenamiento</span>
+            </DrawerClose>
+
+            <div className="px-6 pb-9 pt-10">
+              <h2 className={`${khInterferenceRegularFont.className} text-2xl uppercase`}>
+                Ordenar por
+              </h2>
+
+              <div className="mt-7 space-y-2">
+                {sortOptions.map((option) => {
+                  const isActive = sortBy === option.value;
+
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => {
+                        handleSortChange(option.value);
+                        setMobileSortDrawerOpen(false);
+                      }}
+                      className={`${khInterferenceRegularFont.className} flex w-full items-center justify-between rounded-lg border px-4 py-3 text-left text-sm uppercase transition ${
+                        isActive
+                          ? "border-[#adff00] bg-[#adff00] text-black"
+                          : "border-white/20 text-white hover:border-white/60"
+                      }`}
+                    >
+                      {option.label}
+                      {isActive ? <span>ACTIVO</span> : null}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </DrawerContent>
+        </Drawer>
 
        
 
@@ -295,6 +575,7 @@ export default function Page() {
                   value={searchTerm}
                   onChange={(value) => {
                     setSearchTerm(value);
+                    setActiveCollectionKey(null);
                     setCurrentPage(1);
                   }}
                 />

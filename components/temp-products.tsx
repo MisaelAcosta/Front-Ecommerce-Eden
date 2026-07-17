@@ -274,29 +274,16 @@ function TempProductCard({
         )}
       </button>
 
-      <div className="pt-2 text-left">
+      <div className="flex items-start justify-between gap-3 pt-2 text-left">
         <h3
           className={`${khInterferenceRegularFont.className}
-            text-2xl leading-none text-black sm:text-[26px]
-            uppercase
+            min-w-0 flex-1 text-2xl leading-none text-black sm:text-[26px] uppercase
           `}
         >
           {displayName}
         </h3>
-
-        {secondaryName && (
-          <p
-            className={`${khInterferenceLightFont.className}
-              text-[17px] leading-none text-black sm:text-[18px]
-              uppercase
-            `}
-          >
-            {secondaryName}
-          </p>
-        )}
-
         {hasDiscount ? (
-          <div className="pt-1 leading-none">
+          <div className="shrink-0 pt-1 leading-none text-right">
             <p
               className={`${khInterferenceLightFont.className} text-[15px] text-black/40 line-through`}
             >
@@ -310,7 +297,7 @@ function TempProductCard({
           </div>
         ) : (
           <p
-            className={`${khInterferenceLightFont.className} pt-1 text-[18px] leading-none text-black tabular-nums`}
+            className={`${khInterferenceLightFont.className} shrink-0 pt-1 text-[18px] leading-none text-black tabular-nums`}
           >
             {formatPrice(basePrice)}
           </p>

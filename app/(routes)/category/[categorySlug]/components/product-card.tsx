@@ -299,31 +299,16 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </div>
         </div>
 
-        <h3
-          className={`${khInterferenceRegularFont.className}
-            line-clamp-1 text-left text-[15px] 
-            leading-tight tracking-wide sm:tracking-tight
-            sm:text-xl
-          `}
-        >
-          {displayName}
-        </h3>
-
-        <div className="flex justify-start">
-          <div className="flex items-center gap-2 text-left">
-            <p
-              className={`${khInterferenceLightFont.className} text-left 
-              text-[14px]  tracking-wide sm:tracking-tight
-               text-black md:text-lg md:leading-3`}
-            >
-              {secondaryName}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-start text-left">
+        <div className="flex items-start justify-between gap-2 text-left">
+          <h3
+            className={`${khInterferenceRegularFont.className}
+              line-clamp-1 min-w-0 flex-1 text-[15px] leading-tight tracking-wide sm:tracking-tight sm:text-xl
+            `}
+          >
+            {displayName}
+          </h3>
           {hasDiscount ? (
-            <div className="leading-tight text-left">
+            <div className="shrink-0 leading-tight text-right">
               <p
                 className={`${khInterferenceLightFont.className} 
                 text-[12px] text-black/40 line-through sm:text-[13px]`}
@@ -339,10 +324,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
               </p>
             </div>
           ) : (
-            <p
-              className={`${khInterferenceLightFont.className} 
-              whitespace-nowrap text-[13px] text-left sm:text-[18px]`}
-            >
+              <p
+                className={`${khInterferenceLightFont.className} 
+                shrink-0 whitespace-nowrap text-[13px] text-right sm:text-[18px]`}
+              >
               {formatPrice(basePrice)}
             </p>
           )}

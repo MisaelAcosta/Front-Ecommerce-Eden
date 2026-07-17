@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Step01Order from "./steps/step-01-order";
 import Step02Data from "./steps/step-02-data";
 import Step03Shipping from "./steps/step-03-shipping";
@@ -36,6 +36,7 @@ const Summary = () => {
   const [step, setStep] = useState<Step>(1);
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState<string | null>(null);
+  const paymentInProgressRef = useRef(false);
 
   const next = () => setStep((current) => (current === 3 ? 3 : ((current + 1) as Step)));
   const back = () => setStep((current) => (current === 1 ? 1 : ((current - 1) as Step)));
@@ -60,6 +61,8 @@ const Summary = () => {
   const payerEmail = (step02?.email ?? "").trim().toLowerCase();
 
   const handlePay = async () => {
+    if (paymentInProgressRef.current) return;
+
     setPayError(null);
 
     if (cartItems.length === 0) {
@@ -100,6 +103,7 @@ const Summary = () => {
       return;
     }
 
+    paymentInProgressRef.current = true;
     setPaying(true);
 
     try {
@@ -240,6 +244,7 @@ const Summary = () => {
 
       setPayError(message);
     } finally {
+      paymentInProgressRef.current = false;
       setPaying(false);
     }
   };
@@ -250,7 +255,7 @@ const Summary = () => {
   if (step === 3) {
     return (
       <div className="space-y-3">
-        <Step03Shipping onBack={back} onPay={handlePay} />
+        <Step03Shipping onBack={back} onPay={handlePay} isPaying={paying} />
 
         {payError && (
           <div className="rounded-md border bg-white p-3">

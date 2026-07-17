@@ -34,6 +34,8 @@ type StrapiOrder = {
   orderNumber?: string | null;
   commerceOrder?: string | null;
   total?: number | null;
+  statusOrder?: string | null;
+  trackingNumber?: string | null;
   order_items?: Array<StrapiEntity<StrapiOrderItem>> | { data?: Array<StrapiEntity<StrapiOrderItem>> };
 };
 
@@ -84,8 +86,15 @@ export async function GET() {
 
     const query = new URLSearchParams({
       "filters[customer][id][$eq]": String(customerId),
+      "filters[statusOrder][$eq]": "PAID",
       "sort[0]": "createdAt:desc",
       "pagination[pageSize]": "20",
+      "fields[0]": "orderNumber",
+      "fields[1]": "commerceOrder",
+      "fields[2]": "createdAt",
+      "fields[3]": "paidAt",
+      "fields[4]": "total",
+      "fields[5]": "trackingNumber",
       "populate[order_items][fields][0]": "orderItemName",
       "populate[order_items][fields][1]": "variantNameSnapshot",
       "populate[order_items][fields][2]": "productNameSnapshot",
@@ -96,8 +105,18 @@ export async function GET() {
       `/api/orders?${query.toString()}`
     );
 
-    const orders = (response.data ?? []).map((entry) => {
+    const uniqueOrders = new Map<string, ReturnType<typeof unwrapEntity<StrapiOrder>>>();
+
+    for (const entry of response.data ?? []) {
       const order = unwrapEntity(entry);
+      const orderKey = order.documentId || order.orderNumber || order.commerceOrder || String(order.id ?? "");
+
+      if (orderKey && !uniqueOrders.has(orderKey)) {
+        uniqueOrders.set(orderKey, order);
+      }
+    }
+
+    const orders = Array.from(uniqueOrders.values()).map((order) => {
       const items = unwrapRelationList(order.order_items).map((item) => ({
         name:
           item.variantNameSnapshot ||
@@ -112,6 +131,7 @@ export async function GET() {
         date: order.paidAt || order.createdAt || null,
         total: Number(order.total || 0),
         items,
+        trackingNumber: order.trackingNumber?.trim() || null,
       };
     });
 

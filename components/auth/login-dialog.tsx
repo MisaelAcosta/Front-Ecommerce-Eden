@@ -24,10 +24,10 @@ export function LoginDialog({ children }: LoginDialogProps) {
 
       <DialogContent
         showCloseButton={false}
-        className="border-0 bg-transparent p-0 shadow-none sm:max-w-none"
+        className="h-dvh w-screen max-w-none overflow-y-auto border-0 bg-transparent p-0 shadow-none"
       >
-        <div className="relative flex min-h-dvh w-screen items-center justify-center px-5 py-10">
-          <div className="relative w-full max-w-[540px]">
+        <div className="relative flex min-h-dvh w-full items-center justify-center px-5 py-6 sm:px-8 sm:py-10 md:px-10">
+          <div className="relative w-full max-w-[560px]">
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={mode}

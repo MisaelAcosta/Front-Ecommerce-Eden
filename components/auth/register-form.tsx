@@ -47,6 +47,9 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
             type="email"
             placeholder="CORREO"
             className={authInputClassName}
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
           />
 
           <PasswordInput
@@ -124,6 +127,9 @@ function PasswordInput({
         type={visible ? "text" : "password"}
         placeholder={placeholder}
         className={`${authInputClassName} pr-12`}
+        autoCapitalize="none"
+        autoCorrect="off"
+        spellCheck={false}
       />
       <button
         type="button"

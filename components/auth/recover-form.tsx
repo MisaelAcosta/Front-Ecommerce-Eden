@@ -44,6 +44,9 @@ export function RecoverForm({ onSwitchToLogin }: RecoverFormProps) {
             type="email"
             placeholder="CORREO"
             className={authInputClassName}
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
           />
 
           {safeState.message && (

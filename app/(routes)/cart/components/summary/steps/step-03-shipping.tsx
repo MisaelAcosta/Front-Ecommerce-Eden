@@ -25,6 +25,7 @@ import {
 type Props = {
   onPay?: () => void;
   onBack?: () => void;
+  isPaying?: boolean;
 };
 
 type ProfileData = {
@@ -92,7 +93,7 @@ const normalizeLocationValue = (value: LocationLike): string | null => {
   return null;
 };
 
-const Step03Shipping = ({ onPay, onBack }: Props) => {
+const Step03Shipping = ({ onPay, onBack, isPaying = false }: Props) => {
   const { items } = useCart();
 
   const subtotal = useMemo(
@@ -421,9 +422,9 @@ const Step03Shipping = ({ onPay, onBack }: Props) => {
       <Button
         className="mt-4 w-full bg-black text-white hover:bg-black/90"
         onClick={onPay}
-        disabled={!canPay || loadingAccount}
+        disabled={!canPay || loadingAccount || isPaying}
       >
-        {loadingAccount ? "CARGANDO..." : "PAGAR"}
+        {loadingAccount ? "CARGANDO..." : isPaying ? "REDIRIGIENDO..." : "PAGAR"}
       </Button>
 
       {!canPay && (

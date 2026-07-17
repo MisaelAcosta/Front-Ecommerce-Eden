@@ -258,7 +258,7 @@ function FeaturedProductCard({
     <CarouselItem
       key={id}
       className="basis-[85%] sm:basis-1/2 lg:basis-1/4
-      px-3 md:px-4"
+      px-0 md:px-0"
     >
       <Card
         className="
@@ -349,33 +349,16 @@ function FeaturedProductCard({
             )}
           </div>
 
-          <h3
-            className={`${khInterferenceRegularFont.className}
-              text-lg
-              leading-none
-              text-left sm:text-2xl
-              uppercase pt-0
-              pb-0
-            `}
-          >
-            {displayName}
-          </h3>
-
-          <div className="flex justify-start gap-2">
-            <div className="flex items-center gap-2 text-left">
-              <p
-                className={`${khInterferenceLightFont.className} 
-                text-lg font-normal text-left text-black`}
-              >
-                {secondaryName}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center 
-          justify-start gap-2">
+          <div className="flex items-start justify-between gap-3">
+            <h3
+              className={`${khInterferenceRegularFont.className}
+                min-w-0 flex-1 text-left text-lg leading-none sm:text-2xl uppercase
+              `}
+            >
+              {displayName}
+            </h3>
             {hasDiscount ? (
-              <div className="leading-tight tp-0 text-left">
+              <div className="shrink-0 leading-tight text-right">
                 <p
                   className={`${khInterferenceLightFont.className} text-[12px] font-semibold text-black/40 line-through`}
                 >
@@ -383,7 +366,7 @@ function FeaturedProductCard({
                 </p>
                 <p
                   className={`${khInterferenceLightFont.className} 
-                  text-[17px] sm:text-[17px] 
+                  text-[17px] 
                   font-extrabold text-red-500 tabular-nums`}
                 >
                   {formatPrice(finalPrice)}
@@ -391,8 +374,7 @@ function FeaturedProductCard({
               </div>
             ) : (
               <p
-                className={`${khInterferenceLightFont.className} text-[15px] sm:inline-flex items-center 
-                justify-start font-semibold text-left`}
+                className={`${khInterferenceLightFont.className} shrink-0 text-[15px] font-semibold text-right`}
               >
                 {formatPrice(basePrice)}
               </p>

@@ -29,8 +29,8 @@ export function AuthCard({
     <section
       className={cn(
         interference.className,
-        "relative w-full max-w-[540px] rounded-[14px] bg-black px-7 py-12 text-white shadow-2xl sm:px-16",
-        compact ? "sm:py-16" : "sm:py-14",
+        "relative w-full max-w-[560px] rounded-[14px] bg-black px-6 py-8 text-white shadow-2xl sm:px-10 sm:py-10 md:px-14",
+        compact ? "md:py-14" : "md:py-12",
         className
       )}
     >
@@ -51,12 +51,12 @@ export function AuthCard({
         width={96}
         height={96}
         priority
-        className="mb-8 size-20 object-contain sm:size-24"
+        className="mb-6 size-14 object-contain sm:mb-8 sm:size-20 md:size-24"
       />
 
       {title ? (
-        <h1 className="mb-5 text-[32px] leading-none 
-        tracking-[0] text-white sm:text-[34px]">
+        <h1 className="mb-5 text-[26px] leading-none 
+        tracking-[0] text-white sm:text-[32px] md:text-[34px]">
           {title}
         </h1>
       ) : null}
@@ -67,10 +67,10 @@ export function AuthCard({
 }
 
 export const authInputClassName =
-  "h-14 rounded-[8px] border-0 bg-[#232323] px-5 text-[13px] uppercase tracking-[0] text-white shadow-none placeholder:text-white/25 focus-visible:ring-1 focus-visible:ring-white/45";
+  "h-[52px] rounded-[8px] border-0 bg-[#232323] px-4 font-sans text-[12px] normal-case tracking-normal text-white shadow-none placeholder:uppercase placeholder:tracking-[0] placeholder:text-white/25 focus-visible:ring-1 focus-visible:ring-white/45 sm:h-14 sm:px-5 sm:text-[13px]";
 
 export const authPrimaryButtonClassName =
-  "h-[58px] rounded-[8px] bg-[#bdbdbd] text-[18px] font-normal uppercase tracking-[0] text-white shadow-none transition hover:bg-white hover:text-black disabled:bg-[#7d7d7d]";
+  "h-[52px] rounded-[8px] bg-[#bdbdbd] text-[16px] font-normal uppercase tracking-[0] text-white shadow-none transition hover:bg-white hover:text-black disabled:bg-[#7d7d7d] sm:h-[58px] sm:text-[18px]";
 
 export const authLinkClassName =
-  "cursor-pointer text-[13px] uppercase tracking-[0] text-white/70 transition hover:text-white";
+  "cursor-pointer text-[11px] uppercase tracking-[0] text-white/70 transition hover:text-white sm:text-[13px]";

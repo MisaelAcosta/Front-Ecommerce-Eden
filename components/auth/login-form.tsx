@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { loginUserAction } from "@/components/data/actions/auth-actions";
@@ -24,6 +25,7 @@ export function LoginForm({
   onSwitchToRegister,
   onSwitchToForgot,
 }: LoginFormProps) {
+  const [showPassword, setShowPassword] = useState(false);
   const [state, formAction, isPending] = useActionState<LoginState, FormData>(
     loginUserAction,
     initialLoginState
@@ -51,14 +53,30 @@ export function LoginForm({
             className={authInputClassName}
             id="identifier"
             name="identifier"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
           />
-          <Input
-            type="password"
-            placeholder="CONTRASEÑA"
-            className={authInputClassName}
-            id="password"
-            name="password"
-          />
+          <div className="relative">
+            <Input
+              type={showPassword ? "text" : "password"}
+              placeholder="CONTRASEÑA"
+              className={`${authInputClassName} pr-12`}
+              id="password"
+              name="password"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((value) => !value)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/45 transition hover:text-white"
+              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+            >
+              {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </button>
+          </div>
         </div>
 
         {safeState.message && (
@@ -80,7 +98,7 @@ export function LoginForm({
         </Button>
       </form>
 
-      <div className="mt-12 flex items-center justify-between gap-4">
+      <div className="mt-8 flex flex-col items-start gap-3 sm:mt-12 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <button
           type="button"
           className={authLinkClassName}
