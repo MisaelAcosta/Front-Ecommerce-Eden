@@ -12,7 +12,7 @@ export default function Subscriptions() {
     // Banda de suscripcion de la pagina Inicio. El fondo negro ocupa todo el ancho
     // de la ventana; el contenido interno se limita a 1350px para alinearse con
     // las demas secciones de la pagina principal.
-    <section className="py-10 max-w-[1350px]  mx-auto text-white">
+    <section className="py-10  max-w-[1350px] lg:px-0 px-3  mx-auto text-white">
       <div className="bg-black  mx-auto max-w-[1350px] overflow-hidden">
         {/*
           Contenedor visual principal.
@@ -23,7 +23,7 @@ export default function Subscriptions() {
           Si quieres un bloque mas alto o bajo, este es el lugar a modificar.
         */}
         <div className="relative min-h-[270px] overflow-hidden border-y
-         border-white/10 px-5 py-10 sm:min-h-[290px] 
+         border-white/10 px-5 py-25 pt-10 sm:min-h-[290px] 
          sm:px-8 lg:min-h-[300px] lg:px-0 lg:py-10">
           {/*
             Reticula de fondo. No tiene contenido: solo dibuja lineas horizontales
@@ -33,7 +33,7 @@ export default function Subscriptions() {
           <div
             aria-hidden="true"
             className="absolute inset-0 opacity-70
-             [background-image:linear-gradient(to_right,rgb(51,51,51)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.11)_1px,transparent_1px)]
+             bg-[linear-gradient(to_right,rgb(51,51,51)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.11)_1px,transparent_1px)]
              [background-size:132px_74px]"
           />
 
@@ -48,9 +48,10 @@ export default function Subscriptions() {
             width={400}
             height={444}
             priority={false}
-            className="pointer-events-none absolute bottom-0  lg:bottom-[-22px] 
-            left-[-38px] z-10 w-[195px] max-w-none 
-            sm:left-[-12px] sm:w-[230px] lg:left-[-12px] 
+            className="pointer-events-none absolute bottom-[-35px]  
+            lg:bottom-[-22px] 
+            left-[-38px] z-10 w-[450px] max-w-none 
+            sm:left-[-12px] sm:w-[230px] lg:left-[-15px] 
             lg:w-[300px]"
           />
 
@@ -59,13 +60,18 @@ export default function Subscriptions() {
             38%/34% en pantallas angostas y 300px en escritorio. max-w evita que
             texto y formulario se vuelvan demasiado anchos en monitores grandes.
           */}
-          <div className="relative z-20 ml-[38%] 
-          flex min-h-[190px] max-w-[540px] flex-col justify-center 
-          sm:ml-[34%] lg:ml-[300px] lg:min-h-[195px]">
+         <div
+              className="relative z-20 mx-auto
+              flex min-h-[350px] w-full max-w-[300px] 
+              flex-col items-center justify-center
+              sm:min-h-[230px]
+              lg:mx-0 lg:ml-[300px] lg:min-h-[195px]
+              lg:items-start lg:max-w-[500px]"
+            >
             {/* Etiqueta principal. Su padding y color verde definen el rotulo SUSCRIBETE. */}
             <h2 className={`${khInterferenceRegularFont.className} w-fit
-             bg-black px-3 
-              py-1 text-sm lg:pl-42 lg:text-5xl uppercase text-[#adff00]`}>
+             bg-transparent pr-21 lg:bg-black px-3 
+             py-1 text-4xl lg:pl-42 lg:text-5xl uppercase text-[#adff00]`}>
               Suscribete
             </h2>
 
@@ -74,7 +80,7 @@ export default function Subscriptions() {
               dos columnas: la primera para descripcion y la segunda para el input.
               Ajusta grid-template-columns para cambiar la proporcion entre ambos.
             */}
-            <div className="mt-8 grid w-full bg-black  max-w-[500px] gap-4
+            <div className="mt-8 grid w-full bg-transparent lg:bg-black  max-w-[500px] gap-4
             sm:items-center sm:gap-7
             lg:mt-7 lg:ml-[170px]"
             >
@@ -82,7 +88,7 @@ export default function Subscriptions() {
 
               <p
                 className={`${khInterferenceLight.className}
-                w-full border border-white/20 bg-black
+                w-full border border-white/20 bg-black/60 lg:bg-black
                 px-4 py-5
                 text-[10px] leading-[1.35] text-white/75
                 sm:px-5 sm:py-6 sm:text-lg`}

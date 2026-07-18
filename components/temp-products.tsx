@@ -33,6 +33,13 @@ const khInterferenceRegularFont = localFont({
   display: "swap",
 });
 
+const khInterferenceBoldFont = localFont({
+  src: "./fonts/KHInterferenceTRIAL-Bold.otf",
+  weight: "700",
+  style: "normal",
+  display: "swap",
+});
+
 type ProductImage = {
   url?: string | null;
 };
@@ -277,7 +284,8 @@ function TempProductCard({
       <div className="flex items-start justify-between gap-3 pt-2 text-left">
         <h3
           className={`${khInterferenceRegularFont.className}
-            min-w-0 flex-1 text-2xl leading-none text-black sm:text-[26px] uppercase
+            min-w-0 flex-1 text-[18px] leading-none pt-1
+             text-black sm:text-[18px] uppercase
           `}
         >
           {displayName}
@@ -285,7 +293,8 @@ function TempProductCard({
         {hasDiscount ? (
           <div className="shrink-0 pt-1 leading-none text-right">
             <p
-              className={`${khInterferenceLightFont.className} text-[15px] text-black/40 line-through`}
+              className={`${khInterferenceLightFont.className} 
+              text-[15px] text-black/40 line-through`}
             >
               {formatPrice(basePrice)}
             </p>
@@ -321,7 +330,7 @@ const TempProducts = () => {
   };
 
   return (
-    <section className="mx-auto max-w-[1350px]  px-3 py-8 sm:px-8 sm:py-14 lg:px-0">
+    <section className="mx-auto max-w-[1350px] px-5 py-8 sm:px-6 sm:py-14 lg:px-0">
       <div>
         <motion.h3
           variants={fadeUp}
@@ -329,21 +338,13 @@ const TempProducts = () => {
           whileInView="visible"
           viewport={{ once: true, amount: 0.25 }}
           custom={0}
-          className={`${maratypeFont.className} text-4xl 
-          text-left tracking-wide sm:tracking-tight sm:text-5xl mb-2 sm:mb-4`}
+          className={`${khInterferenceBoldFont.className} 
+          text-4xl 
+          text-left mb-7
+          sm:text-5xl sm:mb-9`}
         >
           PROMOCIONES
         </motion.h3>
-        <motion.p
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.25 }}
-          custom={0.12}
-          className={`${khInterferenceLightFont.className} text-black/55 text-left leading-none tracking-normal mb-6 text-base sm:text-base uppercase`}
-        >
-          Disfruta promociones y ofertas exclusivas en productos seleccionados.
-        </motion.p>
       </div>
 
       <motion.div
@@ -356,7 +357,7 @@ const TempProducts = () => {
         {loading && <SkeletonSchema grid={2} />}
 
         {!loading && (
-          <div className="grid gap-8 lg:gap-1 md:grid-cols-2">
+          <div className="grid gap-8 lg:gap-3 md:grid-cols-2">
             {tempProducts.map((product) => (
               <TempProductCard
                 key={product.id}

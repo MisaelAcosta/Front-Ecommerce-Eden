@@ -18,3 +18,11 @@ export const khInterferenceRegularFont = localFont({
   style: "normal",
   display: "swap",
 });
+
+export const khInterferenceBoldFont = localFont({
+  src: "../../../../components/fonts/KHInterferenceTRIAL-Bold.otf",
+  weight: "700",
+  style: "normal",
+  display: "swap",
+});
+

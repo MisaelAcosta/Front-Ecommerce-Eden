@@ -42,6 +42,13 @@ const khInterferenceRegularFont = localFont({
   display: "swap",
 });
 
+const khInterferenceBoldFont = localFont({
+  src: "./fonts/KHInterferenceTRIAL-Bold.otf",
+  weight: "700",
+  style: "normal",
+  display: "swap",
+});
+
 type ProductImage = {
   url?: string | null;
 };
@@ -257,8 +264,8 @@ function FeaturedProductCard({
   return (
     <CarouselItem
       key={id}
-      className="basis-[85%] sm:basis-1/2 lg:basis-1/4
-      px-0 md:px-0"
+      className=" sm:basis-1/2 lg:basis-1/4
+      px-0 md:px-1"
     >
       <Card
         className="
@@ -349,10 +356,11 @@ function FeaturedProductCard({
             )}
           </div>
 
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-baseline justify-between gap-3">
             <h3
-              className={`${khInterferenceRegularFont.className}
-                min-w-0 flex-1 text-left text-lg leading-none sm:text-2xl uppercase
+              className={`${khInterferenceLightFont.className}
+                min-w-0 flex-1 text-left text-lg 
+                leading-[1.25] sm:text-[17px] uppercase
               `}
             >
               {displayName}
@@ -360,7 +368,8 @@ function FeaturedProductCard({
             {hasDiscount ? (
               <div className="shrink-0 leading-tight text-right">
                 <p
-                  className={`${khInterferenceLightFont.className} text-[12px] font-semibold text-black/40 line-through`}
+                  className={`${khInterferenceLightFont.className} text-[12px] 
+                  font-semibold text-black/40 line-through`}
                 >
                   {formatPrice(basePrice)}
                 </p>
@@ -374,7 +383,8 @@ function FeaturedProductCard({
               </div>
             ) : (
               <p
-                className={`${khInterferenceLightFont.className} shrink-0 text-[15px] font-semibold text-right`}
+                className={`${khInterferenceLightFont.className} shrink-0 
+                text-[15px] font-semibold leading-[1.25] text-right`}
               >
                 {formatPrice(basePrice)}
               </p>
@@ -408,21 +418,14 @@ const FeaturedProducts = () => {
           whileInView="visible"
           viewport={{ once: true, amount: 0.25 }}
           custom={0}
-          className={`${maratypeFont.className} text-4xl 
-          text-left tracking-wide sm:tracking-tight sm:text-5xl mb-2 sm:mb-4`}
+          className={`${khInterferenceBoldFont.className} 
+          text-4xl 
+          text-left mb-2 
+          sm:text-5xl sm:mb-4`}
         >
           TOP VENTAS
         </motion.h3>
-        <motion.p
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.25 }}
-          custom={0.12}
-          className={`${khInterferenceLightFont.className} text-black/35 text-left leading-none tracking-normal mb-6 text-base sm:text-base`}
-        >
-          Los modelos más pedidos y mejor valorados
-        </motion.p>
+        
       </div>
 
       <motion.div
