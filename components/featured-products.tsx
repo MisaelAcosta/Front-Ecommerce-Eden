@@ -264,8 +264,8 @@ function FeaturedProductCard({
   return (
     <CarouselItem
       key={id}
-      className=" sm:basis-1/2 lg:basis-1/4
-      px-0 md:px-1"
+      className=" basis-[95%] sm:basis-1/2 lg:basis-1/4
+      px-1 md:px-1"
     >
       <Card
         className="
@@ -420,6 +420,8 @@ const FeaturedProducts = () => {
           custom={0}
           className={`${khInterferenceBoldFont.className} 
           text-4xl 
+          pl-2
+          lg:pl-0
           text-left mb-2 
           sm:text-5xl sm:mb-4`}
         >

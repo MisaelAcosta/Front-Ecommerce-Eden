@@ -131,7 +131,8 @@ export default function Footer() {
           <h1
             className={`${maratype.className}
             whitespace-nowrap text-center
-            text-[clamp(4rem,10.5vw,12rem)]
+            text-[clamp(2.5rem,8vw,10rem)]
+            lg:text-[clamp(4rem,10.5vw,12rem)]
             leading-[0.7]
             tracking-normal
             text-[#ADFE00]`}

@@ -48,9 +48,9 @@ export default function Subscriptions() {
             width={400}
             height={444}
             priority={false}
-            className="pointer-events-none absolute bottom-[-35px]  
+            className="pointer-events-none absolute bottom-[-30px]  
             lg:bottom-[-22px] 
-            left-[-38px] z-10 w-[450px] max-w-none 
+            left-[-38px] z-10 w-[415px] max-w-none 
             sm:left-[-12px] sm:w-[230px] lg:left-[-15px] 
             lg:w-[300px]"
           />
@@ -70,7 +70,7 @@ export default function Subscriptions() {
             >
             {/* Etiqueta principal. Su padding y color verde definen el rotulo SUSCRIBETE. */}
             <h2 className={`${khInterferenceRegularFont.className} w-fit
-             bg-transparent pr-21 lg:bg-black px-3 
+             bg-transparent pr-21 lg:bg-black px-2
              py-1 text-4xl lg:pl-42 lg:text-5xl uppercase text-[#adff00]`}>
               Suscribete
             </h2>
@@ -80,9 +80,12 @@ export default function Subscriptions() {
               dos columnas: la primera para descripcion y la segunda para el input.
               Ajusta grid-template-columns para cambiar la proporcion entre ambos.
             */}
-            <div className="mt-8 grid w-full bg-transparent lg:bg-black  max-w-[500px] gap-4
+            <div className="mt-8 grid w-full bg-transparent lg:bg-black
+            max-w-[500px] gap-4
             sm:items-center sm:gap-7
-            lg:mt-7 lg:ml-[170px]"
+            lg:mt-7 lg:ml-[170px]
+            pt-5
+            lg:pt-0"
             >
 
 
@@ -90,7 +93,7 @@ export default function Subscriptions() {
                 className={`${khInterferenceLight.className}
                 w-full border border-white/20 bg-black/60 lg:bg-black
                 px-4 py-5
-                text-[10px] leading-[1.35] text-white/75
+                text-[14px] leading-[1.35] text-white/75
                 sm:px-5 sm:py-6 sm:text-lg`}
               >
                 RECIBE OFERTAS EXCLUSIVAS, DESCUENTOS ESPECIALES Y 
