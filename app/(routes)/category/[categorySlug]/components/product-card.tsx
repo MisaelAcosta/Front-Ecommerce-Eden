@@ -223,35 +223,28 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   return (
     <Card
-      className="
-        group relative flex w-full flex-col justify-between
-        rounded-none border-none bg-white pb-6 shadow-none
-        sm:overflow-hidden sm:py-4
-      "
+      className="group relative flex w-full flex-col rounded-none border-none bg-white shadow-none"
     >
-      {hasDiscount && (
-        <div
-          className="
-            absolute left-3 top-3 z-10 rounded-full bg-green-500
-            px-3 py-1 text-[11px] font-black tracking-wide text-white
-          "
-        >
-          OFERTA
-        </div>
-      )}
-
-      <CardContent className="flex flex-col px-0 pt-0 pb-0 sm:px-0">
+      <CardContent className="flex flex-col p-0">
         {/* Contenedor visual del producto e interaccion principal. */}
         <div
           className="
-            relative mt-0 mb-3 flex w-full cursor-pointer items-center
-            justify-center overflow-hidden bg-white pt-1 pb-1 sm:mb-4
+            relative flex w-full cursor-pointer items-center justify-center overflow-hidden
+            bg-neutral-100 text-left
+            aspect-[1.08/1.2]
+            lg:aspect-[1.08/1]
           "
           onClick={() =>
             productSlug && navigateWithTransition(`/product/${productSlug}`)
           }
         >
-          <div className="absolute top-2 right-2 z-20 sm:top-4 sm:right-5">
+          {hasDiscount && (
+            <div className="absolute left-3 top-3 z-10 bg-black px-2 py-1 text-[10px] font-black tracking-wide text-[#ADFE00] lg:left-4 lg:top-4 lg:px-3 lg:text-[11px]">
+              OFERTA
+            </div>
+          )}
+
+          <div className="absolute right-3 top-3 z-20 lg:right-4 lg:top-4">
             <LovedButton
               product={{
                 id: Number(id) || 0,
@@ -264,7 +257,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             />
           </div>
 
-          <div className="relative aspect-4/5 w-full">
+          <div className="relative size-full">
             {image1 && (
               <Image
                 src={image1}
@@ -272,7 +265,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 fill
                 sizes="(max-width: 480px) 50vw, (max-width: 768px) 45vw, (max-width: 1024px) 33vw, 25vw"
                 className="
-                  object-contain transition-all duration-300 ease-out
+                  object-cover transition-all duration-300 ease-out
                   opacity-100 group-hover:opacity-0
                 "
               />
@@ -285,7 +278,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 fill
                 sizes="(max-width: 480px) 50vw, (max-width: 768px) 45vw, (max-width: 1024px) 33vw, 25vw"
                 className="
-                  object-contain transition-all duration-500 ease-out
+                  object-cover transition-all duration-500 ease-out
                   opacity-0 group-hover:opacity-100
                 "
               />
@@ -299,35 +292,38 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </div>
         </div>
 
-        <div className="flex items-start justify-between gap-2 text-left">
+        <div className="flex items-baseline justify-between gap-2 px-1 pt-2 text-left sm:px-0 sm:gap-3">
           <h3
             className={`${khInterferenceRegularFont.className}
-              line-clamp-1 min-w-0 flex-1 text-[15px] leading-tight tracking-wide sm:tracking-tight sm:text-xl
+              line-clamp-1 min-w-0 flex-1 text-[12px] uppercase leading-[1.2]
+              sm:text-[18px] sm:leading-[1.25]
             `}
           >
             {displayName}
           </h3>
           {hasDiscount ? (
-            <div className="shrink-0 leading-tight text-right">
+            <div className="shrink-0 leading-none text-right">
               <p
-                className={`${khInterferenceLightFont.className} 
-                text-[12px] text-black/40 line-through sm:text-[13px]`}
+                className={`${khInterferenceLightFont.className}
+                  text-[10px] text-black/40 line-through
+                  sm:text-[15px]`}
               >
                 {formatPrice(basePrice)}
               </p>
               <p
-                className={`${khInterferenceLightFont.className} 
-                whitespace-nowrap text-[13px] text-red-500 tabular-nums 
-                sm:text-[18px]`}
+                className={`${khInterferenceLightFont.className}
+                  whitespace-nowrap text-[12px] text-black tabular-nums
+                  sm:text-[18px]`}
               >
                 {formatPrice(finalPrice)}
               </p>
             </div>
           ) : (
-              <p
-                className={`${khInterferenceLightFont.className} 
-                shrink-0 whitespace-nowrap text-[13px] text-right sm:text-[18px]`}
-              >
+            <p
+              className={`${khInterferenceLightFont.className}
+                shrink-0 whitespace-nowrap text-[12px] text-right leading-[1.2]
+                sm:text-[18px]`}
+            >
               {formatPrice(basePrice)}
             </p>
           )}
