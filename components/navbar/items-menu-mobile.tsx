@@ -218,7 +218,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
                       key={item.href}
                       className={index === 0 ? "relative pt-10" : "relative"}
                     >
-                      <span className="absolute -top-4 right-0 text-xs font-semibold text-red-500">
+                      <span className="absolute -top-4 right-0 text-xs font-semibold text-[#ADFE00]">
                         {item.mobileNumber}
                       </span>
                       <TransitionLink

@@ -73,7 +73,11 @@ export function ProfileSheet({
 
       <SheetContent side="right" className="w-full p-0 sm:w-[380px]">
         {view === "menu" && (
-          <ProfileMenu onChangeView={setView} onLogout={handleLogout} />
+          <ProfileMenu
+            user={user}
+            onChangeView={setView}
+            onLogout={handleLogout}
+          />
         )}
 
         {view === "compras" && (

@@ -2,6 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, Loader2 } from "lucide-react";
+import {
+  khInterferenceBoldFont,
+  khInterferenceLightFont,
+  khInterferenceRegularFont,
+} from "@/app/(routes)/cart/components/cart-fonts";
 import { formatPrice } from "@/lib/formatPrice";
 
 type ProfileOrdersViewProps = {
@@ -43,7 +48,13 @@ function OrderItemsText({ items }: { items: ProfileOrderItem[] }) {
       .join(", ");
   }, [items]);
 
-  return <p className="mt-1 text-xs leading-5 text-neutral-600">{text}</p>;
+  return (
+    <p
+      className={`${khInterferenceLightFont.className} mt-3 text-[12px] leading-[1.25] text-black/70`}
+    >
+      {text}
+    </p>
+  );
 }
 
 export function ProfileOrdersView({ onBack }: ProfileOrdersViewProps) {
@@ -59,120 +70,141 @@ export function ProfileOrdersView({ onBack }: ProfileOrdersViewProps) {
         setIsLoading(true);
         setError(null);
 
-        const res = await fetch("/api/profile/orders", {
+        const response = await fetch("/api/profile/orders", {
           method: "GET",
           credentials: "include",
           cache: "no-store",
         });
+        const json = await response.json();
 
-        const json = await res.json();
-
-        if (!res.ok || !json?.ok) {
+        if (!response.ok || !json?.ok) {
           throw new Error(json?.error || "No se pudieron cargar tus pedidos");
         }
 
         if (isMounted) {
           setOrders(Array.isArray(json.orders) ? json.orders : []);
         }
-      } catch (err) {
+      } catch (requestError) {
         if (isMounted) {
           setError(
-            err instanceof Error
-              ? err.message
+            requestError instanceof Error
+              ? requestError.message
               : "No se pudieron cargar tus pedidos"
           );
         }
       } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+        if (isMounted) setIsLoading(false);
       }
     }
 
     loadOrders();
-
     return () => {
       isMounted = false;
     };
   }, []);
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex items-center gap-2 border-b border-neutral-200 px-4 py-4">
+    <div className="flex h-full flex-col bg-[#fafafa] text-black">
+      <header className="flex items-center gap-2 border-b border-black px-5 pb-5 pt-14">
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex items-center justify-center rounded-full p-1 hover:bg-neutral-100"
+          aria-label="Volver al perfil"
+          className="inline-flex size-8 items-center justify-center border border-black transition-colors hover:bg-[#ADFE00]"
         >
-          <ChevronLeft className="h-5 w-5" />
+          <ChevronLeft className="size-4" strokeWidth={2} />
         </button>
-        <h2 className="text-2xl font-black tracking-tight">PEDIDOS</h2>
-      </div>
+        <div>
+          <p
+            className={`${khInterferenceLightFont.className} text-[10px] uppercase text-black/55`}
+          >
+            Mi cuenta
+          </p>
+          <h2
+            className={`${khInterferenceBoldFont.className} mt-1 text-[29px] uppercase leading-none`}
+          >
+            Pedidos
+          </h2>
+        </div>
+      </header>
 
-      <div className="flex-1 overflow-y-auto px-4 py-5">
+      <div className="flex-1 overflow-y-auto px-5 py-6">
         {isLoading && (
-          <div className="flex h-full flex-col items-center justify-center text-sm text-neutral-500">
-            <Loader2 className="mb-3 h-5 w-5 animate-spin" />
-            <p>Cargando pedidos...</p>
+          <div className="flex h-full flex-col items-center justify-center text-center">
+            <Loader2 className="mb-4 size-6 animate-spin text-[#6b9b00]" />
+            <p className={`${khInterferenceRegularFont.className} text-[12px] uppercase text-black/60`}>
+              Cargando pedidos
+            </p>
           </div>
         )}
 
         {!isLoading && error && (
-          <div className="flex h-full items-center justify-center px-6 text-center text-sm text-neutral-500">
-            <p>{error}</p>
+          <div className="border-l-4 border-red-600 bg-red-50 px-4 py-3">
+            <p className={`${khInterferenceRegularFont.className} text-[12px] uppercase text-red-700`}>
+              {error}
+            </p>
           </div>
         )}
 
         {!isLoading && !error && orders.length === 0 && (
-          <div className="flex h-full flex-col items-center justify-center px-6 text-center text-sm text-neutral-500">
-            <p>Aun no tienes pedidos.</p>
-            <p className="mt-1">Cuando realices tu primera compra, aparecera aqui.</p>
+          <div className="flex h-full flex-col justify-center border-y border-black py-8">
+            <p className={`${khInterferenceBoldFont.className} text-[25px] uppercase leading-none`}>
+              Aun no hay pedidos
+            </p>
+            <p className={`${khInterferenceLightFont.className} mt-3 max-w-[240px] text-[13px] leading-[1.25] text-black/65`}>
+              Cuando realices tu primera compra, aparecera aqui con su estado.
+            </p>
           </div>
         )}
 
         {!isLoading && !error && orders.length > 0 && (
-          <div className="space-y-3">
+          <div className="border-t border-black">
             {orders.map((order) => (
-              <article
-                key={order.id}
-                className="rounded-lg border border-neutral-200 bg-white p-4"
-              >
+              <article key={order.id} className="border-b border-black py-5">
                 <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-500">
-                      Pedido
+                  <div className="min-w-0">
+                    <p
+                      className={`${khInterferenceLightFont.className} text-[10px] uppercase text-black/55`}
+                    >
+                      Pedido · {formatOrderDate(order.date)}
                     </p>
-                    <h3 className="mt-1 text-sm font-black text-neutral-950">
+                    <h3
+                      className={`${khInterferenceBoldFont.className} mt-2 break-words text-[17px] uppercase leading-[1.05]`}
+                    >
                       {order.id}
                     </h3>
                   </div>
-                  <p className="text-right text-sm font-black text-neutral-950">
+                  <p
+                    className={`${khInterferenceBoldFont.className} shrink-0 text-[18px] leading-none`}
+                  >
                     {formatPrice(order.total)}
                   </p>
                 </div>
 
-                <div className="mt-4 border-t border-neutral-100 pt-3">
-                  <p className="text-xs text-neutral-500">
-                    Fecha: {formatOrderDate(order.date)}
-                  </p>
-                  <OrderItemsText items={order.items} />
-                  {order.trackingNumber ? (
-                    <div className="mt-3 border-l-2 border-emerald-500 pl-3">
-                      <p className="text-xs font-semibold text-emerald-700">
-                        TU PEDIDO FUE ENVIADO
-                      </p>
-                      <p className="mt-1 text-xs text-neutral-600">
-                        Número de seguimiento: {order.trackingNumber}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="mt-3 border-l-2 border-amber-400 pl-3">
-                      <p className="text-xs font-semibold text-amber-700">
-                        ESTAMOS PREPARANDO TU PEDIDO
-                      </p>
-                    </div>
-                  )}
-                </div>
+                <OrderItemsText items={order.items} />
+
+                {order.trackingNumber ? (
+                  <div className="mt-4 border-l-4 border-[#ADFE00] bg-[#ADFE00]/20 px-3 py-3">
+                    <p
+                      className={`${khInterferenceRegularFont.className} text-[11px] uppercase`}
+                    >
+                      Tu pedido fue enviado
+                    </p>
+                    <p
+                      className={`${khInterferenceLightFont.className} mt-2 text-[12px] text-black/70`}
+                    >
+                      Seguimiento: {order.trackingNumber}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="mt-4 border-l-4 border-black bg-black px-3 py-3 text-white">
+                    <p
+                      className={`${khInterferenceRegularFont.className} text-[11px] uppercase`}
+                    >
+                      Estamos preparando tu pedido
+                    </p>
+                  </div>
+                )}
               </article>
             ))}
           </div>

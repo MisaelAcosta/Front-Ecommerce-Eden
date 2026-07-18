@@ -109,9 +109,9 @@ const Navbar = () => {
     if (user) {
       const icon = (
         <Smile
-          strokeWidth={1.7}
+          strokeWidth={2.3}
           fill="none"
-          className={cn(iconClassName, "text-black")}
+          className={cn(iconClassName, "text-[#ADFE00]")}
         />
       );
 
@@ -126,10 +126,9 @@ const Navbar = () => {
         >
           <button
             aria-label="Perfil"
-            className="relative cursor-pointer rounded-full bg-white p-2 text-black  ring-1 ring-white/70 transition duration-300 hover:scale-105 hover:bg-white"
+            className="cursor-pointer rounded-full p-2 transition-transform duration-300 hover:scale-105"
           >
             {icon}
-            <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full border border-[#1A1A1A] bg-emerald-400" />
           </button>
         </ProfileSheet>
       );
@@ -310,17 +309,15 @@ const Navbar = () => {
               <ItemsMenuMobile scrolled={false} />
             </div>
 
-              <div className="rounded-full border border-white/10 bg-white/6 p-1">
-                {renderProfileButton(
-                  [
-                    "h-5",
-                    "w-5",
-                    "text-whit/90",
-                    "transition-colors",
-                    "duration-300",
-                  ].join(" ")
-                )}
-              </div>
+              {renderProfileButton(
+                [
+                  "h-5",
+                  "w-5",
+                  "text-white/90",
+                  "transition-colors",
+                  "duration-300",
+                ].join(" ")
+              )}
             </div>
 
             {/* ---- Columna central mobile: Logo ilustracion ---- */}

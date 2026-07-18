@@ -1,23 +1,25 @@
-// components/profile/profile-info-form.tsx
 "use client";
 
 import { useState } from "react";
 import { ChevronLeft } from "lucide-react";
-
+import {
+  khInterferenceBoldFont,
+  khInterferenceLightFont,
+  khInterferenceRegularFont,
+} from "@/app/(routes)/cart/components/cart-fonts";
 import { Button } from "@/components/ui/button";
-import { writeAccountProfile } from "@/lib/account-profile";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import {
   InputOTP,
   InputOTPGroup,
-  InputOTPSlot,
   InputOTPSeparator,
+  InputOTPSlot,
 } from "@/components/ui/input-otp";
-
-import { RegionCombobox, CommuneCombobox } from "./region-commune-select";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { writeAccountProfile } from "@/lib/account-profile";
+import { CommuneCombobox, RegionCombobox } from "./region-commune-select";
 import type { ProfileData } from "./profile-types";
 
 type ProfileInfoFormProps = {
@@ -26,19 +28,20 @@ type ProfileInfoFormProps = {
   initialProfile?: ProfileData | null;
 };
 
+const labelClassName = `${khInterferenceRegularFont.className} text-[11px] uppercase`;
+const inputClassName =
+  "h-10 rounded-none border-black bg-white text-xs disabled:opacity-60";
+
 export function ProfileInfoForm({
   onBack,
   userId,
   initialProfile,
 }: ProfileInfoFormProps) {
-  // 🔹 Modo edición
   const [isEditing, setIsEditing] = useState(() => !initialProfile);
-
   const [saving, setSaving] = useState(false);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Preferencias
   const [notifyWhatsapp, setNotifyWhatsapp] = useState(
     () => initialProfile?.notifyWhatsapp ?? false
   );
@@ -46,26 +49,21 @@ export function ProfileInfoForm({
     () => initialProfile?.notifyEmail ?? true
   );
 
-  // RUT: partimos el "cuerpo-dv"
   const [rutBody, setRutBody] = useState(() => {
     if (!initialProfile?.rut) return "";
     const [body] = initialProfile.rut.split("-");
     return body ?? "";
   });
-
   const [rutDv, setRutDv] = useState(() => {
     if (!initialProfile?.rut) return "";
     const [, dv] = initialProfile.rut.split("-");
     return dv ?? "";
   });
-
-  // Teléfono: quitar +569
   const [phoneRest, setPhoneRest] = useState(() => {
     if (!initialProfile?.telefono) return "";
     const match = initialProfile.telefono.match(/^\+569(\d{8})$/);
     return match ? match[1] : "";
   });
-
   const [selectedRegion, setSelectedRegion] = useState<string | null>(
     () => initialProfile?.region ?? null
   );
@@ -73,7 +71,6 @@ export function ProfileInfoForm({
     () => initialProfile?.comuna ?? null
   );
 
-  //  Reset a los valores originales cuando el usuario cancela edición
   const resetFromInitial = () => {
     setNotifyWhatsapp(initialProfile?.notifyWhatsapp ?? false);
     setNotifyEmail(initialProfile?.notifyEmail ?? true);
@@ -98,25 +95,20 @@ export function ProfileInfoForm({
     setSelectedComuna(initialProfile?.comuna ?? null);
   };
 
-  const handleSubmitInfo = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!isEditing) return; // seguridad
+  const handleSubmitInfo = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!isEditing) return;
 
     setSaving(true);
     setSavedMessage(null);
     setErrorMessage(null);
 
-    const formData = new FormData(e.currentTarget);
-
+    const formData = new FormData(event.currentTarget);
     const rutFormatted =
       rutBody.trim() && rutDv.trim()
         ? `${rutBody.trim()}-${rutDv.trim()}`
         : "";
-
-    const phoneFormatted = phoneRest.trim()
-      ? `+569${phoneRest.trim()}`
-      : "";
-
+    const phoneFormatted = phoneRest.trim() ? `+569${phoneRest.trim()}` : "";
     const payload = {
       userId,
       notifyWhatsapp,
@@ -132,23 +124,21 @@ export function ProfileInfoForm({
       nota: (formData.get("nota") || "").toString(),
     };
 
-    console.log("Payload enviado a /api/profile:", payload);
-
     try {
-      const res = await fetch("/api/profile", {
+      const response = await fetch("/api/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) {
-        console.error("Error guardando perfil:", await res.text());
-        setErrorMessage("Hubo un problema al guardar tu información.");
-      } else {
-        // 1) Guardamos en localStorage para que el checkout pueda autocompletar
-        writeAccountProfile({
-        name: payload.nombre?.trim(),
+      if (!response.ok) {
+        setErrorMessage("Hubo un problema al guardar tu informacion.");
+        return;
+      }
+
+      writeAccountProfile({
+        name: payload.nombre.trim(),
         rutBody: rutBody.trim(),
         rutDv: rutDv.trim().toUpperCase(),
         phoneRest: phoneRest.trim(),
@@ -158,17 +148,15 @@ export function ProfileInfoForm({
         comuna: payload.comuna
           ? { value: payload.comuna, label: payload.comuna }
           : undefined,
-        calle: payload.calle?.trim(),
-        numero: payload.numero?.trim(),
-        depto: payload.depto?.trim(),
+        calle: payload.calle.trim(),
+        numero: payload.numero.trim(),
+        depto: payload.depto.trim(),
       });
 
-        // ✅ 2) UI feedback
-        setSavedMessage("Información guardada correctamente ✅");
-        setIsEditing(false);
-      }
-    } catch (err) {
-      console.error("Error inesperado:", err);
+      setSavedMessage("Informacion guardada correctamente.");
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error inesperado al guardar perfil:", error);
       setErrorMessage("Error inesperado al guardar.");
     } finally {
       setSaving(false);
@@ -176,205 +164,210 @@ export function ProfileInfoForm({
   };
 
   return (
-    <div className="flex h-full flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-neutral-200 px-4 py-4">
+    <div className="flex h-full flex-col bg-[#fafafa] text-black">
+      <header className="flex items-center justify-between border-b border-black px-5 pb-5 pt-14">
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={onBack}
-            className="inline-flex items-center justify-center rounded-full p-1 hover:bg-neutral-100"
+            aria-label="Volver al perfil"
+            className="inline-flex size-8 items-center justify-center border border-black transition-colors hover:bg-[#ADFE00]"
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="size-4" strokeWidth={2} />
           </button>
-          <h2 className="text-2xl font-black tracking-tight">INFO</h2>
+          <div>
+            <p
+              className={`${khInterferenceLightFont.className} text-[10px] uppercase text-black/55`}
+            >
+              Mi cuenta
+            </p>
+            <h2
+              className={`${khInterferenceBoldFont.className} mt-1 text-[29px] uppercase leading-none`}
+            >
+              Info
+            </h2>
+          </div>
         </div>
 
-        {/* Botón editar / cancelar */}
         {initialProfile && (
-          <div className="flex items-center gap-2">
-            {isEditing ? (
-              <button
-                type="button"
-                onClick={() => {
-                  resetFromInitial();
-                  setIsEditing(false);
-                  setSavedMessage(null);
-                  setErrorMessage(null);
-                }}
-                className="text-[11px] font-medium text-neutral-500 hover:underline"
-              >
-                Cancelar
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setIsEditing(true)}
-                className="text-[11px] pt-10  cursor-pointer font-medium text-black hover:underline"
-              >
-                Editar información
-              </button>
-            )}
-          </div>
+          <button
+            type="button"
+            onClick={() => {
+              if (isEditing) {
+                resetFromInitial();
+                setSavedMessage(null);
+                setErrorMessage(null);
+              }
+              setIsEditing((value) => !value);
+            }}
+            className={`${khInterferenceRegularFont.className} border border-black px-3 py-2 text-[10px] uppercase transition-colors hover:bg-[#ADFE00]`}
+          >
+            {isEditing ? "Cancelar" : "Editar"}
+          </button>
         )}
-      </div>
+      </header>
 
-      {/* Formulario */}
       <form
         onSubmit={handleSubmitInfo}
-        className="flex-1 space-y-6 overflow-y-auto px-6 py-4 text-xs"
+        className="flex-1 space-y-7 overflow-y-auto px-5 py-6 text-xs"
       >
-        {/* Preferencia de contacto */}
-        <div className="space-y-1">
-          <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-neutral-500">
-            RECIBIR INFORMACIÓN DE MIS ENVÍOS POR
+        <section className="border-y border-black py-4">
+          <p
+            className={`${khInterferenceLightFont.className} text-[10px] uppercase text-black/60`}
+          >
+            Recibir informacion de mis envios por
           </p>
-
-          <div className="mt-2 flex gap-4">
-            <label className="flex items-center gap-2">
+          <div className="mt-4 flex gap-5">
+            <label
+              className={`${khInterferenceRegularFont.className} flex items-center gap-2 text-[12px] uppercase`}
+            >
               <Checkbox
                 id="notifyWhatsapp"
                 checked={notifyWhatsapp}
-                onCheckedChange={(v) => {
-                  if (!isEditing) return;
-                  setNotifyWhatsapp(!!v);
+                onCheckedChange={(value) => {
+                  if (isEditing) setNotifyWhatsapp(!!value);
                 }}
                 disabled={!isEditing}
               />
-              <span className="text-xs">Whatsapp</span>
+              <span>Whatsapp</span>
             </label>
-
-            <label className="flex items-center gap-2">
+            <label
+              className={`${khInterferenceRegularFont.className} flex items-center gap-2 text-[12px] uppercase`}
+            >
               <Checkbox
                 id="notifyEmail"
                 checked={notifyEmail}
-                onCheckedChange={(v) => {
-                  if (!isEditing) return;
-                  setNotifyEmail(!!v);
+                onCheckedChange={(value) => {
+                  if (isEditing) setNotifyEmail(!!value);
                 }}
                 disabled={!isEditing}
               />
-              <span className="text-xs">Correo</span>
+              <span>Correo</span>
             </label>
           </div>
-        </div>
+        </section>
 
-        {/* Datos de envío */}
-        <div className="space-y-3">
-          <p className="text-[15px] font-black uppercase tracking-[0.12em]">
-            DATOS DE ENVÍO
-          </p>
+        <section className="space-y-4">
+          <div className="flex items-center gap-3">
+            <span className="h-px w-7 bg-[#ADFE00]" />
+            <p
+              className={`${khInterferenceBoldFont.className} text-[20px] uppercase leading-none`}
+            >
+              Datos de envio
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 gap-3">
+          <div className="space-y-3">
             <div className="space-y-1">
-              <Label htmlFor="nombre" className="text-[11px]">
-                Nombre y Apellido
+              <Label htmlFor="nombre" className={labelClassName}>
+                Nombre y apellido
               </Label>
               <Input
-                placeholder="Juan Perez"
                 id="nombre"
                 name="nombre"
-                className="h-9 bg-neutral-100 text-xs"
+                placeholder="Juan Perez"
+                className={inputClassName}
                 defaultValue={initialProfile?.nombre ?? ""}
                 disabled={!isEditing}
               />
             </div>
 
-            {/* RUT con OTP */}
             <div className="space-y-1">
-              <Label className="text-[11px]">Rut</Label>
+              <Label className={labelClassName}>Rut</Label>
               <div className="flex items-center gap-1">
                 <InputOTP
                   maxLength={8}
                   value={rutBody}
-                  onChange={(val) => {
-                    if (!isEditing) return;
-                    if (/^\d*$/.test(val)) setRutBody(val);
+                  onChange={(value) => {
+                    if (isEditing && /^\d*$/.test(value)) setRutBody(value);
                   }}
                 >
                   <InputOTPGroup>
-                    {Array.from({ length: 8 }).map((_, i) => (
+                    {Array.from({ length: 8 }).map((_, index) => (
                       <InputOTPSlot
-                        key={i}
-                        index={i}
-                        className="h-8 w-6 bg-white text-xs"
+                        key={index}
+                        index={index}
+                        className="h-9 w-6 rounded-none border-black bg-white text-xs"
                       />
                     ))}
                   </InputOTPGroup>
                   <InputOTPSeparator />
                 </InputOTP>
-
                 <InputOTP
                   maxLength={1}
                   value={rutDv}
-                  onChange={(val) => {
-                    if (!isEditing) return;
-                    if (/^[0-9kK]?$/.test(val)) setRutDv(val.toUpperCase());
+                  onChange={(value) => {
+                    if (isEditing && /^[0-9kK]?$/.test(value)) {
+                      setRutDv(value.toUpperCase());
+                    }
                   }}
                 >
                   <InputOTPGroup>
                     <InputOTPSlot
                       index={0}
-                      className="h-8 w-6 bg-white text-xs"
+                      className="h-9 w-6 rounded-none border-black bg-white text-xs"
                     />
                   </InputOTPGroup>
                 </InputOTP>
               </div>
             </div>
-          </div>
 
-          {/* Teléfono con prefijo +56 9 y OTP */}
-          <div className="space-y-1">
-            <Label className="text-[11px]">Teléfono</Label>
-            <div className="flex items-center gap-2">
-              <span className="rounded-md bg-white px-2 py-1 text-[15px] font-medium">
-                +56 9
-              </span>
-              <InputOTP
-                maxLength={8}
-                value={phoneRest}
-                onChange={(val) => {
-                  if (!isEditing) return;
-                  if (/^\d*$/.test(val)) setPhoneRest(val);
-                }}
-              >
-                <InputOTPGroup>
-                  {Array.from({ length: 8 }).map((_, i) => (
-                    <InputOTPSlot
-                      key={i}
-                      index={i}
-                      className="h-8 w-6 bg-white text-xs"
-                    />
-                  ))}
-                </InputOTPGroup>
-              </InputOTP>
+            <div className="space-y-1">
+              <Label className={labelClassName}>Telefono</Label>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`${khInterferenceRegularFont.className} border border-black bg-white px-2 py-2 text-[12px]`}
+                >
+                  +56 9
+                </span>
+                <InputOTP
+                  maxLength={8}
+                  value={phoneRest}
+                  onChange={(value) => {
+                    if (isEditing && /^\d*$/.test(value)) setPhoneRest(value);
+                  }}
+                >
+                  <InputOTPGroup>
+                    {Array.from({ length: 8 }).map((_, index) => (
+                      <InputOTPSlot
+                        key={index}
+                        index={index}
+                        className="h-9 w-6 rounded-none border-black bg-white text-xs"
+                      />
+                    ))}
+                  </InputOTPGroup>
+                </InputOTP>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Dirección */}
-        <div className="space-y-3">
-          <p className="text-[15px] font-black uppercase tracking-[0.12em]">
-            DIRECCIÓN
-          </p>
+        <section className="space-y-4 border-t border-black pt-6">
+          <div className="flex items-center gap-3">
+            <span className="h-px w-7 bg-[#ADFE00]" />
+            <p
+              className={`${khInterferenceBoldFont.className} text-[20px] uppercase leading-none`}
+            >
+              Direccion
+            </p>
+          </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label className="text-[11px]">Región</Label>
-              <div className={!isEditing ? "opacity-60 pointer-events-none" : ""}>
+              <Label className={labelClassName}>Region</Label>
+              <div className={!isEditing ? "pointer-events-none opacity-60" : ""}>
                 <RegionCombobox
                   value={selectedRegion}
-                  onChange={(val) => {
-                    setSelectedRegion(val);
+                  onChange={(value) => {
+                    setSelectedRegion(value);
                     setSelectedComuna(null);
                   }}
                 />
               </div>
             </div>
-
             <div className="space-y-1">
-              <Label className="text-[11px]">Comuna</Label>
-              <div className={!isEditing ? "opacity-60 pointer-events-none" : ""}>
+              <Label className={labelClassName}>Comuna</Label>
+              <div className={!isEditing ? "pointer-events-none opacity-60" : ""}>
                 <CommuneCombobox
                   region={selectedRegion}
                   value={selectedComuna}
@@ -385,13 +378,13 @@ export function ProfileInfoForm({
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor="calle" className="text-[11px]">
+            <Label htmlFor="calle" className={labelClassName}>
               Calle
             </Label>
             <Input
               id="calle"
               name="calle"
-              className="h-9 rounded-md bg-neutral-100 text-xs"
+              className={inputClassName}
               defaultValue={initialProfile?.calle ?? ""}
               disabled={!isEditing}
             />
@@ -399,26 +392,25 @@ export function ProfileInfoForm({
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label htmlFor="numero" className="text-[11px]">
-                Número
+              <Label htmlFor="numero" className={labelClassName}>
+                Numero
               </Label>
               <Input
                 id="numero"
                 name="numero"
-                className="h-9 rounded-md bg-neutral-100 text-xs"
+                className={inputClassName}
                 defaultValue={initialProfile?.numero ?? ""}
                 disabled={!isEditing}
               />
             </div>
-
             <div className="space-y-1">
-              <Label htmlFor="depto" className="text-[11px]">
-                Depto (Opcional)
+              <Label htmlFor="depto" className={labelClassName}>
+                Depto (opcional)
               </Label>
               <Input
                 id="depto"
                 name="depto"
-                className="h-9 rounded-md bg-neutral-100 text-xs"
+                className={inputClassName}
                 defaultValue={initialProfile?.depto ?? ""}
                 disabled={!isEditing}
               />
@@ -426,40 +418,44 @@ export function ProfileInfoForm({
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor="nota" className="text-[11px]">
-              Nota (Opcional)
+            <Label htmlFor="nota" className={labelClassName}>
+              Nota (opcional)
             </Label>
             <Textarea
               id="nota"
               name="nota"
-              className="min-h-[70px] rounded-md bg-neutral-100 text-xs"
+              className="min-h-[88px] rounded-none border-black bg-white text-xs disabled:opacity-60"
               defaultValue={initialProfile?.nota ?? ""}
               disabled={!isEditing}
             />
           </div>
-        </div>
+        </section>
 
-        {/* Mensajes de estado */}
         {savedMessage && (
-          <p className="text-[11px] text-emerald-600">{savedMessage}</p>
+          <p
+            className={`${khInterferenceRegularFont.className} border-l-4 border-[#ADFE00] bg-[#ADFE00]/20 px-3 py-2 text-[11px] uppercase`}
+          >
+            {savedMessage}
+          </p>
         )}
-        {errorMessage && <p className="text-[11px] text-red-600">{errorMessage}</p>}
+        {errorMessage && (
+          <p
+            className={`${khInterferenceRegularFont.className} border-l-4 border-red-600 bg-red-50 px-3 py-2 text-[11px] uppercase text-red-700`}
+          >
+            {errorMessage}
+          </p>
+        )}
 
-        {/* Botón guardar solo si se está editando */}
         {isEditing && (
           <Button
             type="submit"
-            className="mt-2 w-full rounded-xl bg-black text-xs font-semibold tracking-wide text-white hover:bg-black/90"
+            className={`${khInterferenceRegularFont.className} mt-2 h-12 w-full rounded-none bg-black text-[13px] uppercase text-white hover:bg-[#ADFE00] hover:text-black`}
             disabled={saving}
           >
-            {saving ? "Guardando..." : "Guardar información"}
+            {saving ? "Guardando..." : "Guardar informacion"}
           </Button>
         )}
       </form>
     </div>
   );
 }
-
-
-
-
