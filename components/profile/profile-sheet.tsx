@@ -22,11 +22,17 @@ export function ProfileSheet({
   onLogout,
   children,
 }: ProfileSheetProps) {
+  // ESTADO DE NAVEGACION INTERNA
+  // Decide que vista se muestra dentro del mismo panel lateral: menu, pedidos o info.
   const [view, setView] = useState<ProfileView>("menu");
   const router = useRouter();
 
+  // ACCION VOLVER
+  // La usan Info y Pedidos para regresar a la portada del perfil sin cerrar el Sheet.
   const handleBackToMenu = () => setView("menu");
 
+  // ACCION CERRAR SESION
+  // Cierra la cookie de autenticacion, actualiza el icono de navegacion y refresca la pagina.
   const handleLogout = async () => {
     try {
       const res = await fetch("/api/auth/logout", {
@@ -56,22 +62,33 @@ export function ProfileSheet({
   };
 
   return (
+    // CONTENEDOR SHEET
+    // Al cerrar el panel, siempre reinicia en el menu para no abrir directamente una vista anterior.
     <Sheet
       onOpenChange={(open) => {
         if (!open) setView("menu");
       }}
     >
+      {/* DISPARADOR DEL PERFIL: normalmente es el icono del usuario del navbar. */}
       <SheetTrigger asChild>
         {children ? (
           children
         ) : (
-          <button className="hidden cursor-pointer rounded-2xl border border-black px-4 py-1 font-bold transition duration-200 ease-in-out hover:bg-black hover:text-white md:flex">
+          <button
+            className="
+              hidden cursor-pointer rounded-2xl border border-black px-4 py-1
+              font-bold transition duration-200 ease-in-out hover:bg-black hover:text-white
+              md:flex
+            "
+          >
             Perfil
           </button>
         )}
       </SheetTrigger>
 
+      {/* PANEL LATERAL: ancho total en movil y 380px desde tablet/escritorio. */}
       <SheetContent side="right" className="w-full p-0 sm:w-[380px]">
+        {/* VISTA 01: portada con enlaces a Pedidos e Info. */}
         {view === "menu" && (
           <ProfileMenu
             user={user}
@@ -80,10 +97,12 @@ export function ProfileSheet({
           />
         )}
 
+        {/* VISTA 02: historial y estado de las compras del usuario. */}
         {view === "compras" && (
           <ProfileOrdersView onBack={handleBackToMenu} />
         )}
 
+        {/* VISTA 03: formulario de datos personales y direccion de despacho. */}
         {view === "info" && (
           <ProfileInfoForm
             onBack={handleBackToMenu}

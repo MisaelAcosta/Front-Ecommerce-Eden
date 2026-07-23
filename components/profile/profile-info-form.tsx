@@ -21,6 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { writeAccountProfile } from "@/lib/account-profile";
 import { CommuneCombobox, RegionCombobox } from "./region-commune-select";
 import type { ProfileData } from "./profile-types";
+import { Separator } from "@radix-ui/react-separator";
 
 type ProfileInfoFormProps = {
   onBack: () => void;
@@ -28,7 +29,12 @@ type ProfileInfoFormProps = {
   initialProfile?: ProfileData | null;
 };
 
+// ESTILO REUTILIZABLE - ETIQUETAS
+// Mantiene todos los labels del formulario con la tipografia y jerarquia visual de Eden.
 const labelClassName = `${khInterferenceRegularFont.className} text-[11px] uppercase`;
+
+// ESTILO REUTILIZABLE - CAMPOS DE TEXTO
+// Altura fija, borde negro y fondo blanco. `disabled:opacity-60` diferencia lectura de edicion.
 const inputClassName =
   "h-10 rounded-none border-black bg-white text-xs disabled:opacity-60";
 
@@ -37,11 +43,18 @@ export function ProfileInfoForm({
   userId,
   initialProfile,
 }: ProfileInfoFormProps) {
+  // ESTADO DE EDICION
+  // Si no existe perfil, el formulario abre editable para que el cliente complete sus datos.
   const [isEditing, setIsEditing] = useState(() => !initialProfile);
+
+  // ESTADOS DE GUARDADO
+  // Controlan el boton y los mensajes visuales de exito o error bajo el formulario.
   const [saving, setSaving] = useState(false);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // PREFERENCIAS DE AVISO
+  // Se guardan en Strapi y definen el canal de actualizaciones de envio.
   const [notifyWhatsapp, setNotifyWhatsapp] = useState(
     () => initialProfile?.notifyWhatsapp ?? false
   );
@@ -49,6 +62,8 @@ export function ProfileInfoForm({
     () => initialProfile?.notifyEmail ?? true
   );
 
+  // RUT Y TELEFONO
+  // Se separan para controlar los campos OTP y luego se reconstruyen antes de guardar.
   const [rutBody, setRutBody] = useState(() => {
     if (!initialProfile?.rut) return "";
     const [body] = initialProfile.rut.split("-");
@@ -64,6 +79,8 @@ export function ProfileInfoForm({
     const match = initialProfile.telefono.match(/^\+569(\d{8})$/);
     return match ? match[1] : "";
   });
+  // UBICACION
+  // Region y comuna alimentan los comboboxes; cambiar region limpia la comuna seleccionada.
   const [selectedRegion, setSelectedRegion] = useState<string | null>(
     () => initialProfile?.region ?? null
   );
@@ -71,6 +88,8 @@ export function ProfileInfoForm({
     () => initialProfile?.comuna ?? null
   );
 
+  // RESTABLECER EDICION
+  // Recupera los valores cargados desde Strapi al presionar Cancelar.
   const resetFromInitial = () => {
     setNotifyWhatsapp(initialProfile?.notifyWhatsapp ?? false);
     setNotifyEmail(initialProfile?.notifyEmail ?? true);
@@ -95,6 +114,9 @@ export function ProfileInfoForm({
     setSelectedComuna(initialProfile?.comuna ?? null);
   };
 
+  // GUARDAR PERFIL
+  // Construye el payload para `/api/profile` y replica los datos relevantes en localStorage
+  // para que el checkout pueda autocompletar el despacho sin otra consulta.
   const handleSubmitInfo = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!isEditing) return;
@@ -164,20 +186,28 @@ export function ProfileInfoForm({
   };
 
   return (
-    <div className="flex h-full flex-col bg-[#fafafa] text-black">
-      <header className="flex items-center justify-between border-b border-black px-5 pb-5 pt-14">
+    // CONTENEDOR GENERAL DE INFO
+    // `flex` y `h-full` mantienen la cabecera fija y permiten desplazarse solo en el formulario.
+    <div className="flex h-full flex-col shadow-none bg-[#fafafa] text-black">
+      {/* CABECERA: boton volver, etiqueta de contexto y accion Editar/Cancelar. */}
+      <header className="flex items-center justify-between border-b border-black
+       px-5 pb-5 pt-14">
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={onBack}
             aria-label="Volver al perfil"
-            className="inline-flex size-8 items-center justify-center border border-black transition-colors hover:bg-[#ADFE00]"
+            className="
+              inline-flex size-8 items-center cursor-pointer justify-center
+              transition-colors hover:bg-[#ADFE00]
+            "
           >
             <ChevronLeft className="size-4" strokeWidth={2} />
           </button>
           <div>
             <p
-              className={`${khInterferenceLightFont.className} text-[10px] uppercase text-black/55`}
+              className={`${khInterferenceLightFont.className} text-[10px] 
+              tracking-widest  text-black/55`}
             >
               Mi cuenta
             </p>
@@ -189,6 +219,7 @@ export function ProfileInfoForm({
           </div>
         </div>
 
+        {/* BOTON EDITAR: solo aparece si ya existen datos persistidos en el perfil. */}
         {initialProfile && (
           <button
             type="button"
@@ -200,64 +231,38 @@ export function ProfileInfoForm({
               }
               setIsEditing((value) => !value);
             }}
-            className={`${khInterferenceRegularFont.className} border border-black px-3 py-2 text-[10px] uppercase transition-colors hover:bg-[#ADFE00]`}
+            className={`${khInterferenceLightFont.className}
+              border cursor-pointer border-black px-3 py-2 text-[10px] tracking-widest uppercase
+              transition-colors hover:bg-[#ADFE00]`}
           >
             {isEditing ? "Cancelar" : "Editar"}
           </button>
         )}
       </header>
 
+      {/* FORMULARIO DESPLAZABLE: no cambia el alto de la cabecera al tener muchos campos. */}
       <form
         onSubmit={handleSubmitInfo}
-        className="flex-1 space-y-7 overflow-y-auto px-5 py-6 text-xs"
+        className="flex-1 space-y-10 overflow-y-auto px-5 py-6 text-xs"
       >
-        <section className="border-y border-black py-4">
-          <p
-            className={`${khInterferenceLightFont.className} text-[10px] uppercase text-black/60`}
-          >
-            Recibir informacion de mis envios por
-          </p>
-          <div className="mt-4 flex gap-5">
-            <label
-              className={`${khInterferenceRegularFont.className} flex items-center gap-2 text-[12px] uppercase`}
-            >
-              <Checkbox
-                id="notifyWhatsapp"
-                checked={notifyWhatsapp}
-                onCheckedChange={(value) => {
-                  if (isEditing) setNotifyWhatsapp(!!value);
-                }}
-                disabled={!isEditing}
-              />
-              <span>Whatsapp</span>
-            </label>
-            <label
-              className={`${khInterferenceRegularFont.className} flex items-center gap-2 text-[12px] uppercase`}
-            >
-              <Checkbox
-                id="notifyEmail"
-                checked={notifyEmail}
-                onCheckedChange={(value) => {
-                  if (isEditing) setNotifyEmail(!!value);
-                }}
-                disabled={!isEditing}
-              />
-              <span>Correo</span>
-            </label>
-          </div>
-        </section>
+        
 
-        <section className="space-y-4">
+        {/* BLOQUE 02 - DATOS DE ENVIO: nombre, RUT y telefono del destinatario. */}
+        <section className="space-y-4 pt-5">
+          {/* TITULO DE SECCION: linea verde decorativa + tipografia principal. */}
           <div className="flex items-center gap-3">
-            <span className="h-px w-7 bg-[#ADFE00]" />
+            <span className="h-5 w-2 bg-[#ADFE00]" />
             <p
-              className={`${khInterferenceBoldFont.className} text-[20px] uppercase leading-none`}
+              className={`${khInterferenceRegularFont.className} text-[20px] 
+              uppercase leading-none`}
             >
               Datos de envio
             </p>
           </div>
 
+          {/* CAMPO NOMBRE: valor de texto que se envia como `nombre` al backend. */}
           <div className="space-y-3">
+            {/* CAMPO RUT: ocho digitos, separador y digito verificador. */}
             <div className="space-y-1">
               <Label htmlFor="nombre" className={labelClassName}>
                 Nombre y apellido
@@ -272,6 +277,7 @@ export function ProfileInfoForm({
               />
             </div>
 
+            {/* CAMPO TELEFONO: prefijo fijo +56 9 y ocho digitos locales. */}
             <div className="space-y-1">
               <Label className={labelClassName}>Rut</Label>
               <div className="flex items-center gap-1">
@@ -287,7 +293,8 @@ export function ProfileInfoForm({
                       <InputOTPSlot
                         key={index}
                         index={index}
-                        className="h-9 w-6 rounded-none border-black bg-white text-xs"
+                        className="h-9 w-6 rounded-none border-black 
+                        bg-white text-xs"
                       />
                     ))}
                   </InputOTPGroup>
@@ -316,7 +323,8 @@ export function ProfileInfoForm({
               <Label className={labelClassName}>Telefono</Label>
               <div className="flex items-center gap-2">
                 <span
-                  className={`${khInterferenceRegularFont.className} border border-black bg-white px-2 py-2 text-[12px]`}
+                  className={`${khInterferenceLightFont.className} rounded-md border
+                   border-black bg-white px-2 py-2 text-[12px]`}
                 >
                   +56 9
                 </span>
@@ -332,7 +340,7 @@ export function ProfileInfoForm({
                       <InputOTPSlot
                         key={index}
                         index={index}
-                        className="h-9 w-6 rounded-none border-black bg-white text-xs"
+                        className="h-9 w-6  border-black bg-white text-xs"
                       />
                     ))}
                   </InputOTPGroup>
@@ -342,16 +350,21 @@ export function ProfileInfoForm({
           </div>
         </section>
 
-        <section className="space-y-4 border-t border-black pt-6">
+
+        {/* BLOQUE 03 - DIRECCION: datos usados para el despacho durante el checkout. */}
+        <section className="space-y-4 border-t border-black/30 pt-10">
+          {/* TITULO DE SECCION: mantiene el mismo recurso visual verde que Datos de envio. */}
           <div className="flex items-center gap-3">
-            <span className="h-px w-7 bg-[#ADFE00]" />
+            <span className="h-5 w-2  bg-[#ADFE00]" />
             <p
-              className={`${khInterferenceBoldFont.className} text-[20px] uppercase leading-none`}
+              className={`${khInterferenceRegularFont.className} text-[20px] 
+              uppercase leading-none`}
             >
-              Direccion
+              Dirección
             </p>
           </div>
 
+          {/* SELECTORES REGION Y COMUNA: dos columnas de igual ancho. */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label className={labelClassName}>Region</Label>
@@ -377,6 +390,7 @@ export function ProfileInfoForm({
             </div>
           </div>
 
+          {/* CAMPO CALLE: ocupa todo el ancho disponible. */}
           <div className="space-y-1">
             <Label htmlFor="calle" className={labelClassName}>
               Calle
@@ -390,6 +404,7 @@ export function ProfileInfoForm({
             />
           </div>
 
+          {/* CAMPOS NUMERO Y DEPTO: comparten una fila para reducir desplazamiento. */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label htmlFor="numero" className={labelClassName}>
@@ -417,6 +432,7 @@ export function ProfileInfoForm({
             </div>
           </div>
 
+          {/* CAMPO NOTA: textarea alto para indicaciones de entrega opcionales. */}
           <div className="space-y-1">
             <Label htmlFor="nota" className={labelClassName}>
               Nota (opcional)
@@ -431,25 +447,30 @@ export function ProfileInfoForm({
           </div>
         </section>
 
+        {/* MENSAJE DE EXITO: borde y fondo verde Eden despues de guardar. */}
         {savedMessage && (
           <p
-            className={`${khInterferenceRegularFont.className} border-l-4 border-[#ADFE00] bg-[#ADFE00]/20 px-3 py-2 text-[11px] uppercase`}
+            className={`${khInterferenceLightFont.className} border-l-4 border-[#ADFE00] bg-[#ADFE00]/20 px-3 py-2 text-[11px] uppercase`}
           >
             {savedMessage}
           </p>
         )}
+        {/* MENSAJE DE ERROR: conserva el formulario y explica que el guardado fallo. */}
         {errorMessage && (
           <p
-            className={`${khInterferenceRegularFont.className} border-l-4 border-red-600 bg-red-50 px-3 py-2 text-[11px] uppercase text-red-700`}
+            className={`${khInterferenceLightFont.className} border-l-4 border-red-600 bg-red-50 px-3 py-2 text-[11px] uppercase text-red-700`}
           >
             {errorMessage}
           </p>
         )}
 
+        {/* ACCION FINAL: solo es visible en modo edicion para evitar guardados accidentales. */}
         {isEditing && (
           <Button
             type="submit"
-            className={`${khInterferenceRegularFont.className} mt-2 h-12 w-full rounded-none bg-black text-[13px] uppercase text-white hover:bg-[#ADFE00] hover:text-black`}
+            className={`${khInterferenceLightFont.className}
+              mt-2 h-12 w-full rounded-none bg-black text-[13px] uppercase text-white
+              hover:bg-[#ADFE00] hover:text-black`}
             disabled={saving}
           >
             {saving ? "Guardando..." : "Guardar informacion"}

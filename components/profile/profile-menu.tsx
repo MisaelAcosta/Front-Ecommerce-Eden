@@ -20,7 +20,10 @@ export function ProfileMenu({
   onLogout,
 }: ProfileMenuProps) {
   return (
+    // CONTENEDOR GENERAL DEL MENU
+    // Fondo claro, texto negro y altura completa para empujar el cierre de sesion al final.
     <div className="flex h-full flex-col bg-[#fafafa] text-black">
+      {/* CABECERA: identifica la seccion y muestra el correo de la cuenta abierta. */}
       <header className="border-b border-black px-6 pb-6 pt-16">
         <p
           className={`${khInterferenceLightFont.className} text-[11px] uppercase leading-none text-black/60`}
@@ -40,11 +43,17 @@ export function ProfileMenu({
         </p>
       </header>
 
+      {/* NAVEGACION PRINCIPAL: cada boton cambia la vista interna sin cerrar el Sheet. */}
       <nav className="border-b border-black">
+        {/* ACCESO 01 - PEDIDOS: abre el historial de compras y seguimiento. */}
         <button
           type="button"
           onClick={() => onChangeView("compras")}
-          className="group flex w-full items-center justify-between gap-5 border-b border-black px-6 py-7 text-left transition-colors hover:bg-[#ADFE00]"
+          className="
+            group flex w-full items-center justify-between gap-5
+            border-b border-black px-6 py-7 text-left
+            transition-colors hover:bg-[#ADFE00]
+          "
         >
           <div className="min-w-0">
             <p
@@ -64,15 +73,22 @@ export function ProfileMenu({
             </p>
           </div>
           <ChevronRight
-            className="size-6 shrink-0 transition-transform group-hover:translate-x-1"
+            className="
+              size-6 shrink-0 transition-transform
+              group-hover:translate-x-1
+            "
             strokeWidth={1.8}
           />
         </button>
 
+        {/* ACCESO 02 - INFO: abre los datos que el checkout utiliza para autocompletar. */}
         <button
           type="button"
           onClick={() => onChangeView("info")}
-          className="group flex w-full items-center justify-between gap-5 px-6 py-7 text-left transition-colors hover:bg-[#ADFE00]"
+          className="
+            group flex w-full items-center justify-between gap-5 px-6 py-7
+            text-left transition-colors hover:bg-[#ADFE00]
+          "
         >
           <div className="min-w-0">
             <p
@@ -92,17 +108,23 @@ export function ProfileMenu({
             </p>
           </div>
           <ChevronRight
-            className="size-6 shrink-0 transition-transform group-hover:translate-x-1"
+            className="
+              size-6 shrink-0 transition-transform
+              group-hover:translate-x-1
+            "
             strokeWidth={1.8}
           />
         </button>
       </nav>
 
+      {/* PIE DEL MENU: accion separada y visualmente secundaria para cerrar sesion. */}
       <footer className="mt-auto border-t border-black px-6 py-6">
         <button
           type="button"
           onClick={onLogout}
-          className={`${khInterferenceRegularFont.className} w-full border border-black px-4 py-3 text-left text-[12px] uppercase transition-colors hover:bg-black hover:text-white`}
+          className={`${khInterferenceRegularFont.className}
+            w-full border border-black px-4 py-3 text-left
+            text-[12px] uppercase transition-colors hover:bg-black hover:text-white`}
         >
           Cerrar sesion
         </button>
