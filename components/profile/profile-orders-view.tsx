@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, Loader2 } from "lucide-react";
+import { ChevronLeft, Loader2, Package, Truck } from "lucide-react";
 import {
   khInterferenceBoldFont,
   khInterferenceLightFont,
@@ -58,6 +58,75 @@ function OrderItemsText({ items }: { items: ProfileOrderItem[] }) {
     >
       {text}
     </p>
+  );
+}
+
+// SEGUIMIENTO VISUAL DEL PEDIDO
+// La caja se activa cuando la orden esta en preparacion. El camion se activa
+// unicamente cuando Strapi entrega un numero de seguimiento valido.
+function OrderStatusTracker({
+  trackingNumber,
+}: {
+  trackingNumber: string | null;
+}) {
+  const isShipped = Boolean(trackingNumber);
+
+  return (
+    <section className="mt-5">
+      {/* BARRA DE PROGRESO: fondo negro, nodos verdes activos y tramo gris pendiente. */}
+      <div className="rounded-full bg-black px-4 py-3">
+        <div className="flex items-center">
+          {/* PASO 01 - PREPARACION: siempre activo una vez creada la orden. */}
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[#ADFE00] text-black">
+            <Package className="size-5" strokeWidth={2.2} />
+          </div>
+
+          {/* CONECTOR: avanza completamente solo despues de que se envia el pedido. */}
+          <div className="relative h-2 flex-1 overflow-hidden bg-white/25">
+            <span
+              className={`absolute inset-y-0 left-0 bg-[#ADFE00] transition-[width] duration-500 ${
+                isShipped ? "w-full" : "w-[42%]"
+              }`}
+            />
+          </div>
+
+          {/* PASO 02 - ENVIO: cambia de gris a verde al existir trackingNumber. */}
+          <div
+            className={`flex size-11 shrink-0 items-center justify-center rounded-full transition-colors ${
+              isShipped ? "bg-[#ADFE00] text-black" : "bg-white/25 text-white/60"
+            }`}
+          >
+            <Truck className="size-5" strokeWidth={2.2} />
+          </div>
+        </div>
+
+        {/* ETIQUETAS: nombran cada icono sin recargar la barra principal. */}
+        <div
+          className={`${khInterferenceRegularFont.className} mt-3 grid grid-cols-2 text-[10px] uppercase`}
+        >
+          <span className="text-[#ADFE00]">Preparando</span>
+          <span className={isShipped ? "text-right text-[#ADFE00]" : "text-right text-white/50"}>
+            Enviado
+          </span>
+        </div>
+      </div>
+
+      {/* MENSAJE DE ESTADO: se actualiza junto con el segundo paso de la barra. */}
+      <div className="mt-3 border-l-4 border-[#ADFE00] bg-[#ADFE00]/20 px-3 py-3">
+        <p
+          className={`${khInterferenceRegularFont.className} text-[11px] uppercase`}
+        >
+          {isShipped ? "Tu pedido fue enviado" : "Estamos preparando tu pedido"}
+        </p>
+        {isShipped && (
+          <p
+            className={`${khInterferenceLightFont.className} mt-2 text-[12px] text-black/70`}
+          >
+            Seguimiento: {trackingNumber}
+          </p>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -124,7 +193,7 @@ export function ProfileOrdersView({ onBack }: ProfileOrdersViewProps) {
           onClick={onBack}
           aria-label="Volver al perfil"
           className="
-            inline-flex size-8 items-center justify-center border border-black
+            inline-flex size-8 items-center justify-center 
             transition-colors hover:bg-[#ADFE00]
           "
         >
@@ -132,7 +201,7 @@ export function ProfileOrdersView({ onBack }: ProfileOrdersViewProps) {
         </button>
         <div>
           <p
-            className={`${khInterferenceLightFont.className} text-[10px] uppercase text-black/55`}
+            className={`${khInterferenceLightFont.className} text-[10px] tracking-widest uppercase text-black/55`}
           >
             Mi cuenta
           </p>
@@ -176,7 +245,7 @@ export function ProfileOrdersView({ onBack }: ProfileOrdersViewProps) {
           <div className="flex h-full flex-col justify-center border-y border-black py-8">
             <p
               className={`${khInterferenceBoldFont.className}
-                text-[25px] uppercase leading-none`}
+                text-[25px] tracking-widest uppercase leading-none`}
             >
               Aun no hay pedidos
             </p>
@@ -195,23 +264,23 @@ export function ProfileOrdersView({ onBack }: ProfileOrdersViewProps) {
             {orders.map((order) => (
               // TARJETA/LINEA DE PEDIDO
               // El borde inferior separa ordenes sin usar contenedores visuales adicionales.
-              <article key={order.id} className="border-b border-black py-5">
+              <article key={order.id} className=" py-5">
                 {/* CABECERA DE LA ORDEN: fecha e identificador a la izquierda, total a la derecha. */}
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <p
-                      className={`${khInterferenceLightFont.className} text-[10px] uppercase text-black/55`}
+                      className={`${khInterferenceLightFont.className} text-[10px] tracking-widest uppercase text-black/55`}
                     >
                       Pedido · {formatOrderDate(order.date)}
                     </p>
                     <h3
-                      className={`${khInterferenceBoldFont.className} mt-2 break-words text-[17px] uppercase leading-[1.05]`}
+                      className={`${khInterferenceRegularFont.className} mt-2 break-words text-[17px] uppercase leading-[1.05]`}
                     >
                       {order.id}
                     </h3>
                   </div>
                   <p
-                    className={`${khInterferenceBoldFont.className} shrink-0 text-[18px] leading-none`}
+                    className={`${khInterferenceRegularFont.className} shrink-0 text-[18px] leading-none`}
                   >
                     {formatPrice(order.total)}
                   </p>
@@ -220,32 +289,8 @@ export function ProfileOrdersView({ onBack }: ProfileOrdersViewProps) {
                 {/* ARTICULOS: texto resumido con todos los productos de esta orden. */}
                 <OrderItemsText items={order.items} />
 
-                {order.trackingNumber ? (
-                  // ESTADO ENVIADO
-                  // Verde Eden: confirma despacho y hace visible el numero de seguimiento.
-                  <div className="mt-4 border-l-4 border-[#ADFE00] bg-[#ADFE00]/20 px-3 py-3">
-                    <p
-                      className={`${khInterferenceRegularFont.className} text-[11px] uppercase`}
-                    >
-                      Tu pedido fue enviado
-                    </p>
-                    <p
-                      className={`${khInterferenceLightFont.className} mt-2 text-[12px] text-black/70`}
-                    >
-                      Seguimiento: {order.trackingNumber}
-                    </p>
-                  </div>
-                ) : (
-                  // ESTADO PREPARACION
-                  // Fondo negro: comunica que aun no existe numero de seguimiento disponible.
-                  <div className="mt-4 border-l-4 border-black bg-black px-3 py-3 text-white">
-                    <p
-                      className={`${khInterferenceRegularFont.className} text-[11px] uppercase`}
-                    >
-                      Estamos preparando tu pedido
-                    </p>
-                  </div>
-                )}
+                {/* ESTADO DEL PEDIDO: caja + camion y mensaje segun trackingNumber. */}
+                <OrderStatusTracker trackingNumber={order.trackingNumber} />
               </article>
             ))}
           </div>
