@@ -74,17 +74,18 @@ function OrderStatusTracker({
   return (
     <section className="mt-5">
       {/* BARRA DE PROGRESO: fondo negro, nodos verdes activos y tramo gris pendiente. */}
-      <div className="rounded-full bg-black px-4 py-3">
+      <div className=" bg-black px-4 py-2">
         <div className="flex items-center">
           {/* PASO 01 - PREPARACION: siempre activo una vez creada la orden. */}
           <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[#ADFE00] text-black">
-            <Package className="size-5" strokeWidth={2.2} />
+            <Package className="size-5" strokeWidth={1} />
           </div>
 
           {/* CONECTOR: avanza completamente solo despues de que se envia el pedido. */}
           <div className="relative h-2 flex-1 overflow-hidden bg-white/25">
             <span
-              className={`absolute inset-y-0 left-0 bg-[#ADFE00] transition-[width] duration-500 ${
+              className={`absolute inset-y-0 left-0 bg-[#ADFE00] 
+                transition-[width] duration-500 ${
                 isShipped ? "w-full" : "w-[42%]"
               }`}
             />
@@ -92,11 +93,12 @@ function OrderStatusTracker({
 
           {/* PASO 02 - ENVIO: cambia de gris a verde al existir trackingNumber. */}
           <div
-            className={`flex size-11 shrink-0 items-center justify-center rounded-full transition-colors ${
+            className={`flex size-11 shrink-0 items-center justify-center
+               rounded-full transition-colors ${
               isShipped ? "bg-[#ADFE00] text-black" : "bg-white/25 text-white/60"
             }`}
           >
-            <Truck className="size-5" strokeWidth={2.2} />
+            <Truck className="size-5" strokeWidth={1} />
           </div>
         </div>
 
@@ -104,15 +106,15 @@ function OrderStatusTracker({
         <div
           className={`${khInterferenceRegularFont.className} mt-3 grid grid-cols-2 text-[10px] uppercase`}
         >
-          <span className="text-[#ADFE00]">Preparando</span>
+          <span className="text-[#ADFE00]"></span>
           <span className={isShipped ? "text-right text-[#ADFE00]" : "text-right text-white/50"}>
-            Enviado
+            
           </span>
         </div>
       </div>
 
       {/* MENSAJE DE ESTADO: se actualiza junto con el segundo paso de la barra. */}
-      <div className="mt-3 border-l-4 border-[#ADFE00] bg-[#ADFE00]/20 px-3 py-3">
+      <div className="mt-3  bg-[#ADFE00]/20 px-3 py-3">
         <p
           className={`${khInterferenceRegularFont.className} text-[11px] uppercase`}
         >
@@ -274,13 +276,15 @@ export function ProfileOrdersView({ onBack }: ProfileOrdersViewProps) {
                       Pedido · {formatOrderDate(order.date)}
                     </p>
                     <h3
-                      className={`${khInterferenceRegularFont.className} mt-2 break-words text-[17px] uppercase leading-[1.05]`}
+                      className={`${khInterferenceRegularFont.className} mt-2 
+                      break-words text-[10px] lg:text-[13px] uppercase leading-[1.05]`}
                     >
                       {order.id}
                     </h3>
                   </div>
                   <p
-                    className={`${khInterferenceRegularFont.className} shrink-0 text-[18px] leading-none`}
+                    className={`${khInterferenceRegularFont.className} 
+                    shrink-0 text-[10px] lg:text[13px] leading-none`}
                   >
                     {formatPrice(order.total)}
                   </p>
