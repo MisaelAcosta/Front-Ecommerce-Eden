@@ -10,7 +10,8 @@ import { LovedButton } from "@/components/loved-button";
 import { toAbsUrl } from "@/lib/media";
 import { useNavigationTransition } from "@/components/navigation-transition-provider";
 
-// Tipografias locales usadas en la tarjeta del catalogo.
+// TIPOGRAFIAS DE TARJETA
+// Regular para titulo y Light para precios; cambiar aqui modifica todas las tarjetas del catalogo.
 const khInterferenceLightFont = localFont({
   src: "../../../../../components/fonts/KHInterferenceTRIAL-Light.otf",
   weight: "300",
@@ -89,7 +90,8 @@ type ProductCardProps = {
   product: ProductType;
 };
 
-// Evalua si una promocion sigue vigente segun fechas y estado.
+// VALIDAR PROMOCION
+// Evalua estado y rango de fechas antes de mostrar cualquier precio rebajado.
 function isPromoActive(promo: PromotionType, now = new Date()) {
   if (!promo?.active) return false;
 
@@ -102,7 +104,8 @@ function isPromoActive(promo: PromotionType, now = new Date()) {
   return true;
 }
 
-// Aplica el valor de la promocion al precio base.
+// CALCULAR DESCUENTO
+// Acepta porcentaje (0-100), decimal (0-1) o monto fijo y devuelve el precio final.
 function applyPromo(basePrice: number, promo: PromotionType | null) {
   if (!promo) return basePrice;
 
@@ -117,7 +120,8 @@ function applyPromo(basePrice: number, promo: PromotionType | null) {
   return Math.max(0, Math.round(basePrice - discount));
 }
 
-// Escoge la promocion activa que deje el precio final mas bajo.
+// ELEGIR MEJOR PROMOCION
+// Si Strapi entrega varias promociones, muestra la que deja el precio menor al cliente.
 function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
   if (!promos || promos.length === 0) return null;
 
@@ -136,7 +140,8 @@ function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
   return best ? best.promo : null;
 }
 
-// Aplana las promociones cuando Strapi las entrega anidadas.
+// NORMALIZAR PROMOCIONES
+// Soporta las dos formas de respuesta de Strapi: arreglo plano o relacion dentro de `data`.
 function normalizePromotions(input: PromotionsInput): PromotionType[] {
   if (!input) return [];
   if (Array.isArray(input)) return input;
@@ -161,7 +166,8 @@ function normalizePromotions(input: PromotionsInput): PromotionType[] {
   return [];
 }
 
-// Obtiene las imagenes del producto sin importar si vienen planas o relacionadas.
+// NORMALIZAR IMAGENES
+// Extrae las fotos sin importar si Strapi las entrega planas o dentro de una relacion `data`.
 function getImagesArray(attrs: ProductAttrs): ProductImage[] {
   if (Array.isArray(attrs.images)) {
     return attrs.images;
@@ -176,7 +182,8 @@ function getImagesArray(attrs: ProductAttrs): ProductImage[] {
   return [];
 }
 
-// Prepara todos los datos necesarios para renderizar la tarjeta.
+// PREPARAR DATOS DE TARJETA
+// Centraliza nombre, slug, fotos y precios para que la parte visual no dependa de Strapi directamente.
 function buildProductCardData(product: ProductType): ProductCardData {
   const productData = product as ProductWithOptionalAttributes;
   const attrs: ProductAttrs = productData.attributes ?? (product as ProductAttrs) ?? {};
@@ -207,6 +214,8 @@ function buildProductCardData(product: ProductType): ProductCardData {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  // NAVEGACION DE PRODUCTO
+  // El click de la imagen usa la transicion global para abrir el detalle con suavidad.
   const { navigateWithTransition } = useNavigationTransition();
   const productCard = buildProductCardData(product);
   const {
@@ -222,28 +231,41 @@ const ProductCard = ({ product }: ProductCardProps) => {
   } = productCard;
 
   return (
+    // CONTENEDOR DE TARJETA
+    // La tarjeta no tiene borde ni sombra; su separacion la entrega la grilla del catalogo.
     <Card
-      className="group relative flex w-full flex-col rounded-none border-none bg-white shadow-none"
+      className="group relative flex w-full 
+      flex-col rounded-none border-none bg-white shadow-none"
     >
       <CardContent className="flex flex-col p-0">
-        {/* Contenedor visual del producto e interaccion principal. */}
+        {/* AREA DE IMAGEN
+            `aspect-[1.08/1.2]` cambia la proporcion movil.
+            `lg:aspect-[1.08/1]` cambia la proporcion para pantallas grandes. */}
         <div
           className="
             relative flex w-full cursor-pointer items-center justify-center overflow-hidden
             bg-neutral-100 text-left
             aspect-[1.08/1.2]
-            lg:aspect-[1.08/1]
+            lg:aspect-[1.08/1.2]
           "
           onClick={() =>
             productSlug && navigateWithTransition(`/product/${productSlug}`)
           }
         >
+          {/* SELLO OFERTA: solo aparece si hay promocion activa. Ajustar left/top mueve su posicion. */}
           {hasDiscount && (
-            <div className="absolute left-3 top-3 z-10 bg-black px-2 py-1 text-[10px] font-black tracking-wide text-[#ADFE00] lg:left-4 lg:top-4 lg:px-3 lg:text-[11px]">
+            <div
+              className="
+                absolute left-3 top-3 z-10 bg-black px-2 py-1
+                text-[10px] font-black tracking-wide text-[#ADFE00]
+                lg:left-4 lg:top-4 lg:px-3 lg:text-[11px]
+              "
+            >
               OFERTA
             </div>
           )}
 
+          {/* FAVORITO: posicion absoluta sobre la imagen; right/top controlan su esquina. */}
           <div className="absolute right-3 top-3 z-20 lg:right-4 lg:top-4">
             <LovedButton
               product={{
@@ -257,6 +279,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             />
           </div>
 
+          {/* FOTOS: la primera es visible; la segunda aparece al hover en escritorio. */}
           <div className="relative size-full">
             {image1 && (
               <Image
@@ -292,7 +315,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </div>
         </div>
 
-        <div className="flex items-baseline justify-between gap-2 px-1 pt-2 text-left sm:px-0 sm:gap-3">
+        {/* INFORMACION: nombre a la izquierda y precio a la derecha.
+            En movil usa texto pequeno para que ambos quepan en dos columnas. */}
+        <div
+          className="
+            flex items-baseline justify-between gap-2 px-1 pt-2 text-left
+            sm:gap-3 sm:px-0
+          "
+        >
           <h3
             className={`${khInterferenceRegularFont.className}
               line-clamp-1 min-w-0 flex-1 text-[12px] uppercase leading-[1.2]
@@ -302,6 +332,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             {displayName}
           </h3>
           {hasDiscount ? (
+            // PRECIO EN OFERTA: precio original tachado + valor final debajo.
             <div className="shrink-0 leading-none text-right">
               <p
                 className={`${khInterferenceLightFont.className}
@@ -319,6 +350,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
               </p>
             </div>
           ) : (
+            // PRECIO NORMAL: se muestra cuando no hay una promocion vigente.
             <p
               className={`${khInterferenceLightFont.className}
                 shrink-0 whitespace-nowrap text-[12px] text-right leading-[1.2]

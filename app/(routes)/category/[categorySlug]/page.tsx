@@ -34,6 +34,8 @@ import {
   PaginationLink,
 } from "@/components/ui/pagination";
 
+// TIPOS DE RESPUESTA
+// Permiten leer productos aunque Strapi los entregue planos o dentro de `attributes`.
 type ProductWithOptionalAttributes = ProductType & {
   id?: number | string;
   attributes?: {
@@ -53,6 +55,8 @@ type CollectionOption = {
   query: string;
 };
 
+// TIPOGRAFIA DEL CATALOGO
+// Un unico punto para cambiar la fuente de filtros, controles y textos de interfaz.
 const khInterferenceRegularFont = localFont({
   src: "../../../../components/fonts/KHInterferenceTRIAL-Regular.otf",
   weight: "400",
@@ -60,6 +64,8 @@ const khInterferenceRegularFont = localFont({
   display: "swap",
 });
 
+// OPCIONES DE ORDEN
+// El `value` se envia al hook de productos; `label` es lo que ve el cliente.
 const sortOptions: { value: SortOption; label: string }[] = [
   { value: "default", label: "Relevancia" },
   { value: "price-asc", label: "Menor precio" },
@@ -67,6 +73,8 @@ const sortOptions: { value: SortOption; label: string }[] = [
   { value: "recent", label: "Mas reciente" },
 ];
 
+// COLECCIONES DESTACADAS
+// Cada coleccion filtra por su texto configurado sin cambiar la categoria principal.
 const collectionOptions: CollectionOption[] = [
   {
     key: "lord-of-the-rings",
@@ -75,6 +83,8 @@ const collectionOptions: CollectionOption[] = [
   },
 ];
 
+// NORMALIZAR BUSQUEDA
+// Quita acentos y diferencias de mayusculas para que las coincidencias sean mas naturales.
 function normalizeFilterText(value: string) {
   return value
     .normalize("NFD")
@@ -84,25 +94,35 @@ function normalizeFilterText(value: string) {
 }
 
 export default function Page() {
+  // URL Y NAVEGACION
+  // `categorySlug` determina la categoria actual y router cambia de categoria desde los filtros.
   const params = useParams();
   const router = useRouter();
   const { categorySlug } = params as { categorySlug: string };
 
+  // ESTADOS DE FILTRO
+  // Categoria/subcategoria, busqueda, coleccion, orden y pagina gobiernan la consulta de productos.
   const [activeSubSlug, setActiveSubSlug] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCollectionKey, setActiveCollectionKey] =
     useState<CollectionKey | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>("default");
   const [currentPage, setCurrentPage] = useState(1);
+  // ESTADOS MOVILES
+  // Controlan los drawers de categoria/orden y el reemplazo del titulo por el buscador movil.
   const [mobileCategoryDrawerOpen, setMobileCategoryDrawerOpen] = useState(false);
   const [mobileSortDrawerOpen, setMobileSortDrawerOpen] = useState(false);
   const [expandedMobileCategorySlug, setExpandedMobileCategorySlug] =
     useState<string | null>(categorySlug);
   const [showSearchMobile, setShowSearchMobile] = useState(false);
+  // SUBCATEGORIA PENDIENTE
+  // Conserva una subcategoria si el usuario primero debe navegar a otra categoria desde movil.
   const pendingMobileSubcategoryRef = useRef<{
     categorySlug: string;
     subcategorySlug: string;
   } | null>(null);
+  // CATEGORIAS DE STRAPI
+  // Alimentan los filtros laterales y el drawer de categorias en movil.
   const {
     categories,
     loading: loadingCategories,
@@ -110,6 +130,8 @@ export default function Page() {
   } = useGetCategories();
 
   useEffect(() => {
+    // REINICIO AL CAMBIAR DE CATEGORIA
+    // Limpia filtros incompatibles, cierra drawers y restablece la pagina uno.
     const pendingSubcategory = pendingMobileSubcategoryRef.current;
     const nextSubcategorySlug =
       pendingSubcategory?.categorySlug === categorySlug
@@ -131,13 +153,19 @@ export default function Page() {
     }
   }, [categorySlug]);
 
+  // COLECCION ACTIVA
+  // Obtiene los metadatos de la coleccion seleccionada para mostrar etiqueta y buscar productos.
   const activeCollection =
     collectionOptions.find((collection) => collection.key === activeCollectionKey) ??
     null;
 
+  // PARAMETROS DE CONSULTA
+  // Una busqueda escrita siempre consulta "todos los productos", sin limitarse a la categoria actual.
   const isGlobalSearch = searchTerm.trim().length > 0;
   const fetchSearchTerm = isGlobalSearch ? searchTerm : activeCollection?.query ?? "";
 
+  // CONSULTA DE PRODUCTOS
+  // Cualquier cambio de filtros o pagina vuelve a consultar al backend a traves de este hook.
   const { products, loading, error, totalPages } = useGetCategoryProduct({
     categorySlug: isGlobalSearch ? "todos-los-productos" : categorySlug,
     subSlug: isGlobalSearch ? null : activeSubSlug,
@@ -173,6 +201,8 @@ export default function Page() {
     );
   }, [activeSubSlug, categories, categorySlug]);
 
+  // FILTRO LOCAL COMPLEMENTARIO
+  // Revisa nombre y subtitulo por si la respuesta remota requiere una coincidencia adicional en pantalla.
   const filteredProducts = useMemo(() => {
     if (!products) return [];
 
@@ -197,6 +227,8 @@ export default function Page() {
     });
   }, [products, searchTerm, activeCollection]);
 
+  // NAVEGACION DE PAGINAS
+  // Valida limites antes de actualizar la pagina solicitada.
   const goToPage = (page: number) => {
     if (page < 1) return;
     if (page > totalPages) return;
@@ -207,16 +239,22 @@ export default function Page() {
   const handlePrev = () => goToPage(currentPage - 1);
   const handleNext = () => goToPage(currentPage + 1);
 
+  // CAMBIAR ORDEN
+  // Reinicia a la primera pagina para evitar que un nuevo orden muestre una pagina invalida.
   const handleSortChange = (value: string) => {
     setSortBy(value as SortOption);
     setCurrentPage(1);
   };
 
+  // ACTIVAR COLECCION
+  // Un segundo click desactiva la coleccion; ambos casos reinician la paginacion.
   const handleCollectionToggle = (key: CollectionKey) => {
     setActiveCollectionKey((current) => (current === key ? null : key));
     setCurrentPage(1);
   };
 
+  // CONTROL DE COLECCIONES
+  // Se reutiliza en escritorio y en drawer movil. `compact` adapta su ancho al contenedor.
   const CollectionControl = ({ compact = false }: { compact?: boolean }) => (
     <div
       className={`flex items-center gap-4 text-black ${
@@ -252,21 +290,25 @@ export default function Page() {
     </div>
   );
 
+  // CONTROL DE ORDEN
+  // Editar `h-[44px]` cambia la altura. El select usa borde recto para coincidir con el catalogo.
   const SortControl = ({ compact = false }: { compact?: boolean }) => (
     <label
-      className={`flex items-center gap-2 text-black ${
+      className={`flex h-[40px] items-center gap-3 text-black ${
         compact ? "w-full" : "justify-end"
       }`}
     >
-      <ArrowUpDown className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+      
       <span className="sr-only">Ordenar por</span>
       <select
         value={sortBy}
         onChange={(event) => handleSortChange(event.target.value)}
         className={`
-          h-10 cursor-pointer border rounded-2xl border-black/10 bg-white px-3
-          text-xs uppercase tracking-[0.16em] outline-none transition
-          hover:border-black/30 focus:border-black
+          ${khInterferenceRegularFont.className}
+          h-full cursor-pointer appearance-auto border border-black/40 
+          bg-white px-8
+          text-[12px] uppercase tracking-[0.14em] outline-none transition-colors
+          hover:bg-neutral-100 focus:bg-neutral-100
           ${compact ? "w-full" : "min-w-[210px]"}
         `}
       >
@@ -279,6 +321,8 @@ export default function Page() {
     </label>
   );
 
+  // COLECCIONES MOVILES
+  // Barra horizontal con scroll para no reducir el ancho de cada boton en pantallas pequenas.
   const MobileCollectionControl = () => (
     <div className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {collectionOptions.map((collection) => {
@@ -300,6 +344,8 @@ export default function Page() {
     </div>
   );
 
+  // SELECCIONAR CATEGORIA MOVIL
+  // Cierra el drawer, limpia filtros y navega a la categoria elegida.
   const selectMobileCategory = (slug: string) => {
     setMobileCategoryDrawerOpen(false);
     setExpandedMobileCategorySlug(slug);
@@ -310,6 +356,8 @@ export default function Page() {
     router.push(`/category/${slug}`);
   };
 
+  // SELECCIONAR SUBCATEGORIA MOVIL
+  // Si cambia de categoria, guarda temporalmente la subcategoria para aplicarla tras la navegacion.
   const selectMobileSubcategory = (
     selectedCategorySlug: string,
     selectedSubcategorySlug: string
@@ -329,12 +377,19 @@ export default function Page() {
   };
 
   return (
+    // CONTENEDOR PRINCIPAL
+    // Los paddings `md` y `lg` controlan el margen del catalogo en pantallas grandes.
     <SmoothScroll>
       <section className="w-full px-0 pb-28 pt-25 md:px-8 md:pb-0 lg:px-12 lg:pt-30">
         
+        {/* BARRA SUPERIOR MOVIL
+            Solo visible antes de md: buscador, categoria activa, filtro y orden. */}
         <ScrollReveal delay={0.08}>
           <div className="bg-white px-5 pb-5 pt-6 md:hidden">
+            {/* FILA PRINCIPAL MOVIL
+                `grid-cols` fija el ancho de iconos y deja el espacio flexible al titulo/buscador. */}
             <div className="grid grid-cols-[56px_minmax(0,1fr)_56px] items-center gap-3">
+              {/* BOTON BUSCAR: alterna entre el nombre de categoria y el input de texto. */}
               <button
                 type="button"
                 aria-label={showSearchMobile ? "Cerrar buscador" : "Buscar productos"}
@@ -353,6 +408,7 @@ export default function Page() {
                 )}
               </button>
 
+              {/* CENTRO: input cuando se busca; etiqueta de categoria en estado normal. */}
               {showSearchMobile ? (
                 <label
                   className={`${khInterferenceRegularFont.className} flex h-14 min-w-0 items-center rounded-[18px] border border-black px-3 text-xs uppercase text-black`}
@@ -380,6 +436,7 @@ export default function Page() {
                 </div>
               )}
 
+              {/* BOTON FILTROS: abre el drawer inferior de categorias. */}
               <button
                 type="button"
                 aria-label="Filtrar por categoria"
@@ -394,6 +451,7 @@ export default function Page() {
               </button>
             </div>
 
+            {/* FILA SECUNDARIA MOVIL: colecciones desplazables y acceso a ordenamiento. */}
             <div className="mt-5 flex items-center gap-3">
               <MobileCollectionControl />
               <button
@@ -412,6 +470,8 @@ export default function Page() {
           </div>
         </ScrollReveal>
 
+        {/* DRAWER MOVIL - CATEGORIAS
+            Panel inferior para navegar categorias y subcategorias sin salir del catalogo. */}
         <Drawer
           open={mobileCategoryDrawerOpen}
           onOpenChange={setMobileCategoryDrawerOpen}
@@ -521,6 +581,8 @@ export default function Page() {
           </DrawerContent>
         </Drawer>
 
+        {/* DRAWER MOVIL - ORDEN
+            Lista las opciones de orden; seleccionar una cierra el panel y recarga resultados. */}
         <Drawer
           open={mobileSortDrawerOpen}
           onOpenChange={setMobileSortDrawerOpen}
@@ -567,9 +629,12 @@ export default function Page() {
 
        
 
+        {/* ESTRUCTURA DE ESCRITORIO
+            Desde md aparece sidebar de filtros a la izquierda y productos a la derecha. */}
         <ScrollReveal delay={0.16}>
           <div className="grid grid-cols-1 md:grid-cols-[205px_1fr] shadow-none gap-4">
-            <aside className="rounded-md p-4 text-sm hidden md:block">
+            {/* SIDEBAR: buscador y arbol de categorias. `p-4` controla su aire interior. */}
+            <aside className="hidden p-4 text-sm md:block">
               <div className="mb-5">
                 <SearchBar
                   value={searchTerm}
@@ -591,12 +656,16 @@ export default function Page() {
               />
             </aside>
 
-            <main className="w-auto px-0 shadow-none md:p-8">
-              <div className="mb-5 hidden items-center justify-between gap-6 md:flex">
+            {/* AREA DE RESULTADOS: controles, grilla, estados y paginacion. */}
+            <main className="w-auto px-0 shadow-none md:p-2">
+              {/* CONTROLES ESCRITORIO: colecciones a la izquierda y selector Relevancia a la derecha. */}
+              <div className="mb-3 hidden items-center 
+              justify-between gap-6 md:flex">
                 <CollectionControl />
                 <SortControl />
               </div>
 
+              {/* CARGA INICIAL: skeletons con la misma grilla final para evitar saltos visuales. */}
               {showInitialProductsLoading && (
                 <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 md:gap-1">
                   {Array.from({ length: 8 }).map((_, index) => (
@@ -613,6 +682,8 @@ export default function Page() {
                 </p>
               )}
 
+              {/* GRILLA DE PRODUCTOS
+                  Los breakpoints `md`, `xl` y `2xl` cambian cuantas tarjetas se ven por fila. */}
               {showProducts && !error && (
                 <>
                   <div
@@ -646,6 +717,7 @@ export default function Page() {
                     )}
                   </div>
 
+                  {/* PAGINACION: solo se muestra si el backend informa mas de una pagina. */}
                   {totalPages > 1 && (
                     <div className="mt-8 flex justify-center">
                       <Pagination>

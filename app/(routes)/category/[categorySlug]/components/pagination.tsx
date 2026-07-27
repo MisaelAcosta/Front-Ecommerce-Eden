@@ -1,4 +1,5 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 
 type PaginationProps = {
@@ -12,12 +13,18 @@ export const Pagination = ({
   totalPages,
   onPageChange,
 }: PaginationProps) => {
+  // VISIBILIDAD
+  // La paginacion no ocupa espacio cuando todos los productos caben en una sola pagina.
   if (totalPages <= 1) return null;
 
+  // NUMEROS DE PAGINA
+  // Este arreglo alimenta los botones numericos del centro.
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
-    <div className="flex justify-center gap-2 mt-6">
+    // CONTENEDOR VISUAL
+    // `mt-6` separa la navegacion de la grilla; `gap-2` controla el espacio entre botones.
+    <div className="mt-6 flex justify-center gap-2">
       <Button
         variant="outline"
         size="sm"

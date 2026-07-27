@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import localFont from "next/font/local";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Accordion,
@@ -10,7 +9,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import type { CategoryType } from "@/types/category";
 import { useRouter } from "next/navigation";
 
@@ -45,12 +43,12 @@ const allProductsCategory = {
 const FilterCategorySkeleton = () => {
   return (
     <aside
-      className="my-5 space-y-3 bg-white text-black"
+      className="space-y-4 bg-white text-black"
       aria-hidden="true"
     >
-      <Skeleton className="h-9 w-full rounded-md bg-black/8 sm:h-10" />
+      <Skeleton className="h-[52px] w-full bg-black/8" />
 
-      <div className="space-y-2 rounded-md px-2 py-2">
+      <div className="space-y-3">
         <Skeleton className="h-5 w-4/5 rounded-none bg-black/8 sm:h-6" />
         <div className="space-y-2 pl-1 pt-1">
           <div className="flex items-center gap-2">
@@ -64,9 +62,9 @@ const FilterCategorySkeleton = () => {
         </div>
       </div>
 
-      <Skeleton className="h-9 w-11/12 rounded-md bg-black/8 sm:h-10" />
-      <Skeleton className="h-9 w-4/5 rounded-md bg-black/8 sm:h-10" />
-      <Skeleton className="h-9 w-full rounded-md bg-black/8 sm:h-10" />
+      <Skeleton className="h-11 w-11/12 rounded-none bg-black/8" />
+      <Skeleton className="h-11 w-4/5 rounded-none bg-black/8" />
+      <Skeleton className="h-11 w-full rounded-none bg-black/8" />
     </aside>
   );
 };
@@ -115,14 +113,14 @@ const FilterCategory = ({
 
   return (
     <aside
-      className={`${khInterferenceRegularFont.className} my-5 space-y-4 bg-white text-lg text-black`}
+      className={`${khInterferenceRegularFont.className} space-y-5 bg-white text-black`}
     >
       <Accordion
         type="single"
         collapsible
         value={openSlug}
         onValueChange={(value) => setOpenSlug(value || undefined)}
-        className="space-y-2 shadow-none"
+        className="space-y-1 shadow-none"
       >
         {allCategories.map((category) => {
           const hasSubs =
@@ -136,10 +134,13 @@ const FilterCategory = ({
                 onClick={() => goCategory(category.slug)}
                 className={`
                   ${khInterferenceRegularFont.className}
-                  w-full rounded-md px-2 py-2 text-left
-                  text-base uppercase tracking-normal transition
-                  sm:text-lg sm:tracking-wide
-                  ${isCategoryActive ? "bg-black text-white" : "hover:bg-muted"}
+                  w-full px-1 py-4 text-left
+                  text-[18px] uppercase leading-[1.1] transition-colors
+                  ${
+                    isCategoryActive
+                      ? "text-[#6d9500]"
+                      : "text-black hover:text-[#6d9500]"
+                  }
                 `}
               >
                 {category.categoryName}
@@ -151,45 +152,41 @@ const FilterCategory = ({
             <AccordionItem
               key={category.id}
               value={category.slug}
-              className="overflow-hidden rounded-md"
+              className="overflow-hidden border-b border-black/8"
             >
               <AccordionTrigger
                 onClick={() => goCategory(category.slug)}
                 className={`
                   ${khInterferenceRegularFont.className}
-                  cursor-pointer px-2 py-2 text-left
-                  text-base uppercase tracking-normal
-                  sm:text-lg sm:tracking-wide
-                  ${isCategoryActive ? "text-black" : ""}
+                  cursor-pointer px-1 py-4 text-left
+                  text-[18px] uppercase leading-[1.1]
+                  hover:no-underline
+                  ${isCategoryActive ? "text-[#6d9500]" : "text-black"}
                 `}
               >
                 {category.categoryName}
               </AccordionTrigger>
 
-              <AccordionContent className="px-2 pb-2">
-                <RadioGroup
-                  value={activeSubSlug ?? ""}
-                  className="flex flex-col space-y-2"
-                >
+              <AccordionContent className="px-1 pb-3">
+                <div className="flex flex-col gap-1 border-l border-black/20 pl-4">
                   {(category.subcategories ?? []).map((subcategory) => (
-                    <Label
+                    <button
                       key={subcategory.id}
-                      htmlFor={`sub-${subcategory.slug}`}
-                      className={`${khInterferenceRegularFont.className} flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-sm uppercase tracking-wide hover:bg-gray-100`}
+                      type="button"
+                      className={`${khInterferenceRegularFont.className}
+                        w-full py-2 text-left text-[12px] 
+                        uppercase transition-colors
+                        ${
+                          isCategoryActive && activeSubSlug === subcategory.slug
+                            ? "text-[#6d9500]"
+                            : "text-black/65 hover:text-black"
+                        }`}
                       onClick={() => goSubcategory(subcategory.slug)}
                     >
-                      <RadioGroupItem
-                        value={subcategory.slug}
-                        id={`sub-${subcategory.slug}`}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          goSubcategory(subcategory.slug);
-                        }}
-                      />
                       {subcategory.categoryName}
-                    </Label>
+                    </button>
                   ))}
-                </RadioGroup>
+                </div>
               </AccordionContent>
             </AccordionItem>
           );

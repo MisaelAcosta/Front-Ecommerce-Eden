@@ -1,32 +1,41 @@
 "use client";
 
 import { ChangeEvent } from "react";
+import localFont from "next/font/local";
+import { khInterferenceLightFont } from "@/app/(routes)/cart/components/cart-fonts";
+
+// Tipografia del catalogo para que el buscador mantenga el mismo lenguaje visual.
+const khInterferenceRegularFont = localFont({
+  src: "../../../../../components/fonts/KHInterferenceTRIAL-Regular.otf",
+  weight: "400",
+  style: "normal",
+  display: "swap",
+});
 
 type SearchBarProps = {
+  // Texto que controla la pagina del catalogo para filtrar productos globalmente.
   value: string;
+  // Devuelve cada cambio de escritura al estado padre.
   onChange: (value: string) => void;
 };
 
 const SearchBar = ({ value, onChange }: SearchBarProps) => {
+  // LOGICA DE BUSQUEDA
+  // Mantiene este componente presentacional y delega el filtrado real a la pagina.
   const handleInput = (e: ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.value);
   };
 
   return (
+    // CAMPO VISUAL DE BUSQUEDA
+    // Editar `h-[40px]` cambia su alto. `bg-neutral-100` controla el gris de fondo
+    // y `px-5` controla el aire horizontal del texto dentro del buscador.
     <input
-      className="
-        w-full
-        bg-neutral-100
-        px-6
-        py-2
-        md:py-3
-        md:rounded-md
-        outline-none
-        text-lg
-        font-medium
-        placeholder:text-neutral-400
-        text-black
-      "
+      className={`${khInterferenceLightFont.className}
+        h-[40px] w-full bg-neutral-100 px-5
+        text-[14px] text-black outline-none
+        placeholder:text-black/35
+        transition-colors focus:bg-neutral-200`}
       placeholder="Buscar"
       value={value}
       onChange={handleInput}
