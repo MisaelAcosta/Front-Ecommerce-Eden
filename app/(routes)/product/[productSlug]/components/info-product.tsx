@@ -25,6 +25,8 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 
+// TIPOGRAFIAS DE LA FICHA
+// Regular se usa para titulos y acciones; Light para subtitulos, precio y texto tecnico.
 const khInterferenceLightFont = localFont({
   src: "../../../../../components/fonts/KHInterferenceTRIAL-Light.otf",
   weight: "300",
@@ -40,7 +42,9 @@ const khInterferenceRegularFont = localFont({
 });
 
 export type InfoProductProps = {
+  // Producto que se muestra en la ficha.
   product: ProductType;
+  // Variantes consultadas desde Strapi para seleccionar color, modelo o material.
   variantsData?: VariantType[] | null;
 };
 
@@ -106,14 +110,20 @@ function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
 }
 
 const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
+  // CARRITO Y NOTIFICACIONES
+  // `addItem` guarda la linea de compra; las notificaciones se conservan para flujos de variantes.
   const { addItem } = useCart();
   const { notifySelectVariant, notifyProductWithoutVariants } =
     useCartNotification();
+  // CANTIDAD Y FAVORITOS
+  // La cantidad se limita entre 1 y 99; `loved` indica si el usuario marco este producto.
   const [qty, setQty] = useState<number>(1);
 
   const toggleLoved = useLoved((s) => s.toggleLoved);
   const isLoved = useLoved((s) => s.isLoved);
 
+  // ID NORMALIZADO
+  // Soporta respuestas de Strapi con id plano o id anidado dentro de attributes.
   const productData = product as ProductWithOptionalAttributes;
   const productId = productData?.id ?? productData?.attributes?.id ?? 0;
   const loved = isLoved(productId);
@@ -132,6 +142,8 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
       ? variants.find((v) => v.id === selectedVariantId) ?? null
       : null;
 
+  // CONTROLES DE CANTIDAD
+  // Cambiar estos valores modifica el minimo y maximo que puede agregar el cliente.
   const dec = () => setQty((q) => Math.max(1, q - 1));
   const inc = () => setQty((q) => Math.min(99, q + 1));
 
@@ -145,6 +157,8 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
 
   /* ---------------- precio + promo (variant > product) ---------------- */
 
+  // PRECIO FINAL
+  // Una promocion de variante tiene prioridad sobre una promocion del producto base.
   const basePrice = currentVariant?.price ?? product.price ?? 0;
 
   const bestVariantPromo = currentVariant
@@ -164,6 +178,8 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
 
   /* -------------------- imágenes para el carrusel --------------------- */
 
+  // GALERIA DE IMAGENES
+  // La imagen de variante se muestra primero; despues se agregan fotos del producto sin duplicados.
   const normalizeImages = (imgs: ImageInput): ImageLike[] =>
     Array.isArray(imgs) ? imgs : imgs ? [imgs] : [];
 
@@ -177,6 +193,8 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
     ),
   ];
 
+  // ESTADO DEL CARRUSEL
+  // `api` permite que miniaturas y flechas cambien la foto; `currentSlide` marca la miniatura activa.
   const [api, setApi] = useState<CarouselApi | null>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -196,6 +214,8 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
     setCurrentSlide(0);
   }, [currentVariant?.id, api]);
 
+  // URL DE IMAGEN
+  // Convierte una ruta relativa de Strapi en URL completa usando la variable del backend.
   const srcOf = (u?: string) =>
     u?.startsWith("http")
       ? u
@@ -203,6 +223,8 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
 
   /* -------------------- agregar variante al carrito ------------------- */
 
+  // AGREGAR AL CARRITO
+  // Valida variante, calcula imagen/precio actual y agrega una linea de carrito con la cantidad elegida.
   const handleAddToCart = () => {
     if (variants.length > 0 && !currentVariant) {
       alert("Selecciona una variante primero 🙏");
@@ -240,6 +262,8 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
     });
   };
 
+  // DATOS PARA FAVORITOS
+  // El store de favoritos usa esta version resumida del producto fuera de la ficha.
   const productFirstImg = Array.isArray(product.images)
     ? product.images?.[0]
     : product.images?.[0];
@@ -254,39 +278,55 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto pt-1 md:pt-0 ">
-      <div className="grid gap-8 md:gap-14 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+    // CONTENEDOR DE FICHA
+    // `lg:max-w-none` permite ocupar todo el ancho de escritorio en vez de centrar la ficha.
+    <div className="mx-auto w-full max-w-[1120px] pt-1 md:pt-0 lg:max-w-none">
+      {/* ESTRUCTURA 50 / 50 EN ESCRITORIO
+          La primera columna usa `50vw`; la segunda contiene la informacion con margen interno. */}
+      <div className="grid gap-9 lg:grid-cols-[50vw_minmax(0,1fr)] lg:gap-0">
         {/* COLUMNA IZQUIERDA: CARRUSEL */}
-        <div className=" pt-1 md:pt-0">
+        <div className="pt-1 md:pt-0">
           {images.length === 0 ? (
             <div className="text-centerpy-8 text-muted-foreground">
               No hay imágenes disponibles.
             </div>
           ) : (
             <>
+              {/* CARRUSEL PRINCIPAL: `setApi` conecta las miniaturas y flechas con la foto actual. */}
               <Carousel
                 setApi={setApi}
                 opts={{ align: "start", loop: false }}
                 className="relative"
               >
-                <CarouselContent>
+                {/* `lg:-ml-0` y `lg:pl-0` eliminan el padding por defecto para tocar el borde izquierdo. */}
+                <CarouselContent className="lg:-ml-0">
                   {images.map((img, index) => (
-                    <CarouselItem key={img.id ?? index}>
+                    <CarouselItem key={img.id ?? index} className="lg:pl-0">
+                      {/* MARCO DE FOTO: `lg:aspect-[4/5]` 
+                      controla el alto desktop. */}
                       <div
                         className="
-                          w-full aspect-4/5
-                          sm:aspect-5/6
-                          md:border md:rounded-none
-                          overflow-hidden
-                          bg-black/5
-                          flex items-center justify-center
+                          flex w-full items-center justify-center overflow-hidden
+                          aspect-[4/5] bg-black/5
+                          sm:aspect-[5/6]
+                          lg:aspect-[6.3/6] lg:bg-[#ececec]
                         "
                       >
                         <ImageZoom>
+                          {/* IMAGEN PRINCIPAL
+                              - `object-contain` evita que se recorte el archivo original.
+                              - `lg:scale-[0.82]` deja margen interior en escritorio. Baja el valor
+                                (ej. 0.72) para hacerla mas pequena o subelo (ej. 0.9) para agrandarla.
+                              - `object-center` centra el modelo; se puede cambiar por `object-bottom`
+                                o `object-top` si alguna foto necesita otro encuadre. */}
                           <Image
                             src={srcOf(img.url ?? undefined) || "/no-image.png"}
                             alt={`Imagen ${index + 1} del producto`}
-                            className="h-full w-full object-contain object-center"
+                            className="
+                              h-full w-full object-contain object-center
+                              transition-transform duration-300
+                              lg:scale-[1]
+                            "
                             height={800}
                             width={800}
                             draggable={false}
@@ -297,55 +337,98 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <CarouselPrevious className="left-2 top-1/2 -translate-y-1/2 hidden md:flex" />
-                <CarouselNext className="right-2 top-1/2 -translate-y-1/2 hidden md:flex" />
+                {/* FLECHAS: se ven desde lg. `left-3` y `right-3` controlan su posicion. */}
+                <CarouselPrevious className="left-3 top-1/2 hidden -translate-y-1/2 rounded-none border-0 bg-transparent shadow-none hover:bg-transparent lg:flex" />
+                <CarouselNext className="right-3 top-1/2 hidden -translate-y-1/2 rounded-none border-0 bg-transparent shadow-none hover:bg-transparent lg:flex" />
+
+                {/* MINIATURAS SUPERPUESTAS
+                    `bottom-2 right-2` controla la esquina dentro de la imagen.
+                    Al estar dentro del Carousel no agrega altura debajo de la galeria. */}
+                <div className="absolute bottom-2 right-2 z-30 flex gap-1 bg-white/30 p-1">
+                  {images.map((img, i) => (
+                    <button
+                      key={i}
+                      aria-label={`Ir a la imagen ${i + 1}`}
+                      onClick={() => api?.scrollTo(i)}
+                      className={`relative size-10 overflow-hidden border transition-colors ${
+                        currentSlide === i
+                          ? "border-black"
+                          : "border-transparent opacity-65 hover:border-black/40 hover:opacity-100"
+                      }`}
+                    >
+                      <Image
+                        src={srcOf(img.url ?? undefined) || "/no-image.png"}
+                        alt={`Miniatura ${i + 1} del producto`}
+                        fill
+                        className="object-cover"
+                        sizes="40px"
+                        unoptimized
+                      />
+                    </button>
+                  ))}
+                </div>
               </Carousel>
 
               {/* Puntos de paginación */}
-              <div className="mt-3 flex items-center justify-center gap-2">
-                {images.map((_, i) => (
+              <div className="hidden mt-2 flex justify-end gap-1 lg:mt-1">
+                {images.map((img, i) => (
                   <button
                     key={i}
                     aria-label={`Ir a la imagen ${i + 1}`}
                     onClick={() => api?.scrollTo(i)}
-                    className={`h-2 w-2 rounded-full transition ${
+                    className={`relative size-10 overflow-hidden border 
+                      transition-colors ${
                       currentSlide === i
-                        ? "bg-foreground"
-                        : "bg-muted-foreground/30 hover:bg-muted-foreground/60"
+                        ? "border-black"
+                        : "border-transparent opacity-65 hover:border-black/40 hover:opacity-100"
                     }`}
-                  />
+                  >
+                    <Image
+                      src={srcOf(img.url ?? undefined) || "/no-image.png"}
+                      alt={`Miniatura ${i + 1} del producto`}
+                      fill
+                      className="object-cover"
+                      sizes="40px"
+                      unoptimized
+                    />
+                  </button>
                 ))}
               </div>
             </>
           )}
         </div>
 
-        {/* COLUMNA DERECHA: INFO */}
-        <div className="w-full max-w-180 md:max-w-none md:pl-16 pt-1 md:pt-0">
-          <div className="flex items-start justify-between gap-2 px-5 md:px-0">
-            <div className="min-w-0 mr-3">
+        {/* COLUMNA DERECHA - INFORMACION
+            `lg:pl-14` es el margen entre imagen y ficha; `lg:max-w-[440px]` limita el ancho. */}
+        <div className="w-full pt-1 lg:max-w-[600px] lg:pl-30 lg:pt-30">
+          {/* CABECERA: titulo/subtitulo a la izquierda y stock/precio a la derecha. */}
+          <div className="flex items-start justify-between gap-5 px-1 md:px-0">
+            <div className="min-w-0">
               <h1
-                className={`${khInterferenceRegularFont.className} text-3xl 
-                leading-none tracking-[0] sm:text-5xl`}
+                className={`${khInterferenceRegularFont.className}
+                  text-3xl leading-none tracking-[0]
+                  sm:text-5xl lg:text-[66px]`}
               >
                 {product.productName}
               </h1>
               {product.productName2 ? (
                 <h2
-                  className={`${khInterferenceLightFont.className} text-xl 
-                  leading-tight text-black/55 sm:text-2xl`}
+                  className={`${khInterferenceLightFont.className}
+                    mt-2 text-xl leading-tight text-black/65
+                    sm:text-2xl lg:text-[16px] lg:uppercase`}
                 >
                   {product.productName2}
                 </h2>
               ) : null}
             </div>
 
-            <div className="shrink-0 flex flex-col items-end gap-1">
+            <div className="flex shrink-0 flex-col items-end gap-1 pt-1">
               <span
-                className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${
+                className={`${khInterferenceRegularFont.className} 
+                text-[16px] uppercase ${
                   product.active
-                    ? "border-emerald-500/40 bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400"
-                    : "border-zinc-300/40 bg-zinc-50 text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400"
+                    ? "text-[#6d9500]"
+                    : "text-black/45"
                 }`}
               >
                 {product.active ? "DISPONIBLE" : "NO DISPONIBLE"}
@@ -354,19 +437,19 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
               {hasDiscount ? (
                 <div className="flex flex-col items-end leading-tight">
                   <p
-                    className={`${khInterferenceLightFont.className} text-sm line-through text-muted-foreground`}
+                    className={`${khInterferenceLightFont.className} text-[16px] line-through text-black/45`}
                   >
                     {formatPrice(basePrice)}
                   </p>
                   <p
-                    className={`${khInterferenceLightFont.className} text-2xl tabular-nums text-red-500`}
+                    className={`${khInterferenceLightFont.className} text-[16px] tabular-nums text-red-500`}
                   >
                     {formatPrice(finalPrice)}
                   </p>
                 </div>
               ) : (
                 <p
-                  className={`${khInterferenceLightFont.className} text-2xl tabular-nums`}
+                  className={`${khInterferenceLightFont.className} text-[16px] tabular-nums`}
                 >
                   {formatPrice(basePrice)}
                 </p>
@@ -374,33 +457,36 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
             </div>
           </div>
 
-          <Separator className="my-4" />
+          {/* SEPARADOR: `my-6` y `lg:my-7` ajustan el aire vertical entre bloques. */}
+          <Separator className="my-6 bg-white lg:my-7" />
 
-          <section className="space-y-2 px-5 md:px-0">
-            <h3
-              className={`${khInterferenceRegularFont.className} text-2xl leading-none tracking-[0]`}
-            >
-              DESCRIPCION
-            </h3>
-            <p className="text-sm leading-relaxed text-muted-foreground">
+          {/* DESCRIPCION: el encabezado se oculta en desktop para seguir la ficha compacta. */}
+          <section className="space-y-2 px-1 md:px-0">
+            
+            <p className={`${khInterferenceLightFont.className} text-sm 
+            leading-relaxed text-black/65 lg:max-w-[400px] lg:text-[14px] 
+            lg:leading-[1.18] lg:uppercase`}>
               {product.description}
             </p>
           </section>
 
-          <section className="mt-6 space-y-2 px-5 md:px-0">
+          {/* ESPECIFICACIONES: bordes superior/inferior y texto tecnico en mayusculas desde desktop. */}
+          <section className="mt-6 space-y-2 border-y border-black/30 px-1 py-4 md:px-0 lg:mt-7 lg:space-y-0">
             <h3
-              className={`${khInterferenceRegularFont.className} text-2xl leading-none tracking-[0]`}
+              className={`${khInterferenceRegularFont.className} text-2xl leading-none tracking-[0] lg:hidden`}
             >
               ESPECIFICACIONES
             </h3>
-            <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
+            <p className={`${khInterferenceLightFont.className} text-sm 
+            leading-relaxed text-black/65 whitespace-pre-line 
+            lg:text-[14px] lg:leading-[1.45] lg:uppercase`}>
               {specsToShow}
             </p>
           </section>
 
-          {/* Selector de variantes */}
+          {/* SELECTOR DE VARIANTES: cada miniatura actualiza imagen, precio y especificaciones. */}
           {variants.length > 0 && (
-            <section className="mt-6 space-y-3 px-5 md:px-0">
+            <section className="mt-6 space-y-3 px-1 md:px-0">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
                   {variants.map((v) => {
@@ -413,8 +499,8 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
                         key={v.id}
                         type="button"
                         onClick={() => setSelectedVariantId(v.id)}
-                        className={`flex h-15 w-15 items-center cursor-pointer justify-center rounded-full border transition hover:shadow-sm ${
-                          selected ? "border-black bg-black/5" : "border-zinc-200 bg-white"
+                        className={`flex size-13 cursor-pointer items-center justify-center border transition-colors ${
+                          selected ? "border-black bg-black/5" : "border-black/20 bg-white hover:border-black"
                         }`}
                         aria-pressed={selected}
                       >
@@ -422,7 +508,7 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
                           <Image
                             src={srcOf(thumb.url) || "/no-image.png"}
                             alt={v.variantName}
-                            className="h-13 w-13 rounded-full object-cover"
+                            className="size-11 object-cover"
                             width={52}
                             height={52}
                             draggable={false}
@@ -443,16 +529,30 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
             </section>
           )}
 
-          <Separator className="my-6" />
+          {/* SEPARADOR ANTES DE COMPRA */}
+          <Separator className="my-6 bg-white" />
 
           {/* CTA: cantidad + botón + wishlist */}
-          <div className="flex flex-col items-stretch gap-4 sm:flex-row px-8 md:px-0 sm:items-center sm:justify-start">
-            <div className="inline-flex h-10 items-center justify-between rounded-lg border px-2">
+          <div className="flex flex-col items-stretch gap-4 px-1 sm:flex-row sm:items-center sm:justify-start md:px-0">
+            <button
+              type="button"
+              aria-label={loved ? "Quitar de favoritos" : "Agregar a favoritos"}
+              onClick={() => toggleLoved(lovedPayload)}
+              className="grid h-10 w-10 shrink-0 place-items-center border border-black/25 bg-[#efefef] transition-colors hover:bg-[#ADFE00]"
+            >
+              <Heart
+                width={18}
+                strokeWidth={1.6}
+                className={loved ? "fill-black" : ""}
+              />
+            </button>
+
+            <div className="inline-flex h-10 items-center justify-between border border-black bg-black px-2 text-white">
               <button
                 type="button"
                 aria-label="Disminuir cantidad"
                 onClick={dec}
-                className="grid size-8 place-items-center rounded-md hover:bg-muted"
+                className="grid size-8 place-items-center transition-colors hover:bg-white/15"
               >
                 <Minus size={18} strokeWidth={1.5} />
               </button>
@@ -465,34 +565,19 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
                 type="button"
                 aria-label="Aumentar cantidad"
                 onClick={inc}
-                className="grid size-8 place-items-center rounded-md hover:bg-muted"
+                className="grid size-8 place-items-center text-[#ADFE00] transition-colors hover:bg-white/15"
               >
                 <Plus size={18} strokeWidth={1.5} />
               </button>
             </div>
 
-            <div className="flex items-start justify-between gap-5 md:gap-3">
-              <Button
-                disabled={!product.active}
-                onClick={handleAddToCart}
-                className="h-10 flex-1 sm:flex-none sm:w-auto cursor-pointer"
-              >
-                AGREGAR AL CARRITO
-              </Button>
-
-              <button
-                type="button"
-                aria-label={loved ? "Quitar de favoritos" : "Agregar a favoritos"}
-                onClick={() => toggleLoved(lovedPayload)}
-                className="grid h-10 w-10 place-items-center border-black/40 rounded-lg cursor-pointer border hover:bg-muted"
-              >
-                <Heart
-                  width={22}
-                  strokeWidth={1.5}
-                  className={loved ? "fill-foreground" : "hover:fill-foreground/90"}
-                />
-              </button>
-            </div>
+            <Button
+              disabled={!product.active}
+              onClick={handleAddToCart}
+              className={`${khInterferenceRegularFont.className} h-10 flex-1 rounded-none bg-[#efefef] text-[11px] uppercase text-black hover:bg-[#ADFE00] sm:flex-none sm:px-5`}
+            >
+              Agregar al carrito
+            </Button>
           </div>
         </div>
       </div>
