@@ -84,8 +84,8 @@ type LovedCardProps = {
 
 function LovedCard({ product, onOpen, onRemove }: LovedCardProps) {
   return (
-    <article className="group relative flex w-full flex-col justify-between bg-white pb-4">
-      <div className="relative mb-3 flex w-full items-center justify-center overflow-hidden bg-white sm:mb-4">
+    <article className="group relative flex h-auto w-full flex-col justify-between bg-white pb-4 pt-4">
+      <div className="relative mt-0 flex w-full cursor-pointer items-center justify-center overflow-hidden bg-white pb-1 pt-1 sm:mb-4">
         <button
           type="button"
           onClick={(event) => {
@@ -93,10 +93,10 @@ function LovedCard({ product, onOpen, onRemove }: LovedCardProps) {
             event.stopPropagation();
             onRemove();
           }}
-          className="absolute right-2 top-2 z-20 grid size-9 cursor-pointer place-items-center rounded-full border border-black/10 bg-white/90 text-black shadow-sm backdrop-blur transition hover:scale-105 hover:bg-black hover:text-white sm:right-4 sm:top-4"
+          className="absolute right-3 top-3 z-20 cursor-pointer text-black transition hover:text-black/60"
           aria-label="Quitar de favoritos"
         >
-          <Heart className="size-4 fill-current" strokeWidth={1.5} />
+          <Heart className="size-5 fill-current" strokeWidth={1.5} />
         </button>
 
         <button
@@ -122,23 +122,18 @@ function LovedCard({ product, onOpen, onRemove }: LovedCardProps) {
         </button>
       </div>
 
-      <button type="button" onClick={onOpen} className="text-left">
+      <button
+        type="button"
+        onClick={onOpen}
+        className="flex items-baseline justify-between gap-3 px-1 text-left md:px-3"
+      >
         <h2
-          className={`${khInterferenceRegularFont.className} line-clamp-1 text-[15px] uppercase leading-tight tracking-wide text-black sm:text-xl sm:tracking-tight`}
+          className={`${khInterferenceLightFont.className} min-w-0 flex-1 truncate text-left text-lg uppercase leading-[1.25] text-black sm:text-[17px]`}
         >
           {product.title}
         </h2>
-
-        {product.secondaryName ? (
-          <p
-            className={`${khInterferenceLightFont.className} line-clamp-1 text-[14px] tracking-wide text-black sm:text-lg sm:tracking-tight`}
-          >
-            {product.secondaryName}
-          </p>
-        ) : null}
-
         <p
-          className={`${khInterferenceLightFont.className} mt-1 whitespace-nowrap text-[13px] text-black sm:text-[18px]`}
+          className={`${khInterferenceLightFont.className} shrink-0 whitespace-nowrap text-right text-[15px] font-semibold leading-[1.25] text-black`}
         >
           {formatPrice(product.price)}
         </p>

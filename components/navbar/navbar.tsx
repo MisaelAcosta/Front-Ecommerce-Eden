@@ -19,15 +19,16 @@ import { useCart } from "@/hooks/use-cart";
 import { cn } from "@/lib/utils";
 
 // ===== # Navbar | Assets =====
-// Assets del desktop inspirados en las referencias: wordmark principal.
-const DESKTOP_WORDMARK = "/icons/op/white_eden.png";
-const MOBILE_CENTER_LOGO = "/icons/op/white_ilust.png";
+// Un mismo logo para desktop y mobile; cada barra define solo su propio tamano.
+const EDEN_LOGO = "/icons/op/white_ilust.png";
 
 const Navbar = () => {
   // ===== # Navbar | Hooks y contexto principal =====
   const pathname = usePathname();
   const cart = useCart();
   const { navigateWithTransition } = useNavigationTransition();
+  const isLovedPage = pathname.startsWith("/loved-product");
+  const isCartPage = pathname.startsWith("/cart");
 
   // ===== # Navbar | Estado local =====
   const [user, setUser] = useState<CurrentUser | null>(null);
@@ -135,14 +136,21 @@ const Navbar = () => {
     }
 
     const icon = (
-      <Smile strokeWidth={1.5} fill="none" className={iconClassName} />
+      <Smile
+        strokeWidth={1.5}
+        fill="none"
+        className={cn(
+          iconClassName,
+          "transition-colors duration-300 group-hover:text-[#C0FF01]"
+        )}
+      />
     );
 
     return (
       <LoginDialog>
         <button
           aria-label="Iniciar sesion"
-          className="cursor-pointer rounded-full p-2 transition-colors duration-300 hover:bg-white/10"
+          className="group cursor-pointer rounded-full p-2"
         >
           {icon}
         </button>
@@ -160,7 +168,7 @@ const Navbar = () => {
         type="button"
         aria-label="Ver resumen del carrito"
         className="
-          inline-flex
+          group inline-flex
           h-8
           min-w-8
           cursor-pointer
@@ -174,7 +182,13 @@ const Navbar = () => {
       >
         <ShoppingBag
           strokeWidth={1.5}
-          className={cn(iconClassName, "shrink-0 translate-y-[0.5px]")}
+          className={cn(
+            iconClassName,
+            "shrink-0 translate-y-[0.5px] transition-colors duration-300",
+            isCartPage
+              ? "text-[#C0FF01]"
+              : "text-white/90 group-hover:text-[#C0FF01]"
+          )}
         />
 
         {hasItems && (
@@ -216,7 +230,7 @@ const Navbar = () => {
             >
               <span className="relative block h-9 w-[120px] overflow-visible ">
                 <Image
-                  src={DESKTOP_WORDMARK}
+                  src={EDEN_LOGO}
                   alt="Eden"
                   fill
                   priority
@@ -258,8 +272,12 @@ const Navbar = () => {
                 <button
                   type="button"
                   aria-label="Ir a favoritos"
-                  className="rounded-full p-2 text-white/80 transition-colors 
-                  duration-300 hover:bg-white/10 hover:text-white cursor-pointer"
+                  className={cn(
+                    "cursor-pointer rounded-full p-2 transition-colors duration-300",
+                    isLovedPage
+                      ? "text-[#C0FF01]"
+                      : "text-white/80 hover:text-[#C0FF01]"
+                  )}
                   onClick={handleGoLoved}
                 >
                   <Heart strokeWidth={1.5} className="h-6 w-6" />
@@ -330,7 +348,7 @@ const Navbar = () => {
               >
                 <span className="relative block h-10 w-[80px] overflow-visible">
                 <Image
-                  src={MOBILE_CENTER_LOGO}
+                  src={EDEN_LOGO}
                   alt="Eden"
                   fill
                   priority
@@ -347,9 +365,12 @@ const Navbar = () => {
                 <button
                   type="button"
                   aria-label="Ir a favoritos"
-                  className="rounded-full p-2 text-white/80 
-                  transition-colors duration-300 hover:bg-white/10
-                   hover:text-white"
+                  className={cn(
+                    "cursor-pointer rounded-full p-2 transition-colors duration-300",
+                    isLovedPage
+                      ? "text-[#C0FF01]"
+                      : "text-white/80 hover:text-[#C0FF01]"
+                  )}
                   onClick={handleGoLoved}
                 >
                   <Heart strokeWidth={1.5} className="h-5 w-5" />

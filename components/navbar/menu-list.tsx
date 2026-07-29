@@ -30,10 +30,10 @@ const MenuList = ({ pathname }: MenuListProps) => {
                 href={item.href}
                 className={cn(
                   desktopNavFont.className,
-                  "group relative inline-flex items-center rounded-full px-3 py-2 text-[12px] tracking-[0.24em] transition-all duration-300 xl:text-[13px]",
+                  "group relative inline-flex items-center px-3 py-2 text-[12px] tracking-[0.24em] transition-colors duration-300 xl:text-[13px]",
                   isCurrent
-                    ? "bg-white/15 text-white"
-                    : "text-white/80 hover:bg-white/10 hover:text-white"
+                    ? "text-[#C0FF01]"
+                    : "text-white/80 hover:text-[#C0FF01]"
                 )}
               >
                 {item.label}
