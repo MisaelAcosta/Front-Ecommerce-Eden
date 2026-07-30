@@ -11,7 +11,7 @@ export function useGetFeaturedBlock1() {
             try {
                 const res = await fetch(url)
                 const json = await res.json()
-                console.log("🔍 Resultado Block1:", json);
+                console.log("Resultado Block1:", json);
                 setResult(json.data)
                 setLoading(false)
             } catch (error: any) {

@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
+import { toast } from "sonner";
 import { useCart } from "@/hooks/use-cart";
 import { formatPrice } from "@/lib/formatPrice";
 import { Separator } from "@/components/ui/separator";
@@ -67,7 +68,7 @@ const Step02Data = ({ onContinue, onBack }: Props) => {
     [items]
   );
 
-  // ✅ Wizard store
+  // Estado compartido de los datos del checkout.
   const { step02, setStep02 } = useCartWizard();
   const { useAccount, name, rutBody, rutDv, phoneRest, email } = step02;
   const emailSafe = String(email ?? "");
@@ -81,6 +82,26 @@ const Step02Data = ({ onContinue, onBack }: Props) => {
 
   const [loadingAccount, setLoadingAccount] = useState(false);
   const [accountHint, setAccountHint] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Solo una sesion activa puede solicitar datos personales guardados en la cuenta.
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await fetch("/api/auth/me", {
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
+        });
+
+        setIsAuthenticated(response.ok);
+      } catch {
+        setIsAuthenticated(false);
+      }
+    };
+
+    void checkSession();
+  }, []);
 
   const canContinue =
     items.length > 0 &&
@@ -100,7 +121,7 @@ const Step02Data = ({ onContinue, onBack }: Props) => {
       applied = true;
     }
 
-    // ✅ email local (si lo guardas)
+    // Email local, si existe en el perfil guardado.
     if (p.email) {
       setEmail(String(p.email).trim());
       applied = true;
@@ -143,7 +164,7 @@ const Step02Data = ({ onContinue, onBack }: Props) => {
       applied = true;
     }
 
-    // ❗OJO: el email real viene como json.account.email (no en prof)
+    // El email real viene como json.account.email (no en prof).
     // Igual lo dejamos por si algún día lo agregas en el profile
     if (prof.email) {
       setEmail(String(prof.email).trim());
@@ -221,6 +242,13 @@ const Step02Data = ({ onContinue, onBack }: Props) => {
           checked={useAccount}
           disabled={loadingAccount}
           onCheckedChange={async (checked) => {
+            if (checked && !isAuthenticated) {
+              setUseAccount(false);
+              setAccountHint("* Debes iniciar sesión para usar los datos de tu cuenta.");
+              toast.error("Inicia sesión para usar los datos de tu cuenta.");
+              return;
+            }
+
             setUseAccount(checked);
 
             if (!checked) {
@@ -250,7 +278,7 @@ const Step02Data = ({ onContinue, onBack }: Props) => {
 
               const json = await res.json();
 
-              // ✅ email real del user (users-permissions)
+              // Email real del usuario (users-permissions).
               const accountEmail: string | null = json?.account?.email ?? null;
               if (accountEmail) {
                 setEmail(String(accountEmail).trim());
@@ -440,7 +468,7 @@ const Step02Data = ({ onContinue, onBack }: Props) => {
       </Button>
 
       {/* Hint */}
-      {useAccount && (
+      {(useAccount || accountHint) && (
         <p
           className={`${khInterferenceLightFont.className} mt-3 text-[11px] text-muted-foreground`}
         >

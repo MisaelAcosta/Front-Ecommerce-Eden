@@ -6,7 +6,7 @@ import type { ResponseType } from "@/types/response";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-// 👇 export EXACTO como lo pediste
+// Export exacto como lo pediste.
 export const getCategoryRecommended = (categorySlug?: string): ResponseType => {
   const [result, setResult] = useState<ProductType[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);

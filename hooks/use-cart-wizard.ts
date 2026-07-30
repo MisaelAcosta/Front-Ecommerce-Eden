@@ -51,7 +51,7 @@ const initialState = {
     numero: "",
     depto: "",
     nota: "",
-    // ✅ NUEVO
+  // Campo agregado al estado del checkout.
     shippingCost: 0,
   },
 };

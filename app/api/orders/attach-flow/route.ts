@@ -35,7 +35,7 @@ export async function POST(req: Request) {
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Error attach-flow";
 
-    console.error("💥 /api/orders/attach-flow error:", message);
+    console.error("/api/orders/attach-flow error:", message);
 
     return NextResponse.json(
       { ok: false, error: message },

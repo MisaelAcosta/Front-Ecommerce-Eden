@@ -201,9 +201,9 @@ function CategoryTab({
       type="button"
       onClick={onClick}
       className={`${khInterferenceRegularFont.className}
-       h-[26px] min-w-[56px] cursor-pointer
-       bg-[#e7e7e7] px-3
-       text-[12px] uppercase leading-[22px] text-black
+       h-[34px] min-w-[72px] cursor-pointer
+       bg-[#e7e7e7] px-4
+       text-[14px] uppercase leading-[28px] text-black
        transition-colors hover:bg-[#dcdcdc]
        ${
         isActive ? "bg-black text-white hover:bg-black" : ""
@@ -298,7 +298,7 @@ const ChooseCategory = () => {
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.85 }}
+            viewport={{ once: true, amount: 0.25 }}
             className={`${khInterferenceBoldFont.className}
               text-4xl leading-none text-black
               lg:text-5xl`}
@@ -395,8 +395,8 @@ const ChooseCategory = () => {
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.85 }}
-              className={`${khInterferenceRegularFont.className}
+              viewport={{ once: true, amount: 0.25 }}
+              className={`${khInterferenceBoldFont.className}
                 text-[34px] leading-none text-black`}
             >
               CATEGORIAS

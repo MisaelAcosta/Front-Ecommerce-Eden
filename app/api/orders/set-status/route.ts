@@ -42,7 +42,7 @@ export async function POST(req: Request) {
     const message =
       err instanceof Error ? err.message : "Error set-status";
 
-    console.error("💥 /api/orders/set-status error:", message);
+    console.error("/api/orders/set-status error:", message);
 
     return NextResponse.json(
       { ok: false, error: message },

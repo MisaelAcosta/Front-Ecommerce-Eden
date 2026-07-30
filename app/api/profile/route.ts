@@ -156,7 +156,7 @@ export async function GET() {
 
     return NextResponse.json({ ok: true, profile, account }, { status: 200 });
   } catch (err: unknown) {
-    console.error("💥 Error inesperado en GET /api/profile:", err);
+    console.error("Error inesperado en GET /api/profile:", err);
     return NextResponse.json(
       { ok: true, profile: null, account: null },
       { status: 200 }
@@ -181,7 +181,7 @@ export async function POST(req: Request) {
     }
 
     const body = (await req.json()) as ProfileUpdateBody;
-    console.log("🟦 /api/profile BODY recibido desde el cliente:", body);
+    console.log("/api/profile BODY recibido desde el cliente:", body);
 
     const { userId, ...profile } = body;
 
@@ -208,7 +208,7 @@ export async function POST(req: Request) {
     if (profile.comuna) updatePayload.comuna = profile.comuna;
 
     console.log(
-      "🟨 Payload enviado a Strapi PUT /api/users/:id:",
+      "Payload enviado a Strapi PUT /api/users/:id:",
       JSON.stringify(updatePayload, null, 2)
     );
 
@@ -223,7 +223,7 @@ export async function POST(req: Request) {
 
     const updateText = await updateRes.text();
     console.log(
-      "🟥 Respuesta de Strapi al actualizar user:",
+      "Respuesta de Strapi al actualizar user:",
       updateRes.status,
       updateText
     );
@@ -244,7 +244,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: true, user: updatedUser });
   } catch (err: unknown) {
-    console.error("💥 Error inesperado en /api/profile:", err);
+    console.error("Error inesperado en /api/profile:", err);
     return NextResponse.json(
       { error: "Error inesperado en el servidor" },
       { status: 500 }

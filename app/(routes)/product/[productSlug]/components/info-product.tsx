@@ -151,8 +151,8 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
   console.log("variantsData =>", variantsData);
 
   useEffect(() => {
-    console.log("🟣 currentVariant FULL:", currentVariant);
-    console.log("🟣 currentVariant.image:", currentVariant?.image);
+    console.log("currentVariant FULL:", currentVariant);
+    console.log("currentVariant.image:", currentVariant?.image);
   }, [currentVariant]);
 
   /* ---------------- precio + promo (variant > product) ---------------- */
@@ -227,12 +227,16 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
   // Valida variante, calcula imagen/precio actual y agrega una linea de carrito con la cantidad elegida.
   const handleAddToCart = () => {
     if (variants.length > 0 && !currentVariant) {
-      alert("Selecciona una variante primero 🙏");
+      toast.error("Selecciona una variante primero.", {
+        position: "top-center",
+      });
       return;
     }
 
     if (!currentVariant) {
-      alert("Este producto no tiene variantes configuradas.");
+      toast.error("Este producto no tiene variantes configuradas.", {
+        position: "top-center",
+      });
       return;
     }
 

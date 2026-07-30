@@ -25,7 +25,7 @@ export async function GET() {
       profile: auth.profile,
     });
   } catch (err) {
-    console.error("🔥 Error en /api/auth/me:", err);
+    console.error("Error en /api/auth/me:", err);
     return NextResponse.json(
       { user: null, profile: null },
       { status: 500 }

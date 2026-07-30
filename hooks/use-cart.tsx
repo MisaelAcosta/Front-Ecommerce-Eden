@@ -16,7 +16,7 @@ type CartLineInput =
 type CartState = {
   items: CartLine[];
 
-  // 👇 NUEVO: evento de último agregado
+  // Evento del ultimo producto agregado.
   lastAddedItem: CartLine | null;
   clearLastAdded: () => void;
 

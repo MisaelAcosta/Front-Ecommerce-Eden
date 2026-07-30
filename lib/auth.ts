@@ -6,14 +6,14 @@ const STRAPI_URL =
   process.env.NEXT_PUBLIC_STRAPI_URL ??
   "http://localhost:1338"; // mismo puerto que estás usando ahora
 
-// 👉 Tipo simple para usar en navbar, etc.
+// Tipo simple para usar en navbar, etc.
 export type CurrentUser = {
   id: number;
   username: string;
   email: string;
 };
 
-// 👉 Tipo extendido con los campos de perfil que guardas en Strapi
+// Tipo extendido con los campos de perfil que guardas en Strapi.
 export type EdenUserWithProfile = {
   id: number;
   username: string;
@@ -54,7 +54,7 @@ export async function getCurrentUserWithProfile(): Promise<EdenUserWithProfile |
     });
 
     if (!res.ok) {
-      console.log("❌ /api/users/me respondió:", res.status, await res.text());
+      console.log("/api/users/me respondió:", res.status, await res.text());
       return null;
     }
 
@@ -65,7 +65,7 @@ export async function getCurrentUserWithProfile(): Promise<EdenUserWithProfile |
       username: data.username,
       email: data.email,
       profile: {
-        // 👇 estos nombres deben coincidir con los API IDs de Strapi
+        // Estos nombres deben coincidir con los API IDs de Strapi.
         nombre: data.nombre ?? null,
         rut: data.rut ?? null,
         telefono: data.telefono ?? null,
@@ -80,7 +80,7 @@ export async function getCurrentUserWithProfile(): Promise<EdenUserWithProfile |
       },
     };
   } catch (error) {
-    console.error("🔥 Error en getCurrentUserWithProfile:", error);
+    console.error("Error en getCurrentUserWithProfile:", error);
     return null;
   }
 }

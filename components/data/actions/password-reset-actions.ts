@@ -49,7 +49,7 @@ export async function resetPasswordAction(
     const raw = await res.text();
 
     if (!res.ok) {
-      console.log("❌ reset-password:", res.status, raw);
+      console.log("reset-password:", res.status, raw);
       return {
         ok: false,
         message: "No se pudo restablecer la contraseña. El enlace puede haber expirado.",
@@ -58,10 +58,10 @@ export async function resetPasswordAction(
 
     return {
       ok: true,
-      message: "Contraseña actualizada correctamente ✅ Ya puedes iniciar sesión.",
+      message: "Contraseña actualizada correctamente. Ya puedes iniciar sesión.",
     };
   } catch (e) {
-    console.error("🔥 resetPasswordAction error:", e);
+    console.error("resetPasswordAction error:", e);
     return { ok: false, message: "Error inesperado. Intenta nuevamente." };
   }
 }

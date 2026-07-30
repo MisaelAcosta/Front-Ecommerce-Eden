@@ -1,6 +1,6 @@
 // components/data/actions/auth-state.ts
 
-// ✅ ESTADO PARA REGISTRO
+// Estado para registro.
 export type RegisterState = {
   ok: boolean;
   message: string | null;
@@ -11,7 +11,7 @@ export const initialRegisterState: RegisterState = {
   message: null,
 };
 
-// ✅ ESTADO PARA LOGIN
+// Estado para login.
 export type LoginState = {
   ok: boolean;
   message: string | null;

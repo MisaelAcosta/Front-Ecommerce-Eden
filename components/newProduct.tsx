@@ -240,10 +240,11 @@ function NewProductCard({
     image2,
   } = product;
 
+  // ANCHO MOVIL DEL RIEL: cambia `basis-[76%]` para agrandar o achicar cada tarjeta de Colecciones.
   return (
     <CarouselItem
       key={id}
-      className="basis-[85%] px-3 sm:basis-1/2 md:px-4 lg:basis-1/4"
+      className="basis-[76%] px-1 sm:basis-1/2 md:px-4 lg:basis-1/4"
     >
       <Card
         className="

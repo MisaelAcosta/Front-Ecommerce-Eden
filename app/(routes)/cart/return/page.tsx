@@ -322,7 +322,7 @@ function FlowReturnContent() {
 
         {status === "paid" && (
           <div className="space-y-2">
-            <p className="text-sm font-semibold">✅ Pago aprobado</p>
+            <p className="text-sm font-semibold">Pago aprobado</p>
             <p className="text-xs text-muted-foreground">
               Tu pedido quedó registrado. Te enviaremos confirmación al correo.
             </p>
@@ -337,7 +337,7 @@ function FlowReturnContent() {
 
         {status === "rejected" && (
           <div className="space-y-3">
-            <p className="text-sm font-semibold">❌ Pago rechazado o cancelado</p>
+            <p className="text-sm font-semibold">Pago rechazado o cancelado</p>
             <p className="text-xs text-muted-foreground">
               Puedes intentar nuevamente desde el carrito.
             </p>
@@ -355,7 +355,7 @@ function FlowReturnContent() {
 
         {status === "error" && (
           <div className="space-y-3">
-            <p className="text-sm font-semibold">⚠️ No pudimos validar el pago</p>
+            <p className="text-sm font-semibold">No pudimos validar el pago</p>
             <p className="text-xs text-muted-foreground">
               Intenta refrescar o vuelve al carrito.
             </p>

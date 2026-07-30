@@ -7,7 +7,7 @@ import type {
   LoginState,
 } from "@/components/data/actions/auth-state";
 
-// 👇 Usamos el mismo BACKEND_URL que ya tienes configurado
+// Usamos el mismo BACKEND_URL que ya tienes configurado.
 const STRAPI_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ??
   process.env.NEXT_PUBLIC_STRAPI_URL ??
@@ -44,7 +44,7 @@ export async function registerUserAction(
   const confirmPassword = formData.get("confirm_password")?.toString();
 
   if (!email || !password || !confirmPassword) {
-    console.log("❌ Faltan campos en el registro");
+    console.log("Faltan campos en el registro");
     return {
       ok: false,
       message: "Completa todos los campos.",
@@ -52,7 +52,7 @@ export async function registerUserAction(
   }
 
   if (password !== confirmPassword) {
-    console.log("❌ Las contraseñas no coinciden");
+    console.log("Las contraseñas no coinciden");
     return {
       ok: false,
       message: "Las contraseñas no coinciden.",
@@ -71,17 +71,17 @@ export async function registerUserAction(
     });
 
     const raw = await res.text();
-    console.log("🔍 Raw response registro Strapi:", res.status, raw);
+    console.log("Raw response registro Strapi:", res.status, raw);
 
     let data: StrapiAuthResponse | null = null;
     try {
       data = raw ? (JSON.parse(raw) as StrapiAuthResponse) : null;
     } catch (e) {
-      console.error("❌ No se pudo parsear JSON en registro:", e);
+      console.error("No se pudo parsear JSON en registro:", e);
     }
 
     if (!res.ok) {
-      console.log("❌ Strapi respondió error en registro:", res.status, data);
+      console.log("Strapi respondió error en registro:", res.status, data);
       const msg =
         (data as StrapiAuthError)?.error?.message ??
         "No se pudo crear la cuenta. Intenta nuevamente.";
@@ -91,16 +91,16 @@ export async function registerUserAction(
       };
     }
 
-    console.log("✅ Usuario registrado correctamente en Strapi");
+    console.log("Usuario registrado correctamente en Strapi");
 
-    // 🔥 Nuevo mensaje pensado para confirmación por correo:
+    // Mensaje para confirmación por correo.
     return {
       ok: true,
       message:
-        "Cuenta creada correctamente. Te enviamos un correo para confirmar tu cuenta. Revisa tu bandeja de entrada. ✅",
+        "Cuenta creada correctamente. Te enviamos un correo para confirmar tu cuenta. Revisa tu bandeja de entrada.",
     };
   } catch (error) {
-    console.error("🔥 Error inesperado en registerUserAction:", error);
+    console.error("Error inesperado en registerUserAction:", error);
     return {
       ok: false,
       message: "Error inesperado. Intenta nuevamente.",
@@ -123,7 +123,7 @@ export async function loginUserAction(
   const password = formData.get("password")?.toString();
 
   if (!identifier || !password) {
-    console.log("❌ Faltan campos en el login");
+    console.log("Faltan campos en el login");
     return {
       ok: false,
       message: "Completa correo y contraseña.",
@@ -140,22 +140,22 @@ export async function loginUserAction(
     });
 
     const raw = await res.text();
-    console.log("🔍 Raw response login Strapi:", res.status, raw);
+    console.log("Raw response login Strapi:", res.status, raw);
 
     let data: StrapiAuthResponse | null = null;
     try {
       data = raw ? (JSON.parse(raw) as StrapiAuthResponse) : null;
     } catch (e) {
-      console.error("❌ No se pudo parsear JSON en login:", e);
+      console.error("No se pudo parsear JSON en login:", e);
     }
 
     if (!res.ok) {
-      console.log("❌ Strapi respondió error en login:", res.status, data);
+      console.log("Strapi respondió error en login:", res.status, data);
 
       const rawMsg = (data as StrapiAuthError)?.error?.message ?? "";
       let msg = "Credenciales inválidas. Intenta nuevamente.";
 
-      // 🔥 Si Strapi se queja de email no confirmado, mensaje especial
+      // Mensaje especial si Strapi indica un email sin confirmar.
       if (rawMsg.toLowerCase().includes("confirm")) {
         msg =
           "Debes confirmar tu correo antes de iniciar sesión. Revisa tu bandeja de entrada.";
@@ -168,7 +168,7 @@ export async function loginUserAction(
     }
 
     if (!data || !("jwt" in data) || !data.jwt) {
-      console.log("❌ No vino jwt en la respuesta de login");
+    console.log("No vino jwt en la respuesta de login");
       return {
         ok: false,
         message: "No se pudo iniciar sesión. Intenta nuevamente.",
@@ -183,14 +183,14 @@ export async function loginUserAction(
       maxAge: 60 * 60 * 24 * 7,
     });
 
-    console.log("✅ Login correcto y cookie seteada");
+    console.log("Login correcto y cookie seteada");
 
     return {
       ok: true,
-      message: "Sesión iniciada correctamente. ✅",
+      message: "Sesión iniciada correctamente.",
     };
   } catch (error) {
-    console.error("🔥 Error inesperado en loginUserAction:", error);
+    console.error("Error inesperado en loginUserAction:", error);
     return {
       ok: false,
       message: "Error inesperado. Intenta nuevamente.",

@@ -261,10 +261,11 @@ function FeaturedProductCard({
     image2,
   } = product;
 
+  // ANCHO MOVIL DEL RIEL: cambia `basis-[76%]` para agrandar o achicar cada tarjeta de Top Ventas.
   return (
     <CarouselItem
       key={id}
-      className=" basis-[95%] sm:basis-1/2 lg:basis-1/4
+      className=" basis-[76%] sm:basis-1/2 lg:basis-1/4
       px-1 md:px-1"
     >
       <Card
@@ -443,7 +444,7 @@ const FeaturedProducts = () => {
             Array.from({ length: 4 }).map((_, index) => (
               <CarouselItem
                 key={`featured-product-skeleton-${index}`}
-                className="basis-[85%] sm:basis-1/2 lg:basis-1/4 px-3 md:px-4"
+                className="basis-[76%] px-1 sm:basis-1/2 md:px-1 lg:basis-1/4"
               >
                 <ProductCardSkeleton />
               </CarouselItem>

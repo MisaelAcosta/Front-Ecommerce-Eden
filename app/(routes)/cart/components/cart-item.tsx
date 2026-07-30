@@ -37,7 +37,8 @@ const CartItem = ({ item }: CartItemProps) => {
   const destination = isPrintQuote ? "/cotiza" : `/product/${item.productSlug}`;
 
   return (
-    <li className="flex items-start gap-4 border-b border-black/15 py-5 sm:gap-6 sm:py-7">
+    <li className="flex items-start gap-4 border-b 
+    border-black/15 py-5 sm:gap-6 sm:py-7">
       {/* La cotización 3D navega de vuelta a /cotiza; los productos normales conservan su detalle. */}
       <div
         onClick={() => navigateWithTransition(destination)}
@@ -52,7 +53,8 @@ const CartItem = ({ item }: CartItemProps) => {
         />
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex min-w-0 flex-1 flex-col gap-4 sm:flex-row 
+      sm:items-center sm:justify-between">
         <div className="min-w-0">
           <h2
             className={`${khInterferenceRegularFont.className} truncate 
@@ -64,21 +66,24 @@ const CartItem = ({ item }: CartItemProps) => {
           {isPrintQuote ? (
             <div className="mt-2 space-y-1">
               <p
-                className={`${khInterferenceLightFont.className} text-xs uppercase text-black/50`}
+                className={`${khInterferenceLightFont.className} 
+                text-xs uppercase text-black/50`}
               >
                 {getPrintQuoteDimensionsLabel(item)}
               </p>
               <p
-                className={`${khInterferenceLightFont.className} text-xs uppercase text-black/50`}
+                className={`${khInterferenceLightFont.className} 
+                text-xs uppercase text-black/50`}
               >
                 {item.printQuote.selectedColor} · {item.printQuote.postProcessLabel}
               </p>
             </div>
           ) : (
-            <div className="mt-2 flex items-center gap-2">
+            <div className="mt-2 flex items-center pt-2 lg:pt-4 gap-2">
               <button
                 onClick={() => decQty(item.id)}
-                className="flex h-8 w-8 items-center justify-center border border-black/20 transition-colors hover:border-[#ADFE00] hover:bg-[#ADFE00]"
+                className="flex h-8 w-8 items-center 
+                justify-center lg:border border-black/20 transition-colors hover:border-[#ADFE00] hover:bg-[#ADFE00]"
                 aria-label="Disminuir cantidad"
                 type="button"
               >
@@ -86,14 +91,16 @@ const CartItem = ({ item }: CartItemProps) => {
               </button>
 
               <span
-                className={`${khInterferenceLightFont.className} w-6 text-center text-sm`}
+                className={`${khInterferenceLightFont.className} w-6 
+                text-center text-sm`}
               >
                 {item.qty}
               </span>
 
               <button
                 onClick={() => incQty(item.id)}
-                className="flex h-8 w-8 items-center justify-center border border-black/20 transition-colors hover:border-[#ADFE00] hover:bg-[#ADFE00]"
+                className="flex h-8 w-8 items-center justify-center 
+                lg:border border-black/20 transition-colors hover:border-[#ADFE00] hover:bg-[#ADFE00]"
                 aria-label="Aumentar cantidad"
                 type="button"
               >
@@ -103,9 +110,11 @@ const CartItem = ({ item }: CartItemProps) => {
           )}
         </div>
 
-        <div className="flex items-center justify-between gap-4 sm:justify-end">
+        <div className="flex items-center justify-between gap-4 
+        sm:justify-end">
           <p
-            className={`${khInterferenceLightFont.className} whitespace-nowrap text-sm font-semibold text-black`}
+            className={`${khInterferenceLightFont.className} whitespace-nowrap 
+            text-sm font-semibold text-black`}
           >
             {formatPrice(item.unitPrice * item.qty)}
           </p>
@@ -113,7 +122,7 @@ const CartItem = ({ item }: CartItemProps) => {
           <button
             onClick={() => removeItem(item.id)}
             className={cn(
-              "flex h-8 w-8 items-center justify-center border border-black/20 text-black/60 transition-colors hover:border-[#ADFE00] hover:bg-[#ADFE00] hover:text-black"
+              "flex h-8 w-8 items-center justify-center lg:border border-black/20 text-black/60 transition-colors hover:border-[#ADFE00] hover:bg-[#ADFE00] hover:text-black"
             )}
             aria-label="Eliminar producto"
             type="button"

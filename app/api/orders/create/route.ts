@@ -404,7 +404,7 @@ export async function POST(req: Request) {
     );
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Error creando orden";
-    console.error("💥 /api/orders/create error:", message);
+    console.error("/api/orders/create error:", message);
 
     return NextResponse.json(
       { ok: false, error: message },

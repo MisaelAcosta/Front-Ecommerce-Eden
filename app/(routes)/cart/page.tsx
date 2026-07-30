@@ -4,24 +4,26 @@ import { useCart } from "@/hooks/use-cart";
 import CartItem from "./components/cart-item";
 import Summary from "./components/summary";
 import { maratypeFont, khInterferenceLightFont } from "./components/cart-fonts";
+import SmoothScroll from "@/components/animation_page/smooth-scroll";
 
 export default function Page() {
   const { items } = useCart();
 
   return (
-    <div className="mx-auto max-w-[1400px] px-4 pb-20 pt-28 lg:pt-34 sm:px-6 lg:px-8">
+    <SmoothScroll>
+      <div className="mx-auto max-w-[1400px] px-4 pb-20 pt-28 lg:pt-34 sm:px-6 lg:px-8">
       {/* ENCABEZADO: identifica el flujo y la cantidad de piezas antes del detalle. */}
-      <header className="mb-10 flex flex-col gap-5 border-b border-black pb-6 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
+      <header className="mb-10 flex flex-col gap-5 
+       pb-2 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
         <div>
           
-          <h1 className={`${maratypeFont.className} text-5xl uppercase leading-none text-black sm:text-7xl`}>
+          <h1 className={`${maratypeFont.className} text-6xl 
+          uppercase leading-none text-black sm:text-7xl`}>
             CHECKOUT
           </h1>
         </div>
 
-        <p className={`${khInterferenceLightFont.className} text-sm uppercase text-black/60`}>
-          {items.length} {items.length === 1 ? "pieza en tu pedido" : "piezas en tu pedido"}
-        </p>
+        
       </header>
 
       {/* CONTENIDO: productos a la izquierda y pasos de pago fijos a la derecha en escritorio. */}
@@ -32,9 +34,7 @@ export default function Page() {
             uppercase tracking-[0.16em] text-black`}>
               Tu pedido
             </h2>
-            <span className={`${khInterferenceLightFont.className} text-xs text-black/45`}>
-              Revisa tus productos
-            </span>
+            
           </div>
 
           {items.length === 0 ? (
@@ -59,10 +59,10 @@ export default function Page() {
           <Summary />
         </aside>
       </div>
-    </div>
+      </div>
+    </SmoothScroll>
   );
 }
-
 
 
 

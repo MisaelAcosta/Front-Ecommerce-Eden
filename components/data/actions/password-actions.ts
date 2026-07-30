@@ -25,13 +25,13 @@ export async function forgotPasswordAction(
     const res = await fetch(`${STRAPI_URL}/api/auth/forgot-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }), // ✅ sin url
+      body: JSON.stringify({ email }), // Sin URL.
     });
 
     const raw = await res.text();
 
     if (!res.ok) {
-      console.log("❌ forgot-password:", res.status, raw);
+      console.log("forgot-password:", res.status, raw);
       return {
         ok: false,
         message: "No se pudo enviar el correo. Intenta nuevamente.",
@@ -40,10 +40,10 @@ export async function forgotPasswordAction(
 
     return {
       ok: true,
-      message: "Si el correo existe, te enviaremos un enlace de recuperación. ✅",
+      message: "Si el correo existe, te enviaremos un enlace de recuperación.",
     };
   } catch (e) {
-    console.error("🔥 forgotPasswordAction error:", e);
+    console.error("forgotPasswordAction error:", e);
     return { ok: false, message: "Error inesperado. Intenta nuevamente." };
   }
 }

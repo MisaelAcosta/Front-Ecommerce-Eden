@@ -108,7 +108,7 @@ export async function POST(req: Request) {
 
     return new NextResponse("ok", { status: 200 });
   } catch (err) {
-    console.error("💥 /api/flow/confirm error:", err);
+    console.error("/api/flow/confirm error:", err);
     return new NextResponse("ok", { status: 200 });
   }
 }

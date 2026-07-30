@@ -6,8 +6,8 @@ export function useGetVariant(productSlug: string | string[]) {
 
   const base = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-  // ✅ Strapi v5 bugfix: NO usar populate[image]=*
-  // ✅ filtramos por product (singular) como tu schema
+  // Strapi v5: no usar populate[image]=*.
+  // Filtramos por product (singular) como tu schema.
   const url =
     `${base}/api/variants` +
     `?filters[product][slug][$eq]=${encodeURIComponent(resolvedSlug)}` +
