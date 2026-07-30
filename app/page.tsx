@@ -14,6 +14,7 @@ export default function Home() {
     <main>
       <Header />
       <FeaturedProducts />
+      <NewProduct />
       <TempProducts/>
       <ChooseCategory />
       <Subscriptions />

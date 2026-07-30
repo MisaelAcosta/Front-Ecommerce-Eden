@@ -258,14 +258,14 @@ const Summary = () => {
         <Step03Shipping onBack={back} onPay={handlePay} isPaying={paying} />
 
         {payError && (
-          <div className="rounded-md border bg-white p-3">
-            <p className="text-xs text-red-600">{payError}</p>
+          <div className="border border-[#ADFE00]/35 bg-[#1B2C1C] p-3">
+            <p className="text-xs text-[#ADFE00]">{payError}</p>
           </div>
         )}
 
         {paying && (
-          <div className="rounded-md border bg-white p-3">
-            <p className="text-xs text-muted-foreground">Redirigiendo a Flow...</p>
+          <div className="border border-[#ADFE00]/35 bg-[#1B2C1C] p-3">
+            <p className="text-xs text-[#ADFE00]">Redirigiendo a Flow...</p>
           </div>
         )}
       </div>

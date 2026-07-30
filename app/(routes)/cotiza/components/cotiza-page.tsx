@@ -543,23 +543,23 @@ export default function CotizaPage() {
 
         {showAuthNotice && (
           <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/65 px-4 backdrop-blur-sm">
-            <div className="relative w-full max-w-[430px] rounded-[18px] bg-[#111111] p-6 text-white shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
+            <div className="relative w-full max-w-[430px] rounded-[18px] bg-[#1B2C1C] p-6 text-[#ADFE00] shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
               <button
                 type="button"
                 onClick={() => setShowAuthNotice(false)}
-                className="absolute right-4 top-4 text-white/55 transition-colors hover:text-white"
+                className="absolute right-4 top-4 text-[#ADFE00]/55 transition-colors hover:text-[#ADFE00]"
                 aria-label="Cerrar aviso"
               >
                 x
               </button>
 
-              <p className="text-xs uppercase tracking-[0.28em] text-white/45">
+              <p className="text-xs uppercase tracking-[0.28em] text-[#ADFE00]/65">
                 Cotizacion protegida
               </p>
               <h3 className="mt-4 text-2xl font-black uppercase leading-none">
                 Inicia sesion para subir tu modelo
               </h3>
-              <p className="mt-4 text-sm leading-6 text-white/65">
+              <p className="mt-4 text-sm leading-6 text-[#ADFE00]/75">
                 Para usar la cotizacion 3D debes iniciar sesion o crear una
                 cuenta. Asi podremos guardar tu pedido y asociarlo correctamente
                 al checkout.
@@ -569,14 +569,14 @@ export default function CotizaPage() {
                 <button
                   type="button"
                   onClick={openLoginFromAuthNotice}
-                  className="w-full rounded-full bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-black transition-transform hover:scale-[1.02]"
+                  className="w-full rounded-full bg-[#ADFE00] px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#1B2C1C] transition-transform hover:scale-[1.02]"
                 >
                   Iniciar sesion / registrarse
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowAuthNotice(false)}
-                  className="w-full rounded-full border border-white/20 px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-white/70 transition-colors hover:border-white/55 hover:text-white"
+                  className="w-full rounded-full border border-[#ADFE00]/35 px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#ADFE00]/80 transition-colors hover:border-[#ADFE00] hover:text-[#ADFE00]"
                 >
                   Volver
                 </button>

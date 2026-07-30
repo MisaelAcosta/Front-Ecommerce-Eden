@@ -223,30 +223,32 @@ const Step03Shipping = ({ onPay, onBack, isPaying = false }: Props) => {
   };
 
   return (
-    <div className="w-full rounded-md border bg-white p-5 shadow-none">
+    <div className="w-full border border-black bg-white p-5 shadow-none sm:p-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={onBack}
             disabled={!onBack}
-            className="rounded-full p-1 hover:bg-muted disabled:opacity-40"
+            className="p-1 transition-colors hover:bg-[#ADFE00] disabled:opacity-40"
             aria-label="Volver"
           >
             <ArrowLeft size={16} />
           </button>
 
-          <h3 className="text-sm font-semibold tracking-wide">ENVÍO Y PAGO</h3>
+          <h3 className={`${khInterferenceRegularFont.className} text-base uppercase tracking-wide text-black`}>
+            ENVÍO Y PAGO
+          </h3>
         </div>
 
         <div className="flex items-center gap-1">
-          <span className="h-[3px] w-2 rounded-full bg-black/20" />
-          <span className="h-[3px] w-2 rounded-full bg-black/20" />
-          <span className="h-[3px] w-6 rounded-full bg-black" />
+          <span className="h-1 w-3 bg-black/15" />
+          <span className="h-1 w-3 bg-black/15" />
+          <span className="h-1 w-7 bg-[#ADFE00]" />
         </div>
       </div>
 
-      <Separator className="my-3" />
+      <Separator className="my-4 bg-black/15" />
 
       <div className="flex items-center justify-between">
         <p className="text-[11px] font-medium text-muted-foreground">
@@ -311,7 +313,7 @@ const Step03Shipping = ({ onPay, onBack, isPaying = false }: Props) => {
         </p>
       )}
 
-      <Separator className="my-3" />
+      <Separator className="my-4 bg-black/15" />
 
       <div className="space-y-4">
         <p className="text-[11px] font-medium text-muted-foreground">
@@ -382,7 +384,7 @@ const Step03Shipping = ({ onPay, onBack, isPaying = false }: Props) => {
         </div>
       </div>
 
-      <Separator className="my-4" />
+      <Separator className="my-4 bg-black/15" />
 
       <div className="space-y-2 text-sm">
         <div className="flex items-center justify-between">
@@ -408,19 +410,19 @@ const Step03Shipping = ({ onPay, onBack, isPaying = false }: Props) => {
         </div>
       </div>
 
-      <div className="mt-4 flex items-center gap-2 rounded-md border bg-neutral-50 p-3">
+      <div className="mt-4 flex items-center gap-2 border border-[#ADFE00]/35 bg-[#1B2C1C] p-3 text-[#ADFE00]">
         <ShieldCheck className="h-4 w-4" />
-        <p className="text-[11px] text-neutral-700">
+        <p className="text-[11px]">
           Compra segura • 
         </p>
-        <span className="ml-auto inline-flex items-center gap-1 rounded-full border bg-white px-2 py-1 text-[10px]">
+        <span className="ml-auto inline-flex items-center gap-1 border border-[#ADFE00]/35 px-2 py-1 text-[10px]">
           <CreditCard className="h-3.5 w-3.5" />
           Flow
         </span>
       </div>
 
       <Button
-        className="mt-4 w-full bg-black text-white hover:bg-black/90"
+        className="mt-4 w-full rounded-none bg-[#ADFE00] text-[#1B2C1C] hover:bg-[#C0FF01]"
         onClick={onPay}
         disabled={!canPay || loadingAccount || isPaying}
       >

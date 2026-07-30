@@ -22,7 +22,7 @@ const Step01Order = ({ onContinue }: Props) => {
   
 
   return (
-    <div className="w-full rounded-md border bg-white p-5 shadow-none">
+    <div className="w-full border border-black bg-white p-5 shadow-none sm:p-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3
@@ -33,13 +33,13 @@ const Step01Order = ({ onContinue }: Props) => {
 
         {/* mini “paginador” visual (solo decorativo por ahora) */}
         <div className="flex items-center gap-1">
-          <span className="h-[3px] w-6 rounded-full bg-black" />
-          <span className="h-[3px] w-2 rounded-full bg-black/20" />
-          <span className="h-[3px] w-2 rounded-full bg-black/20" />
+          <span className="h-1 w-7 bg-[#ADFE00]" />
+          <span className="h-1 w-3 bg-black/15" />
+          <span className="h-1 w-3 bg-black/15" />
         </div>
       </div>
 
-      <Separator className="my-3" />
+      <Separator className="my-4 bg-black/15" />
 
       {/* Items */}
       <div className="space-y-2">
@@ -71,10 +71,10 @@ const Step01Order = ({ onContinue }: Props) => {
         )}
       </div>
 
-      <Separator className="my-4" />
+      <Separator className="my-4 bg-black/15" />
 
       {/* Total */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between bg-[#1B2C1C] px-4 py-3 text-[#ADFE00]">
         <div>
           <p className={`${khInterferenceRegularFont.className} text-xs leading-4`}>
             ESTIMADO
@@ -91,7 +91,7 @@ const Step01Order = ({ onContinue }: Props) => {
 
       {/* CTA */}
       <Button
-        className="mt-4 w-full bg-black cursor-pointer text-white hover:bg-black/90"
+        className="mt-4 w-full cursor-pointer rounded-none bg-[#ADFE00] text-[#1B2C1C] hover:bg-[#C0FF01]"
         onClick={onContinue}
         disabled={items.length === 0}
       >

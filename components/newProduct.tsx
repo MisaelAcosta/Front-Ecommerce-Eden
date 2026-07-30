@@ -22,22 +22,17 @@ import { motion } from "motion/react";
 import { fadeUp } from "@/lib/fade-up";
 import { useNavigationTransition } from "@/components/navigation-transition-provider";
 
-// Local fonts used only by the new products section.
-const maratypeFont = localFont({
-  src: "./fonts/Maratype.otf",
+// Fuente del titulo; coincide con la seccion Top Ventas.
+const khInterferenceBoldFont = localFont({
+  src: "./fonts/KHInterferenceTRIAL-Bold.otf",
+  weight: "700",
+  style: "normal",
   display: "swap",
 });
 
 const khInterferenceLightFont = localFont({
   src: "./fonts/KHInterferenceTRIAL-Light.otf",
   weight: "300",
-  style: "normal",
-  display: "swap",
-});
-
-const khInterferenceRegularFont = localFont({
-  src: "./fonts/KHInterferenceTRIAL-Regular.otf",
-  weight: "400",
   style: "normal",
   display: "swap",
 });
@@ -248,7 +243,7 @@ function NewProductCard({
   return (
     <CarouselItem
       key={id}
-      className="basis-[85%] sm:basis-1/2 lg:basis-1/4 px-2 md:px-4"
+      className="basis-[85%] px-3 sm:basis-1/2 md:px-4 lg:basis-1/4"
     >
       <Card
         className="
@@ -278,7 +273,7 @@ function NewProductCard({
           </div>
         )}
 
-        <CardContent className="flex flex-col justify-around px-3 md:px-3 pt-0 pb-0">
+        <CardContent className="flex flex-col justify-around px-1 pb-0 pt-0 md:px-3">
           <div
             className="
               relative mb-3 sm:mb-4
@@ -337,11 +332,9 @@ function NewProductCard({
             )}
           </div>
 
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-baseline justify-between gap-3">
             <h3
-              className={`${khInterferenceRegularFont.className}
-                min-w-0 flex-1 text-left text-lg leading-none sm:text-2xl uppercase
-              `}
+              className={`${khInterferenceLightFont.className} min-w-0 flex-1 text-left text-lg uppercase leading-[1.25] sm:text-[17px]`}
             >
               {displayName}
             </h3>
@@ -394,22 +387,10 @@ const NewProducts = () => {
           whileInView="visible"
           viewport={{ once: true, amount: 0.25 }}
           custom={0}
-          className={`${maratypeFont.className} text-4xl 
-          tracking-wide sm:tracking-normal text-left sm:text-5xl mb-2 sm:mb-4`}
+          className={`${khInterferenceBoldFont.className} mb-2 pl-2 text-left text-4xl sm:mb-4 sm:text-5xl lg:pl-0`}
         >
-          NOVEDADES
+          COLECCIONES
         </motion.h3>
-        <motion.p
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.25 }}
-          custom={0.12}
-          className={`${khInterferenceLightFont.className} text-black/35 text-left leading-none tracking-normal mb-6 text-base sm:text-base`}
-        >
-          Recien salidos del horno, descubre los ultimos modelos anadidos a
-          nuestro catalogo
-        </motion.p>
       </div>
 
       <motion.div

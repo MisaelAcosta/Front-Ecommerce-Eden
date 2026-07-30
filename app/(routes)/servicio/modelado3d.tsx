@@ -23,8 +23,8 @@ const khInterferenceRegularFont = localFont({
 const Modelodo3D = () => {
   return (
     <section className="w-full bg-white py-12 sm:py-16">
-      <div className="mx-auto max-w-[1220px] px-4 sm:px-6 lg:px-10">
-        <div className="grid items-start gap-6 lg:grid-cols-[0.66fr_0.34fr] lg:gap-8">
+      <div className="mx-auto max-w-[1350px] px-4 sm:px-6 lg:px-0">
+        <div className="grid items-start gap-6 lg:grid-cols-[0.66fr_0.34fr] lg:gap-38">
           {/* Bloque visual de modelado 3D. */}
           <motion.div
             variants={fadeUp}
@@ -34,7 +34,8 @@ const Modelodo3D = () => {
             custom={0}
             className="w-full"
           >
-            <div className="relative aspect-[31/25] w-full overflow-hidden bg-black sm:aspect-[35/22]">
+            <div className="relative aspect-[31/25] w-full overflow-hidden 
+            bg-black sm:aspect-[35/22]">
               <video
                 className="absolute inset-0 h-full w-full object-cover"
                 src={VIDEO_3D}

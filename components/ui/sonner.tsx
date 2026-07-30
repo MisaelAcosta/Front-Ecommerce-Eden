@@ -18,7 +18,6 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
       closeButton
-      richColors
       position="bottom-right"
       duration={3200}
       visibleToasts={4}
@@ -32,21 +31,22 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       style={
         {
-          "--normal-bg": "#ffffff",
-          "--normal-text": "#111111",
-          "--normal-border": "rgba(0, 0, 0, 0.12)",
+          "--normal-bg": "#1B2C1C",
+          "--normal-text": "#ADFE00",
+          "--normal-border": "rgba(173, 254, 0, 0.3)",
           "--border-radius": "10px",
         } as React.CSSProperties
       }
       toastOptions={{
         classNames: {
           toast:
-            "eden-toast group/toast border border-black/10 bg-white text-black shadow-[0_18px_50px_rgba(0,0,0,0.14)]",
-          title: "text-sm font-semibold",
-          description: "text-xs text-black/60",
+            "eden-toast group/toast border border-[#ADFE00]/30 bg-[#1B2C1C] text-[#ADFE00] shadow-[0_18px_50px_rgba(0,0,0,0.22)]",
+          title: "text-sm font-semibold text-[#ADFE00]",
+          description: "text-xs text-[#ADFE00]/70",
           actionButton:
-            "bg-black text-white hover:bg-black/85 text-xs font-semibold",
-          closeButton: "border-black/10 bg-white text-black",
+            "bg-[#ADFE00] text-[#1B2C1C] hover:bg-[#C0FF01] text-xs font-semibold",
+          closeButton:
+            "border-[#ADFE00]/30 bg-[#1B2C1C] text-[#ADFE00] hover:bg-[#ADFE00]/10",
         },
       }}
       {...props}
