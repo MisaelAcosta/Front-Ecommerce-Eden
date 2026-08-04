@@ -198,8 +198,10 @@ function buildTempProductCardData(product: ProductType): TempProductCardData {
   const raw = product as ProductWithAttributes;
   const attrs: ProductAttrs = raw.attributes ?? raw;
   const imagesArray = getImagesArray(attrs);
-  const image1 = toAbsUrl(imagesArray[0]?.url ?? null);
-  const image2 = toAbsUrl(imagesArray[1]?.url ?? null);
+  // PROMOCIONES: usa la segunda imagen del producto para variar este riel.
+  // Si aun no existe una segunda imagen, conserva la primera como respaldo.
+  const image1 = toAbsUrl(imagesArray[1]?.url ?? imagesArray[0]?.url ?? null);
+  const image2 = toAbsUrl(imagesArray[0]?.url ?? null);
   const displayName = attrs.productName ?? "Producto sin nombre";
   const secondaryName = attrs.productName2 ?? attrs.variant ?? "";
   const productSlug = attrs.slug ?? "";
@@ -329,8 +331,9 @@ const TempProducts = () => {
     navigateWithTransition(`/product/${slug}`);
   };
 
+  // RITMO VERTICAL DE INICIO: coincide con los demas bloques de productos.
   return (
-    <section className="mx-auto max-w-[1350px] px-5 py-8 sm:px-6 sm:py-14 lg:px-0">
+    <section className="mx-auto max-w-[1350px] px-5 py-10 sm:px-6 sm:py-14 lg:px-0">
       <div>
         <motion.h3
           variants={fadeUp}

@@ -284,12 +284,14 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
   return (
     // CONTENEDOR DE FICHA
     // `lg:max-w-none` permite ocupar todo el ancho de escritorio en vez de centrar la ficha.
-    <div className="mx-auto w-full max-w-[1120px] pt-1 md:pt-0 lg:max-w-none">
+    <div className="mx-auto w-full max-w-[1490px] 
+    pt-1 md:pt-0  ">
       {/* ESTRUCTURA 50 / 50 EN ESCRITORIO
           La primera columna usa `50vw`; la segunda contiene la informacion con margen interno. */}
-      <div className="grid gap-9 lg:grid-cols-[50vw_minmax(0,1fr)] lg:gap-0">
+      <div className="grid gap-9 lg:grid-cols-2 
+      lg:gap-0">
         {/* COLUMNA IZQUIERDA: CARRUSEL */}
-        <div className="pt-1 md:pt-0">
+        <div className="pt-0 md:pt-15">
           {images.length === 0 ? (
             <div className="text-centerpy-8 text-muted-foreground">
               No hay imágenes disponibles.
@@ -310,10 +312,11 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
                       controla el alto desktop. */}
                       <div
                         className="
-                          flex w-full items-center justify-center overflow-hidden
-                          aspect-[4/5] bg-black/5
+                          flex w-full items-center justify-center 
+                          overflow-hidden
+                          aspect-[3.5/5] bg-black/5
                           sm:aspect-[5/6]
-                          lg:aspect-[6.3/6] lg:bg-[#ececec]
+                          lg:aspect-[6/6] lg:bg-[#ececec]
                         "
                       >
                         <ImageZoom>
@@ -403,8 +406,9 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
         </div>
 
         {/* COLUMNA DERECHA - INFORMACION
-            `lg:pl-14` es el margen entre imagen y ficha; `lg:max-w-[440px]` limita el ancho. */}
-        <div className="w-full pt-1 lg:max-w-[600px] lg:pl-30 lg:pt-30">
+            `lg:justify-self-center` centra esta columna dentro de la mitad derecha.
+            Asi el espacio sobrante no queda acumulado solo al borde derecho. */}
+        <div className="w-full pt-1 lg:max-w-[600px] lg:justify-self-center lg:pl-30 lg:pt-30">
           {/* CABECERA: titulo/subtitulo a la izquierda y stock/precio a la derecha. */}
           <div className="flex items-start justify-between gap-5 px-1 md:px-0">
             <div className="min-w-0">
@@ -467,8 +471,9 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
           {/* DESCRIPCION: el encabezado se oculta en desktop para seguir la ficha compacta. */}
           <section className="space-y-2 px-1 md:px-0">
             
-            <p className={`${khInterferenceLightFont.className} text-sm 
-            leading-relaxed text-black/65 lg:max-w-[400px] lg:text-[14px] 
+            <p className={`${khInterferenceLightFont.className} text-[13px] 
+            leading-relaxed text-black/65 lg:max-w-[400px] 
+            lg:text-[14px] 
             lg:leading-[1.18] lg:uppercase`}>
               {product.description}
             </p>
@@ -479,9 +484,9 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
             <h3
               className={`${khInterferenceRegularFont.className} text-2xl leading-none tracking-[0] lg:hidden`}
             >
-              ESPECIFICACIONES
+              
             </h3>
-            <p className={`${khInterferenceLightFont.className} text-sm 
+            <p className={`${khInterferenceLightFont.className} text-[13px] 
             leading-relaxed text-black/65 whitespace-pre-line 
             lg:text-[14px] lg:leading-[1.45] lg:uppercase`}>
               {specsToShow}
@@ -537,48 +542,52 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
           <Separator className="my-6 bg-white" />
 
           {/* CTA: cantidad + botón + wishlist */}
-          <div className="flex flex-col items-stretch gap-4 px-1 sm:flex-row sm:items-center sm:justify-start md:px-0">
-            <button
-              type="button"
-              aria-label={loved ? "Quitar de favoritos" : "Agregar a favoritos"}
-              onClick={() => toggleLoved(lovedPayload)}
-              className="grid h-10 w-10 shrink-0 place-items-center border border-black/25 bg-[#efefef] transition-colors hover:bg-[#ADFE00]"
-            >
-              <Heart
-                width={18}
-                strokeWidth={1.6}
-                className={loved ? "fill-black" : ""}
-              />
-            </button>
+          <div className="flex flex-col gap-3 px-1 sm:flex-row sm:items-center sm:gap-4 md:px-0">
+            {/* FILA MOVIL: agrupa favorito y selector de cantidad. */}
+            <div className="flex items-center justify-between gap-3 sm:contents">
+              <button
+                type="button"
+                aria-label={loved ? "Quitar de favoritos" : "Agregar a favoritos"}
+                onClick={() => toggleLoved(lovedPayload)}
+                className="grid h-10 w-10 shrink-0 place-items-center border border-black/25 bg-[#efefef] transition-colors hover:bg-[#ADFE00]"
+              >
+                <Heart
+                  width={18}
+                  strokeWidth={1.6}
+                  className={loved ? "fill-black" : ""}
+                />
+              </button>
 
-            <div className="inline-flex h-10 items-center justify-between border border-black bg-black px-2 text-white">
-              <button
-                type="button"
-                aria-label="Disminuir cantidad"
-                onClick={dec}
-                className="grid size-8 place-items-center transition-colors hover:bg-white/15"
-              >
-                <Minus size={18} strokeWidth={1.5} />
-              </button>
-              <span
-                className={`${khInterferenceLightFont.className} w-8 text-center text-sm tabular-nums`}
-              >
-                {qty}
-              </span>
-              <button
-                type="button"
-                aria-label="Aumentar cantidad"
-                onClick={inc}
-                className="grid size-8 place-items-center text-[#ADFE00] transition-colors hover:bg-white/15"
-              >
-                <Plus size={18} strokeWidth={1.5} />
-              </button>
+              {/* `flex-1` hace que cantidad ocupe el espacio restante junto al corazon en movil. */}
+              <div className="flex h-10 flex-1 items-center justify-between border border-black bg-black px-2 text-white sm:flex-none">
+                <button
+                  type="button"
+                  aria-label="Disminuir cantidad"
+                  onClick={dec}
+                  className="grid size-8 place-items-center transition-colors hover:bg-white/15"
+                >
+                  <Minus size={18} strokeWidth={1.5} />
+                </button>
+                <span
+                  className={`${khInterferenceLightFont.className} w-8 text-center text-sm tabular-nums`}
+                >
+                  {qty}
+                </span>
+                <button
+                  type="button"
+                  aria-label="Aumentar cantidad"
+                  onClick={inc}
+                  className="grid size-8 place-items-center text-[#ADFE00] transition-colors hover:bg-white/15"
+                >
+                  <Plus size={18} strokeWidth={1.5} />
+                </button>
+              </div>
             </div>
 
             <Button
               disabled={!product.active}
               onClick={handleAddToCart}
-              className={`${khInterferenceRegularFont.className} h-10 flex-1 rounded-none bg-[#efefef] text-[11px] uppercase text-black hover:bg-[#ADFE00] sm:flex-none sm:px-5`}
+              className={`${khInterferenceRegularFont.className} h-10 w-full rounded-none bg-[#efefef] text-[11px] uppercase text-black hover:bg-[#ADFE00] sm:w-auto sm:flex-none sm:px-5`}
             >
               Agregar al carrito
             </Button>

@@ -410,8 +410,9 @@ const FeaturedProducts = () => {
     navigateWithTransition(`/product/${slug}`);
   };
 
+  // RITMO VERTICAL DE INICIO: py-10 movil y sm:py-14 en pantallas grandes.
   return (
-    <section className="mx-auto max-w-[1350px] px-4 py-8 sm:px-6 sm:py-14 lg:px-0">
+    <section className="mx-auto max-w-[1350px] px-4 py-10 sm:px-6 sm:py-14 lg:px-0">
       <div>
         <motion.h3
           variants={fadeUp}

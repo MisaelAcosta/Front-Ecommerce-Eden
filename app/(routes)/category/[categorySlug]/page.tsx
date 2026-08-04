@@ -5,7 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import localFont from "next/font/local";
 import {
   ArrowDownNarrowWide,
-  ArrowUpDown,
+  ChevronLeft,
+  ChevronRight,
   Search,
   SlidersHorizontal,
   X,
@@ -29,9 +30,6 @@ import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationPrevious,
-  PaginationNext,
-  PaginationLink,
 } from "@/components/ui/pagination";
 
 /*
@@ -297,36 +295,67 @@ export default function Page() {
     </div>
   );
 
-  // CONTROL DE ORDEN
-  // Editar `h-[44px]` cambia la altura. El select usa borde recto para coincidir con el catalogo.
-  const SortControl = ({ compact = false }: { compact?: boolean }) => (
-    <label
-      className={`flex h-[40px] items-center gap-3 text-black ${
-        compact ? "w-full" : "justify-end"
-      }`}
-    >
-      
-      <span className="sr-only">Ordenar por</span>
-      <select
-        value={sortBy}
-        onChange={(event) => handleSortChange(event.target.value)}
-        className={`
-          ${khInterferenceRegularFont.className}
-          h-full cursor-pointer appearance-auto border border-black/40 
-          bg-white px-8
-          text-[12px] uppercase tracking-[0.14em] outline-none transition-colors
-          hover:bg-neutral-100 focus:bg-neutral-100
-          ${compact ? "w-full" : "min-w-[210px]"}
-        `}
-      >
-        {sortOptions.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
+  // CONTROL DE ORDEN DE ESCRITORIO
+  // `details` expone su estado abierto para girar la flecha: derecha cerrado,
+  // abajo abierto. `min-w-[210px]` controla el ancho del selector y su menu.
+  const SortControl = () => {
+    const activeSortLabel =
+      sortOptions.find((option) => option.value === sortBy)?.label ??
+      "Relevancia";
+
+    return (
+      <details className="group relative min-w-[210px] text-black">
+        <summary
+          className={`
+            ${khInterferenceRegularFont.className}
+            flex h-10 cursor-pointer list-none items-center justify-between
+            border border-black/40 bg-white px-8
+            text-[13px] uppercase tracking-[0.14em]
+            transition-colors hover:bg-neutral-100
+            [&::-webkit-details-marker]:hidden
+          `}
+        >
+          {activeSortLabel}
+          <ChevronRight
+            className="size-4 shrink-0 transition-transform duration-200 group-open:rotate-90"
+            strokeWidth={2}
+          />
+        </summary>
+
+        {/* MENU: mismo ancho y borde recto que el selector cerrado. */}
+        <div className="absolute right-0 top-[calc(100%+4px)] z-30 w-full border border-black/40 bg-white p-1">
+          {sortOptions.map((option) => {
+            const isActive = sortBy === option.value;
+
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={(event) => {
+                  handleSortChange(option.value);
+                  event.currentTarget.closest("details")?.removeAttribute("open");
+                }}
+                className={`
+                  ${khInterferenceRegularFont.className}
+                  flex w-full items-center justify-between px-3 py-2
+                  text-left text-[11px] uppercase tracking-[0.1em]
+                  transition-colors
+                  ${
+                    isActive
+                      ? "bg-[#ADFE00] text-black"
+                      : "text-black hover:bg-[#1B2C1C] hover:text-[#ADFE00]"
+                  }
+                `}
+              >
+                {option.label}
+                {isActive ? <span>ACTIVA</span> : null}
+              </button>
+            );
+          })}
+        </div>
+      </details>
+    );
+  };
 
   // COLECCIONES MOVILES
   // Barra horizontal con scroll. `overflow-x-auto` evita comprimir los botones
@@ -350,9 +379,12 @@ export default function Page() {
             className={`
               ${khInterferenceRegularFont.className}
               h-10 shrink-0  border border-black
-              bg-black px-5 text-xs uppercase leading-none text-white
-              transition hover:bg-white hover:text-black
-              ${isActive ? "ring-2 ring-black ring-offset-2" : ""}
+              px-5 text-[11px] uppercase leading-none transition
+              ${
+                isActive
+                  ? "bg-[#1B2C1C] text-[#ADFE00]"
+                  : "bg-white text-black hover:bg-white hover:text-black"
+              }
             `}
           >
             {collection.label}
@@ -399,7 +431,7 @@ export default function Page() {
     // Los paddings `md` y `lg` controlan el margen del catalogo en pantallas grandes.
     <SmoothScroll>
       <section className="w-full px-0 pb-28 pt-25 md:px-8 
-      md:pb-0 lg:px-12 lg:pt-30">
+      md:pb-24 lg:px-12 lg:pt-30">
         
         {/* ================================================================
             FILTRO MOVIL: BARRA SUPERIOR
@@ -445,8 +477,9 @@ export default function Page() {
                   className={`
                     ${khInterferenceRegularFont.className}
                     flex h-14 min-w-0 items-center 
+                    bg-[#1B2C1C]
                     border border-black px-3
-                    text-xs uppercase text-black
+                    text-xs uppercase text-[#ADFE00]
                   `}
                   htmlFor="catalog-mobile-search"
                 >
@@ -464,7 +497,8 @@ export default function Page() {
                     className="
                       min-w-0 flex-1 bg-transparent
                       text-xs uppercase outline-none
-                      placeholder:text-black/45
+                      placeholder:text-white/45
+
                     "
                   />
                 </label>
@@ -473,8 +507,8 @@ export default function Page() {
                   className={`
                     ${khInterferenceRegularFont.className}
                     flex h-12 min-w-0 items-center justify-center 
-                    border border-black/20 px-3
-                    text-center text-xs uppercase leading-none text-black
+                    border border-black/20 px-3 bg-[#1B2C1C]
+                    text-center text-xs uppercase leading-none text-[#ADFE00]
                   `}
                 >
                   <span className="line-clamp-2">{mobileCategoryLabel}</span>
@@ -511,6 +545,7 @@ export default function Page() {
               "
             >
               <MobileCollectionControl />
+
               <button
                 type="button"
                 aria-label="Ordenar productos"
@@ -718,32 +753,42 @@ export default function Page() {
                 Ordenar por
               </h2>
 
-              <div className="mt-7 space-y-2">
+              {/*
+                LISTA DE ORDEN: usa los mismos divisores que Categorias.
+                No usa fondos ni bordes redondeados para mantener una sola estetica.
+              */}
+              <div className="mt-7">
                 {sortOptions.map((option) => {
                   const isActive = sortBy === option.value;
 
                   return (
-                    <button
+                    <div
                       key={option.value}
-                      type="button"
-                      onClick={() => {
-                        handleSortChange(option.value);
-                        setMobileSortDrawerOpen(false);
-                      }}
-                      className={`
-                        ${khInterferenceRegularFont.className}
-                        flex w-full items-center justify-between rounded-lg
-                        border px-4 py-3 text-left text-sm uppercase transition
-                        ${
-                          isActive
-                            ? "border-[#ADFE00] bg-[#ADFE00] text-black"
-                            : "border-white/20 text-white hover:border-white/60"
-                        }
-                      `}
+                      className="border-b border-white/15"
                     >
-                      {option.label}
-                      {isActive ? <span>ACTIVO</span> : null}
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleSortChange(option.value);
+                          setMobileSortDrawerOpen(false);
+                        }}
+                        className={`
+                          ${khInterferenceRegularFont.className}
+                          flex w-full items-center justify-between py-3
+                          text-left text-sm uppercase transition
+                          ${
+                            isActive
+                              ? "text-[#ADFE00]"
+                              : "text-white hover:text-white/60"
+                          }
+                        `}
+                      >
+                        {option.label}
+                        <span className="text-white/45">
+                          {isActive ? "ACTIVA" : ""}
+                        </span>
+                      </button>
+                    </div>
                   );
                 })}
               </div>
@@ -756,7 +801,8 @@ export default function Page() {
         {/* ESTRUCTURA DE ESCRITORIO
             Desde md aparece sidebar de filtros a la izquierda y productos a la derecha. */}
         <ScrollReveal delay={0.16}>
-          <div className="grid grid-cols-1 md:grid-cols-[205px_1fr] shadow-none gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-[205px_1fr] 
+          shadow-none gap-4">
             {/* SIDEBAR: buscador y arbol de categorias. `p-4` controla su aire interior. */}
             <aside className="hidden p-4 text-sm md:block">
               <div className="mb-5">
@@ -782,7 +828,8 @@ export default function Page() {
 
             {/* AREA DE RESULTADOS: controles, grilla, estados y paginacion. */}
             <main className="w-auto px-0 shadow-none md:p-2">
-              {/* CONTROLES ESCRITORIO: colecciones a la izquierda y selector Relevancia a la derecha. */}
+              {/* CONTROLES ESCRITORIO: colecciones a la izquierda y selector Relevancia
+               a la derecha. */}
               <div className="mb-3 hidden items-center 
               justify-between gap-6 md:flex">
                 <CollectionControl />
@@ -791,7 +838,8 @@ export default function Page() {
 
               {/* CARGA INICIAL: skeletons con la misma grilla final para evitar saltos visuales. */}
               {showInitialProductsLoading && (
-                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 md:gap-1">
+                <div className="grid grid-cols-2 sm:grid-cols-2 
+                lg:grid-cols-3 2xl:grid-cols-4 gap-3 md:gap-1">
                   {Array.from({ length: 8 }).map((_, index) => (
                     <ProductCardSkeleton
                       key={`catalog-product-skeleton-${index}`}
@@ -841,22 +889,64 @@ export default function Page() {
                     )}
                   </div>
 
-                  {/* PAGINACION: solo se muestra si el backend informa mas de una pagina. */}
+                  {/* =================================================================
+                      PAGINACION DEL CATALOGO
+                      Este unico bloque contiene MOVIL y ESCRITORIO para editar ambos
+                      estilos juntos. Solo aparece si Strapi informa mas de una pagina.
+
+                      MOVIL: clases sin prefijo; fondo #1B2C1C y texto verde Eden.
+                      ESCRITORIO: clases con `md:`; fondo transparente y divisor superior.
+                      `size-10` controla el tamano de flechas y numeros en ambos formatos.
+                     ================================================================= */}
+                  {/*
+                    CONTENEDOR RESPONSIVE
+                    Movil usa una banda oscura. Desde `md` vuelve al fondo blanco
+                    y muestra solamente un borde superior para separar resultados.
+                  */}
                   {totalPages > 1 && (
-                    <div className="mt-8 flex justify-center">
-                      <Pagination>
-                        <PaginationContent className="flex flex-wrap gap-2">
+                    <div
+                      className="
+                        mt-8 bg-white px-4 py-3
+                        md:mt-10 md:border-t md:border-black/15 
+                        md:bg-transparent
+                        md:px-0 md:pt-4 md:pb-0
+                      "
+                    >
+                      <Pagination className="justify-between gap-3 md:gap-4">
+                        {/* CONTADOR: formato corto en movil y texto completo en escritorio. */}
+                        <p
+                          className={`${khInterferenceRegularFont.className} text-[11px] uppercase text-black md:text-xs md:text-black/45`}
+                        >
+                          <span className="md:hidden">
+                            Pag. {currentPage}/{totalPages}
+                          </span>
+                          <span className="hidden md:inline">
+                            Pagina {currentPage} de {totalPages}
+                          </span>
+                        </p>
+
+                        {/* CONTROLES: anterior, numeros de pagina y siguiente. */}
+                        <PaginationContent className="ml-0 flex flex-wrap gap-1 md:ml-auto">
                           <PaginationItem>
+                            {/* FLECHA ANTERIOR: se deshabilita al estar en la pagina uno. */}
                             <button
+                              type="button"
                               onClick={handlePrev}
                               disabled={currentPage === 1}
-                              className={`px-3 py-2 rounded-md text-sm ${
+                              aria-label="Pagina anterior"
+                              className={`
+                                flex size-10 items-center justify-center
+                                border border-[#ADFE00]/40 text-black
+                                transition-colors
+                                md:border-black/20 md:text-black
+                                ${
                                 currentPage === 1
-                                  ? "cursor-not-allowed opacity-50"
-                                  : "hover:bg-accent hover:text-accent-foreground"
-                              }`}
+                                  ? "cursor-not-allowed opacity-25" 
+                                  : "hover:bg-[#1B2C1C] hover:text-[#ADFE00]"
+                                }
+                              `}
                             >
-                              <PaginationPrevious />
+                              <ChevronLeft className="size-4" strokeWidth={1.8} />
                             </button>
                           </PaginationItem>
 
@@ -866,33 +956,49 @@ export default function Page() {
 
                             return (
                               <PaginationItem key={pageNum}>
+                                {/* NUMERO: fondo verde si es la pagina actual. */}
                                 <button
+                                  type="button"
                                   onClick={() => goToPage(pageNum)}
-                                  className={`px-3 py-2 rounded-md text-sm ${
-                                    isActive
-                                      ? "text-black border"
-                                      : "hover:bg-accent hover:text-accent-foreground"
-                                  }`}
+                                  aria-label={`Ir a la pagina ${pageNum}`}
+                                  aria-current={isActive ? "page" : undefined}
+                                  className={`
+                                    ${khInterferenceRegularFont.className}
+                                    flex size-10 items-center justify-center
+                                    text-sm transition-colors
+                                    ${
+                                      isActive
+                                        ? "bg-[#1B2C1C] text-[#ADFE00]"
+                                        : "text-black hover:bg-[#1B2C1C] hover:text-[#ADFE00] md:text-black/60 md:hover:bg-black md:hover:text-white"
+                                    }
+                                  `}
                                 >
-                                  <PaginationLink isActive={isActive}>
-                                    {pageNum}
-                                  </PaginationLink>
+                                  {pageNum}
                                 </button>
                               </PaginationItem>
                             );
                           })}
 
                           <PaginationItem>
+                            {/* FLECHA SIGUIENTE: se deshabilita al alcanzar la ultima pagina. */}
                             <button
+                              type="button"
                               onClick={handleNext}
                               disabled={currentPage === totalPages}
-                              className={`px-3 py-2 rounded-md border text-sm ${
+                              aria-label="Pagina siguiente"
+                              className={`
+                                flex size-10 items-center justify-center
+                                border border-black text-black
+                                transition-colors
+                                md:border-black/20 md:text-black
+                                ${
                                 currentPage === totalPages
-                                  ? "opacity-50 cursor-not-allowed"
-                                  : "hover:bg-accent hover:text-accent-foreground"
-                              }`}
+                                  ? "cursor-not-allowed opacity-25"
+                                  : "hover:bg-[#1B2C1C] hover:text-[#ADFE00]"
+                                }
+                              `}
                             >
-                              <PaginationNext />
+                              <ChevronRight className="size-4" strokeWidth={1.8} />
                             </button>
                           </PaginationItem>
                         </PaginationContent>

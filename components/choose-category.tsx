@@ -347,8 +347,8 @@ const ChooseCategory = () => {
                   href={activeCategory.href}
                   className={`${khInterferenceRegularFont.className}
                     flex h-[58px] w-[155px] items-center
-                    bg-[#b7ff00] px-6
-                    text-[18px] uppercase leading-[1.05] text-black
+                    bg-[#1B2C1C] px-6
+                    text-[18px] uppercase leading-[1.05] text-[#ADFE00]
                     transition-transform hover:text-white`}
                 >
                   VER
@@ -371,7 +371,7 @@ const ChooseCategory = () => {
                 initial="initial"
                 animate="animate"
                 exit="exit"
-                className="mt-9 grid grid-cols-[1.45fr_1.35fr_0.9fr] gap-3"
+                className="mt-9 grid grid-cols-[1.95fr_1fr_0.9fr] gap-3"
               >
                 {activeCategory.images.slice(0, 3).map((image, index) => (
                   <CategoryImageTile
@@ -386,6 +386,9 @@ const ChooseCategory = () => {
             </AnimatePresence>
           )}
         </div>
+
+
+
 
         {/* BLOQUE MOVIL: se muestra antes de md y apila solo dos imagenes. */}
         <div className="md:hidden">
@@ -409,7 +412,7 @@ const ChooseCategory = () => {
                 className={`${khInterferenceRegularFont.className}
                   flex h-[40px] w-[100px] items-center
                   bg-[#1B2C1C] px-2
-                  text-[14px] uppercase leading-[0.95] text-[#b7ff00]`}
+                  text-[14px] uppercase leading-[0.95] text-[#ADFE00]`}
               >
                 VER
                 <br />
@@ -441,7 +444,7 @@ const ChooseCategory = () => {
                 exit="exit"
                 className={`${khInterferenceLightFont.className}
                   mt-5 max-w-[410px]
-                  text-[14px] uppercase 
+                  text-[13px] uppercase py-3 lg:py-0
                   leading-[1.1] text-black/65`}
               >
                 {activeCategory.description}
@@ -453,7 +456,7 @@ const ChooseCategory = () => {
           {loading && (
             <div className="mt-3 space-y-1">
               <div className="h-[207px] animate-pulse bg-zinc-200" />
-              <div className="h-[280px] animate-pulse bg-zinc-200" />
+              <div className="h-[290px] animate-pulse bg-zinc-200" />
             </div>
           )}
 
@@ -473,7 +476,7 @@ const ChooseCategory = () => {
                     key={`${activeCategory.key}-${image.src}-${index}`}
                     src={image.src}
                     alt={image.alt}
-                    className={index === 0 ? "h-[207px]" : "h-[280px]"}
+                    className={index === 0 ? "h-[207px]" : "h-[290px]"}
                     priority={index === 0}
                   />
                 ))}

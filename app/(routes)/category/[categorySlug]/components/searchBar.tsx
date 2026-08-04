@@ -32,10 +32,10 @@ const SearchBar = ({ value, onChange }: SearchBarProps) => {
     // y `px-5` controla el aire horizontal del texto dentro del buscador.
     <input
       className={`${khInterferenceLightFont.className}
-        h-[40px] w-full bg-neutral-100 px-5
-        text-[14px] text-black outline-none
-        placeholder:text-black/35
-        transition-colors focus:bg-neutral-200`}
+        h-[40px] w-full bg-[#1B2C1C] px-5
+        text-[14px] text-[#ADFE00] outline-none
+        placeholder:text-[#ADFE00]/35
+        transition-colors focus:bg-[#1B2C1C]`}
       placeholder="Buscar"
       value={value}
       onChange={handleInput}

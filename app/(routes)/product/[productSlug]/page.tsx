@@ -46,11 +46,12 @@ export default function Page() {
 
   return (
     // CONTENEDOR GENERAL
-    // En escritorio `lg:max-w-none lg:px-0` permite que la galeria llegue al borde izquierdo.
+    // En movil `px-0 py-0` elimina los bordes laterales y superiores de la ficha.
+    // Desde `sm` se recupera aire para tablet; en escritorio la galeria llega al borde izquierdo.
     <SmoothScroll>
       <div
         className="
-          mx-auto max-w-[1240px] px-4 py-8
+          mx-auto max-w-[1240px] px-0 py-0
           sm:px-8 sm:py-18
           lg:max-w-none lg:px-0 lg:py-0
         "

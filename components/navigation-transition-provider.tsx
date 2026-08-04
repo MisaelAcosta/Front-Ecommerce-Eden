@@ -345,7 +345,7 @@ export function NavigationTransitionProvider({
       {showInitialLoader && (
         <div
           ref={initialLoaderRef}
-          className="fixed inset-0 z-[130] grid place-items-center bg-black text-white"
+          className="fixed inset-0 z-[130] grid place-items-center bg-[#1B2C1C] text-[#ADFE00]"
           aria-label="Cargando"
           aria-live="polite"
         >
