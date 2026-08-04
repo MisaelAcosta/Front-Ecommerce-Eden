@@ -34,6 +34,13 @@ import {
   PaginationLink,
 } from "@/components/ui/pagination";
 
+/*
+ * FILTROS MOVILES DEL CATALOGO
+ * Este archivo concentra la interfaz y la logica movil: buscador, categoria,
+ * subcategorias, colecciones y orden. Los componentes `filter-category.tsx`
+ * y `searchBar.tsx` se usan solamente desde el sidebar de escritorio.
+ */
+
 // TIPOS DE RESPUESTA
 // Permiten leer productos aunque Strapi los entregue planos o dentro de `attributes`.
 type ProductWithOptionalAttributes = ProductType & {
@@ -109,14 +116,14 @@ export default function Page() {
   const [sortBy, setSortBy] = useState<SortOption>("default");
   const [currentPage, setCurrentPage] = useState(1);
   // ESTADOS MOVILES
-  // Controlan los drawers de categoria/orden y el reemplazo del titulo por el buscador movil.
+  // Controlan que panel esta abierto y si el titulo central se reemplaza por el buscador.
   const [mobileCategoryDrawerOpen, setMobileCategoryDrawerOpen] = useState(false);
   const [mobileSortDrawerOpen, setMobileSortDrawerOpen] = useState(false);
   const [expandedMobileCategorySlug, setExpandedMobileCategorySlug] =
     useState<string | null>(categorySlug);
   const [showSearchMobile, setShowSearchMobile] = useState(false);
   // SUBCATEGORIA PENDIENTE
-  // Conserva una subcategoria si el usuario primero debe navegar a otra categoria desde movil.
+  // Conserva una subcategoria si el usuario primero navega a otra categoria desde movil.
   const pendingMobileSubcategoryRef = useRef<{
     categorySlug: string;
     subcategorySlug: string;
@@ -276,7 +283,7 @@ export default function Page() {
               key={collection.key}
               type="button"
               onClick={() => handleCollectionToggle(collection.key)}
-              className={`${khInterferenceRegularFont.className} h-10 rounded-full border px-5 text-sm uppercase leading-none tracking-[0] transition ${
+              className={`${khInterferenceRegularFont.className} h-10 border px-5 text-sm uppercase leading-none tracking-[0] transition ${
                 isActive
                   ? "border-black bg-black text-white"
                   : "border-black/70 bg-white text-black hover:border-black hover:bg-black hover:text-white"
@@ -322,9 +329,16 @@ export default function Page() {
   );
 
   // COLECCIONES MOVILES
-  // Barra horizontal con scroll para no reducir el ancho de cada boton en pantallas pequenas.
+  // Barra horizontal con scroll. `overflow-x-auto` evita comprimir los botones
+  // y `h-10` controla la altura visible de cada coleccion en movil.
   const MobileCollectionControl = () => (
-    <div className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div
+      className="
+        flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1
+        [scrollbar-width:none]
+        [&::-webkit-scrollbar]:hidden
+      "
+    >
       {collectionOptions.map((collection) => {
         const isActive = activeCollectionKey === collection.key;
 
@@ -333,9 +347,13 @@ export default function Page() {
             key={collection.key}
             type="button"
             onClick={() => handleCollectionToggle(collection.key)}
-            className={`${khInterferenceRegularFont.className} h-10 shrink-0 rounded-xl border border-black bg-black px-5 text-xs uppercase leading-none text-white transition hover:bg-white hover:text-black ${
-              isActive ? "ring-2 ring-black ring-offset-2" : ""
-            }`}
+            className={`
+              ${khInterferenceRegularFont.className}
+              h-10 shrink-0  border border-black
+              bg-black px-5 text-xs uppercase leading-none text-white
+              transition hover:bg-white hover:text-black
+              ${isActive ? "ring-2 ring-black ring-offset-2" : ""}
+            `}
           >
             {collection.label}
           </button>
@@ -380,21 +398,34 @@ export default function Page() {
     // CONTENEDOR PRINCIPAL
     // Los paddings `md` y `lg` controlan el margen del catalogo en pantallas grandes.
     <SmoothScroll>
-      <section className="w-full px-0 pb-28 pt-25 md:px-8 md:pb-0 lg:px-12 lg:pt-30">
+      <section className="w-full px-0 pb-28 pt-25 md:px-8 
+      md:pb-0 lg:px-12 lg:pt-30">
         
-        {/* BARRA SUPERIOR MOVIL
-            Solo visible antes de md: buscador, categoria activa, filtro y orden. */}
+        {/* ================================================================
+            FILTRO MOVIL: BARRA SUPERIOR
+            `md:hidden` hace que este control exista solo en celulares.
+            Incluye buscador, categoria activa, colecciones y orden.
+           ================================================================ */}
         <ScrollReveal delay={0.08}>
           <div className="bg-white px-5 pb-5 pt-6 md:hidden">
-            {/* FILA PRINCIPAL MOVIL
-                `grid-cols` fija el ancho de iconos y deja el espacio flexible al titulo/buscador. */}
-            <div className="grid grid-cols-[56px_minmax(0,1fr)_56px] items-center gap-3">
+            {/* FILA PRINCIPAL: `56px` controla el tamano de ambos botones circulares. */}
+            <div
+              className="
+                grid grid-cols-[56px_minmax(0,1fr)_56px]
+                items-center gap-3
+              "
+            >
               {/* BOTON BUSCAR: alterna entre el nombre de categoria y el input de texto. */}
               <button
                 type="button"
                 aria-label={showSearchMobile ? "Cerrar buscador" : "Buscar productos"}
                 aria-expanded={showSearchMobile}
-                className="flex h-14 w-14 items-center justify-center rounded-full bg-neutral-200 text-black transition hover:bg-neutral-300"
+                className="
+                  flex h-14 w-14 items-center justify-center 
+                  
+                text-black
+                  
+                "
                 onClick={() => {
                   setShowSearchMobile((value) => !value);
                   setMobileCategoryDrawerOpen(false);
@@ -408,10 +439,15 @@ export default function Page() {
                 )}
               </button>
 
-              {/* CENTRO: input cuando se busca; etiqueta de categoria en estado normal. */}
+              {/* CENTRO: muestra el input al buscar o el nombre de la categoria activa. */}
               {showSearchMobile ? (
                 <label
-                  className={`${khInterferenceRegularFont.className} flex h-14 min-w-0 items-center rounded-[18px] border border-black px-3 text-xs uppercase text-black`}
+                  className={`
+                    ${khInterferenceRegularFont.className}
+                    flex h-14 min-w-0 items-center 
+                    border border-black px-3
+                    text-xs uppercase text-black
+                  `}
                   htmlFor="catalog-mobile-search"
                 >
                   <span className="sr-only">Buscar productos</span>
@@ -425,23 +461,36 @@ export default function Page() {
                       setCurrentPage(1);
                     }}
                     placeholder="BUSCAR"
-                    className="min-w-0 flex-1 bg-transparent text-xs uppercase outline-none placeholder:text-black/45"
+                    className="
+                      min-w-0 flex-1 bg-transparent
+                      text-xs uppercase outline-none
+                      placeholder:text-black/45
+                    "
                   />
                 </label>
               ) : (
                 <div
-                  className={`${khInterferenceRegularFont.className} flex h-14 min-w-0 items-center justify-center rounded-[18px] border border-black/20 px-3 text-center text-xs uppercase leading-none text-black`}
+                  className={`
+                    ${khInterferenceRegularFont.className}
+                    flex h-12 min-w-0 items-center justify-center 
+                    border border-black/20 px-3
+                    text-center text-xs uppercase leading-none text-black
+                  `}
                 >
                   <span className="line-clamp-2">{mobileCategoryLabel}</span>
                 </div>
               )}
 
-              {/* BOTON FILTROS: abre el drawer inferior de categorias. */}
+              {/* BOTON FILTROS: abre el drawer inferior con categorias y subcategorias. */}
               <button
                 type="button"
                 aria-label="Filtrar por categoria"
                 aria-expanded={mobileCategoryDrawerOpen}
-                className="flex h-14 w-14 items-center justify-center rounded-full bg-neutral-200 text-black transition hover:bg-neutral-300"
+                className="
+                  flex h-14 w-14 items-center justify-center 
+                text-black
+                  
+                "
                 onClick={() => {
                   setMobileCategoryDrawerOpen(true);
                   setMobileSortDrawerOpen(false);
@@ -451,14 +500,25 @@ export default function Page() {
               </button>
             </div>
 
-            {/* FILA SECUNDARIA MOVIL: colecciones desplazables y acceso a ordenamiento. */}
-            <div className="mt-5 flex items-center gap-3">
+            {/*
+              FILA SECUNDARIA: la columna final de 56px replica el eje del
+              boton de filtros superior y mantiene ambos iconos alineados.
+            */}
+            <div
+              className="
+                mt-5 grid grid-cols-[minmax(0,1fr)_56px]
+                items-center gap-3
+              "
+            >
               <MobileCollectionControl />
               <button
                 type="button"
                 aria-label="Ordenar productos"
                 aria-expanded={mobileSortDrawerOpen}
-                className="flex h-9 w-9 shrink-0 items-center justify-center text-black"
+                className="
+                  flex h-14 w-14 items-center justify-center
+                  text-black
+                "
                 onClick={() => {
                   setMobileSortDrawerOpen(true);
                   setMobileCategoryDrawerOpen(false);
@@ -470,25 +530,43 @@ export default function Page() {
           </div>
         </ScrollReveal>
 
-        {/* DRAWER MOVIL - CATEGORIAS
-            Panel inferior para navegar categorias y subcategorias sin salir del catalogo. */}
+        {/* ================================================================
+            FILTRO MOVIL: DRAWER DE CATEGORIAS
+            Panel inferior. `max-h-[82vh]` limita su altura y `overflow-y-auto`
+            habilita el scroll interno al existir muchas categorias.
+           ================================================================ */}
         <Drawer
           open={mobileCategoryDrawerOpen}
           onOpenChange={setMobileCategoryDrawerOpen}
           direction="bottom"
         >
-          <DrawerContent className="max-h-[82vh] overflow-y-auto rounded-t-[18px] border-t-0 bg-[#090909] p-0 text-white md:hidden [&>div:first-child]:hidden">
-            <DrawerClose className="absolute right-5 top-5 z-10 text-white/80 transition-colors hover:text-white">
+          <DrawerContent
+            className="
+              max-h-[82vh] overflow-y-auto rounded-t-[18px] border-t-0
+              bg-[#090909] p-0 text-white
+              md:hidden
+              [&>div:first-child]:hidden
+            "
+          >
+            {/* CIERRE DEL DRAWER: cambiar `right-5` o `top-5` mueve la X. */}
+            <DrawerClose
+              className="
+                absolute right-5 top-5 z-10 text-white/80
+                transition-colors hover:text-white
+              "
+            >
               <X className="h-5 w-5" />
               <span className="sr-only">Cerrar categorias</span>
             </DrawerClose>
 
             <div className="px-6 pb-9 pt-10">
+              {/* TITULO DEL PANEL: cambiar `text-2xl` modifica solo este encabezado. */}
               <h2 className={`${khInterferenceRegularFont.className} text-2xl uppercase`}>
                 Categorias
               </h2>
 
               <div className="mt-7 space-y-2">
+                {/* TODOS LOS PRODUCTOS: limpia la categoria actual y recupera el catalogo completo. */}
                 <div className="border-b border-white/15 pb-2">
                   <button
                     type="button"
@@ -518,6 +596,7 @@ export default function Page() {
                   </p>
                 )}
 
+                {/* LISTA DE CATEGORIAS: permite expandir subcategorias antes de navegar. */}
                 {!loadingCategories && !categoriesError && categories.map((category) => {
                   const isCurrentCategory = category.slug === categorySlug;
                   const hasSubcategories = Boolean(category.subcategories?.length);
@@ -537,13 +616,26 @@ export default function Page() {
                             current === category.slug ? null : category.slug
                           );
                         }}
-                        className={`${khInterferenceRegularFont.className} flex w-full items-center justify-between py-3 text-left text-sm uppercase transition ${
-                          isCurrentCategory ? "text-[#adff00]" : "text-white hover:text-white/60"
-                        }`}
+                        className={`
+                          ${khInterferenceRegularFont.className}
+                          flex w-full items-center justify-between py-3
+                          text-left text-sm uppercase transition
+                          ${
+                            isCurrentCategory
+                              ? "text-[#ADFE00]"
+                              : "text-white hover:text-white/60"
+                          }
+                        `}
                       >
                         {category.categoryName}
                         <span className="text-white/45">
-                          {hasSubcategories ? (isExpanded ? "-" : "+") : isCurrentCategory ? "ACTIVA" : ""}
+                          {hasSubcategories
+                            ? isExpanded
+                              ? "-"
+                              : "+"
+                            : isCurrentCategory
+                              ? "ACTIVA"
+                              : ""}
                         </span>
                       </button>
 
@@ -552,7 +644,11 @@ export default function Page() {
                           <button
                             type="button"
                             onClick={() => selectMobileCategory(category.slug)}
-                            className={`${khInterferenceRegularFont.className} block w-full py-2 text-left text-xs uppercase text-white/80 transition hover:text-[#adff00]`}
+                            className={`
+                              ${khInterferenceRegularFont.className}
+                              block w-full py-2 text-left text-xs uppercase
+                              text-white/80 transition hover:text-[#ADFE00]
+                            `}
                           >
                             Ver todo en {category.categoryName}
                           </button>
@@ -562,11 +658,17 @@ export default function Page() {
                               key={subcategory.id}
                               type="button"
                               onClick={() => selectMobileSubcategory(category.slug, subcategory.slug)}
-                              className={`${khInterferenceRegularFont.className} block w-full py-2 text-left text-xs uppercase transition ${
-                                isCurrentCategory && activeSubSlug === subcategory.slug
-                                  ? "text-[#adff00]"
-                                  : "text-white/55 hover:text-white"
-                              }`}
+                              className={`
+                                ${khInterferenceRegularFont.className}
+                                block w-full py-2 text-left text-xs uppercase
+                                transition
+                                ${
+                                  isCurrentCategory &&
+                                  activeSubSlug === subcategory.slug
+                                    ? "text-[#ADFE00]"
+                                    : "text-white/55 hover:text-white"
+                                }
+                              `}
                             >
                               {subcategory.categoryName}
                             </button>
@@ -581,20 +683,37 @@ export default function Page() {
           </DrawerContent>
         </Drawer>
 
-        {/* DRAWER MOVIL - ORDEN
-            Lista las opciones de orden; seleccionar una cierra el panel y recarga resultados. */}
+        {/* ================================================================
+            FILTRO MOVIL: DRAWER DE ORDEN
+            Lista las opciones de orden. Al elegir una, se cierra el panel y
+            el catalogo solicita nuevamente sus productos ordenados.
+           ================================================================ */}
         <Drawer
           open={mobileSortDrawerOpen}
           onOpenChange={setMobileSortDrawerOpen}
           direction="bottom"
         >
-          <DrawerContent className="max-h-[62vh] overflow-y-auto rounded-t-[18px] border-t-0 bg-[#090909] p-0 text-white md:hidden [&>div:first-child]:hidden">
-            <DrawerClose className="absolute right-5 top-5 z-10 text-white/80 transition-colors hover:text-white">
+          <DrawerContent
+            className="
+              max-h-[62vh] overflow-y-auto rounded-t-[18px] border-t-0
+              bg-[#090909] p-0 text-white
+              md:hidden
+              [&>div:first-child]:hidden
+            "
+          >
+            {/* CIERRE DEL DRAWER DE ORDEN. */}
+            <DrawerClose
+              className="
+                absolute right-5 top-5 z-10 text-white/80
+                transition-colors hover:text-white
+              "
+            >
               <X className="h-5 w-5" />
               <span className="sr-only">Cerrar ordenamiento</span>
             </DrawerClose>
 
             <div className="px-6 pb-9 pt-10">
+              {/* TITULO DEL PANEL DE ORDEN. */}
               <h2 className={`${khInterferenceRegularFont.className} text-2xl uppercase`}>
                 Ordenar por
               </h2>
@@ -611,11 +730,16 @@ export default function Page() {
                         handleSortChange(option.value);
                         setMobileSortDrawerOpen(false);
                       }}
-                      className={`${khInterferenceRegularFont.className} flex w-full items-center justify-between rounded-lg border px-4 py-3 text-left text-sm uppercase transition ${
-                        isActive
-                          ? "border-[#adff00] bg-[#adff00] text-black"
-                          : "border-white/20 text-white hover:border-white/60"
-                      }`}
+                      className={`
+                        ${khInterferenceRegularFont.className}
+                        flex w-full items-center justify-between rounded-lg
+                        border px-4 py-3 text-left text-sm uppercase transition
+                        ${
+                          isActive
+                            ? "border-[#ADFE00] bg-[#ADFE00] text-black"
+                            : "border-white/20 text-white hover:border-white/60"
+                        }
+                      `}
                     >
                       {option.label}
                       {isActive ? <span>ACTIVO</span> : null}

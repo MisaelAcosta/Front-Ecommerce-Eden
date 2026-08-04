@@ -137,7 +137,7 @@ const Navbar = () => {
 
     const icon = (
       <Smile
-        strokeWidth={1.5}
+        strokeWidth={2}
         fill="none"
         className={cn(
           iconClassName,
@@ -214,7 +214,7 @@ const Navbar = () => {
         {/* ===== # Navbar Desktop ===== */}
         {/* Desktop: barra flotante tipo capsule inspirada en las referencias. */}
         <div className="hidden pt-4 lg:block">
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6 rounded-[30px] border border-white/10 
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6  rounded-[10px] border border-white/10 
           bg-[rgba(82,82,82,0.76)] px-6 py-3 text-white backdrop-blur-xs">
             {/* ---- Columna izquierda desktop: enlaces de navegacion ---- */}
             <div className="min-w-0">
@@ -250,7 +250,7 @@ const Navbar = () => {
                   justify-between
                   min-w-[190px]
                   h-[54px]
-                  rounded-full
+                  rounded-[10px]
                   border
                   border-white/10
                   bg-[#1A1A1A]
@@ -280,7 +280,7 @@ const Navbar = () => {
                   )}
                   onClick={handleGoLoved}
                 >
-                  <Heart strokeWidth={1.5} className="h-6 w-6" />
+                  <Heart strokeWidth={2} className="h-6 w-6" />
                 </button>
 
                 <div className="h-5 w-px bg-white/15" />
@@ -311,7 +311,7 @@ const Navbar = () => {
               grid-cols-[auto_1fr_auto]
               items-center
               gap-3
-              rounded-full
+              rounded-[10px]
               border
               border-white/10
               bg-[rgba(82,82,82,0.76)]
@@ -323,7 +323,7 @@ const Navbar = () => {
           >
             {/* ---- Columna izquierda mobile: boton menu y acceso a perfil ---- */}
             <div className="flex items-center gap-1">
-              <div className="rounded-full p-1">
+              <div className="rounded-[10px] p-1">
               <ItemsMenuMobile scrolled={false} />
             </div>
 
@@ -360,7 +360,7 @@ const Navbar = () => {
 
             {/* ---- Columna derecha mobile: favoritos y carrito dentro de capsule ---- */}
             <div className="flex items-center justify-end">
-              <div className="inline-flex items-center gap-1 rounded-full 
+              <div className="inline-flex items-center gap-1 rounded-[10px]
               border border-black/40 bg-black/80 p-1">
                 <button
                   type="button"
@@ -373,7 +373,7 @@ const Navbar = () => {
                   )}
                   onClick={handleGoLoved}
                 >
-                  <Heart strokeWidth={1.5} className="h-5 w-5" />
+                  <Heart strokeWidth={2} className="h-5 w-5" />
                 </button>
 
                 <div className="h-4 w-px bg-white/15" />

@@ -24,7 +24,8 @@ const footerLinks = [
 
 export default function Footer() {
   return (
-    <footer className="overflow-hidden border-t border-white/20 bg-[#111111] text-white">
+    <footer className="overflow-hidden border-t border-white/20
+     bg-[#111111] text-white">
       <div className="w-full px-9 pb-10 pt-10 sm:px-29 lg:px-44 ">
         {/* Contenido superior */}
         <div
@@ -38,7 +39,7 @@ export default function Footer() {
           >
             <p
               className={`${khInterferenceLight.className}
-              text-[11px] leading-[1.05] text-white sm:text-base`}
+              text-[13px] leading-[1.05] text-white sm:text-base`}
             >
               SUSCRÍBETE Y RECIBE OFERTAS
               <br />
@@ -51,7 +52,7 @@ export default function Footer() {
           <nav aria-label="Explora">
             <h2
               className={`${khInterferenceLight.className}
-              mb-4 text-base text-white/55`}
+              mb-4 text-[14px] lg:text-base text-white/55`}
             >
               EXPLORA
             </h2>
@@ -63,7 +64,7 @@ export default function Footer() {
               {footerLinks.map((link) => (
                 <li key={link.label}>
                   <Link
-                    className="transition-opacity hover:opacity-60"
+                    className="transition-opacity hover:opacity-60 text-[14px] lg:text-base"
                     href={link.href}
                   >
                     {link.label}
@@ -76,7 +77,7 @@ export default function Footer() {
           <address className="not-italic" aria-label="Contáctanos">
             <h2
               className={`${khInterferenceLight.className}
-              mb-4 text-base text-white/55`}
+              mb-4 text-[14px] lg:text-base text-white/55`}
             >
               CONTÁCTANOS
             </h2>
@@ -87,7 +88,7 @@ export default function Footer() {
             >
               <li>
                 <a
-                  className="transition-opacity hover:opacity-60"
+                  className="transition-opacity hover:opacity-60 text-[14px] lg:text-base"
                   href="mailto:EdenCorreos@gmail.com"
                 >
                   EMAIL
@@ -96,7 +97,7 @@ export default function Footer() {
 
               <li>
                 <a
-                  className="transition-opacity hover:opacity-60"
+                  className="transition-opacity hover:opacity-60 text-[14px] lg:text-base"
                   href="tel:+56931107284"
                 >
                   WHATSAPP
@@ -105,7 +106,7 @@ export default function Footer() {
 
               <li>
                 <a
-                  className="transition-opacity hover:opacity-60"
+                  className="transition-opacity hover:opacity-60 text-[14px] lg:text-base"
                   href="https://www.instagram.com/eden.3d_/"
                   target="_blank"
                   rel="noopener noreferrer"

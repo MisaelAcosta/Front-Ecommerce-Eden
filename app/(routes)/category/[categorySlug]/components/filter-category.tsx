@@ -113,7 +113,8 @@ const FilterCategory = ({
 
   return (
     <aside
-      className={`${khInterferenceRegularFont.className} space-y-5 bg-white text-black`}
+      className={`${khInterferenceRegularFont.className} space-y-5 
+      bg-white text-black`}
     >
       <Accordion
         type="single"

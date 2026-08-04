@@ -408,8 +408,8 @@ const ChooseCategory = () => {
                 href={activeCategory.href}
                 className={`${khInterferenceRegularFont.className}
                   flex h-[40px] w-[100px] items-center
-                  bg-[#b7ff00] px-2
-                  text-[14px] uppercase leading-[0.95] text-black`}
+                  bg-[#1B2C1C] px-2
+                  text-[14px] uppercase leading-[0.95] text-[#b7ff00]`}
               >
                 VER
                 <br />
