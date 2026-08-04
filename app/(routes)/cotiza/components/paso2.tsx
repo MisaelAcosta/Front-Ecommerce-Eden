@@ -130,7 +130,8 @@ const Paso2 = ({
       <div className="mx-auto grid w-full max-w-[1350px] gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
         <div>
           <p
-            className={`${cotizaTextBoldFont.className} text-base uppercase tracking-[0.35em] text-black/65 lg:text-2xl`}
+            className={`${cotizaTextBoldFont.className} text-base uppercase 
+            tracking-[0.35em] text-black/65 lg:text-2xl`}
           >
             Paso 02
           </p>
@@ -140,15 +141,15 @@ const Paso2 = ({
             Carga tu archivo
           </h2>
           <p
-            className={`${cotizaTextRegularFont.className} mt-10 max-w-lg text-sm leading-6 text-black/70 sm:text-base lg:mt-15`}
+            className={`${cotizaTextRegularFont.className} mt-10 
+            max-w-lg text-[13px] leading-5 lg:leading-6 text-black/70 sm:text-base lg:mt-15`}
           >
-            Sube tu modelo 3D, revisa la vista previa y ajusta su tamano antes
-            de recalcular. Las medidas se muestran en centimetros como ancho x
-            alto x profundidad.
+            Sube tu modelo 3D, revisa la vista previa y ajusta su tamaño antes
+            de recalcular. Las medidas se muestran en centimetros.
           </p>
 
           <div
-            className={`${cotizaTextRegularFont.className} mt-6 rounded-[14px] bg-[#e4e4e4] p-4 text-xs leading-6 text-black/70 lg:w-100 lg:text-sm`}
+            className={`${cotizaTextRegularFont.className} mt-6  bg-[#e4e4e4] p-4 text-xs leading-6 text-black/70 lg:w-100 lg:text-sm`}
           >
             Formatos admitidos: <span className="font-semibold">.stl</span>,{" "}
             <span className="font-semibold">.3mf</span> y{" "}
@@ -158,28 +159,30 @@ const Paso2 = ({
           </div>
         </div>
 
-        <div className="rounded-[18px] border border-black/10 bg-[#111111] p-4 text-white shadow-[0_16px_40px_rgba(0,0,0,0.16)]">
-          <div className="relative overflow-hidden rounded-[14px] bg-[#bfbfbf]">
-            <div className="relative h-[260px] sm:h-[295px]">
+        <div className="border border-black/10 bg-[#111111] p-1 text-white ">
+          <div className="relative overflow-hidden  bg-[#bfbfbf]">
+            <div className="relative h-[360px] sm:h-[320px] ">
               {showModelViewer && modelFile ? (
                 <ModelViewer file={modelFile} scalePercent={scalePercent} />
               ) : (
-                <div className="absolute inset-0 bg-[#bfbfbf]">
+                <div className="absolute inset-0 bg-[#1B2C1C]">
                   <Image
-                    src="/cotiza/portada_paso2_lenta.gif"
+                    src="/cotiza/bg-imprime.gif"
                     alt="Portada animada para cargar modelo 3D"
                     fill
                     unoptimized
-                    className="scale-[1.04] object-cover blur-[1.5px]"
+                    className="scale-[1.04] lg:scale-[0.9] object-cover blur-[1.5px] "
                   />
                   <div className="absolute inset-0 bg-black/15 backdrop-blur-[1px]" />
                   <p
-                    className={`${cotizaTextRegularFont.className} pointer-events-none absolute left-4 top-4 text-[10px] uppercase tracking-[0.08em] text-white/80`}
+                    className={`${cotizaTextRegularFont.className} 
+                    pointer-events-none absolute left-4 top-4 text-[13px] uppercase tracking-[0.08em] text-white/80`}
                   >
                     Vista 3D
                   </p>
                   <p
-                    className={`${cotizaTextRegularFont.className} pointer-events-none absolute right-4 top-4 text-[10px] uppercase tracking-[0.08em] text-white/80`}
+                    className={`${cotizaTextRegularFont.className} 
+                    pointer-events-none absolute right-4 top-4 text-[13px] uppercase tracking-[0.08em] text-white/80`}
                   >
                     Arrastra para rotar
                   </p>
@@ -194,7 +197,10 @@ const Paso2 = ({
                 <button
                   type="button"
                   onClick={onOpenPicker}
-                  className={`${cotizaTextBoldFont.className} rounded-full bg-white px-5 py-3 text-xs uppercase tracking-[0.22em] text-black shadow-sm transition-transform duration-300 hover:scale-[1.03]`}
+                  className={`${cotizaTextBoldFont.className} bg-[#1B2C1C] 
+                  px-5 py-3 text-xs uppercase tracking-[0.22em] 
+                  text-[#ADFE00] shadow-sm cursor-pointer
+                   `}
                 >
                   Sube tu archivo
                 </button>

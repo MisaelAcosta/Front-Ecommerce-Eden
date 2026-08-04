@@ -5,7 +5,7 @@ import { cotizaTextBoldFont, cotizaTextRegularFont, cotizaTitleFont } from "./co
 
 const Paso1 = () => {
   return (
-    <section className="border-b border-black/10 bg-[#F3F3F3] 
+    <section className="border-b border-black/50 bg-white 
     px-4 py-16 lg:py-25 sm:px-8 lg:px-12">
       <div className="mx-auto grid w-full max-w-[1350px] gap-8 
       lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
@@ -28,12 +28,11 @@ const Paso1 = () => {
           <p
             className={`${cotizaTextRegularFont.className} mt-10 
             lg:mt-15
-            max-w-lg text-sm leading-6 text-black/70 
+            max-w-lg text-[13px] leading-5 lg:leading-6 text-black/70
             sm:text-base`}
           >
             Antes de cotizar, recomendamos descargar tu archivo desde
-            plataformas reconocidas. El flujo ideal es simple: buscar, descargar
-            el STL y volver aquí para cargarlo.
+            plataformas reconocidas.
           </p>
         </div>
 
@@ -43,9 +42,9 @@ const Paso1 = () => {
             href="https://makerworld.com/es?from=bambulab.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="group rounded-[28px]  bg-white p-6 transition-transform duration-300 hover:-translate-y-1"
+            className="group bg-[#f3f3f3] p-6 transition-transform duration-300 hover:-translate-y-1"
           >
-            <div className="relative h-30 lg:h-50 w-full">
+            <div className="relative h-25 lg:h-45 w-full">
               <Image
                 src="/cotiza/makeword.png"
                 alt="MakerWorld"
@@ -59,10 +58,10 @@ const Paso1 = () => {
             href="https://cults3d.com/es"
             target="_blank"
             rel="noopener noreferrer"
-            className="group rounded-[28px] 
-             bg-white p-6 transition-transform duration-300 hover:-translate-y-1"
+            className="group 
+             bg-[#f3f3f3] p-6 transition-transform duration-300 hover:-translate-y-1"
           >
-            <div className="relative h-30 lg:h-50 w-full">
+            <div className="relative h-25 lg:h-45 w-full">
               <Image
                 src="/cotiza/culst.png"
                 alt="Cults"
