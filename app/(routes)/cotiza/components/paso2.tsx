@@ -7,6 +7,7 @@ import {
   cotizaTextRegularFont,
   cotizaTitleFont,
   cotizaTextBoldFont,
+  cotizaTextLightFont,
 } from "./cotiza-fonts";
 
 type Paso2Props = {
@@ -127,7 +128,7 @@ const Paso2 = ({
 
   return (
     <section className="border-b border-black/10 bg-white px-4 py-16 sm:px-8 lg:px-12 lg:py-25">
-      <div className="mx-auto grid w-full max-w-[1350px] gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
+      <div className="mx-auto grid w-full max-w-[1350px] gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:items-start">
         <div>
           <p
             className={`${cotizaTextBoldFont.className} text-base uppercase 
@@ -159,9 +160,11 @@ const Paso2 = ({
           </div>
         </div>
 
-        <div className="border border-black/10 bg-[#111111] p-1 text-white ">
-          <div className="relative overflow-hidden  bg-[#bfbfbf]">
-            <div className="relative h-[360px] sm:h-[320px] ">
+        {/* PANEL DE COTIZACION: el visor ocupa la mayor parte del bloque. */}
+        <div className="border border-black/10 bg-[#111111] p-1 text-white">
+          {/* VISTA 3D: el ancho extra del panel se asigna desde la grilla exterior. */}
+          <div className="relative overflow-hidden bg-[#bfbfbf]">
+            <div className="relative h-[360px] sm:h-[400px] lg:h-[430px]">
               {showModelViewer && modelFile ? (
                 <ModelViewer file={modelFile} scalePercent={scalePercent} />
               ) : (
@@ -216,18 +219,24 @@ const Paso2 = ({
             />
           </div>
 
-          <div className="grid gap-8 px-4 py-8 sm:grid-cols-2 sm:px-5">
-            <div>
-              <p
-                className={`${cotizaTextBoldFont.className} text-[11px] uppercase tracking-[0.08em] text-white`}
-              >
-                Escala
-              </p>
-              <p className={`${cotizaTextBoldFont.className} mt-1 text-xs text-white`}>
-                {scalePercent}%
-              </p>
+          {/* DATOS DE COTIZACION: cambia de orden entre movil y escritorio sin duplicar contenido. */}
+          <div className="grid grid-cols-[1fr_0.95fr] gap-x-6 gap-y-5 px-5 py-5 sm:gap-x-12 sm:px-7 lg:px-8">
+            {/* ESCALA: usa todo el ancho en movil para centrar y ampliar el control. */}
+            <div className="order-1 col-span-2 lg:col-span-1">
+              {/* ESCALA ACTUAL: titulo y porcentaje comparten linea para ahorrar alto. */}
+              <div className="flex items-baseline gap-2">
+                <p
+                  className={`${cotizaTextLightFont.className} text-[11px] 
+                  uppercase tracking-[0.08em] text-white`}
+                >
+                  Escala
+                </p>
+                <p className={`${cotizaTextBoldFont.className} text-xs text-white`}>
+                  {scalePercent}%
+                </p>
+              </div>
 
-              <div className="mt-3 max-w-[220px]">
+              <div className="mx-auto mt-3 w-full max-w-[300px] lg:mx-0 lg:max-w-[240px]">
                 <div
                   className={`${cotizaTextRegularFont.className} mb-1 flex items-center justify-between px-1 text-[8px] text-white/45`}
                 >
@@ -254,67 +263,70 @@ const Paso2 = ({
                 type="button"
                 onClick={onRequote}
                 disabled={!canRequote || isProcessing}
-                className={`${cotizaTextBoldFont.className} mt-3 rounded-full border border-white/45 px-4 py-2 text-[10px] uppercase tracking-[0.08em] text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-40`}
+                className={`${cotizaTextBoldFont.className} mt-3 border border-white/45 px-4 py-2 text-[10px] uppercase tracking-[0.08em] text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-40`}
               >
                 Recalcular
               </button>
 
               {scaleNeedsUpdate && (
                 <p
-                  className={`${cotizaTextRegularFont.className} mt-3 max-w-[260px] text-[11px] leading-4 text-[#ffd18a]`}
+                  className={`${cotizaTextLightFont.className} mt-3 max-w-[260px] text-[11px] leading-4 text-[#ffd18a]`}
                 >
                   Cambiaste la escala. Recalcula para actualizar medidas.
                 </p>
               )}
             </div>
 
-            <div>
+            {/* RESULTADO: comparte fila con estado solo en movil. */}
+            <div className="order-2">
               <p
-                className={`${cotizaTextBoldFont.className} text-[11px] uppercase tracking-[0.08em] text-white`}
+                className={`${cotizaTextLightFont.className} text-[11px] uppercase tracking-[0.08em] text-white`}
               >
                 Resultado
               </p>
               {quote ? (
                 <div className="mt-2 space-y-1">
-                  <p className={`${cotizaTextRegularFont.className} text-xs uppercase text-white/55`}>
+                  <p className={`${cotizaTextLightFont.className} text-xs uppercase text-white/55`}>
                     Material: {quote.materialLabel}
                   </p>
-                  <p className={`${cotizaTextRegularFont.className} text-xs uppercase text-white/55`}>
+                  <p className={`${cotizaTextLightFont.className} text-xs uppercase text-white/55`}>
                     Tiempo: {formatPrintTime(quote.printTimeSeconds)}
                   </p>
                   {displayDimensions && (
-                    <p className={`${cotizaTextRegularFont.className} text-xs uppercase text-white/55`}>
+                    <p className={`${cotizaTextLightFont.className} text-xs uppercase text-white/55`}>
                       Medidas (ancho x alto x prof.): {formatCm(displayDimensions.x)} x{" "}
                       {formatCm(displayDimensions.y)} x{" "}
                       {formatCm(displayDimensions.z)} cm
                     </p>
                   )}
                   {scaleNeedsUpdate && displayDimensions && (
-                    <p className={`${cotizaTextRegularFont.className} text-[10px] uppercase leading-4 text-[#ffd18a]`}>
+                    <p className={`${cotizaTextLightFont.className} text-[10px] uppercase leading-4 text-[#ffd18a]`}>
                       Vista previa segun la escala actual.
                     </p>
                   )}
                   {quote.fitsPrinter === false && (
-                    <p className={`${cotizaTextRegularFont.className} text-xs uppercase text-[#ff8d8d]`}>
+                    <p className={`${cotizaTextLightFont.className} text-xs uppercase text-[#ff8d8d]`}>
                       El modelo no cabe en la impresora configurada.
                     </p>
                   )}
                 </div>
               ) : (
                 <p
-                  className={`${cotizaTextRegularFont.className} mt-2 max-w-[260px] text-xs uppercase leading-4 text-white/55`}
+                  className={`${cotizaTextLightFont.className}
+                   mt-2 max-w-[260px] 
+                   text-xs uppercase leading-4 text-white/55`}
                 >
                   La cotizacion aparecera aqui apenas termine la laminacion.
                 </p>
               )}
             </div>
-          </div>
-
-          <div className="grid gap-6 px-4 pb-5 sm:grid-cols-[1fr_0.95fr] sm:px-5">
-            <div>
+          {/* Estos bloques entran a la grilla anterior para poder cambiar su orden responsive. */}
+          <div className="contents">
+            {/* PROGRESO: ocupa una sola fila completa en movil. */}
+            <div className="order-4 col-span-2 lg:order-3 lg:col-span-1">
               <div className="mb-2 flex items-center justify-between gap-4">
                 <p
-                  className={`${cotizaTextBoldFont.className} text-[11px] uppercase tracking-[0.08em] text-white`}
+                  className={`${cotizaTextLightFont.className} text-[11px] uppercase tracking-[0.08em] text-white`}
                 >
                   Progreso
                 </p>
@@ -325,14 +337,14 @@ const Paso2 = ({
                 </p>
               </div>
 
-              <div className="grid grid-cols-[repeat(16,minmax(0,1fr))] gap-[3px] sm:grid-cols-[repeat(32,minmax(0,1fr))]">
+              <div className="grid grid-cols-[repeat(32,minmax(0,1fr))] gap-[2px] sm:gap-[3px]">
                 {progressSegments.map((segment) => {
                   const isFilled = segment < filledSegments;
 
                   return (
                     <span
                       key={segment}
-                      className={`h-5 transition-colors duration-300 ${
+                      className={`h-4 sm:h-5 transition-colors duration-300 ${
                         uploadStatus === "error" && isFilled
                           ? "bg-[#ff6b6b]"
                           : isFilled
@@ -345,9 +357,10 @@ const Paso2 = ({
               </div>
             </div>
 
-            <div>
+            {/* ESTADO: acompana el resultado en movil y queda a la derecha del progreso en escritorio. */}
+            <div className="order-3 lg:order-4">
               <p
-                className={`${cotizaTextBoldFont.className} text-[11px] uppercase tracking-[0.08em] text-white`}
+                className={`${cotizaTextLightFont.className} text-[11px] uppercase tracking-[0.08em] text-white`}
               >
                 Estado
               </p>
@@ -363,16 +376,17 @@ const Paso2 = ({
                   "La cotizacion se detuvo. Intenta nuevamente."}
               </p>
               {fileName && (
-                <p className={`${cotizaTextBoldFont.className} mt-2 text-xs uppercase text-white/85`}>
+                <p className={`${cotizaTextLightFont.className} mt-2 text-xs uppercase text-white/85`}>
                   {fileName} {fileSizeLabel && `- ${fileSizeLabel}`}
                 </p>
               )}
               {uploadError && (
-                <p className={`${cotizaTextRegularFont.className} mt-2 text-xs text-[#ff8d8d]`}>
+                <p className={`${cotizaTextLightFont.className} mt-2 text-xs text-[#ff8d8d]`}>
                   {uploadError}
                 </p>
               )}
             </div>
+          </div>
           </div>
         </div>
       </div>
