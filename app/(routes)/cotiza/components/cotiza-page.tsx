@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { X } from "lucide-react";
 import HeaderCotiza from "./headerCotiza";
 import Paso1 from "./paso1";
 import Paso2 from "./paso2";
@@ -17,6 +18,10 @@ import type {
   PrintQuality,
 } from "@/types/print-quote";
 import { useNavigationTransition } from "@/components/navigation-transition-provider";
+import {
+  cotizaTextLightFont,
+  cotizaTextRegularFont,
+} from "./cotiza-fonts";
 
 type QuoteResult = {
   fileId: string;
@@ -543,40 +548,39 @@ export default function CotizaPage() {
 
         {showAuthNotice && (
           <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/65 px-4 backdrop-blur-sm">
-            <div className="relative w-full max-w-[430px] rounded-[18px] bg-[#1B2C1C] p-6 text-[#ADFE00] shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
+            <div className="relative w-full max-w-[460px] bg-[#1B2C1C] px-7 py-8 text-[#C0FF01] sm:px-8 sm:py-9">
               <button
                 type="button"
                 onClick={() => setShowAuthNotice(false)}
-                className="absolute right-4 top-4 text-[#ADFE00]/55 transition-colors hover:text-[#ADFE00]"
+                className="absolute right-4 top-4 grid size-8 place-items-center text-[#C0FF01] transition-colors hover:bg-[#C0FF01]/10"
                 aria-label="Cerrar aviso"
               >
-                x
+                <X size={18} strokeWidth={2} />
               </button>
 
-              <p className="text-xs uppercase tracking-[0.28em] text-[#ADFE00]/65">
-                Cotizacion protegida
-              </p>
-              <h3 className="mt-4 text-2xl font-black uppercase leading-none">
+              <h3
+                className={`${cotizaTextRegularFont.className} pr-8 text-2xl uppercase leading-[1.25] sm:text-3xl`}
+              >
                 Inicia sesion para subir tu modelo
               </h3>
-              <p className="mt-4 text-sm leading-6 text-[#ADFE00]/75">
-                Para usar la cotizacion 3D debes iniciar sesion o crear una
-                cuenta. Asi podremos guardar tu pedido y asociarlo correctamente
-                al checkout.
+              <p
+                className={`${cotizaTextLightFont.className} mt-5 max-w-[300px] text-xs uppercase leading-4 text-[#C0FF01]/85`}
+              >
+                Para usar la cotizacion 3D debes iniciar sesion o crear una cuenta.
               </p>
 
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-14 grid grid-cols-[1.7fr_0.72fr] gap-4 sm:gap-8">
                 <button
                   type="button"
                   onClick={openLoginFromAuthNotice}
-                  className="w-full rounded-full bg-[#ADFE00] px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#1B2C1C] transition-transform hover:scale-[1.02]"
+                  className={`${cotizaTextRegularFont.className} border border-[#C0FF01] px-3 py-3 text-[11px] uppercase text-[#C0FF01] transition-colors hover:bg-[#C0FF01] hover:text-[#1B2C1C] sm:px-5`}
                 >
                   Iniciar sesion / registrarse
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowAuthNotice(false)}
-                  className="w-full rounded-full border border-[#ADFE00]/35 px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#ADFE00]/80 transition-colors hover:border-[#ADFE00] hover:text-[#ADFE00]"
+                  className={`${cotizaTextRegularFont.className} border border-[#C0FF01] px-3 py-3 text-[11px] uppercase text-[#C0FF01] transition-colors hover:bg-[#C0FF01] hover:text-[#1B2C1C] sm:px-5`}
                 >
                   Volver
                 </button>

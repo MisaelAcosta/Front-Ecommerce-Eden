@@ -36,7 +36,7 @@ type Paso3Props = {
 const cardBaseClassName = [
   "relative",
   "overflow-hidden",
-  "rounded-[10px]",
+  "",
   "border",
   "border-white/8",
   "bg-[#050505]",
@@ -159,7 +159,7 @@ const Paso3 = ({
               "lg:leading-[1.20]",
             ].join(" ")}
           >
-            Selecciona la calidad y color
+            Calidad y color
           </h2>
 
           <p
@@ -199,7 +199,7 @@ const Paso3 = ({
                   className={[
                     "h-6",
                     "w-6",
-                    "rounded-[2px]",
+                    "",
                     "border",
                     "transition-all",
                     "duration-200",
@@ -207,7 +207,7 @@ const Paso3 = ({
                     "sm:h-6",
                     "sm:w-6",
                     selected
-                      ? "border-white shadow-[0_0_0_2px_rgba(255,255,255,0.18)]"
+                      ? "border-[#C0FF01] shadow-[0_0_0_2px_rgba(255,255,255,0.18)]"
                       : "border-white/12",
                   ].join(" ")}
                   style={{ backgroundColor: color.hex }}
@@ -228,7 +228,7 @@ const Paso3 = ({
               className={[
                 cardBaseClassName,
                 "min-h-[300px]",
-                "rounded-[2px]",
+                "",
                 "p-4",
                 "transition-transform",
                 "duration-300",
@@ -236,7 +236,7 @@ const Paso3 = ({
                 "sm:min-h-85",
                 "sm:p-6",
                 colorMode === "single"
-                  ? "ring-1 ring-white/30"
+                  ? "ring-1 ring-[#C0FF01]"
                   : "border-white/12",
               ].join(" ")}
               aria-pressed={colorMode === "single"}
@@ -244,7 +244,7 @@ const Paso3 = ({
               {/* Titulo principal de la tarjeta activa para impresion a un color. */}
               <p
                 className={[
-                  cotizaTextBoldFont.className,
+                  cotizaTextRegularFont.className,
                   "absolute",
                   "top-5",
                   "text-xl",
@@ -273,7 +273,7 @@ const Paso3 = ({
                   "text-white/90",
                   "sm:bottom-8",
                   "sm:max-w-55",
-                  "sm:text-sm",
+                  "sm:text-[13px]",
                 ].join(" ")}
               >
                 Elige uno de nuestros colores disponibles. Toda la impresion se
@@ -321,7 +321,7 @@ const Paso3 = ({
               <div className="flex items-start justify-between gap-2 sm:gap-3 sm:pt-7">
                 <p
                   className={[
-                    cotizaTextBoldFont.className,
+                    cotizaTextRegularFont.className,
                     "max-w-[140px]",
                     "text-base",
                     "uppercase",
@@ -338,7 +338,7 @@ const Paso3 = ({
                 <span
                   className={[
                     cotizaTextRegularFont.className,
-                    "rounded-full",
+                    "",
                     "border",
                     "border-white/12",
                     "bg-white/6",
@@ -368,7 +368,7 @@ const Paso3 = ({
                   "text-white/50",
                   "sm:mt-12",
                   "sm:max-w-56",
-                  "sm:text-sm",
+                  "sm:text-[13px]",
                 ].join(" ")}
               >
                 Impresion multicolor mediante sistema AMS. Anade una referencia
@@ -446,7 +446,7 @@ const Paso3 = ({
               {/* Nombre visible de la configuracion activa de calidad. */}
               <p
                 className={[
-                  cotizaTextBoldFont.className,
+                  cotizaTextRegularFont.className,
                   "max-w-[150px]",
                   "pr-12",
                   "text-base",
@@ -474,7 +474,7 @@ const Paso3 = ({
                   "text-white/90",
                   "sm:mt-6",
                   "sm:max-w-62.5",
-                  "sm:text-sm",
+                  "sm:text-[13px]",
                 ].join(" ")}
               >
                 Boquilla 0.4 mm y capa 0.2 mm para un acabado equilibrado.
@@ -500,7 +500,7 @@ const Paso3 = ({
               {/* Nombre de la calidad reservada para una implementacion futura. */}
               <p
                 className={[
-                  cotizaTextBoldFont.className,
+                  cotizaTextRegularFont.className,
                   "max-w-[150px]",
                   "pr-12",
                   "text-base",
@@ -528,7 +528,7 @@ const Paso3 = ({
                   "text-white/50",
                   "sm:mt-6",
                   "sm:max-w-62.5",
-                  "sm:text-sm",
+                  "sm:text-[13px]",
                 ].join(" ")}
               >
                 Boquilla 0.6 mm y capa 0.3 mm para impresiones mas rapidas.
@@ -545,7 +545,7 @@ const Paso3 = ({
               className={[
                 cotizaTextRegularFont.className,
                 "mt-5",
-                "text-sm",
+                "text-[13px]",
                 "text-white/45",
               ].join(" ")}
             >

@@ -1,16 +1,21 @@
 "use client";
 
 import Image from "next/image";
-import { cotizaTextBoldFont, cotizaTextRegularFont, cotizaTitleFont } from "./cotiza-fonts";
+import {
+  cotizaTextBoldFont,
+  cotizaTextLightFont,
+  cotizaTextRegularFont,
+  cotizaTitleFont,
+} from "./cotiza-fonts";
 
 const Paso1 = () => {
   return (
     <section className="border-b border-black/50 bg-white 
     px-4 py-16 lg:py-25 sm:px-8 lg:px-12">
       <div className="mx-auto grid w-full max-w-[1350px] gap-8 
-      lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
+      lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
         {/* Columna editorial con el texto guía del paso. */}
-        <div>
+        <div className="lg:col-start-1 lg:row-span-2 lg:row-start-1">
           <p
             className={`${cotizaTextBoldFont.className} text-base 
             uppercase tracking-[0.35em] lg:text-2xl text-black/65`}
@@ -36,13 +41,26 @@ const Paso1 = () => {
           </p>
         </div>
 
+        <div
+            className={`${cotizaTextRegularFont.className} mt-6 
+             bg-[#1B2C1C] p-4 text-[13px] leading-6
+              text-[#ADFE00] lg:col-start-2 lg:row-start-1 lg:mt-0 lg:w-full lg:text-sm`}
+          >
+             Recuerda:{" "}<span className={cotizaTextLightFont.className}>
+              Solo impresión FDM. No trabajamos con resina por el momento.</span>
+            
+            <br />
+            
+          </div>
+
         {/* Tarjetas externas con logos reales ya presentes en public/cotiza. */}
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:col-start-2 lg:row-start-2">
           <a
             href="https://makerworld.com/es?from=bambulab.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="group bg-[#f3f3f3] p-6 transition-transform duration-300 hover:-translate-y-1"
+            className="group border border-[#1B2C1C] p-3 lg:p-6 transition-transform 
+            duration-300 hover:-translate-y-1"
           >
             <div className="relative h-25 lg:h-45 w-full">
               <Image
@@ -59,7 +77,7 @@ const Paso1 = () => {
             target="_blank"
             rel="noopener noreferrer"
             className="group 
-             bg-[#f3f3f3] p-6 transition-transform duration-300 hover:-translate-y-1"
+              border border-[#1B2C1C]  p-3 lg:p-6 transition-transform duration-300 hover:-translate-y-1"
           >
             <div className="relative h-25 lg:h-45 w-full">
               <Image

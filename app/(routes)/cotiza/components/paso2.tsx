@@ -2,6 +2,7 @@
 
 import type { RefObject } from "react";
 import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ModelViewer } from "./model-viewer";
 import {
   cotizaTextRegularFont,
@@ -98,6 +99,10 @@ const uploadProgressLabel = {
 } satisfies Record<Paso2Props["uploadStatus"], string>;
 
 const progressSegments = Array.from({ length: 32 }, (_, index) => index);
+const scaleMarkers = Array.from({ length: 24 }, (_, index) => index);
+const scaleMinimum = 20;
+const scaleMaximum = 300;
+const scaleStep = 5;
 
 const Paso2 = ({
   fileInputRef,
@@ -125,9 +130,24 @@ const Paso2 = ({
     quoteScalePercent,
     scalePercent
   );
+  const scaleMarkerPosition = Math.min(
+    100,
+    Math.max(
+      0,
+      ((scalePercent - scaleMinimum) / (scaleMaximum - scaleMinimum)) * 100
+    )
+  );
+  const updateScaleBy = (amount: number) => {
+    const nextScale = Math.min(
+      scaleMaximum,
+      Math.max(scaleMinimum, scalePercent + amount)
+    );
+
+    onScaleChange(nextScale);
+  };
 
   return (
-    <section className="border-b border-black/10 bg-white px-4 py-16 sm:px-8 lg:px-12 lg:py-25">
+    <section className=" lg:border-l lg:border-black/10 bg-white px-4 py-16 sm:px-8 lg:px-12 lg:py-25">
       <div className="mx-auto grid w-full max-w-[1350px] gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:items-start">
         <div>
           <p
@@ -150,13 +170,12 @@ const Paso2 = ({
           </p>
 
           <div
-            className={`${cotizaTextRegularFont.className} mt-6  bg-[#e4e4e4] p-4 text-xs leading-6 text-black/70 lg:w-100 lg:text-sm`}
+            className={`${cotizaTextRegularFont.className} mt-6 bg-[#e4e4e4] p-4 text-xs leading-6 text-black/70 lg:w-100 lg:text-sm`}
           >
             Formatos admitidos: <span className="font-semibold">.stl</span>,{" "}
             <span className="font-semibold">.3mf</span> y{" "}
             <span className="font-semibold">.obj</span>.
             <br />
-            
           </div>
         </div>
 
@@ -219,174 +238,263 @@ const Paso2 = ({
             />
           </div>
 
-          {/* DATOS DE COTIZACION: cambia de orden entre movil y escritorio sin duplicar contenido. */}
-          <div className="grid grid-cols-[1fr_0.95fr] gap-x-6 gap-y-5 px-5 py-5 sm:gap-x-12 sm:px-7 lg:px-8">
-            {/* ESCALA: usa todo el ancho en movil para centrar y ampliar el control. */}
-            <div className="order-1 col-span-2 lg:col-span-1">
-              {/* ESCALA ACTUAL: titulo y porcentaje comparten linea para ahorrar alto. */}
-              <div className="flex items-baseline gap-2">
-                <p
-                  className={`${cotizaTextLightFont.className} text-[11px] 
-                  uppercase tracking-[0.08em] text-white`}
-                >
-                  Escala
-                </p>
-                <p className={`${cotizaTextBoldFont.className} text-xs text-white`}>
-                  {scalePercent}%
-                </p>
+          {/* DATOS DE COTIZACION: dos filas y dos columnas con un solo divisor central. */}
+          <div className="overflow-hidden">
+            {/* FILA SUPERIOR: ESCALA / RESULTADO */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 ">
+              {/* ESCALA Y MEDIDAS */}
+              <div className="order-2 min-w-0 px-3 py-5 sm:px-5 lg:order-none lg:px-6">
+                <div className="flex items-baseline gap-2">
+                  <p
+                    className={`${cotizaTextLightFont.className} text-[13px] uppercase tracking-[0.08em] text-white`}
+                  >
+                    Escala
+                  </p>
+                  <p
+                    className={`${cotizaTextLightFont.className} text-[13px] text-[#C0FF01]`}
+                  >
+                    {scalePercent}%
+                  </p>
+                </div>
+
+                {/* MEDIDAS ACTUALES: quedan bajo la escala para mostrar el efecto del cambio. */}
+                {displayDimensions ? (
+                  <p
+                    className={`${cotizaTextBoldFont.className} mt-2 text-[13px] leading-4 text-white/70 sm:text-[14px]`}
+                  >
+                    {formatCm(displayDimensions.x)} x {formatCm(displayDimensions.y)} x{" "}
+                    {formatCm(displayDimensions.z)} cm
+                  </p>
+                ) : (
+                  <p
+                    className={`${cotizaTextLightFont.className} mt-2 text-[13px] leading-4 text-white/45`}
+                  >
+                    Medidas 
+                  </p>
+                )}
+
+                <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+                  {/* REGLA DE ESCALA */}
+                  <div className="min-w-0">
+                   
+
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        title="Reducir escala"
+                        aria-label="Reducir escala"
+                        disabled={isProcessing || scalePercent <= scaleMinimum}
+                        onClick={() => updateScaleBy(-scaleStep)}
+                        className="grid size-6 shrink-0 place-items-center text-white/70 transition-colors hover:text-[#C0FF01] disabled:cursor-not-allowed disabled:opacity-35"
+                      >
+                        <ChevronLeft size={15} strokeWidth={2} />
+                      </button>
+
+                      <div className="relative h-10 min-w-0 flex-1">
+                        {/*
+                          Las marcas anteriores al indicador verde se muestran
+                          altas y claras. Las siguientes se muestran más bajas
+                          y oscuras. La última siempre queda alta para marcar
+                          el límite máximo del control.
+                        */}
+                        <div className="pointer-events-none absolute inset-x-1 top-1/2 flex -translate-y-1/2 items-center justify-between">
+                          {scaleMarkers.map((marker) => {
+                            const markerPosition =
+                              (marker / (scaleMarkers.length - 1)) * 100;
+                            const isReached =
+                              markerPosition <= scaleMarkerPosition;
+                            const isLastMarker =
+                              marker === scaleMarkers.length - 1;
+
+                            return (
+                              <span
+                                key={marker}
+                                className={`w-[2px] transition-[height,background-color] duration-150 sm:w-[3px] ${
+                                  isReached
+                                    ? "h-8 bg-white/95"
+                                    : isLastMarker
+                                      ? "h-8 bg-white/25"
+                                      : "h-5 bg-white/20"
+                                }`}
+                              />
+                            );
+                          })}
+                        </div>
+
+                        {/* Indicador de la escala seleccionada. */}
+                        <span
+                          aria-hidden="true"
+                          className="pointer-events-none absolute top-1/2 z-10 h-10 w-[3px] -translate-x-1/2 -translate-y-1/2 bg-[#C0FF01] transition-[left] duration-150"
+                          style={{ left: `${scaleMarkerPosition}%` }}
+                        />
+
+                        {/* El input es invisible, pero recibe el clic y el arrastre. */}
+                        <input
+                          type="range"
+                          min={scaleMinimum}
+                          max={scaleMaximum}
+                          step={scaleStep}
+                          value={scalePercent}
+                          disabled={isProcessing}
+                          onChange={(event) =>
+                            onScaleChange(Number(event.target.value))
+                          }
+                          aria-label="Escala del modelo"
+                          className="absolute inset-0 z-20 h-full w-full cursor-ew-resize opacity-0 disabled:cursor-not-allowed"
+                        />
+                      </div>
+
+                      <button
+                        type="button"
+                        title="Aumentar escala"
+                        aria-label="Aumentar escala"
+                        disabled={isProcessing || scalePercent >= scaleMaximum}
+                        onClick={() => updateScaleBy(scaleStep)}
+                        className="grid size-6 shrink-0 place-items-center text-white/70 transition-colors hover:text-[#C0FF01] disabled:cursor-not-allowed disabled:opacity-35"
+                      >
+                        <ChevronRight size={15} strokeWidth={2} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* MEDIDAS: quedan dentro del mismo bloque, sin una línea adicional. */}
+                  <div className="justify-self-start lg:min-w-[105px]">
+                    <button
+                      type="button"
+                      onClick={onRequote}
+                      disabled={!canRequote || isProcessing}
+                      className={`${cotizaTextLightFont.className} mt-2 border border-white/45 px-2 py-1.5 text-[11px] uppercase tracking-[0.08em] text-white transition-colors hover:border-[#C0FF01] hover:text-[#C0FF01] disabled:cursor-not-allowed disabled:opacity-40 sm:px-3`}
+                    >
+                      Recalcular
+                    </button>
+                  </div>
+                </div>
+
+                {scaleNeedsUpdate && (
+                  <p
+                    className={`${cotizaTextLightFont.className} mt-3 text-[10px] leading-4 text-[#ffd18a]`}
+                  >
+                    Cambiaste la escala. Recalcula para actualizar costo, peso y
+                    tiempo.
+                  </p>
+                )}
               </div>
 
-              <div className="mx-auto mt-3 w-full max-w-[300px] lg:mx-0 lg:max-w-[240px]">
-                <div
-                  className={`${cotizaTextRegularFont.className} mb-1 flex items-center justify-between px-1 text-[8px] text-white/45`}
-                >
-                  <span>20%</span>
-                  <span>100%</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-white/55">v</span>
-                  <input
-                    type="range"
-                    min={20}
-                    max={300}
-                    step={5}
-                    value={scalePercent}
-                    disabled={isProcessing}
-                    onChange={(event) => onScaleChange(Number(event.target.value))}
-                    className="h-1 flex-1 accent-white"
-                  />
-                  <span className="text-xs text-white/55">^</span>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={onRequote}
-                disabled={!canRequote || isProcessing}
-                className={`${cotizaTextBoldFont.className} mt-3 border border-white/45 px-4 py-2 text-[10px] uppercase tracking-[0.08em] text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-40`}
-              >
-                Recalcular
-              </button>
-
-              {scaleNeedsUpdate && (
-                <p
-                  className={`${cotizaTextLightFont.className} mt-3 max-w-[260px] text-[11px] leading-4 text-[#ffd18a]`}
-                >
-                  Cambiaste la escala. Recalcula para actualizar medidas.
-                </p>
-              )}
-            </div>
-
-            {/* RESULTADO: comparte fila con estado solo en movil. */}
-            <div className="order-2">
-              <p
-                className={`${cotizaTextLightFont.className} text-[11px] uppercase tracking-[0.08em] text-white`}
-              >
-                Resultado
-              </p>
-              {quote ? (
-                <div className="mt-2 space-y-1">
-                  <p className={`${cotizaTextLightFont.className} text-xs uppercase text-white/55`}>
-                    Material: {quote.materialLabel}
-                  </p>
-                  <p className={`${cotizaTextLightFont.className} text-xs uppercase text-white/55`}>
-                    Tiempo: {formatPrintTime(quote.printTimeSeconds)}
-                  </p>
-                  {displayDimensions && (
-                    <p className={`${cotizaTextLightFont.className} text-xs uppercase text-white/55`}>
-                      Medidas (ancho x alto x prof.): {formatCm(displayDimensions.x)} x{" "}
-                      {formatCm(displayDimensions.y)} x{" "}
-                      {formatCm(displayDimensions.z)} cm
-                    </p>
-                  )}
-                  {scaleNeedsUpdate && displayDimensions && (
-                    <p className={`${cotizaTextLightFont.className} text-[10px] uppercase leading-4 text-[#ffd18a]`}>
-                      Vista previa segun la escala actual.
-                    </p>
-                  )}
-                  {quote.fitsPrinter === false && (
-                    <p className={`${cotizaTextLightFont.className} text-xs uppercase text-[#ff8d8d]`}>
-                      El modelo no cabe en la impresora configurada.
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <p
-                  className={`${cotizaTextLightFont.className}
-                   mt-2 max-w-[260px] 
-                   text-xs uppercase leading-4 text-white/55`}
-                >
-                  La cotizacion aparecera aqui apenas termine la laminacion.
-                </p>
-              )}
-            </div>
-          {/* Estos bloques entran a la grilla anterior para poder cambiar su orden responsive. */}
-          <div className="contents">
-            {/* PROGRESO: ocupa una sola fila completa en movil. */}
-            <div className="order-4 col-span-2 lg:order-3 lg:col-span-1">
-              <div className="mb-2 flex items-center justify-between gap-4">
+              {/* RESULTADO */}
+              <div className="order-1 min-w-0 border-b lg:border-l border-white/20 px-3 py-5 sm:px-5 lg:order-none lg:px-6">
                 <p
                   className={`${cotizaTextLightFont.className} text-[11px] uppercase tracking-[0.08em] text-white`}
                 >
-                  Progreso
+                  Resultado
+                </p>
+
+                {quote ? (
+                  <div className="mt-2 space-y-1">
+                    <p
+                      className={`${cotizaTextLightFont.className} text-[10px] uppercase leading-4 text-white/55 sm:text-xs`}
+                    >
+                      Material: {quote.materialLabel}
+                    </p>
+                    <p
+                      className={`${cotizaTextLightFont.className} text-[10px] uppercase leading-4 text-white/55 sm:text-xs`}
+                    >
+                      Tiempo: {formatPrintTime(quote.printTimeSeconds)}
+                    </p>
+                    {quote.fitsPrinter === false && (
+                      <p
+                        className={`${cotizaTextLightFont.className} text-[10px] uppercase leading-4 text-[#ff8d8d] sm:text-xs`}
+                      >
+                        El modelo no cabe en la impresora configurada.
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p
+                    className={`${cotizaTextLightFont.className} mt-2 max-w-[260px] text-[11px] uppercase leading-4 text-white/55 sm:text-[13px]    `}
+                  >
+                    La cotizacion aparecera aqui apenas termine la laminacion.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* FILA INFERIOR: PROGRESO / ESTADO. Esta fila crea la única línea horizontal. */}
+            <div className="grid grid-cols-1 lg:grid-cols-2  lg:border-t lg:border-white/20">
+           
+              {/* PROGRESO */}
+              <div className="order-2 min-w-0 px-3 py-5 sm:px-5 lg:order-none lg:px-6">
+                <div className="mb-3 flex items-center justify-between gap-4">
+                  <p
+                    className={`${cotizaTextLightFont.className} text-[13px] uppercase tracking-[0.08em] text-white`}
+                  >
+                    Progreso
+                  </p>
+                  <p
+                    className={`${cotizaTextRegularFont.className} text-[13px] uppercase text-white/45`}
+                  >
+                    {uploadProgressLabel[uploadStatus]}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-[repeat(32,minmax(0,1fr))] gap-[2px]">
+                  {progressSegments.map((segment) => {
+                    const isFilled = segment < filledSegments;
+
+                    return (
+                      <span
+                        key={segment}
+                        className={`h-4 transition-colors duration-300 sm:h-5 ${
+                          uploadStatus === "error" && isFilled
+                            ? "bg-[#ff6b6b]"
+                            : isFilled
+                              ? "bg-[#C0FF01]"
+                              : "bg-white/16"
+                        }`}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* ESTADO */}
+              <div className="order-1 min-w-0 border-t border-white/20 px-3 py-5 sm:px-5 lg:border-l lg:px-6">
+                <p
+                  className={`${cotizaTextLightFont.className} text-[13px] uppercase tracking-[0.08em] text-white`}
+                >
+                  Estado
                 </p>
                 <p
-                  className={`${cotizaTextRegularFont.className} text-[10px] uppercase text-white/45`}
+                  className={`${cotizaTextRegularFont.className} mt-1 text-[13px] uppercase leading-4 text-white/55 sm:text-[13px]    `}
                 >
-                  {uploadProgressLabel[uploadStatus]}
+                  {uploadStatus === "idle" &&
+                    "Selecciona un archivo para iniciar."}
+                  {uploadStatus === "uploading" &&
+                    "Estamos subiendo tu modelo 3D."}
+                  {uploadStatus === "pricing" &&
+                    "Archivo cargado. Laminando."}
+                  {uploadStatus === "ready" &&
+                    "Listo. Ya puedes revisar y seguir avanzando."}
+                  {uploadStatus === "error" &&
+                    "La cotizacion se detuvo. Intenta nuevamente."}
                 </p>
-              </div>
 
-              <div className="grid grid-cols-[repeat(32,minmax(0,1fr))] gap-[2px] sm:gap-[3px]">
-                {progressSegments.map((segment) => {
-                  const isFilled = segment < filledSegments;
+                {fileName && (
+                  <p
+                    className={`${cotizaTextLightFont.className} mt-2 break-all text-[13px] uppercase leading-4 text-[#C0FF01] sm:text-[13px  ]    `}
+                  >
+                    {fileName} {fileSizeLabel && `- ${fileSizeLabel}`}
+                  </p>
+                )}
 
-                  return (
-                    <span
-                      key={segment}
-                      className={`h-4 sm:h-5 transition-colors duration-300 ${
-                        uploadStatus === "error" && isFilled
-                          ? "bg-[#ff6b6b]"
-                          : isFilled
-                            ? "bg-white"
-                            : "bg-white/16"
-                      }`}
-                    />
-                  );
-                })}
+                {uploadError && (
+                  <p
+                    className={`${cotizaTextLightFont.className} mt-2 text-[13px] leading-4 text-[#ff8d8d] lg:text-[13px]    `}
+                  >
+                    {uploadError}
+                  </p>
+                )}
               </div>
             </div>
-
-            {/* ESTADO: acompana el resultado en movil y queda a la derecha del progreso en escritorio. */}
-            <div className="order-3 lg:order-4">
-              <p
-                className={`${cotizaTextLightFont.className} text-[11px] uppercase tracking-[0.08em] text-white`}
-              >
-                Estado
-              </p>
-              <p
-                className={`${cotizaTextRegularFont.className} mt-1 text-xs uppercase leading-4 text-white/55`}
-              >
-                {uploadStatus === "idle" && "Selecciona un archivo para iniciar."}
-                {uploadStatus === "uploading" && "Estamos subiendo tu modelo 3D."}
-                {uploadStatus === "pricing" && "Archivo cargado. Laminando."}
-                {uploadStatus === "ready" &&
-                  "Listo. Ya puedes revisar y seguir avanzando."}
-                {uploadStatus === "error" &&
-                  "La cotizacion se detuvo. Intenta nuevamente."}
-              </p>
-              {fileName && (
-                <p className={`${cotizaTextLightFont.className} mt-2 text-xs uppercase text-white/85`}>
-                  {fileName} {fileSizeLabel && `- ${fileSizeLabel}`}
-                </p>
-              )}
-              {uploadError && (
-                <p className={`${cotizaTextLightFont.className} mt-2 text-xs text-[#ff8d8d]`}>
-                  {uploadError}
-                </p>
-              )}
-            </div>
-          </div>
           </div>
         </div>
       </div>
