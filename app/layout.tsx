@@ -10,10 +10,32 @@ import Navbar from "@/components/navbar/navbar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Eden 3D",
-  description: "Figuras, soportes y mas en Eden 3D. Envios a todo Chile.",
+  metadataBase: new URL("https://www.eden3d.cl"),
+  title: {
+    default: "Eden 3D",
+    template: "%s | Eden 3D",
+  },
+  description: "Figuras, soportes y accesorios impresos en 3D. Envíos a todo Chile.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Eden 3D",
+    description: "Figuras, soportes y accesorios impresos en 3D. Envíos a todo Chile.",
+    url: "/",
+    siteName: "Eden 3D",
+    locale: "es_CL",
+    type: "website",
+  },
   icons: {
-    icon: "/icons/favicon.png",
+    icon: [
+      {
+        url: "/icons/nuevo%20icono.png",
+        type: "image/png",
+      },
+    ],
+    shortcut: "/icons/nuevo%20icono.png",
+    apple: "/icons/nuevo%20icono.png",
   },
 };
 
@@ -23,7 +45,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       <body className={`${inter.className} flex min-h-screen flex-col`}>
         <ThemeProvider>
           <NavigationTransitionProvider>

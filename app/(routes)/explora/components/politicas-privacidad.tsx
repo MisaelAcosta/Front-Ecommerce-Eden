@@ -2,7 +2,7 @@
 
 const PoliticasPrivacidad = () => {
   return (
-    <section className="w-full bg-zinc-200/70 px-4 py-10 sm:py-14">
+    <section id="politicas-privacidad" className="w-full bg-zinc-200/70 px-4 py-10 sm:py-14">
       <div className="mx-auto w-full max-w-4xl">
         <article className="rounded-md bg-white p-6 sm:p-10 shadow-sm">
           <header className="text-sm text-zinc-500">
