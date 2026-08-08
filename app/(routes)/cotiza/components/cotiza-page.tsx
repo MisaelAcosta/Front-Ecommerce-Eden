@@ -75,6 +75,7 @@ const POST_PROCESS_LABELS: Record<PrintPostProcess, string> = {
 };
 
 const QUALITY_LABELS: Record<PrintQuality, string> = {
+  none: "Sin seleccionar",
   standard: "Calidad estandar",
 };
 
@@ -310,6 +311,8 @@ export default function CotizaPage() {
     !!quote &&
     quotedScalePercent === scalePercent &&
     quote.basePrice > 0 &&
+    colorMode !== "none" &&
+    quality !== "none" &&
     quote.fitsPrinter !== false;
 
   const openPicker = () => {
@@ -644,7 +647,9 @@ export default function CotizaPage() {
           <ResumenPedido
             fileName={quote?.fileName ?? fileName}
             materialLabel={quote?.materialLabel ?? "PLA"}
-            selectedColorLabel={selectedColorOption.label}
+            selectedColorLabel={
+              colorMode === "none" ? "Sin seleccionar" : selectedColorOption.label
+            }
             qualityLabel={QUALITY_LABELS[quality]}
             postProcessLabel={POST_PROCESS_LABELS[postProcess]}
             postProcessPrice={postProcessPrice}

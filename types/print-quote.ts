@@ -1,6 +1,6 @@
-export type PrintColorMode = "single" | "multi";
+export type PrintColorMode = "none" | "single" | "multi";
 
-export type PrintQuality = "standard";
+export type PrintQuality = "none" | "standard";
 
 export type PrintPostProcess = "none" | "basic" | "advanced";
 

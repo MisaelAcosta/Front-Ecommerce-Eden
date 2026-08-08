@@ -277,7 +277,9 @@ const Paso3 = ({
             {/* ---- Tarjeta de color unico disponible ---- */}
             <button
               type="button"
-              onClick={() => onColorModeChange("single")}
+              onClick={() =>
+                onColorModeChange(colorMode === "single" ? "none" : "single")
+              }
               className={[
                 cardBaseClassName,
                 "min-h-[300px]",
@@ -285,12 +287,13 @@ const Paso3 = ({
                 "p-4",
                 "transition-transform",
                 "duration-300",
+                "hover:!border-[#C0FF01]",
                 "hover:-translate-y-1",
                 "sm:min-h-85",
                 "sm:p-6",
                 colorMode === "single"
-                  ? "ring-1 ring-[#C0FF01]"
-                  : "border-white/12",
+                  ? "!border-[#C0FF01] !bg-[#1B2C1C] ring-1 ring-[#C0FF01]"
+                  : "!border-[#2B2B2B] !bg-[#050505]",
               ].join(" ")}
               aria-pressed={colorMode === "single"}
             >
@@ -372,7 +375,7 @@ const Paso3 = ({
               ].join(" ")}
             >
               {/* Cabecera con nombre de la opcion y estado actual. */}
-              <div className="flex items-start justify-between gap-2 sm:gap-3 sm:pt-7">
+              <div className="flex items-start justify-between gap-2 pt-3 sm:gap-3 sm:pt-7">
                 <p
                   className={[
                     cotizaTextRegularFont.className,
@@ -434,11 +437,11 @@ const Paso3 = ({
                 className={[
                   "absolute",
                   "-bottom-20",
-                  "right-10",
+                  "-right-10",
                   "z-0",
                   "h-[320px]",
-                  "w-[320px]",
-                  "",
+                  "w-[280px]",
+                  "sm:-bottom-10",
                   "sm:-right-10",
                   "sm:-bottom-38",
                   "sm:h-[430px]",
@@ -455,21 +458,30 @@ const Paso3 = ({
               </div>
             </div>
 
+            {/* SEPARADOR MOVIL: divide modos de color y opciones de calidad sin afectar escritorio. */}
+            <div
+              aria-hidden="true"
+              className="border-t border-white/20 pb-2 pt-2 md:hidden"
+            />
+
             {/* ---- Tarjeta de calidad estandar disponible ---- */}
             <button
               type="button"
-              onClick={() => onQualityChange("standard")}
+              onClick={() =>
+                onQualityChange(quality === "standard" ? "none" : "standard")
+              }
               className={[
                 cardBaseClassName,
                 "min-h-40",
                 "p-4",
                 "transition-transform",
                 "duration-300",
+                "hover:!border-[#C0FF01]",
                 "hover:-translate-y-1",
                 "sm:p-4",
                 quality === "standard"
-                  ? "ring-1 ring-white/20"
-                  : "border-white/12",
+                  ? "!border-[#C0FF01] !bg-[#1B2C1C] ring-1 ring-[#C0FF01]"
+                  : "!border-[#2B2B2B] !bg-[#050505]",
               ].join(" ")}
               aria-pressed={quality === "standard"}
             >
