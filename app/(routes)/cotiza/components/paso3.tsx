@@ -97,6 +97,9 @@ const Paso3 = ({
   onQualityChange,
   onReferenceLinkChange,
 }: Paso3Props) => {
+  // La referencia solo se habilita cuando la modalidad multicolor este disponible y activa.
+  const canAttachColorReference = colorMode === "multi";
+
   return (
     // ===== # Paso 3 | Estructura principal =====
     // ---- Seccion principal del paso 3 ----
@@ -172,13 +175,63 @@ const Paso3 = ({
               "text-white/58",
               "sm:text-base",
               "sm:mt-10",
-              "lg:mt-55",
-              "lg:px-5",
+              "lg:mt-30",
+              "lg:px-0",
             ].join(" ")}
           >
-            Personaliza el acabado de tu pieza seleccionando calidad y
-            configuracion de color.
+            Personaliza el acabado de tu pieza seleccionando la calidad y
+            el color.
           </p>
+
+          {/* REFERENCIA DE COLOR: enlace opcional, independiente de la tarjeta AMS. */}
+          <p
+            className={[
+              cotizaTextLightFont.className,
+              "mt-6",
+              "lg:mt-10",
+              "max-w-[280px]",
+              "text-[13px]",
+              "leading-6",
+              "text-white/55",
+              "sm:text-base",
+            ].join(" ")}
+          >
+            {canAttachColorReference
+              ? "Adjunta el link de una imagen referencial para definir los colores."
+              : "Adjunta el link de una imagen referencial para definir los colores."}
+          </p>
+
+          <input
+            type="url"
+            value={referenceLink}
+            onChange={(event) => onReferenceLinkChange(event.target.value)}
+            placeholder={
+              canAttachColorReference
+                ? "https://tu-referencia.com/imagen"
+                : "https://tu-referencia.com/imagen"
+            }
+            disabled={!canAttachColorReference}
+            className={[
+              cotizaTextRegularFont.className,
+              "mt-3",
+              "h-12",
+              "w-full",
+              "max-w-[390px]",
+              "border",
+              "border-white/20",
+              "bg-white/5",
+              "px-4",
+              "text-sm",
+              "text-white",
+              "outline-none",
+              "transition-colors",
+              "placeholder:text-white/35",
+              "focus:border-[#C0FF01]",
+              "focus:bg-white/10",
+              "disabled:cursor-not-allowed",
+              "disabled:opacity-45",
+            ].join(" ")}
+          />
         </div>
 
         {/* ===== # Paso 3 | Columna interactiva ===== */}
@@ -284,23 +337,24 @@ const Paso3 = ({
               <div
                 className={[
                   "absolute",
-                  "-bottom-6",
-                  "-right-18",
+                  "-bottom-20",
+                  "-right-10",
                   "z-0",
-                  "h-[280px]",
+                  "h-[320px]",
                   "w-[280px]",
                   "sm:-bottom-10",
-                  "sm:-right-2",
-                  "sm:-bottom-50",
+                  "sm:-right-10",
+                  "sm:-bottom-38",
                   "sm:h-[430px]",
                   "sm:w-[430px]",
                 ].join(" ")}
               >
                 <Image
-                  src="/cotiza/uncolor.png"
+                  src="/cotiza/color.png"
                   alt="Vista referencial de impresion a un color"
                   fill
-                  className="object-contain object-bottom-right scale-[1.02] sm:scale-[1.15]"
+                  className="object-contain object-bottom-right 
+                  scale-[1.10] sm:scale-[1.15]"
                 />
               </div>
             </button>
@@ -344,7 +398,8 @@ const Paso3 = ({
                     "bg-white/6",
                     "px-2",
                     "py-1",
-                    "text-[8px]",
+                    "text-[11px]",
+                    "lg:text-[11px]",
                     "uppercase",
                     "tracking-[0.22em]",
                     "text-white/70",
@@ -358,69 +413,44 @@ const Paso3 = ({
               {/* Texto explicativo del flujo AMS reservado para una etapa futura. */}
               <p
                 className={[
-                  cotizaTextRegularFont.className,
-                  "mt-8",
+                  cotizaTextLightFont.className,
+                  "mt-40",
                   "max-w-[160px]",
                   "text-[11px]",
                   "uppercase",
                   "leading-4",
                   "tracking-[0.08em]",
                   "text-white/50",
-                  "sm:mt-12",
+                  "sm:mt-45",
                   "sm:max-w-56",
                   "sm:text-[13px]",
                 ].join(" ")}
               >
-                Impresion multicolor mediante sistema AMS. Anade una referencia
-                para definir los colores.
+                Impresion multicolor mediante sistema AMS. 
               </p>
-
-              {/* Campo visible pero inactivo para mantener documentado el flujo futuro. */}
-              <input
-                value={referenceLink}
-                onChange={(event) => onReferenceLinkChange(event.target.value)}
-                placeholder="https://referencia-colores.com/tu-imagen"
-                disabled
-                className={[
-                  "mt-5",
-                  "h-12",
-                  "w-full",
-                  "rounded-md",
-                  "border",
-                  "border-white/10",
-                  "bg-white/10",
-                  "px-4",
-                  "text-sm",
-                  "text-white/45",
-                  "outline-none",
-                  "disabled:cursor-not-allowed",
-                  "sm:w-[70%]",
-                  "sm:mt-20",
-                  "sm:w-[50%]",
-                ].join(" ")}
-              />
 
               {/* Imagen de referencia visual asociada al modo multicolor. */}
               <div
                 className={[
                   "absolute",
-                  "-bottom-2",
-                  "right-0",
+                  "-bottom-20",
+                  "right-10",
                   "z-0",
-                  "h-[220px]",
-                  "w-[145px]",
-                  "sm:-right-2",
-                  "sm:-right-2",
-                  "sm:-bottom-5",
+                  "h-[320px]",
+                  "w-[320px]",
+                  "",
+                  "sm:-right-10",
+                  "sm:-bottom-38",
                   "sm:h-[430px]",
-                  "sm:w-[180px]",
+                  "sm:w-[430px]",
                 ].join(" ")}
               >
                 <Image
-                  src="/cotiza/multicolor.png"
+                  src="/cotiza/ams.png"
                   alt="Vista referencial de impresion multicolor"
                   fill
-                  className="object-contain object-bottom-right scale-[1.02] sm:scale-[1.15]"
+                  className="object-contain object-bottom-right 
+                  scale-[1.02] sm:scale-[1.15]"
                 />
               </div>
             </div>
@@ -514,6 +544,30 @@ const Paso3 = ({
               >
                 Calidad optimizada
               </p>
+
+              {/* Distintivo: la calidad optimizada aun no puede seleccionarse. */}
+              <span
+                className={[
+                  cotizaTextRegularFont.className,
+                  "absolute",
+                  "bottom-3",
+                  "right-3",
+                  "border",
+                  "border-white/12",
+                  "bg-white/6",
+                  "px-2",
+                  "py-1",
+                  "text-[8px]",
+                  "uppercase",
+                  "tracking-[0.22em]",
+                  "text-white/70",
+                  "sm:right-4",
+                  "sm:bottom-4",
+                  "sm:px-3",
+                ].join(" ")}
+              >
+                No disponible
+              </span>
 
               {/* Resumen tecnico de la variante futura para dejar claro su objetivo. */}
               <p

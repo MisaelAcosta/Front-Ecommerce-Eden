@@ -2,11 +2,26 @@
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import {
+  CircleCheckBig,
+  CircleX,
+  Clock3,
+  Home,
+  LoaderCircle,
+  RefreshCw,
+  ShoppingBag,
+  TriangleAlert,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
 import { useCartWizard } from "@/hooks/use-cart-wizard";
 import { useNavigationTransition } from "@/components/navigation-transition-provider";
+import {
+  khInterferenceLightFont,
+  khInterferenceRegularFont,
+  maratypeFont,
+} from "../components/cart-fonts";
 
 type UiStatus = "loading" | "paid" | "rejected" | "pending" | "error";
 
@@ -300,19 +315,25 @@ function FlowReturnContent() {
   }, [tokenFromUrl, cart, wizard]);
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-35 shadow-none sm:pt-30">
-      <div className=" lg:border bg-white p-6">
-        <h1 className="text-xl font-black">RESULTADO DEL PAGO</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+    <main className="min-h-[70vh] bg-[#ece9e1] px-4 py-16 sm:px-8 sm:py-24 lg:px-12">
+      <section className="mx-auto w-full max-w-[760px] overflow-hidden border border-black bg-white">
+        <header className="bg-[#1B2C1C] px-7 py-8 text-[#C0FF01] sm:px-10 sm:py-10">
+        <h1 className={`${maratypeFont.className} text-5xl uppercase leading-[0.85] sm:text-6xl`}>
+          Resultado del pago
+        </h1>
+        <p className={`${khInterferenceLightFont.className} mt-5 text-xs uppercase tracking-[0.18em] text-[#C0FF01]/80`}>
           Estamos verificando tu transacción con Flow.
         </p>
+        </header>
 
-        <Separator className="my-4" />
+        <div className="p-7 sm:p-10">
+        <Separator className="my-0" />
 
         {status === "loading" && <p className="text-sm">Procesando…</p>}
 
         {status === "pending" && (
-          <div className="space-y-2">
+          <div className="space-y-3 py-10 text-[#1B2C1C]">
+            <Clock3 size={34} strokeWidth={1.5} />
             <p className="text-sm">Pago en proceso… (esperando confirmación)</p>
             <p className="text-xs text-muted-foreground">
               Esto puede tardar unos segundos mientras confirmamos tu orden.
@@ -321,14 +342,16 @@ function FlowReturnContent() {
         )}
 
         {status === "paid" && (
-          <div className="space-y-2">
-            <p className="text-sm font-semibold">Pago aprobado</p>
-            <p className="text-xs text-muted-foreground">
+          <div className="space-y-3 py-10 text-[#1B2C1C]">
+            <CircleCheckBig size={34} strokeWidth={1.5} />
+            <p className={`${khInterferenceRegularFont.className} text-xl uppercase`}>Pago aprobado</p>
+            <p className={`${khInterferenceLightFont.className} text-xs uppercase leading-5 text-black/60`}>
               Tu pedido quedó registrado. Te enviaremos confirmación al correo.
             </p>
 
             <div className="pt-3">
-              <Button className="w-full" onClick={() => navigateWithTransition("/")}>
+              <Button className={`${khInterferenceRegularFont.className} w-full rounded-none bg-[#ADFE00] text-xs uppercase text-black hover:bg-[#1B2C1C] hover:text-[#ADFE00]`} onClick={() => navigateWithTransition("/")}>
+                <Home size={15} strokeWidth={1.8} />
                 Volver al inicio
               </Button>
             </div>
@@ -336,17 +359,19 @@ function FlowReturnContent() {
         )}
 
         {status === "rejected" && (
-          <div className="space-y-3">
-            <p className="text-sm font-semibold">Pago rechazado o cancelado</p>
-            <p className="text-xs text-muted-foreground">
+          <div className="space-y-3 py-10 text-[#1B2C1C]">
+            <CircleX size={34} strokeWidth={1.5} />
+            <p className={`${khInterferenceRegularFont.className} text-xl uppercase`}>Pago rechazado o cancelado</p>
+            <p className={`${khInterferenceLightFont.className} text-xs uppercase leading-5 text-black/60`}>
               Puedes intentar nuevamente desde el carrito.
             </p>
 
             <div className="flex gap-2 pt-2">
               <Button
-                className="w-full"
+                className={`${khInterferenceRegularFont.className} w-full rounded-none bg-[#ADFE00] text-xs uppercase text-black hover:bg-[#1B2C1C] hover:text-[#ADFE00]`}
                 onClick={() => navigateWithTransition("/cart")}
               >
+                <ShoppingBag size={15} strokeWidth={1.8} />
                 Volver al carrito
               </Button>
             </div>
@@ -354,24 +379,27 @@ function FlowReturnContent() {
         )}
 
         {status === "error" && (
-          <div className="space-y-3">
-            <p className="text-sm font-semibold">No pudimos validar el pago</p>
-            <p className="text-xs text-muted-foreground">
+          <div className="space-y-3 py-10 text-[#1B2C1C]">
+            <TriangleAlert size={34} strokeWidth={1.5} />
+            <p className={`${khInterferenceRegularFont.className} text-xl uppercase`}>No pudimos validar el pago</p>
+            <p className={`${khInterferenceLightFont.className} text-xs uppercase leading-5 text-black/60`}>
               Intenta refrescar o vuelve al carrito.
             </p>
 
-            <div className=" gap-2 pt-2 ">
+            <div className="flex flex-col gap-3 pt-2">
               <Button
                 variant="outline"
-                className="w-full"
+                className={`${khInterferenceRegularFont.className} w-full rounded-none border-black text-xs uppercase`}
                 onClick={() => window.location.reload()}
               >
+                <RefreshCw size={15} strokeWidth={1.8} />
                 Reintentar
               </Button>
               <Button
-                className="w-full"
+                className={`${khInterferenceRegularFont.className} w-full rounded-none bg-[#ADFE00] text-xs uppercase text-black hover:bg-[#1B2C1C] hover:text-[#ADFE00]`}
                 onClick={() => navigateWithTransition("/cart")}
               >
+                <ShoppingBag size={15} strokeWidth={1.8} />
                 Ir al carrito
               </Button>
             </div>
@@ -392,7 +420,8 @@ function FlowReturnContent() {
           </>
         )}
       </div>
-    </div>
+      </section>
+    </main>
   );
 }
 
