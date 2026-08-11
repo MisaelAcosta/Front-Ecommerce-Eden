@@ -5,6 +5,7 @@ import {
   cotizaTextRegularFont,
   cotizaTitleFont,
   cotizaTextBoldFont,
+  cotizaTextLightFont,
 } from "./cotiza-fonts";
 
 type ResumenPedidoProps = {
@@ -116,15 +117,16 @@ const ResumenPedido = ({
       <div className="relative z-10 mx-auto grid min-h-[390px] w-full max-w-[1350px] gap-10 lg:grid-cols-[0.8fr_1.45fr_0.85fr] lg:items-center">
         <h2
           className={`${cotizaTitleFont.className} 
-          max-w-[260px] text-5xl uppercase leading-[0.9] lg:leading-[1.20] 
-          sm:text-6xl lg:text-7xl`}
+          text-4xl uppercase leading-[1.30] 
+            lg:leading-[1.20] sm:text-5xl lg:text-6xl
+            lg:pt-10 pt-5`}
         >
           Resumen de pedido
         </h2>
 
         <div className="max-w-[560px]">
           <p
-            className={`${cotizaTextBoldFont.className} mb-3 text-lg uppercase tracking-[0.04em] text-white`}
+            className={`${cotizaTextRegularFont.className} mb-3 text-lg uppercase tracking-[0.04em] text-white/50`}
           >
             Resumen
           </p>
@@ -141,7 +143,7 @@ const ResumenPedido = ({
                   {label}
                 </p>
                 <p
-                  className={`${cotizaTextRegularFont.className} text-right text-base uppercase leading-5 tracking-[0.04em] text-white/62 sm:text-lg`}
+                  className={`${cotizaTextLightFont.className} text-right text-base uppercase leading-5 tracking-[0.04em] text-white/62 sm:text-lg`}
                 >
                   {value}
                 </p>
@@ -179,25 +181,24 @@ const ResumenPedido = ({
           )}
         </div>
 
-        <div className="flex flex-col items-start gap-5 lg:items-end">
-          <p
-            className={`${cotizaTextRegularFont.className} max-w-[230px] text-left text-xs uppercase leading-4 tracking-[0.08em] text-white/45 lg:text-right`}
-          >
-            Recibe tu pedido con la mejor calidad
-          </p>
-
+        {/* ACCION SIN COTIZACION: centrada en movil y alineada al borde derecho en escritorio. */}
+        <div className="flex flex-col items-center gap-5 lg:items-end">
+       
           <button
             type="button"
             onClick={onCheckout}
             disabled={!canCheckout || addingToCart}
-            className={`${cotizaTextBoldFont.className} w-full max-w-[170px] bg-[#67dd00] px-5 py-4 text-center text-xl uppercase tracking-[0.04em] text-black transition-opacity duration-300 disabled:cursor-not-allowed disabled:opacity-45`}
+            className={`${cotizaTextRegularFont.className} w-full max-w-[170px]
+             bg-[#1B2C1C] px-5 py-4   text-center text-xl uppercase 
+             tracking-[0.04em] text-[#ADFE00] transition-opacity cursor-pointer duration-300 
+             disabled:cursor-not-allowed disabled:opacity-45`}
           >
             {addingToCart ? "..." : "Imprimir"}
           </button>
 
           {uploadStatus !== "ready" && (
             <p
-              className={`${cotizaTextRegularFont.className} max-w-[240px] text-xs uppercase leading-4 text-white/45 lg:text-right`}
+              className={`${cotizaTextLightFont.className} max-w-[240px] text-center text-[13px] lg:text-[14px] uppercase leading-4 text-white/45 lg:text-right`}
             >
               Primero necesitas subir el archivo y esperar la cotizacion.
             </p>

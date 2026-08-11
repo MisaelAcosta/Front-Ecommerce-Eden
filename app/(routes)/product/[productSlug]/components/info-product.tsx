@@ -408,7 +408,7 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
         {/* COLUMNA DERECHA - INFORMACION
             `lg:justify-self-center` centra esta columna dentro de la mitad derecha.
             Asi el espacio sobrante no queda acumulado solo al borde derecho. */}
-        <div className="w-full pt-1 lg:max-w-[600px] lg:justify-self-center lg:pl-30 lg:pt-30">
+        <div className="w-full pt-1 lg:max-w-[600px] lg:justify-self-center lg:pl-30 px-4 lg:pt-30">
           {/* CABECERA: titulo/subtitulo a la izquierda y stock/precio a la derecha. */}
           <div className="flex items-start justify-between gap-5 px-1 md:px-0">
             <div className="min-w-0">
@@ -466,7 +466,7 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
           </div>
 
           {/* SEPARADOR: `my-6` y `lg:my-7` ajustan el aire vertical entre bloques. */}
-          <Separator className="my-6 bg-white lg:my-7" />
+          <Separator className="my-4 bg-white lg:my-7" />
 
           {/* DESCRIPCION: el encabezado se oculta en desktop para seguir la ficha compacta. */}
           <section className="space-y-2 px-1 md:px-0">

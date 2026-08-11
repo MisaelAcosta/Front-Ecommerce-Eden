@@ -51,12 +51,26 @@ export default function Page() {
     <SmoothScroll>
       <div
         className="
-          mx-auto max-w-[1240px] px-0 py-0
+          relative mx-auto max-w-[1240px] px-0 py-0
           sm:px-8 sm:py-18
           lg:max-w-none lg:px-0 lg:py-0
         "
       >
-       
+        {/* VOLVER AL CATALOGO: usa la categoria actual para conservar el contexto del producto. */}
+        <button
+          type="button"
+          title="Volver al catálogo"
+          aria-label="Volver al catálogo"
+          onClick={() =>
+            router.push(
+              `/category/${product.category?.slug ?? "todos-los-productos"}`
+            )
+          }
+          className="absolute left-4 top-20 z-30 grid size-10 place-items-center
+           text-black  sm:left-12 sm:top-22 lg:left-18 lg:top-26 lg:hidden"
+        >
+          <ArrowLeft size={19} strokeWidth={1.8} />
+        </button>
 
         {/* FICHA PRINCIPAL: galeria, informacion, variantes, favoritos y carrito. */}
         <ScrollReveal delay={0.08}>

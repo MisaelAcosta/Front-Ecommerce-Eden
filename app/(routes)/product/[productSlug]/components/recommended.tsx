@@ -232,7 +232,8 @@ const Recommmended = ({
       // Cambiar los breakpoints del titulo o el `grid` del Skeleton altera su composicion responsive.
       <section className="mx-auto max-w-[1350px] px-4 py-10 sm:px-6 lg:px-0">
         <h3
-          className={`${khInterferenceRegularFont.className} mb-6 text-4xl uppercase leading-none tracking-[0] text-black sm:text-6xl`}
+          className={`${khInterferenceRegularFont.className} mb-6 text-4xl 
+          uppercase leading-none tracking-[0] text-black sm:text-5xl`}
         >
           TE PUEDE INTERESAR
         </h3>
@@ -249,7 +250,8 @@ const Recommmended = ({
     <section className="mx-auto max-w-[1350px] px-4 py-10 sm:px-6 lg:px-0">
       {/* TITULO: editar text-4xl/sm:text-6xl cambia su escala movil y escritorio. */}
       <h3
-        className={`${khInterferenceRegularFont.className} mb-8 text-4xl uppercase leading-none tracking-[0] text-black sm:mb-12 sm:text-6xl`}
+        className={`${khInterferenceRegularFont.className} mb-8 text-4xl uppercase leading-none tracking-[0]
+         text-black sm:mb-12 sm:text-5xl`}
       >
         TE PUEDE INTERESAR
       </h3>

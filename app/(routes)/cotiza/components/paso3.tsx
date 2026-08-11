@@ -8,6 +8,7 @@ import {
   cotizaTextBoldFont,
   cotizaTextLightFont,
 } from "./cotiza-fonts";
+import { Separator } from "@radix-ui/react-separator";
 
 // ===== # Paso 3 | Tipos y props =====
 // ---- Tipos base del selector de color ----
@@ -370,7 +371,7 @@ const Paso3 = ({
                 "border-dashed",
                 "border-white/40",
                 "bg-[#080808]",
-                "opacity-80",
+                "opacity-45",
                 "sm:min-h-60",
               ].join(" ")}
             >
@@ -458,10 +459,11 @@ const Paso3 = ({
               </div>
             </div>
 
-            {/* SEPARADOR MOVIL: divide modos de color y opciones de calidad sin afectar escritorio. */}
-            <div
-              aria-hidden="true"
-              className="border-t border-white/20 pb-2 pt-2 md:hidden"
+            {/* SEPARADOR MOVIL: visible solo antes de las opciones de calidad. */}
+            <Separator
+              decorative
+              orientation="horizontal"
+              className="my-4 block h-px w-full bg-white/20 md:hidden"
             />
 
             {/* ---- Tarjeta de calidad estandar disponible ---- */}
@@ -535,7 +537,7 @@ const Paso3 = ({
                 "border-dashed",
                 "border-white/40",
                 "bg-[#080808]",
-                "opacity-80",
+                "opacity-45",
                 "sm:p-4",
               ].join(" ")}
             >
