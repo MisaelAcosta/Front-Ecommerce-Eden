@@ -243,9 +243,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
             `lg:aspect-[1.08/1]` cambia la proporcion para pantallas grandes. */}
         <div
           className="
-            relative flex w-full cursor-pointer items-center justify-center overflow-hidden
+            relative flex w-full cursor-pointer items-center justify-center 
+            overflow-hidden
             bg-neutral-100 text-left
-            aspect-[1.08/1.2]
+            aspect-[1.08/1.3]
             lg:aspect-[1.08/1.2]
           "
           onClick={() =>

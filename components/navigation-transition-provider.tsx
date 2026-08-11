@@ -44,7 +44,7 @@ const TRANSITION_CONFIG = {
     rows: 10,
     columns: 5,
   },
-  pixelColor: "#C0FF01",
+  pixelColor: "#1B2C1C",
   exitCellDuration: 0.16,
   enterCellDuration: 0.16,
   staggerEach: 0.035,

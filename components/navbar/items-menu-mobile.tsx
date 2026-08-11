@@ -173,7 +173,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
       {isOpen && (
         <motion.div
           key="overlay"
-          className="fixed inset-0 z-[3000] isolate bg-white"
+          className="fixed inset-0 z-[3000] isolate bg-[#1B2C1C]"
           variants={overlayVariants(originPx)}
           initial="initial"
           animate="animate"
@@ -188,8 +188,9 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="absolute top-0 left-0 right-0 flex items-center justify-between px-5 pt-5"
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+              className="absolute top-4 left-0 right-0 flex items-center 
+              justify-between px-5 pt-5"
             >
               <motion.button
                 onClick={closeMenu}
@@ -198,7 +199,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 exit={{ opacity: 0, scale: 0.95, rotate: -10 }}
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                className="absolute top-3 left-5 rounded-md p-2 text-black"
+                className="absolute top-4 left-5 rounded-md p-2 text-white"
               >
                 <X className="h-6 w-6" />
               </motion.button>
@@ -218,12 +219,14 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
                       key={item.href}
                       className={index === 0 ? "relative pt-10" : "relative"}
                     >
-                      <span className="absolute -top-4 right-0 text-xs font-semibold text-[#ADFE00]">
+                      <span className="absolute -top-4 right-0 text-xs font-semibold 
+                      text-[#ADFE00]">
                         {item.mobileNumber}
                       </span>
                       <TransitionLink
                         href={item.href}
-                        className={`${maratypeFont.className} block text-8xl leading-none tracking-tighter text-black sm:text-6xl`}
+                        className={`${maratypeFont.className} block text-8xl 
+                        leading-none tracking-tighter text-white sm:text-6xl`}
                         onClick={closeMenu}
                       >
                         {item.label}
@@ -233,7 +236,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
 
                   <div className="hidden">
                     {loadingUser ? (
-                      <span className="block text-3xl font-semibold text-black opacity-40" />
+                      <span className="block text-3xl font-semibold text-white opacity-40" />
                     ) : user ? (
                       <ProfileSheet
                         user={user}
@@ -244,7 +247,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
                         }}
                       >
                         <button
-                          className="block text-3xl font-semibold text-black"
+                          className="block text-3xl font-semibold text-white"
                           type="button"
                           onClick={closeMenu}
                         />
@@ -252,7 +255,7 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
                     ) : (
                       <LoginDialog>
                         <button
-                          className="block text-3xl font-semibold text-black"
+                          className="block text-3xl font-semibold text-white"
                           type="button"
                           onClick={closeMenu}
                         />
@@ -264,27 +267,29 @@ export default function ItemsMenuMobile({ scrolled }: ItemsMenuMobileProps) {
 
               {/* Footer del overlay con links externos. */}
               <motion.div variants={itemVariants} className="pb-10">
-                <div className="mb-4 pl-3 text-xs text-black/50">(REDES)</div>
+                <div className="mb-4 pl-3 text-xs text-white/50">(REDES)</div>
 
                 <div className="flex items-center justify-between gap-4 px-3 text-xl">
                   <TransitionLink
                     href="https://www.instagram.com/eden.3d_/"
                     target="_blank"
-                    className={`${khInterferenceBoldFont.className} inline-flex items-center gap-2 tracking-wide text-black`}
+                    className={`${khInterferenceBoldFont.className} inline-flex 
+                    items-center gap-2 tracking-wide text-white/90`}
                   >
                     <Instagram className="h-4 w-4" />
                     INSTAGRAM
-                    <ArrowUpRight className="h-4 w-4 text-black/60" />
+                    <ArrowUpRight className="h-4 w-4 text-white/60" />
                   </TransitionLink>
 
                   <TransitionLink
                     href="https://youtube.com"
                     target="_blank"
-                    className={`${khInterferenceBoldFont.className} inline-flex items-center gap-2 tracking-wide text-black`}
+                    className={`${khInterferenceBoldFont.className} inline-flex 
+                    items-center gap-2 tracking-wide text-white/90`}
                   >
                     <Youtube className="h-5 w-5" />
                     YOUTUBE
-                    <ArrowUpRight className="h-4 w-4 text-black/90" />
+                    <ArrowUpRight className="h-4 w-4 text-white/90" />
                   </TransitionLink>
                 </div>
               </motion.div>

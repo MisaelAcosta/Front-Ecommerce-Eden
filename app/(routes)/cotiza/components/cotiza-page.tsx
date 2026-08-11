@@ -667,6 +667,9 @@ export default function CotizaPage() {
             onCheckout={handleCheckout}
           />
         </ScrollReveal>
+
+        {/* ESPACIO FINAL: separa el resumen oscuro del footer con fondo blanco. */}
+        <div aria-hidden="true" className="h-30 bg-white sm:h-16 lg:h-40" />
       </main>
     </SmoothScroll>
   );

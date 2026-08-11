@@ -244,7 +244,7 @@ function NewProductCard({
   return (
     <CarouselItem
       key={id}
-      className="basis-[76%] px-1 sm:basis-1/2 md:px-4 lg:basis-1/4"
+      className="basis-[76%] px-1 sm:basis-1/2 md:px-1 lg:basis-1/4"
     >
       <Card
         className="
@@ -415,8 +415,9 @@ const NewProducts = () => {
             ))}
           </CarouselContent>
 
-          <CarouselPrevious />
-          <CarouselNext className="hidden sm:flex" />
+          {/* CONTROLES DEL RIEL: sin borde ni fondo para no competir con las tarjetas. */}
+          <CarouselPrevious className="border-0 bg-transparent shadow-none hover:bg-transparent" />
+          <CarouselNext className="hidden border-0 bg-transparent shadow-none hover:bg-transparent sm:flex" />
         </Carousel>
       </motion.div>
     </section>

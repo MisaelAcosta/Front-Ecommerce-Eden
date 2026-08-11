@@ -461,8 +461,9 @@ const FeaturedProducts = () => {
             ))}
         </CarouselContent>
 
-        <CarouselPrevious />
-        <CarouselNext className="hidden sm:flex" />
+        {/* CONTROLES DEL RIEL: sin borde ni fondo para no competir con las tarjetas. */}
+        <CarouselPrevious className="border-0 bg-transparent shadow-none hover:bg-transparent" />
+        <CarouselNext className="hidden border-0 bg-transparent shadow-none hover:bg-transparent sm:flex" />
         </Carousel>
       </motion.div>
     </section>
