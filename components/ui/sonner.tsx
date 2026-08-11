@@ -34,6 +34,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
           "--normal-bg": "#1B2C1C",
           "--normal-text": "#ADFE00",
           "--normal-border": "rgba(173, 254, 0, 0.3)",
+          // Mantiene los avisos de exito, como "Sesion iniciada", dentro de la paleta Eden.
+          "--success-bg": "#1B2C1C",
+          "--success-border": "rgba(173, 254, 0, 0.3)",
+          "--success-text": "#ADFE00",
           "--border-radius": "10px",
         } as React.CSSProperties
       }

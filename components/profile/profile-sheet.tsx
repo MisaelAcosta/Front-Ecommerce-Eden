@@ -77,7 +77,8 @@ export function ProfileSheet({
           <button
             className="
               hidden cursor-pointer rounded-2xl border border-black px-4 py-1
-              font-bold transition duration-200 ease-in-out hover:bg-black hover:text-white
+              font-bold transition duration-200 ease-in-out hover:bg-black
+               hover:text-white
               md:flex
             "
           >
@@ -87,7 +88,11 @@ export function ProfileSheet({
       </SheetTrigger>
 
       {/* PANEL LATERAL: ancho total en movil y 380px desde tablet/escritorio. */}
-      <SheetContent side="right" className="w-full p-0 sm:w-[380px]">
+      <SheetContent
+        side="right"
+        className="w-full border-l-0 bg-black p-0 
+        text-white sm:w-[380px]"
+      >
         {/* VISTA 01: portada con enlaces a Pedidos e Info. */}
         {view === "menu" && (
           <ProfileMenu

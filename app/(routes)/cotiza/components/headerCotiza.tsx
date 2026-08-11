@@ -5,6 +5,7 @@ import Typewriter from "@/components/fancy/text/typewriter";
 import {
   cotizaTextBoldFont,
   cotizaTextLightFont,
+  cotizaTextRegularFont,
 } from "./cotiza-fonts";
 
 const HERO_TITLE_OPTIONS = [
@@ -60,14 +61,7 @@ const HeaderCotiza = () => {
         <div className="absolute left-1/2 top-[52%] z-10 aspect-[0.8] w-[70vw]
          max-w-[430px] -translate-x-1/2 -translate-y-1/2 sm:w-[48vw] 
          lg:max-w-[540px]">
-          <Image
-            src="/cotiza/img_header.png"
-            alt="Modelo 3D impreso sostenido a mano"
-            fill
-            priority
-            sizes="(max-width: 640px) 70vw, (max-width: 1024px) 48vw, 540px"
-            className="object-cover"
-          />
+          
           <div className="absolute inset-0 bg-black/22 mix-blend-multiply" />
           <div className="absolute inset-0 bg-black/18" />
         </div>
@@ -75,25 +69,27 @@ const HeaderCotiza = () => {
         <div className="pointer-events-none absolute inset-x-0 
         top-[52%] z-20 -translate-y-1/2 px-4 text-center">
           <h1
-            className={`${cotizaTextBoldFont.className} mx-auto max-w-[800px] 
+            className={`${cotizaTextRegularFont.className} mx-auto max-w-[800px] 
             text-[clamp(3.2rem,6vw,6.5rem)] uppercase leading-[0.86] 
-            tracking-[0] text-white`}
+            tracking-[0] text-[#ADFE00]`}
           >
             <span>{"¿QUE "}</span>
             <Typewriter
               text={HERO_TITLE_OPTIONS}
-              speed={150}
-              waitTime={1900}
-              deleteSpeed={90}
+              speed={230}
+              waitTime={2500}
+              deleteSpeed={120}
               cursorChar="_"
               cursorClassName="ml-2 align-baseline"
-              className="text-white"
+              className="text-[#ADFE00] "
             />
           </h1>
         </div>
 
         <p
-          className={`${cotizaTextLightFont.className} max-w-[360px] text-sm uppercase leading-relaxed tracking-[0.06em] text-white/85 sm:text-xl lg:mt-auto`}
+          className={`${cotizaTextLightFont.className} max-w-[360px] 
+          text-sm uppercase leading-relaxed tracking-[0.06em] 
+          text-white/85 sm:text-xl lg:mt-auto`}
         >
           IMPRIME TUS MODELOS 3D DE FORMA RAPIDA, PERSONALIZADA Y CON
           COTIZACION INSTANTANEA EN POCOS PASOS.

@@ -45,7 +45,8 @@ function frameObject(object: ThreeObject, modelRoot: ModelRoot, camera: unknown)
   (camera as CameraLike).lookAt(0, 0, 0);
 }
 
-function createOrangeMatcapTexture() {
+// Matcap verde Eden: conserva profundidad, brillo y lectura de las formas del STL/OBJ.
+function createEdenMatcapTexture() {
   const canvas = document.createElement("canvas");
   const size = 256;
   const context = canvas.getContext("2d");
@@ -58,23 +59,23 @@ function createOrangeMatcapTexture() {
   }
 
   const base = context.createRadialGradient(92, 70, 12, 128, 132, 156);
-  base.addColorStop(0, "#ffcf8a");
-  base.addColorStop(0.22, "#ff7a19");
-  base.addColorStop(0.62, "#e74608");
-  base.addColorStop(1, "#6f1704");
+  base.addColorStop(0, "#efffb5");
+  base.addColorStop(0.22, "#ADFE00");
+  base.addColorStop(0.62, "#79bc00");
+  base.addColorStop(1, "#173d09");
   context.fillStyle = base;
   context.fillRect(0, 0, size, size);
 
   const shine = context.createRadialGradient(76, 54, 0, 76, 54, 86);
   shine.addColorStop(0, "rgba(255,255,255,0.82)");
-  shine.addColorStop(0.34, "rgba(255,202,116,0.42)");
+  shine.addColorStop(0.34, "rgba(220,255,116,0.42)");
   shine.addColorStop(1, "rgba(255,255,255,0)");
   context.fillStyle = shine;
   context.fillRect(0, 0, size, size);
 
   const lowerGlow = context.createRadialGradient(164, 182, 12, 164, 182, 116);
-  lowerGlow.addColorStop(0, "rgba(255,106,16,0.72)");
-  lowerGlow.addColorStop(1, "rgba(72,11,0,0)");
+  lowerGlow.addColorStop(0, "rgba(173,254,0,0.72)");
+  lowerGlow.addColorStop(1, "rgba(12,42,4,0)");
   context.fillStyle = lowerGlow;
   context.fillRect(0, 0, size, size);
 
@@ -115,7 +116,7 @@ function addEdges(mesh: unknown) {
   const lines = new THREE.LineSegments(
     edges,
     new THREE.LineBasicMaterial({
-      color: 0x5f1d08,
+      color: 0x355c10,
       transparent: true,
       opacity: 0.2,
     })
@@ -174,7 +175,7 @@ export function ModelViewer({ file, scalePercent }: ModelViewerProps) {
     const ambient = new THREE.HemisphereLight(0xffffff, 0x7a7a7a, 2.7);
     const key = new THREE.DirectionalLight(0xffffff, 4.2);
     const fill = new THREE.DirectionalLight(0xffffff, 1.8);
-    const matcapTexture = createOrangeMatcapTexture();
+    const matcapTexture = createEdenMatcapTexture();
     let animationFrame = 0;
 
     setError(null);

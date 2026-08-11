@@ -41,7 +41,7 @@ const LovedGrid = () => {
         <button
           type="button"
           onClick={() => navigateWithTransition("/")}
-          className="mt-8 rounded-full bg-black px-6 py-3 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-black/85"
+          className="mt-8  bg-black px-6 py-3 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-black/85"
         >
           Explorar productos
         </button>

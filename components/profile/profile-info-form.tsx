@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ChevronLeft } from "lucide-react";
+import { toast } from "sonner";
 import {
   khInterferenceBoldFont,
   khInterferenceLightFont,
@@ -34,9 +35,9 @@ type ProfileInfoFormProps = {
 const labelClassName = `${khInterferenceRegularFont.className} text-[11px] uppercase`;
 
 // ESTILO REUTILIZABLE - CAMPOS DE TEXTO
-// Altura fija, borde negro y fondo blanco. `disabled:opacity-60` diferencia lectura de edicion.
+// Altura fija, borde claro y fondo negro. `disabled:opacity-60` diferencia lectura de edicion.
 const inputClassName =
-  "h-10 rounded-none border-black bg-white text-xs disabled:opacity-60";
+  "h-10 rounded-none border-white/35 bg-black text-xs text-white placeholder:text-white/35 disabled:opacity-60";
 
 export function ProfileInfoForm({
   onBack,
@@ -114,6 +115,24 @@ export function ProfileInfoForm({
     setSelectedComuna(initialProfile?.comuna ?? null);
   };
 
+  // AVISO DE SOLO LECTURA
+  // Captura intentos sobre campos bloqueados y explica como habilitar su edicion.
+  const handleReadOnlyFieldAttempt = (
+    event: React.PointerEvent<HTMLFormElement>
+  ) => {
+    if (isEditing) return;
+
+    const target = event.target as HTMLElement;
+    const isFormControl = target.closest(
+      "input, textarea, button, [role=checkbox]"
+    );
+
+    if (!isFormControl) return;
+
+    event.preventDefault();
+    toast.info("Activa Editar para modificar tu informacion.");
+  };
+
   // GUARDAR PERFIL
   // Construye el payload para `/api/profile` y replica los datos relevantes en localStorage
   // para que el checkout pueda autocompletar el despacho sin otra consulta.
@@ -188,9 +207,9 @@ export function ProfileInfoForm({
   return (
     // CONTENEDOR GENERAL DE INFO
     // `flex` y `h-full` mantienen la cabecera fija y permiten desplazarse solo en el formulario.
-    <div className="flex h-full flex-col shadow-none bg-[#fafafa] text-black">
+    <div className="flex h-full flex-col bg-black text-white shadow-none">
       {/* CABECERA: boton volver, etiqueta de contexto y accion Editar/Cancelar. */}
-      <header className="flex items-center justify-between border-b border-black
+      <header className="flex items-center justify-between border-b border-white/20
        px-5 pb-5 pt-14">
         <div className="flex items-center gap-2">
           <button
@@ -199,7 +218,7 @@ export function ProfileInfoForm({
             aria-label="Volver al perfil"
             className="
               inline-flex size-8 items-center cursor-pointer justify-center
-              transition-colors hover:bg-[#ADFE00]
+              transition-colors 
             "
           >
             <ChevronLeft className="size-4" strokeWidth={2} />
@@ -207,7 +226,7 @@ export function ProfileInfoForm({
           <div>
             <p
               className={`${khInterferenceLightFont.className} text-[10px] 
-              tracking-widest  text-black/55`}
+              tracking-widest text-white/55`}
             >
               Mi cuenta
             </p>
@@ -232,8 +251,8 @@ export function ProfileInfoForm({
               setIsEditing((value) => !value);
             }}
             className={`${khInterferenceLightFont.className}
-              border cursor-pointer border-black px-3 py-2 text-[10px] tracking-widest uppercase
-              transition-colors hover:bg-[#ADFE00]`}
+              cursor-pointer  px-3 py-2 text-[10px] tracking-widest uppercase
+              transition-colors hover:text-white`}
           >
             {isEditing ? "Cancelar" : "Editar"}
           </button>
@@ -243,6 +262,7 @@ export function ProfileInfoForm({
       {/* FORMULARIO DESPLAZABLE: no cambia el alto de la cabecera al tener muchos campos. */}
       <form
         onSubmit={handleSubmitInfo}
+        onPointerDownCapture={handleReadOnlyFieldAttempt}
         className="flex-1 space-y-10 overflow-y-auto px-5 py-6 text-xs"
       >
         
@@ -293,8 +313,8 @@ export function ProfileInfoForm({
                       <InputOTPSlot
                         key={index}
                         index={index}
-                        className="h-9 w-6 rounded-none border-black 
-                        bg-white text-xs"
+                        className="h-9 w-6 rounded-none border-white/35 
+                        bg-black text-xs text-white"
                       />
                     ))}
                   </InputOTPGroup>
@@ -312,7 +332,7 @@ export function ProfileInfoForm({
                   <InputOTPGroup>
                     <InputOTPSlot
                       index={0}
-                      className="h-9 w-6 rounded-none border-black bg-white text-xs"
+                      className="h-9 w-6 rounded-none border-white/35 bg-black text-xs text-white"
                     />
                   </InputOTPGroup>
                 </InputOTP>
@@ -323,8 +343,8 @@ export function ProfileInfoForm({
               <Label className={labelClassName}>Telefono</Label>
               <div className="flex items-center gap-2">
                 <span
-                  className={`${khInterferenceLightFont.className} rounded-md border
-                   border-black bg-white px-2 py-2 text-[12px]`}
+                  className={`${khInterferenceLightFont.className} border
+                   border-white/35 bg-black px-2 py-2 text-[12px] text-white`}
                 >
                   +56 9
                 </span>
@@ -340,7 +360,7 @@ export function ProfileInfoForm({
                       <InputOTPSlot
                         key={index}
                         index={index}
-                        className="h-9 w-6  border-black bg-white text-xs"
+                        className="h-9 w-6 border-white/35 bg-black text-xs text-white"
                       />
                     ))}
                   </InputOTPGroup>
@@ -352,7 +372,7 @@ export function ProfileInfoForm({
 
 
         {/* BLOQUE 03 - DIRECCION: datos usados para el despacho durante el checkout. */}
-        <section className="space-y-4 border-t border-black/30 pt-10">
+        <section className="space-y-4 border-t border-white/20 pt-10">
           {/* TITULO DE SECCION: mantiene el mismo recurso visual verde que Datos de envio. */}
           <div className="flex items-center gap-3">
             <span className="h-5 w-2  bg-[#ADFE00]" />
@@ -440,7 +460,7 @@ export function ProfileInfoForm({
             <Textarea
               id="nota"
               name="nota"
-              className="min-h-[88px] rounded-none border-black bg-white text-xs disabled:opacity-60"
+              className="min-h-[88px] rounded-none border-white/35 bg-black text-xs text-white placeholder:text-white/35 disabled:opacity-60"
               defaultValue={initialProfile?.nota ?? ""}
               disabled={!isEditing}
             />
@@ -458,7 +478,7 @@ export function ProfileInfoForm({
         {/* MENSAJE DE ERROR: conserva el formulario y explica que el guardado fallo. */}
         {errorMessage && (
           <p
-            className={`${khInterferenceLightFont.className} border-l-4 border-red-600 bg-red-50 px-3 py-2 text-[11px] uppercase text-red-700`}
+            className={`${khInterferenceLightFont.className} border-l-4 border-red-400 bg-red-950/50 px-3 py-2 text-[11px] uppercase text-red-200`}
           >
             {errorMessage}
           </p>
@@ -469,7 +489,7 @@ export function ProfileInfoForm({
           <Button
             type="submit"
             className={`${khInterferenceLightFont.className}
-              mt-2 h-12 w-full rounded-none bg-black text-[13px] uppercase text-white
+              mt-2 h-12 w-full rounded-none bg-white text-[13px] uppercase text-black
               hover:bg-[#ADFE00] hover:text-black`}
             disabled={saving}
           >

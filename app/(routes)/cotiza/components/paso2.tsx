@@ -1,8 +1,8 @@
 "use client";
 
-import type { RefObject } from "react";
+import { useState, type RefObject } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { ModelViewer } from "./model-viewer";
 import {
   cotizaTextRegularFont,
@@ -120,6 +120,8 @@ const Paso2 = ({
   onScaleChange,
   onRequote,
 }: Paso2Props) => {
+  // DESPLEGABLE MOVIL: evita mostrar todos los datos tecnicos hasta que el cliente los solicite.
+  const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false);
   const uploadProgress = uploadProgressByStatus[uploadStatus];
   const isProcessing = uploadStatus === "uploading" || uploadStatus === "pricing";
   const scaleNeedsUpdate = quoteScalePercent !== null && quoteScalePercent !== scalePercent;
@@ -187,13 +189,14 @@ const Paso2 = ({
               {showModelViewer && modelFile ? (
                 <ModelViewer file={modelFile} scalePercent={scalePercent} />
               ) : (
-                <div className="absolute inset-0 bg-[#1B2C1C]">
+                <div className="absolute inset-0 bg-[#080808]">
                   <Image
-                    src="/cotiza/bg-imprime.gif"
+                    src="/nuevo.png"
                     alt="Portada animada para cargar modelo 3D"
                     fill
                     unoptimized
-                    className="scale-[1.04] lg:scale-[0.9] object-cover blur-[1.5px] "
+                    className="scale-[1.04] lg:scale-[1.09]
+                     object-cover blur-[1px] lg:blur-[0.7px]"
                   />
                   <div className="absolute inset-0 bg-black/15 backdrop-blur-[1px]" />
                   <p
@@ -238,8 +241,30 @@ const Paso2 = ({
             />
           </div>
 
-          {/* DATOS DE COTIZACION: dos filas y dos columnas con un solo divisor central. */}
-          <div className="overflow-hidden">
+          {/* CONTROL MOVIL: abre o cierra resultado, escala, estado y progreso. */}
+          <button
+            type="button"
+            title={isMobileDetailsOpen ? "Ocultar detalles" : "Ver detalles"}
+            aria-label={isMobileDetailsOpen ? "Ocultar detalles" : "Ver detalles"}
+            aria-expanded={isMobileDetailsOpen}
+            onClick={() => setIsMobileDetailsOpen((isOpen) => !isOpen)}
+            className="flex h-12 w-full items-center justify-center border-t border-white/20 text-white transition-colors hover:text-[#C0FF01] lg:hidden"
+          >
+            <ChevronDown
+              size={20}
+              strokeWidth={1.8}
+              className={`transition-transform duration-300 ${
+                isMobileDetailsOpen ? "rotate-180" : "rotate-0"
+              }`}
+            />
+          </button>
+
+          {/* DATOS DE COTIZACION: siempre visibles en escritorio y desplegables en movil. */}
+          <div
+            className={`overflow-hidden ${
+              isMobileDetailsOpen ? "block" : "hidden"
+            } lg:block`}
+          >
             {/* FILA SUPERIOR: ESCALA / RESULTADO */}
             <div className="grid grid-cols-1 lg:grid-cols-2 ">
               {/* ESCALA Y MEDIDAS */}
@@ -260,14 +285,16 @@ const Paso2 = ({
                 {/* MEDIDAS ACTUALES: quedan bajo la escala para mostrar el efecto del cambio. */}
                 {displayDimensions ? (
                   <p
-                    className={`${cotizaTextBoldFont.className} mt-2 text-[13px] leading-4 text-white/70 sm:text-[14px]`}
+                    className={`${cotizaTextLightFont.className} mt-2 
+                    text-[11px] leading-4 text-white/70 sm:text-[13px]`}
                   >
                     {formatCm(displayDimensions.x)} x {formatCm(displayDimensions.y)} x{" "}
                     {formatCm(displayDimensions.z)} cm
                   </p>
                 ) : (
                   <p
-                    className={`${cotizaTextLightFont.className} mt-2 text-[13px] leading-4 text-white/45`}
+                    className={`${cotizaTextLightFont.className} mt-2 
+                    text-[13px] leading-4 text-white/45`}
                   >
                     Medidas 
                   </p>
@@ -400,6 +427,19 @@ const Paso2 = ({
                     >
                       Tiempo: {formatPrintTime(quote.printTimeSeconds)}
                     </p>
+                    {/*
+                      MEDIDAS COTIZADAS: usan quote.dimensions, no la medida
+                      provisional de escala. Solo cambian al recalcular.
+                    */}
+                    {quote.dimensions && (
+                      <p
+                        className={`${cotizaTextLightFont.className} text-[10px] uppercase leading-4 text-white/55 sm:text-xs`}
+                      >
+                        Medidas: {formatCm(quote.dimensions.x)} x {" "}
+                        {formatCm(quote.dimensions.y)} x {" "}
+                        {formatCm(quote.dimensions.z)} cm
+                      </p>
+                    )}
                     {quote.fitsPrinter === false && (
                       <p
                         className={`${cotizaTextLightFont.className} text-[10px] uppercase leading-4 text-[#ff8d8d] sm:text-xs`}
