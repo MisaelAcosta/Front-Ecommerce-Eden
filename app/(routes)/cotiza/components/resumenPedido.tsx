@@ -93,7 +93,7 @@ const ResumenPedido = ({
 
   return (
     <section className="relative isolate overflow-hidden bg-[#050505] 
-    px-4 py-16 text-white sm:px-8 lg:px-12 lg:py-60">
+    px-4 py-16 text-white sm:px-8 lg:px-12 lg:py-32 xl:py-44 2xl:py-60">
       <div className="absolute inset-0 z-0 bg-[#050505]" />
       <div
         className="absolute inset-0 z-0"
@@ -114,7 +114,7 @@ const ResumenPedido = ({
         }}
       />
 
-      <div className="relative z-10 mx-auto grid min-h-[390px] w-full max-w-[1350px] gap-10 lg:grid-cols-[0.8fr_1.45fr_0.85fr] lg:items-center">
+      <div className="relative z-10 mx-auto grid min-h-[390px] w-full max-w-[1350px] gap-10 xl:grid-cols-[0.8fr_1.45fr_0.85fr] xl:items-center">
         <h2
           className={`${cotizaTitleFont.className} 
           text-4xl uppercase leading-[1.30] 
@@ -182,7 +182,7 @@ const ResumenPedido = ({
         </div>
 
         {/* ACCION SIN COTIZACION: centrada en movil y alineada al borde derecho en escritorio. */}
-        <div className="flex flex-col items-center gap-5 lg:items-end">
+        <div className="flex flex-col items-center gap-5 xl:items-end">
        
           <button
             type="button"
@@ -198,7 +198,7 @@ const ResumenPedido = ({
 
           {uploadStatus !== "ready" && (
             <p
-              className={`${cotizaTextLightFont.className} max-w-[240px] text-center text-[13px] lg:text-[14px] uppercase leading-4 text-white/45 lg:text-right`}
+              className={`${cotizaTextLightFont.className} max-w-[240px] text-center text-[13px] uppercase leading-4 text-white/45 xl:text-right xl:text-[14px]`}
             >
               Primero necesitas subir el archivo y esperar la cotizacion.
             </p>

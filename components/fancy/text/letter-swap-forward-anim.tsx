@@ -109,7 +109,7 @@ const LetterSwapForward = ({
         )
       })}
     </span>
-  )
-}
+    )
+  }
 
 export default LetterSwapForward

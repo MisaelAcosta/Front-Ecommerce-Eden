@@ -149,7 +149,7 @@ const Paso2 = ({
   };
 
   return (
-    <section className=" lg:border-l lg:border-black/10 bg-white px-4 py-16 sm:px-8 lg:px-12 lg:py-25">
+    <section className="lg:border-l lg:border-black/10 bg-white px-4 py-16 sm:px-8 lg:px-12 lg:py-20 xl:py-25">
       <div className="mx-auto grid w-full max-w-[1350px] gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:items-start">
         <div>
           <p

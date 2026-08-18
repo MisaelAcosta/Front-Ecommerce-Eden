@@ -48,9 +48,11 @@ const HeaderCotiza = () => {
         }}
       />
 
-      <div className="relative z-10 mx-auto flex min-h-[700px] w-full 
-      max-w-[1680px] flex-col justify-between px-6 pb-12 pt-28 sm:px-10 
-      lg:min-h-[980px] lg:px-28 lg:pb-24 lg:pt-40">
+      <div className="relative z-10 mx-auto flex min-h-[700px] w-full
+      max-w-[1680px] flex-col justify-between px-6 pb-12 pt-28 sm:min-h-[760px] sm:px-10
+      lg:min-h-[760px] lg:px-16 lg:pb-16 lg:pt-32
+      xl:min-h-[880px] xl:px-24 xl:pb-20 xl:pt-36
+      2xl:min-h-[980px] 2xl:px-28 2xl:pb-24 2xl:pt-40">
         <p
           className={`${cotizaTextLightFont.className} text-sm uppercase 
           tracking-[0.08em] text-white/85 sm:text-xl`}

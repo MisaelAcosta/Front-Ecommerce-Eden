@@ -284,8 +284,8 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
   return (
     // CONTENEDOR DE FICHA
     // `lg:max-w-none` permite ocupar todo el ancho de escritorio en vez de centrar la ficha.
-    <div className="mx-auto w-full max-w-[1490px] 
-    pt-1 md:pt-0  ">
+    <div className="mx-auto w-full max-w-[1490px]
+    pt-6 md:pt-8 lg:pt-10">
       {/* ESTRUCTURA 50 / 50 EN ESCRITORIO
           La primera columna usa `50vw`; la segunda contiene la informacion con margen interno. */}
       <div className="grid gap-9 lg:grid-cols-2 

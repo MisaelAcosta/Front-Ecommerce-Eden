@@ -114,7 +114,8 @@ const Paso3 = ({
         "text-white",
         "sm:px-8",
         "lg:px-12",
-        "lg:py-25",
+        "lg:py-20",
+        "xl:py-25",
       ].join(" ")}
     >
       <div

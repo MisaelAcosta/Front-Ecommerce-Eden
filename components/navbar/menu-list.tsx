@@ -2,6 +2,7 @@
 
 import localFont from "next/font/local";
 import TransitionLink from "@/components/transition-link";
+import ScrambleHover from "@/components/fancy/text/scramble-hover";
 import {
   PRIMARY_NAV_ITEMS,
   isNavItemCurrent,
@@ -16,6 +17,13 @@ const desktopNavFont = localFont({
 type MenuListProps = {
   pathname: string;
 };
+
+// Solo los destinos principales usan el efecto de conteo; Inicio se mantiene estable.
+const animatedDesktopLinks = new Set([
+  "/category/todos-los-productos",
+  "/servicio",
+  "/cotiza",
+]);
 
 const MenuList = ({ pathname }: MenuListProps) => {
   return (
@@ -36,7 +44,17 @@ const MenuList = ({ pathname }: MenuListProps) => {
                     : "text-white/80 hover:text-[#C0FF01]"
                 )}
               >
-                {item.label}
+                {animatedDesktopLinks.has(item.href) ? (
+                  <ScrambleHover
+                    text={item.label}
+                    className="leading-none"
+                    scrambledClassName="opacity-70"
+                    scrambleSpeed={32}
+                    maxIterations={15}
+                  />
+                ) : (
+                  item.label
+                )}
               </TransitionLink>
             </li>
           );

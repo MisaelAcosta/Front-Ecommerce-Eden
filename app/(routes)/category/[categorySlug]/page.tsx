@@ -19,6 +19,7 @@ import { useGetCategories } from "@/api/useGetCategories";
 import { useGetCategoryProduct } from "@/api/useGetCategoryProducts";
 import type { ProductType } from "@/types/product";
 import FilterCategory from "./components/filter-category";
+import ScrambleIn from "@/components/fancy/text/scramble-In";
 import SearchBar from "./components/searchBar";
 import ProductCard from "./components/product-card";
 import {
@@ -511,7 +512,17 @@ export default function Page() {
                     text-center text-xs uppercase leading-none text-[#ADFE00]
                   `}
                 >
-                  <span className="line-clamp-2">{mobileCategoryLabel}</span>
+                  <span className="line-clamp-2">
+                    <ScrambleIn
+                      key={mobileCategoryLabel}
+                      text={mobileCategoryLabel}
+                      className="leading-none"
+                      scrambledClassName="text-[#ADFE00]/65"
+                      scrambleSpeed={38}
+                      scrambledLetterCount={2}
+                      characters="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+                    />
+                  </span>
                 </div>
               )}
 

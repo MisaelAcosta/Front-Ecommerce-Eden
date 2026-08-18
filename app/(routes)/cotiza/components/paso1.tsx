@@ -11,7 +11,7 @@ import {
 const Paso1 = () => {
   return (
     <section className="border-b border-black/50 bg-white 
-    px-4 py-16 lg:py-25 sm:px-8 lg:px-12">
+    px-4 py-16 sm:px-8 lg:px-12 lg:py-20 xl:py-25">
       <div className="mx-auto grid w-full max-w-[1350px] gap-8 
       lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
         {/* Columna editorial con el texto guía del paso. */}

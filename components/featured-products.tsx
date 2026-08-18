@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useGetFeaturedProducts } from "@/api/useGetFeaturedProducts";
 import localFont from "next/font/local";
 import {
@@ -245,9 +246,11 @@ function buildFeaturedProductCardData(product: ProductType): FeaturedProductCard
 function FeaturedProductCard({
   product,
   onOpenProduct,
+  showSecondaryImage,
 }: {
   product: FeaturedProductCardData;
   onOpenProduct: (slug: string) => void;
+  showSecondaryImage: boolean;
 }) {
   const {
     id,
@@ -260,6 +263,7 @@ function FeaturedProductCard({
     image1,
     image2,
   } = product;
+  const shouldShowSecondImage = showSecondaryImage && Boolean(image2);
 
   // ANCHO MOVIL DEL RIEL: cambia `basis-[76%]` para agrandar o achicar cada tarjeta de Top Ventas.
   return (
@@ -328,11 +332,11 @@ function FeaturedProductCard({
                 width={700}
                 height={700}
                 unoptimized
-                className="
+                className={`
                   sm:max-h-102.5 h-auto w-auto object-contain
-                  transition-all duration-300 ease-out
-                  opacity-100 group-hover:opacity-0
-                "
+                  transition-opacity duration-700 ease-out
+                  ${shouldShowSecondImage ? "opacity-0" : "opacity-100 group-hover:opacity-0"}
+                `}
               />
             )}
 
@@ -342,12 +346,12 @@ function FeaturedProductCard({
                 alt={displayName}
                 fill
                 unoptimized
-                className="
+                className={`
                   absolute inset-0
                   object-cover
-                  transition-all duration-300 ease-out
-                  opacity-0 group-hover:opacity-100
-                "
+                  transition-opacity duration-700 ease-out
+                  ${shouldShowSecondImage ? "opacity-100" : "opacity-0 group-hover:opacity-100"}
+                `}
               />
             )}
 
@@ -401,9 +405,62 @@ function FeaturedProductCard({
 const FeaturedProducts = () => {
   const { result, loading }: ResponseType = useGetFeaturedProducts();
   const { navigateWithTransition } = useNavigationTransition();
+  const [showSecondaryImages, setShowSecondaryImages] = useState(false);
+  const [isImageSwapRangeActive, setIsImageSwapRangeActive] = useState(false);
+  const featuredSectionRef = useRef<HTMLElement>(null);
+  const lastScrollY = useRef(0);
   const featuredProducts = Array.isArray(result)
     ? result.map(buildFeaturedProductCardData)
     : [];
+
+  // RANGO DE ACTIVACION: evita cambiar las fotos apenas la seccion asoma en pantalla.
+  useEffect(() => {
+    const section = featuredSectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const isInActiveRange = entry.isIntersecting && entry.intersectionRatio >= 0.85;
+        setIsImageSwapRangeActive(isInActiveRange);
+
+        if (!isInActiveRange) setShowSecondaryImages(false);
+      },
+      { threshold: [0, 0.85] }
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
+  // IMAGENES POR SCROLL: dentro del rango activo, bajar revela la segunda foto y subir la principal.
+  useEffect(() => {
+    lastScrollY.current = window.scrollY;
+    let animationFrame: number | null = null;
+
+    const handleScroll = () => {
+      if (animationFrame !== null) return;
+
+      animationFrame = window.requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+        const scrollDelta = currentScrollY - lastScrollY.current;
+
+        if (isImageSwapRangeActive && Math.abs(scrollDelta) >= 8) {
+          setShowSecondaryImages(scrollDelta > 0);
+        }
+
+        lastScrollY.current = currentScrollY;
+
+        animationFrame = null;
+      });
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
+    };
+  }, [isImageSwapRangeActive]);
 
   // Keep navigation logic in one place instead of repeating it in the JSX.
   const handleOpenProduct = (slug: string) => {
@@ -413,7 +470,10 @@ const FeaturedProducts = () => {
 
   // RITMO VERTICAL DE INICIO: py-10 movil y sm:py-14 en pantallas grandes.
   return (
-    <section className="mx-auto max-w-[1350px] px-4 py-10 sm:px-6 sm:py-14 lg:px-0">
+    <section
+      ref={featuredSectionRef}
+      className="mx-auto max-w-[1350px] px-4 py-10 sm:px-6 sm:py-14 lg:px-8 2xl:px-0"
+    >
       <div>
         <motion.h3
           variants={fadeUp}
@@ -458,6 +518,7 @@ const FeaturedProducts = () => {
                 key={product.id}
                 product={product}
                 onOpenProduct={handleOpenProduct}
+                showSecondaryImage={showSecondaryImages}
               />
             ))}
         </CarouselContent>

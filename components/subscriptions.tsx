@@ -14,7 +14,7 @@ export default function Subscriptions() {
        `max-w-[1350px]` alinea esta banda con las demas secciones de Inicio.
        Ajustar `px` cambia solo los margenes laterales fuera de la imagen.
        ================================================================ */
-    <section className="mx-auto max-w-[1350px] px-3 py-10 lg:px-0">
+    <section className="mx-auto max-w-[1350px] px-3 py-10 lg:px-8 2xl:px-0">
       {/* ==============================================================
           SUSCRIPCIONES: IMAGEN DE FONDO
           `aspect-[3.7/1]` conserva la proporcion de suscripcion_gmail.png

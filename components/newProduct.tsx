@@ -381,7 +381,7 @@ const NewProducts = () => {
 
   // RITMO VERTICAL DE INICIO: coincide con Top Ventas, Promociones y Categorias.
   return (
-    <section className="mx-auto max-w-[1350px] px-4 py-10 sm:px-6 sm:py-14 lg:px-0">
+    <section className="mx-auto max-w-[1350px] px-4 py-10 sm:px-6 sm:py-14 lg:px-8 2xl:px-0">
       <div>
         <motion.h3
           variants={fadeUp}

@@ -281,7 +281,7 @@ const ChooseCategory = () => {
       className="
         mx-auto max-w-[1350px] bg-white px-4 py-10
         sm:px-6 sm:py-14
-        lg:px-0
+        lg:px-8 2xl:px-0
       "
     >
       <div className="w-full">
