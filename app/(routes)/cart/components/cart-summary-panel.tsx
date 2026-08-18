@@ -96,13 +96,18 @@ function SwipeContinueButton({
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerEnd}
       onPointerCancel={handlePointerEnd}
-      className={`${khInterferenceRegularFont.className} relative h-12 w-full touch-none overflow-hidden bg-white/20 text-xs uppercase tracking-[0.16em] text-white/35 disabled:cursor-not-allowed disabled:opacity-45`}
+      className={`${khInterferenceRegularFont.className} relative h-12 w-full
+       touch-none overflow-hidden bg-white/20 text-xs uppercase 
+       tracking-[0.16em] text-white/35 disabled:cursor-not-allowed 
+       disabled:opacity-45`}
     >
-      <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
+      <span className="pointer-events-none absolute inset-0 flex items-center
+       justify-center">
         Continuar
       </span>
       <span
-        className={`absolute left-0.5 top-0.5 flex h-11 w-[68px] items-center justify-center  bg-white text-black shadow-sm transition-transform ${
+        className={`absolute left-0.5 top-0.5 flex h-11 w-[68px] items-center 
+          justify-center  bg-white text-black shadow-sm transition-transform ${
           isDragging ? "duration-0" : "duration-200"
         }`}
         style={{ transform: `translateX(${dragX}px)` }}
@@ -128,10 +133,11 @@ function CartSummaryContent({
 
   if (mode === "mobile") {
     return (
-      <div className="flex h-full min-h-[330px] flex-col bg-[#0e0e0e] px-8 pb-8 pt-10 text-white">
+      <div className="flex h-full min-h-[330px] flex-col bg-[#1B2C1C] 
+      px-8 pb-8 pt-10 text-white">
         <h3
           className={`${khInterferenceRegularFont.className} text-2xl 
-          uppercase tracking-normal text-[#C0FF01]`}
+          uppercase tracking-normal text-white`}
         >
           Resumen
         </h3>
@@ -150,7 +156,8 @@ function CartSummaryContent({
                 className="flex items-start justify-between gap-3 text-white"
               >
                 <p
-                  className={`${khInterferenceLightFont.className} min-w-0 flex-1 truncate text-xs uppercase text-white/60`}
+                  className={`${khInterferenceLightFont.className}
+                   min-w-0 flex-1 truncate text-xs uppercase text-white/60`}
                 >
                   {item.variantName}
                   {item.qty > 1 ? ` x${item.qty}` : ""}
@@ -158,7 +165,7 @@ function CartSummaryContent({
                 <div className="flex items-center gap-1">
                   <p
                     className={`${khInterferenceLightFont.className} 
-                    whitespace-nowrap text-sm text-[#C0FF01]`}
+                    whitespace-nowrap text-sm text-white`}
                   >
                     {formatSummaryPrice(item.unitPrice * item.qty)}
                   </p>
@@ -201,7 +208,7 @@ function CartSummaryContent({
   }
 
   return (
-    <div className="flex h-full min-h-screen flex-col bg-[#0e0e0e] px-8 pb-8 pt-16
+    <div className="flex h-full min-h-screen flex-col bg-[#1B2C1C] px-8 pb-8 pt-16
      text-white">
       <div>
         <h3
@@ -223,7 +230,7 @@ function CartSummaryContent({
             items.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center gap-3  bg-[#363636] p-3 pr-4"
+                className="flex items-center gap-3  p-3 pr-4"
               >
                 <Image
                   src={item.imageUrl}
@@ -240,7 +247,7 @@ function CartSummaryContent({
                     {item.qty > 1 ? ` x${item.qty}` : ""}
                   </p>
                   <p
-                    className={`${khInterferenceRegularFont.className} mt-1 text-sm text-white`}
+                    className={`${khInterferenceLightFont.className} mt-1 text-sm text-white`}
                   >
                     {formatSummaryPrice(item.unitPrice * item.qty)}
                   </p>

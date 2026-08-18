@@ -82,7 +82,7 @@ function OrderStatusTracker({
           </div>
 
           {/* CONECTOR: avanza completamente solo despues de que se envia el pedido. */}
-          <div className="relative h-2 flex-1 overflow-hidden bg-black/25">
+          <div className="relative h-2 flex-1 overflow-hidden bg-[#1B2C1C]/25">
             <span
               className={`absolute inset-y-0 left-0 bg-[#ADFE00] 
                 transition-[width] duration-500 ${
@@ -95,7 +95,7 @@ function OrderStatusTracker({
           <div
             className={`flex size-11 shrink-0 items-center justify-center
                 transition-colors ${
-              isShipped ? "bg-[#ADFE00] text-black" : "bg-black/15 text-black/60"
+              isShipped ? "bg-[#ADFE00] text-black" : "bg-[#1B2C1C]/15 text-black/60"
             }`}
           >
             <Truck className="size-5" strokeWidth={1} />
@@ -187,7 +187,7 @@ export function ProfileOrdersView({ onBack }: ProfileOrdersViewProps) {
   return (
     // CONTENEDOR GENERAL DE PEDIDOS
     // La cabecera permanece arriba; la lista puede desplazarse de manera independiente.
-    <div className="flex h-full flex-col bg-black text-white">
+    <div className="flex h-full flex-col bg-[#1B2C1C] text-white">
       {/* CABECERA: vuelve al menu principal y mantiene la jerarquia de Mi cuenta. */}
       <header className="flex items-center gap-2 border-b border-white/20 px-5 pb-5 pt-14">
         <button

@@ -49,7 +49,7 @@ export function RegionCombobox({
         <button
           type="button"
           className={cn(
-            "flex h-9 w-full items-center justify-between rounded-md border border-white/35 bg-black px-3 text-left text-xs text-white",
+            "flex h-9 w-full items-center justify-between rounded-md border border-white/35 bg-[#1B2C1C] px-3 text-left text-xs text-white",
             !value && "text-white/40"
           )}
         >
@@ -57,8 +57,8 @@ export function RegionCombobox({
           <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-[260px] border-white/25 bg-black p-0 text-white">
-        <Command className="bg-black text-white">
+      <PopoverContent className="w-[260px] border-white/25 bg-[#1B2C1C] p-0 text-white">
+        <Command className="bg-[#1B2C1C] text-white">
           <CommandInput placeholder="Buscar región..." />
           <CommandList>
             <CommandEmpty>Sin resultados</CommandEmpty>
@@ -116,7 +116,7 @@ export function CommuneCombobox({
         <button
           type="button"
           className={cn(
-            "flex h-9 w-full items-center justify-between rounded-md border border-white/35 bg-black px-3 text-left text-xs text-white",
+            "flex h-9 w-full items-center justify-between rounded-md border border-white/35 bg-[#1B2C1C] px-3 text-left text-xs text-white",
             !value && "text-white/40"
           )}
           disabled={!region}
@@ -125,8 +125,8 @@ export function CommuneCombobox({
           <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-[260px] border-white/25 bg-black p-0 text-white">
-        <Command className="bg-black text-white">
+      <PopoverContent className="w-[260px] border-white/25 bg-[#1B2C1C] p-0 text-white">
+        <Command className="bg-[#1B2C1C] text-white">
           <CommandInput placeholder="Buscar comuna..." />
           <CommandList>
             <CommandEmpty>Sin resultados</CommandEmpty>

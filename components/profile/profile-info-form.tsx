@@ -37,7 +37,7 @@ const labelClassName = `${khInterferenceRegularFont.className} text-[11px] upper
 // ESTILO REUTILIZABLE - CAMPOS DE TEXTO
 // Altura fija, borde claro y fondo negro. `disabled:opacity-60` diferencia lectura de edicion.
 const inputClassName =
-  "h-10 rounded-none border-white/35 bg-black text-xs text-white placeholder:text-white/35 disabled:opacity-60";
+  "h-10 rounded-none border-white/35 bg-[#1B2C1C] text-xs text-white placeholder:text-white/35 disabled:opacity-60";
 
 export function ProfileInfoForm({
   onBack,
@@ -207,7 +207,7 @@ export function ProfileInfoForm({
   return (
     // CONTENEDOR GENERAL DE INFO
     // `flex` y `h-full` mantienen la cabecera fija y permiten desplazarse solo en el formulario.
-    <div className="flex h-full flex-col bg-black text-white shadow-none">
+    <div className="flex h-full flex-col bg-[#1B2C1C] text-white shadow-none">
       {/* CABECERA: boton volver, etiqueta de contexto y accion Editar/Cancelar. */}
       <header className="flex items-center justify-between border-b border-white/20
        px-5 pb-5 pt-14">
@@ -314,7 +314,7 @@ export function ProfileInfoForm({
                         key={index}
                         index={index}
                         className="h-9 w-6 rounded-none border-white/35 
-                        bg-black text-xs text-white"
+                        bg-[#1B2C1C] text-xs text-white"
                       />
                     ))}
                   </InputOTPGroup>
@@ -332,7 +332,7 @@ export function ProfileInfoForm({
                   <InputOTPGroup>
                     <InputOTPSlot
                       index={0}
-                      className="h-9 w-6 rounded-none border-white/35 bg-black text-xs text-white"
+                      className="h-9 w-6 rounded-none border-white/35 bg-[#1B2C1C] text-xs text-white"
                     />
                   </InputOTPGroup>
                 </InputOTP>
@@ -344,7 +344,7 @@ export function ProfileInfoForm({
               <div className="flex items-center gap-2">
                 <span
                   className={`${khInterferenceLightFont.className} border
-                   border-white/35 bg-black px-2 py-2 text-[12px] text-white`}
+                   border-white/35 bg-[#1B2C1C] px-2 py-2 text-[12px] text-white`}
                 >
                   +56 9
                 </span>
@@ -360,7 +360,7 @@ export function ProfileInfoForm({
                       <InputOTPSlot
                         key={index}
                         index={index}
-                        className="h-9 w-6 border-white/35 bg-black text-xs text-white"
+                        className="h-9 w-6 border-white/35 bg-[#1B2C1C] text-xs text-white"
                       />
                     ))}
                   </InputOTPGroup>
@@ -460,7 +460,7 @@ export function ProfileInfoForm({
             <Textarea
               id="nota"
               name="nota"
-              className="min-h-[88px] rounded-none border-white/35 bg-black text-xs text-white placeholder:text-white/35 disabled:opacity-60"
+              className="min-h-[88px] rounded-none border-white/35 bg-[#1B2C1C] text-xs text-white placeholder:text-white/35 disabled:opacity-60"
               defaultValue={initialProfile?.nota ?? ""}
               disabled={!isEditing}
             />

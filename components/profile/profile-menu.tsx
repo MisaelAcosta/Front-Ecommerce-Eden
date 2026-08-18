@@ -22,7 +22,7 @@ export function ProfileMenu({
   return (
     // CONTENEDOR GENERAL DEL MENU
     // Fondo negro, texto blanco y altura completa para empujar el cierre de sesion al final.
-    <div className="flex h-full flex-col bg-black text-white">
+    <div className="flex h-full flex-col bg-[#1B2C1C] text-white">
       {/* CABECERA: identifica la seccion y muestra el correo de la cuenta abierta. */}
       <header className="border-b border-white/20 px-6 pb-6 pt-16">
         <p

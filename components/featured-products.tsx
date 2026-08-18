@@ -296,8 +296,7 @@ function FeaturedProductCard({
           </div>
         )}
 
-        <CardContent className="flex flex-col 
-        justify-around px-1 md:px-3 pt-0 pb-0">
+        <CardContent className="flex flex-col justify-around px-1 pt-0 pb-0 md:px-3">
           <div
             className="
               relative mb-3 sm:mb-4
@@ -355,13 +354,15 @@ function FeaturedProductCard({
             {!image1 && (
               <span className="text-sm text-muted-foreground">Sin imagen</span>
             )}
+
           </div>
 
+          {/* INFORMACION DE TARJETA: titulo a la izquierda y precio a la derecha. */}
           <div className="flex items-baseline justify-between gap-3">
             <h3
               className={`${khInterferenceLightFont.className}
-                min-w-0 flex-1 text-left text-lg 
-                leading-[1.25] sm:text-[17px] uppercase
+                min-w-0 flex-1 text-left text-lg
+                uppercase leading-[1.25] sm:text-[17px]
               `}
             >
               {displayName}
@@ -369,14 +370,14 @@ function FeaturedProductCard({
             {hasDiscount ? (
               <div className="shrink-0 leading-tight text-right">
                 <p
-                  className={`${khInterferenceLightFont.className} text-[12px] 
+                  className={`${khInterferenceLightFont.className} text-[12px]
                   font-semibold text-black/40 line-through`}
                 >
                   {formatPrice(basePrice)}
                 </p>
                 <p
-                  className={`${khInterferenceLightFont.className} 
-                  text-[17px] 
+                  className={`${khInterferenceLightFont.className}
+                  text-[17px]
                   font-extrabold text-red-500 tabular-nums`}
                 >
                   {formatPrice(finalPrice)}
@@ -384,7 +385,7 @@ function FeaturedProductCard({
               </div>
             ) : (
               <p
-                className={`${khInterferenceLightFont.className} shrink-0 
+                className={`${khInterferenceLightFont.className} shrink-0
                 text-[15px] font-semibold leading-[1.25] text-right`}
               >
                 {formatPrice(basePrice)}

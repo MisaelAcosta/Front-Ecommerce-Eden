@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type TouchEvent } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -28,7 +28,27 @@ type Block1Item = {
   imageBlock1Movile?: MediaItem | MediaItem[] | null;
 };
 
-const SLIDE_DURATION_MS = 5600;
+const SLIDE_DURATION_MS = 8000;
+type SlideDirection = 1 | -1;
+
+// TRANSICION LATERAL: mantiene una direccion clara al avanzar o retroceder en el reel.
+const slideVariants = {
+  enter: (direction: SlideDirection) => ({
+    opacity: 0,
+    x: direction * 56,
+    scale: 1.01,
+  }),
+  center: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+  },
+  exit: (direction: SlideDirection) => ({
+    opacity: 0,
+    x: direction * -40,
+    scale: 1,
+  }),
+};
 
 function toAbsUrl(url?: string | null) {
   if (!url) return null;
@@ -71,6 +91,9 @@ const Block1 = () => {
   const { result, loading, error } = useGetFeaturedBlock1();
   const { navigateWithTransition } = useNavigationTransition();
   const [activeIndex, setActiveIndex] = useState(0);
+  const [slideDirection, setSlideDirection] = useState<SlideDirection>(1);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const didSwipe = useRef(false);
 
   const items = (result ?? []) as Block1Item[];
   const hasMultipleSlides = items.length > 1;
@@ -83,6 +106,7 @@ const Block1 = () => {
     if (!hasMultipleSlides) return;
 
     const timer = window.setInterval(() => {
+      setSlideDirection(1);
       setActiveIndex((current) => (current + 1) % items.length);
     }, SLIDE_DURATION_MS);
 
@@ -115,7 +139,8 @@ const Block1 = () => {
   const finalDesktopUrl = desktopUrl || mobileUrl;
   const hasLink = Boolean(productSlug || categorySlug || blockSlug);
 
-  const goToSlide = (index: number) => {
+  const goToSlide = (index: number, direction: SlideDirection) => {
+    setSlideDirection(direction);
     setActiveIndex((index + items.length) % items.length);
   };
 
@@ -129,24 +154,64 @@ const Block1 = () => {
     }
   };
 
+  // GESTO MOVIL: permite avanzar o retroceder entre banners sin bloquear el scroll vertical.
+  const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+    const touch = event.touches[0];
+    if (!touch) return;
+
+    didSwipe.current = false;
+    touchStart.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const handleTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
+    const start = touchStart.current;
+    const touch = event.changedTouches[0];
+    touchStart.current = null;
+
+    if (!start || !touch || !hasMultipleSlides) return;
+
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+    const isHorizontalSwipe =
+      Math.abs(deltaX) >= 44 && Math.abs(deltaX) > Math.abs(deltaY);
+
+    if (!isHorizontalSwipe) return;
+
+    didSwipe.current = true;
+    goToSlide(activeIndex + (deltaX < 0 ? 1 : -1), deltaX < 0 ? 1 : -1);
+
+    // El click sintetico posterior al touch no debe abrir el enlace del banner.
+    window.setTimeout(() => {
+      didSwipe.current = false;
+    }, 0);
+  };
+
+  const handleSlideClick = () => {
+    if (!didSwipe.current) handleClick();
+  };
+
   return (
     <section
       className="relative h-full w-full overflow-hidden bg-black"
       aria-roledescription="carousel"
       aria-label="Destacados"
     >
-      <AnimatePresence initial={false} mode="sync">
+      <AnimatePresence initial={false} mode="sync" custom={slideDirection}>
         <motion.div
           key={String(item.id ?? item.documentId ?? activeIndex)}
-          initial={{ opacity: 0, scale: 1.025 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 1.01 }}
-          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-          className={`absolute inset-0 ${hasLink ? "cursor-pointer" : ""}`}
+          custom={slideDirection}
+          variants={slideVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+          className={`absolute inset-0 touch-pan-y ${hasLink ? "cursor-pointer" : ""}`}
           role={hasLink ? "link" : undefined}
           tabIndex={hasLink ? 0 : -1}
           aria-label={hasLink ? title || "Ver mas" : undefined}
-          onClick={hasLink ? handleClick : undefined}
+          onClick={hasLink ? handleSlideClick : undefined}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
           onKeyDown={
             hasLink
               ? (event) => {
@@ -203,7 +268,7 @@ const Block1 = () => {
           <button
             type="button"
             aria-label="Slide anterior"
-            onClick={() => goToSlide(activeIndex - 1)}
+            onClick={() => goToSlide(activeIndex - 1, -1)}
             className="absolute left-4 top-1/2 z-20 hidden -translate-y-1/2 items-center justify-center text-white/80 transition-opacity hover:text-white md:flex"
           >
             <ArrowLeft className="h-6 w-6" strokeWidth={1.5} />
@@ -211,7 +276,7 @@ const Block1 = () => {
           <button
             type="button"
             aria-label="Siguiente slide"
-            onClick={() => goToSlide(activeIndex + 1)}
+            onClick={() => goToSlide(activeIndex + 1, 1)}
             className="absolute right-4 top-1/2 z-20 hidden -translate-y-1/2 items-center justify-center text-white/80 transition-opacity hover:text-white md:flex"
           >
             <ArrowRight className="h-6 w-6" strokeWidth={1.5} />
@@ -224,7 +289,9 @@ const Block1 = () => {
                 type="button"
                 aria-label={`Ir al slide ${index + 1}`}
                 aria-current={index === activeIndex}
-                onClick={() => goToSlide(index)}
+                onClick={() =>
+                  goToSlide(index, index < activeIndex ? -1 : 1)
+                }
                 className="group relative h-[2px] flex-1 overflow-hidden bg-white/35"
               >
                 {index === activeIndex && (
