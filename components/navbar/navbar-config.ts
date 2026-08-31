@@ -40,5 +40,15 @@ export function isNavItemCurrent(pathname: string, item: NavbarItem) {
 }
 
 export function getVisibleMobileNavItems(pathname: string) {
-  return PRIMARY_NAV_ITEMS.filter((item) => !isNavItemCurrent(pathname, item));
+  const currentItem = PRIMARY_NAV_ITEMS.find((item) =>
+    isNavItemCurrent(pathname, item)
+  );
+
+  // En rutas auxiliares (Favoritos, Checkout, Perfil), el logo ya permite volver
+  // al inicio. Asi el overlay conserva tres enlaces y no se desborda en movil.
+  if (!currentItem) {
+    return PRIMARY_NAV_ITEMS.filter((item) => item.href !== "/");
+  }
+
+  return PRIMARY_NAV_ITEMS.filter((item) => item.href !== currentItem.href);
 }

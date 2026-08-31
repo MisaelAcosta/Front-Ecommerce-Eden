@@ -32,55 +32,78 @@ const ProductCardSkeleton = ({ className }: ProductCardSkeletonProps) => {
   );
 };
 
+// SKELETON DE LA FICHA
+// Replica galeria, informacion y recomendados para evitar el salto visual mientras
+// Strapi carga. Los bloques `bg-black/8` son el tono neutro del catalogo.
 const ProductDetailSkeleton = () => {
   return (
-    <div
-      className="mx-auto grid w-full max-w-6xl gap-8 pt-1 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:gap-14 md:pt-0"
-      aria-hidden="true"
-    >
-      <div>
-        <Skeleton className="aspect-4/5 w-full rounded-none bg-black/8 sm:aspect-5/6" />
-        <div className="mt-3 flex justify-center gap-2">
-          <Skeleton className="h-2 w-2 rounded-full bg-black/12" />
-          <Skeleton className="h-2 w-2 rounded-full bg-black/8" />
-          <Skeleton className="h-2 w-2 rounded-full bg-black/8" />
+    <div className="mx-auto w-full max-w-[1490px] pt-6 md:pt-8 lg:px-6 lg:pt-10 xl:px-0" aria-hidden="true">
+      {/* FICHA PRINCIPAL: misma grilla que la pagina de producto real. */}
+      <div className="grid gap-9 lg:grid-cols-2 lg:gap-0">
+        {/* GALERIA: el aspect-ratio conserva el espacio final de la imagen. */}
+        <div className="relative aspect-[3.5/5] bg-[#ececec] sm:aspect-[5/6] lg:aspect-square lg:pt-8 xl:pt-15">
+          <Skeleton className="h-full w-full rounded-none bg-black/8" />
+          <div className="absolute bottom-2 right-2 flex gap-1 bg-white/30 p-1">
+            <Skeleton className="size-10 rounded-none bg-black/12" />
+            <Skeleton className="size-10 rounded-none bg-black/8" />
+            <Skeleton className="size-10 rounded-none bg-black/8" />
+          </div>
         </div>
-      </div>
 
-      <div className="space-y-6 px-5 md:px-0 md:pl-16">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0 flex-1 space-y-3">
-            <Skeleton className="h-8 w-4/5 rounded-none bg-black/8" />
-            <Skeleton className="h-6 w-1/2 rounded-none bg-black/8" />
+        {/* INFORMACION: representa titulo, precio, descripcion, variantes y compra. */}
+        <div className="space-y-6 px-4 pt-7 lg:max-w-[560px] lg:justify-self-center lg:px-6 lg:pt-12 xl:max-w-[600px] xl:pl-30 xl:pr-0 xl:pt-30">
+          <div className="flex items-start justify-between gap-5">
+            <div className="min-w-0 flex-1 space-y-3">
+              <Skeleton className="h-12 w-4/5 rounded-none bg-black/8 lg:h-16" />
+              <Skeleton className="h-4 w-2/5 rounded-none bg-black/8" />
+            </div>
+            <div className="space-y-2 text-right">
+              <Skeleton className="ml-auto h-4 w-20 rounded-none bg-black/8" />
+              <Skeleton className="ml-auto h-4 w-16 rounded-none bg-black/8" />
+            </div>
           </div>
 
+          <Skeleton className="h-px w-full rounded-none bg-black/10" />
+
+          {/* DESCRIPCION Y ESPECIFICACIONES */}
           <div className="space-y-2">
-            <Skeleton className="h-7 w-28 rounded-full bg-black/8" />
-            <Skeleton className="h-7 w-24 rounded-none bg-black/8" />
+            <Skeleton className="h-3 w-full rounded-none bg-black/8" />
+            <Skeleton className="h-3 w-11/12 rounded-none bg-black/8" />
+            <Skeleton className="h-3 w-4/5 rounded-none bg-black/8" />
+          </div>
+          <div className="space-y-2 border-y border-black/10 py-4">
+            <Skeleton className="h-3 w-full rounded-none bg-black/8" />
+            <Skeleton className="h-3 w-3/4 rounded-none bg-black/8" />
+            <Skeleton className="h-3 w-5/6 rounded-none bg-black/8" />
+          </div>
+
+          {/* VARIANTES Y ACCIONES */}
+          <div className="flex gap-2">
+            <Skeleton className="size-13 rounded-none bg-black/8" />
+            <Skeleton className="size-13 rounded-none bg-black/8" />
+            <Skeleton className="size-13 rounded-none bg-black/8" />
+          </div>
+          <Skeleton className="h-px w-full rounded-none bg-black/10" />
+          <div className="flex gap-3">
+            <Skeleton className="size-10 rounded-none bg-black/8" />
+            <Skeleton className="h-10 w-28 rounded-none bg-black/8" />
+            <Skeleton className="h-10 flex-1 rounded-none bg-black/8" />
           </div>
         </div>
-
-        <Skeleton className="h-px w-full rounded-none bg-black/10" />
-
-        <div className="space-y-3">
-          <Skeleton className="h-6 w-40 rounded-none bg-black/8" />
-          <Skeleton className="h-4 w-full rounded-none bg-black/8" />
-          <Skeleton className="h-4 w-11/12 rounded-none bg-black/8" />
-          <Skeleton className="h-4 w-3/4 rounded-none bg-black/8" />
-        </div>
-
-        <div className="space-y-3">
-          <Skeleton className="h-6 w-48 rounded-none bg-black/8" />
-          <Skeleton className="h-4 w-full rounded-none bg-black/8" />
-          <Skeleton className="h-4 w-2/3 rounded-none bg-black/8" />
-        </div>
-
-        <div className="flex gap-3">
-          <Skeleton className="h-10 w-28 rounded-lg bg-black/8" />
-          <Skeleton className="h-10 w-44 rounded-md bg-black/8" />
-          <Skeleton className="h-10 w-10 rounded-lg bg-black/8" />
-        </div>
       </div>
+
+      {/* RECOMENDADOS: se reserva su posicion para que el footer no salte al cargar. */}
+      <section className="pt-24 lg:pt-32">
+        <Skeleton className="h-10 w-64 rounded-none bg-black/8" />
+        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 lg:gap-6">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className="space-y-3">
+              <Skeleton className="aspect-square w-full rounded-none bg-black/8" />
+              <Skeleton className="h-4 w-4/5 rounded-none bg-black/8" />
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 };

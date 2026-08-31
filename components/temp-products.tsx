@@ -341,10 +341,10 @@ const TempProducts = () => {
           whileInView="visible"
           viewport={{ once: true, amount: 0.25 }}
           custom={0}
-          className={`${khInterferenceBoldFont.className} 
-          text-4xl 
+          className={`${khInterferenceRegularFont.className} 
+          text-2xl 
           text-left mb-7
-          sm:text-5xl sm:mb-9`}
+          sm:text-4xl sm:mb-9`}
         >
           PROMOCIONES
         </motion.h3>

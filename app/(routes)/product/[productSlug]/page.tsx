@@ -9,6 +9,7 @@ import SmoothScroll from "@/components/animation_page/smooth-scroll";
 import type { ProductType } from "@/types/product";
 import InfoProduct from "./components/info-product";
 import Recommmended from "./components/recommended";
+import ProductDetailSkeleton from "./components/skeleton-product";
 
 // TIPO DE PRODUCTO DE ESTA RUTA
 // Incluye la categoria porque Recomendados necesita su slug para traer productos relacionados.
@@ -37,9 +38,9 @@ export default function Page() {
   const products = (productResult ?? []) as ProductPageItem[];
 
   // ESTADO DE CARGA
-  // Evita renderizar una ficha incompleta mientras Strapi responde.
+  // Muestra una estructura equivalente a la ficha final mientras Strapi responde.
   if (loadingProduct || products.length === 0) {
-    return <div>Cargando...</div>;
+    return <ProductDetailSkeleton />;
   }
 
   const product = products[0];

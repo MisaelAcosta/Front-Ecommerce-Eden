@@ -481,12 +481,12 @@ const FeaturedProducts = () => {
           whileInView="visible"
           viewport={{ once: true, amount: 0.25 }}
           custom={0}
-          className={`${khInterferenceBoldFont.className} 
-          text-4xl 
+          className={`${khInterferenceRegularFont.className} 
+          text-2xl 
           pl-2
           lg:pl-0
           text-left mb-2 
-          sm:text-5xl sm:mb-4`}
+          sm:text-4xl sm:mb-4`}
         >
           TOP VENTAS
         </motion.h3>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useGetNewProducts } from "@/api/useGetNewProduct";
+import { useEffect, useMemo, useState } from "react";
 import localFont from "next/font/local";
 import {
   Carousel,
@@ -8,19 +9,18 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi,
 } from "./ui/carousel";
 import SkeletonSchema from "./skeletonSchema";
 import type { ResponseType } from "@/types/response";
 import type { ProductType } from "@/types/product";
-import type { PromotionType } from "@/types/promotion";
-import { Card, CardContent } from "./ui/card";
-import { formatPrice } from "@/lib/formatPrice";
-import { LovedButton } from "./loved-button";
 import { toAbsUrl } from "@/lib/media";
 import Image from "next/image";
 import { motion } from "motion/react";
 import { fadeUp } from "@/lib/fade-up";
 import { useNavigationTransition } from "@/components/navigation-transition-provider";
+import { khInterferenceRegularFont } from "@/app/(routes)/cart/components/cart-fonts";
+import { ArrowRight } from "lucide-react";
 
 // Fuente del titulo; coincide con la seccion Top Ventas.
 const khInterferenceBoldFont = localFont({
@@ -53,27 +53,20 @@ type StrapiRelationSingle<T> = {
   data?: T | null;
 };
 
-type PromotionLike = PromotionType & {
-  value?: number | string | null;
+type SubCategoryLike = {
+  categoryName?: string | null;
+  attributes?: {
+    categoryName?: string | null;
+  } | null;
 };
-
-type PromotionStrapiItem = {
-  id?: number;
-  attributes?: PromotionLike;
-} & PromotionLike;
 
 type ProductAttrs = {
   productName?: string | null;
   productName2?: string | null;
   variant?: string | null;
   slug?: string | null;
-  price?: number | string | null;
   images?: ProductImage[] | StrapiRelationArray<StrapiImageWrapper> | null;
-  promotions?:
-    | PromotionType[]
-    | StrapiRelationArray<PromotionStrapiItem>
-    | StrapiRelationSingle<PromotionStrapiItem>
-    | null;
+  sub_category?: SubCategoryLike | StrapiRelationSingle<SubCategoryLike> | null;
 };
 
 type ProductWithAttributes = ProductType & {
@@ -83,93 +76,10 @@ type ProductWithAttributes = ProductType & {
 
 type NewProductCardData = {
   id: number;
-  displayName: string;
-  secondaryName: string;
   productSlug: string;
-  basePrice: number;
-  finalPrice: number;
-  hasDiscount: boolean;
   image1: string | null;
-  image2: string | null;
+  subCategoryName: string;
 };
-
-// Promotion helpers used to decide the final visible price.
-function isPromoActive(p: PromotionType, now = new Date()) {
-  if (!p?.active) return false;
-  const start = p.startAt ? new Date(p.startAt) : null;
-  const end = p.endAt ? new Date(p.endAt) : null;
-  if (start && now < start) return false;
-  if (end && now > end) return false;
-  return true;
-}
-
-function applyPromo(basePrice: number, promo: PromotionType | null) {
-  if (!promo) return basePrice;
-
-  const promoValue = promo as PromotionLike;
-  const val = Number(promoValue.value || 0);
-  let discount = 0;
-
-  if (val <= 1) discount = basePrice * val;
-  else if (val <= 100) discount = basePrice * (val / 100);
-  else discount = val;
-
-  return Math.max(0, Math.round(basePrice - discount));
-}
-
-function pickBestPromo(basePrice: number, promos?: PromotionType[] | null) {
-  if (!promos || promos.length === 0) return null;
-
-  const actives = promos.filter((p) => isPromoActive(p));
-  if (actives.length === 0) return null;
-
-  let best: { promo: PromotionType; finalPrice: number } | null = null;
-
-  for (const p of actives) {
-    const fp = applyPromo(basePrice, p);
-    if (!best || fp < best.finalPrice) best = { promo: p, finalPrice: fp };
-  }
-
-  return best ? best.promo : null;
-}
-
-// Normalize Strapi promotion payloads into a flat array the UI can consume.
-function normalizePromotionItem(x: PromotionStrapiItem): PromotionType {
-  const source = x?.attributes ?? x;
-  const { id: sourceId, ...rest } = source;
-
-  return {
-    ...rest,
-    id: x?.id ?? sourceId,
-  } as PromotionType;
-}
-
-function normalizePromotions(
-  input:
-    | PromotionType[]
-    | StrapiRelationArray<PromotionStrapiItem>
-    | StrapiRelationSingle<PromotionStrapiItem>
-    | null
-    | undefined
-): PromotionType[] {
-  if (!input) return [];
-
-  if (Array.isArray(input)) {
-    return input;
-  }
-
-  const data = "data" in input ? input.data : null;
-
-  if (Array.isArray(data)) {
-    return data.map(normalizePromotionItem);
-  }
-
-  if (data && typeof data === "object") {
-    return [normalizePromotionItem(data)];
-  }
-
-  return [];
-}
 
 // Resolve product images regardless of whether Strapi returns raw arrays or relations.
 function getImagesArray(attrs: ProductAttrs): ProductImage[] {
@@ -190,37 +100,39 @@ function getImagesArray(attrs: ProductAttrs): ProductImage[] {
   return [];
 }
 
-// Convert the raw product payload into the shape used by the card UI.
+// SUBCATEGORIA VISIBLE
+// Acepta tanto la respuesta plana de Strapi v5 como la relacion anidada.
+function getSubCategoryName(value: ProductAttrs["sub_category"]) {
+  if (!value) return "";
+
+  const relation = "data" in value ? value.data : value;
+  if (!relation) return "";
+
+  const source = relation as SubCategoryLike;
+
+  return source.attributes?.categoryName?.trim()
+    ?? source.categoryName?.trim()
+    ?? "";
+}
+
+// Convierte el producto crudo en los datos visuales minimos del nuevo riel.
 function buildNewProductCardData(product: ProductType): NewProductCardData {
   const raw = product as ProductWithAttributes;
   const attrs: ProductAttrs = raw.attributes ?? raw;
   const imagesArray = getImagesArray(attrs);
   const image1 = toAbsUrl(imagesArray[0]?.url ?? null);
-  const image2 = toAbsUrl(imagesArray[1]?.url ?? null);
-  const displayName = attrs.productName ?? "Producto sin nombre";
-  const secondaryName = attrs.productName2 ?? attrs.variant ?? "";
   const productSlug = attrs.slug ?? "";
-  const basePrice = Number(attrs.price ?? 0);
-  const promos = normalizePromotions(attrs.promotions);
-  const appliedPromo = pickBestPromo(basePrice, promos);
-  const finalPrice = appliedPromo
-    ? applyPromo(basePrice, appliedPromo)
-    : basePrice;
 
   return {
     id: raw.id,
-    displayName,
-    secondaryName,
     productSlug,
-    basePrice,
-    finalPrice,
-    hasDiscount: appliedPromo !== null && finalPrice < basePrice,
     image1,
-    image2,
+    subCategoryName: getSubCategoryName(attrs.sub_category),
   };
 }
 
-// Product card renderer used by the carousel to keep the main section compact.
+// TARJETA DEL RIEL
+// Solo muestra la imagen: los productos deben sentirse como una coleccion visual.
 function NewProductCard({
   product,
   onOpenProduct,
@@ -228,140 +140,42 @@ function NewProductCard({
   product: NewProductCardData;
   onOpenProduct: (slug: string) => void;
 }) {
-  const {
-    id,
-    displayName,
-    secondaryName,
-    productSlug,
-    basePrice,
-    finalPrice,
-    hasDiscount,
-    image1,
-    image2,
-  } = product;
+  const { id, productSlug, image1 } = product;
 
-  // ANCHO MOVIL DEL RIEL: cambia `basis-[76%]` para agrandar o achicar cada tarjeta de Colecciones.
+  // RIEL MOVIL: replica Top Ventas con una tarjeta principal y parte de la
+  // siguiente. Desde `sm` se ven dos, manteniendo el gesto horizontal.
   return (
     <CarouselItem
       key={id}
-      className="basis-[76%] px-1 sm:basis-1/2 md:px-1 lg:basis-1/4"
+      className="basis-[76%] px-1 sm:basis-1/2 md:px-1 lg:basis-1/2 lg:px-4"
     >
-      <Card
+      <button
+        type="button"
+        aria-label="Ver producto"
+        onClick={() => onOpenProduct(productSlug)}
         className="
-          shadow-none
-          group relative
-          w-full
-          h-auto
-          pt-4
-          pb-4
-          overflow-hidden
-          border-none
-          bg-[#ffffff]
-          flex flex-col
-          justify-between
+          group relative block w-full cursor-pointer overflow-hidden
+          bg-[#eeeeee] text-left aspect-square
+          focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ADFE00]
         "
       >
-        {hasDiscount && (
-          <div
-            className="
-              absolute left-4 top-4 z-10
-              rounded-full px-3 py-1
-              text-[11px] font-black tracking-wide
-              bg-green-500 text-white
-            "
+        {image1 ? (
+          <Image
+            src={image1}
+            alt="Nuevo producto"
+            fill
+            sizes="(max-width: 1023px) 50vw, 310px"
+            unoptimized
+            className="object-contain p-3 transition-transform duration-300 group-hover:scale-[1.03] lg:p-5"
+          />
+        ) : (
+          <span
+            className={`${khInterferenceLightFont.className} grid h-full place-items-center text-sm text-black/45`}
           >
-            OFERTA
-          </div>
+            Sin imagen
+          </span>
         )}
-
-        <CardContent className="flex flex-col justify-around px-1 pb-0 pt-0 md:px-3">
-          <div
-            className="
-              relative mb-3 sm:mb-4
-              mt-0 w-full
-              bg-white
-              flex items-center justify-center overflow-hidden
-              pt-1 pb-1 cursor-pointer
-            "
-            onClick={() => onOpenProduct(productSlug)}
-          >
-            <div className="absolute top-3 right-3 z-20">
-              <LovedButton
-                product={{
-                  id,
-                  title: displayName,
-                  secondaryName,
-                  price: basePrice,
-                  slug: productSlug,
-                  imageUrl: image1,
-                }}
-              />
-            </div>
-
-            {image1 && (
-              <Image
-                src={image1}
-                alt={displayName}
-                width={700}
-                height={700}
-                unoptimized
-                className="
-                  sm:max-h-102.5 h-auto w-auto object-contain
-                  transition-all duration-300 ease-out
-                  opacity-100 group-hover:opacity-0
-                "
-              />
-            )}
-
-            {image2 && (
-              <Image
-                src={image2}
-                alt={displayName}
-                fill
-                unoptimized
-                className="
-                  absolute inset-0
-                  object-cover
-                  transition-all duration-300 ease-out
-                  opacity-0 group-hover:opacity-100
-                "
-              />
-            )}
-
-            {!image1 && (
-              <span className="text-sm text-muted-foreground">Sin imagen</span>
-            )}
-          </div>
-
-          <div className="flex items-baseline justify-between gap-3">
-            <h3
-              className={`${khInterferenceLightFont.className} min-w-0 flex-1 text-left text-lg uppercase leading-[1.25] sm:text-[17px]`}
-            >
-              {displayName}
-            </h3>
-            {hasDiscount ? (
-              <div className="shrink-0 leading-tight text-right">
-                <p
-                  className={`${khInterferenceLightFont.className} text-[12px] font-semibold text-black/40 line-through`}
-                >
-                  {formatPrice(basePrice)}
-                </p>
-                <p
-                  className={`${khInterferenceLightFont.className} text-[17px] sm:text-[17px] font-extrabold text-red-500 tabular-nums`}
-                >
-                  {formatPrice(finalPrice)}
-                </p>
-              </div>
-            ) : (
-              <p
-                className={`${khInterferenceLightFont.className} shrink-0 text-[15px] font-semibold text-right`}
-              >
-                {formatPrice(basePrice)}
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      </button>
     </CarouselItem>
   );
 }
@@ -369,42 +183,131 @@ function NewProductCard({
 const NewProducts = () => {
   const { result, loading }: ResponseType = useGetNewProducts();
   const { navigateWithTransition } = useNavigationTransition();
+  const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
   const newProducts = Array.isArray(result)
     ? result.map(buildNewProductCardData)
     : [];
 
-  // Keep navigation logic in one place instead of repeating it in the JSX.
+  // SINCRONIZACION DEL RIEL
+  // El indice permite actualizar las subcategorias de los dos productos visibles.
+  useEffect(() => {
+    if (!carouselApi) return;
+
+    const updateActiveIndex = () => setActiveIndex(carouselApi.selectedScrollSnap());
+    updateActiveIndex();
+    carouselApi.on("select", updateActiveIndex);
+
+    return () => {
+      carouselApi.off("select", updateActiveIndex);
+    };
+  }, [carouselApi]);
+
+  // SUBCATEGORIAS ACTIVAS
+  // Elimina duplicados para mostrar, por ejemplo, "SEPARA LIBROS · FIGURAS".
+  const visibleSubCategories = useMemo(() => {
+    const visibleProducts = newProducts.slice(activeIndex, activeIndex + 2);
+
+    return [...new Set(
+      visibleProducts
+        .map((product) => product.subCategoryName)
+        .filter(Boolean)
+    )];
+  }, [activeIndex, newProducts]);
+
+  // NAVEGACION A LA FICHA DEL PRODUCTO.
   const handleOpenProduct = (slug: string) => {
     if (!slug) return;
     navigateWithTransition(`/product/${slug}`);
   };
 
-  // RITMO VERTICAL DE INICIO: coincide con Top Ventas, Promociones y Categorias.
+  // AVANCE DEL RIEL: el control inferior izquierdo conserva el gesto editorial de la referencia.
+  const handleNextProducts = () => carouselApi?.scrollNext();
+
+  // BLOQUE COLECCIONES: columna editorial a la izquierda y dos productos a la derecha.
   return (
     <section className="mx-auto max-w-[1350px] px-4 py-10 sm:px-6 sm:py-14 lg:px-8 2xl:px-0">
-      <div>
-        <motion.h3
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.25 }}
-          custom={0}
-          className={`${khInterferenceBoldFont.className} mb-2 pl-2 text-left text-4xl sm:mb-4 sm:text-5xl lg:pl-0`}
-        >
-          COLECCIONES
-        </motion.h3>
-      </div>
-
       <motion.div
         variants={fadeUp}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.15 }}
         custom={0.2}
+        className="grid gap-7 lg:grid-cols-[320px_minmax(0,1fr)] lg:gap-20"
       >
-        <Carousel>
-          <CarouselContent className="ml-1 md:-ml-4">
-            {loading && <SkeletonSchema grid={1} />}
+        {/* COLUMNA EDITORIAL: titulo, descripcion y subcategorias de los productos visibles. */}
+        <div className="flex min-h-full flex-col justify-between py-1 lg:py-2">
+          <div>
+            <h3
+              className={`${khInterferenceRegularFont.className} text-2xl 
+              uppercase leading-none
+              sm:text-3xl lg:text-4xl`}
+            >
+              Nuevos Productos
+            </h3>
+            <p
+              className={`${khInterferenceLightFont.className} mt-5 max-w-[285px]
+              text-[13px] uppercase leading-[1.12] text-black/75
+              sm:text-[15px] lg:mt-6 lg:text-[16px]`}
+            >
+              Descubre nuestros ultimos lanzamientos y encuentra productos nuevos pensados para darle un toque unico a tu espacio.
+            </p>
+          </div>
+
+          {/* PIE DEL BLOQUE: categoria e indicadores arriba de las imagenes en movil. */}
+          <div className="mt-5 flex items-center justify-between gap-4 lg:mt-12">
+            <p
+              className={`${khInterferenceLightFont.className} 
+              text-[13px] uppercase leading-none sm:text-lg lg:hidden text-black/75`}
+            >
+              {visibleSubCategories.length > 0
+                ? visibleSubCategories.join(" · ")
+                : "Nuevos productos"}
+            </p>
+            <p
+              className={`${khInterferenceLightFont.className} hidden text-lg uppercase leading-none lg:block`}
+            >
+              {visibleSubCategories.length > 0
+                ? visibleSubCategories.join(" · ")
+                : "Nuevos productos"}
+            </p>
+
+            {/* INDICADORES MOVIL: cada punto representa un producto y permite ir a el. */}
+            <div className="flex items-center gap-2 lg:hidden">
+              {newProducts.map((product, index) => (
+                <button
+                  key={product.id}
+                  type="button"
+                  aria-label={`Ver producto ${index + 1}`}
+                  aria-current={activeIndex === index}
+                  onClick={() => carouselApi?.scrollTo(index)}
+                  className={`size-2 rounded-full transition-colors ${
+                    activeIndex === index ? "bg-black" : "bg-black/15"
+                  }`}
+                />
+              ))}
+            </div>
+
+            <button
+              type="button"
+              aria-label="Ver siguientes productos"
+              onClick={handleNextProducts}
+              className="hidden size-10 shrink-0 place-items-center transition-colors hover:text-[#ADFE00] disabled:opacity-30 lg:grid"
+              disabled={!carouselApi || activeIndex >= newProducts.length - 2}
+            >
+              <ArrowRight size={22} strokeWidth={1.5} />
+            </button>
+          </div>
+        </div>
+
+        {/* RIEL: mismo gesto y proporcion movil que Top Ventas. */}
+        <Carousel
+          setApi={setCarouselApi}
+          opts={{ align: "start", slidesToScroll: 1 }}
+          className="group/carousel min-w-0"
+        >
+          <CarouselContent className="ml-1 md:-ml-4 lg:-ml-8">
+            {loading && <SkeletonSchema grid={2} />}
 
             {newProducts.map((product) => (
               <NewProductCard
@@ -415,9 +318,28 @@ const NewProducts = () => {
             ))}
           </CarouselContent>
 
-          {/* CONTROLES DEL RIEL: sin borde ni fondo para no competir con las tarjetas. */}
-          <CarouselPrevious className="border-0 bg-transparent shadow-none hover:bg-transparent" />
-          <CarouselNext className="hidden border-0 bg-transparent shadow-none hover:bg-transparent sm:flex" />
+          {/* FLECHAS DEL CARRUSEL: ocultas hasta entrar al riel. Sin fondo; el borde
+              cuadrado solo aparece al posar el puntero directamente sobre el control. */}
+          <CarouselPrevious
+            variant="ghost"
+            className="
+              hidden left-2 z-20 rounded-none border border-transparent bg-transparent text-black
+              opacity-0 shadow-none pointer-events-none transition-opacity
+              hover:border-black hover:bg-transparent hover:text-black
+              group-hover/carousel:pointer-events-auto group-hover/carousel:opacity-100
+              disabled:!pointer-events-none disabled:!opacity-0 lg:flex lg:left-3
+            "
+          />
+          <CarouselNext
+            variant="ghost"
+            className="
+              hidden right-2 z-20 rounded-none border border-transparent bg-transparent text-black
+              opacity-0 shadow-none pointer-events-none transition-opacity
+              hover:border-black hover:bg-transparent hover:text-black
+              group-hover/carousel:pointer-events-auto group-hover/carousel:opacity-100
+              disabled:!pointer-events-none disabled:!opacity-0 lg:flex lg:right-3
+            "
+          />
         </Carousel>
       </motion.div>
     </section>

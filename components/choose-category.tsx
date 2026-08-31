@@ -299,9 +299,9 @@ const ChooseCategory = () => {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.25 }}
-            className={`${khInterferenceBoldFont.className}
+            className={`${khInterferenceRegularFont.className}
               text-4xl leading-none text-black
-              lg:text-5xl`}
+              lg:text-4xl`}
           >
             CATEGORIAS
           </motion.h3>

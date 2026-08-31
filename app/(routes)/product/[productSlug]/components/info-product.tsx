@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import Image from "next/image";
 import localFont from "next/font/local";
 import { Button } from "@/components/ui/button";
@@ -58,9 +58,21 @@ type ProductWithOptionalAttributes = ProductType & {
 type ImageLike = {
   id?: number | string;
   url?: string | null;
+  width?: number | null;
+  height?: number | null;
 };
 
 type ImageInput = ImageLike | ImageLike[] | null | undefined;
+
+// PROPORCION DE GALERIA
+// Strapi entrega el ancho y alto originales de cada archivo. En escritorio esta
+// proporcion evita franjas vacias al mostrar una foto horizontal o vertical.
+function getImageAspectRatio(image: ImageLike) {
+  const width = Number(image.width ?? 0);
+  const height = Number(image.height ?? 0);
+
+  return width > 0 && height > 0 ? `${width} / ${height}` : "1 / 1";
+}
 
 /* ----------------------- helpers de promociones ----------------------- */
 
@@ -285,13 +297,13 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
     // CONTENEDOR DE FICHA
     // `lg:max-w-none` permite ocupar todo el ancho de escritorio en vez de centrar la ficha.
     <div className="mx-auto w-full max-w-[1490px]
-    pt-6 md:pt-8 lg:pt-10">
+    pt-6 md:pt-8 lg:px-6 lg:pt-10 xl:px-0">
       {/* ESTRUCTURA 50 / 50 EN ESCRITORIO
           La primera columna usa `50vw`; la segunda contiene la informacion con margen interno. */}
       <div className="grid gap-9 lg:grid-cols-2 
       lg:gap-0">
         {/* COLUMNA IZQUIERDA: CARRUSEL */}
-        <div className="pt-0 md:pt-15">
+        <div className="pt-0 md:pt-15 lg:pt-8 xl:pt-15">
           {images.length === 0 ? (
             <div className="text-centerpy-8 text-muted-foreground">
               No hay imágenes disponibles.
@@ -308,22 +320,29 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
                 <CarouselContent className="lg:-ml-0">
                   {images.map((img, index) => (
                     <CarouselItem key={img.id ?? index} className="lg:pl-0">
-                      {/* MARCO DE FOTO: `lg:aspect-[4/5]` 
-                      controla el alto desktop. */}
+                      {/* MARCO DE FOTO
+                          En movil se mantienen proporciones fijas para estabilidad.
+                          En escritorio `--product-image-aspect` usa el archivo real
+                          de Strapi, por lo que la foto ocupa su alto correcto. */}
                       <div
+                        style={
+                          {
+                            "--product-image-aspect": getImageAspectRatio(img),
+                          } as CSSProperties
+                        }
                         className="
-                          flex w-full items-center justify-center 
+                          flex w-full items-center justify-center
                           overflow-hidden
                           aspect-[3.5/5] bg-black/5
                           sm:aspect-[5/6]
-                          lg:aspect-[6/6] lg:bg-[#ececec]
+                          lg:aspect-[var(--product-image-aspect)] lg:bg-[#ececec]
                         "
                       >
-                        <ImageZoom>
+                        <ImageZoom className="h-full w-full">
                           {/* IMAGEN PRINCIPAL
                               - `object-contain` evita que se recorte el archivo original.
-                              - `lg:scale-[0.82]` deja margen interior en escritorio. Baja el valor
-                                (ej. 0.72) para hacerla mas pequena o subelo (ej. 0.9) para agrandarla.
+                              - El marco de escritorio toma la proporcion original de cada foto,
+                                por eso no agrega franjas vacias a imagenes horizontales o verticales.
                               - `object-center` centra el modelo; se puede cambiar por `object-bottom`
                                 o `object-top` si alguna foto necesita otro encuadre. */}
                           <Image
@@ -332,7 +351,6 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
                             className="
                               h-full w-full object-contain object-center
                               transition-transform duration-300
-                              lg:scale-[1]
                             "
                             height={800}
                             width={800}
@@ -408,14 +426,16 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
         {/* COLUMNA DERECHA - INFORMACION
             `lg:justify-self-center` centra esta columna dentro de la mitad derecha.
             Asi el espacio sobrante no queda acumulado solo al borde derecho. */}
-        <div className="w-full pt-1 lg:max-w-[600px] lg:justify-self-center lg:pl-30 px-4 lg:pt-30">
+        <div className="w-full px-4 pt-1
+        lg:max-w-[560px] lg:justify-self-center lg:px-6 lg:pt-12
+        xl:max-w-[600px] xl:pl-30 xl:pr-0 xl:pt-30">
           {/* CABECERA: titulo/subtitulo a la izquierda y stock/precio a la derecha. */}
           <div className="flex items-start justify-between gap-5 px-1 md:px-0">
             <div className="min-w-0">
               <h1
                 className={`${khInterferenceRegularFont.className}
                   text-3xl leading-none tracking-[0]
-                  sm:text-5xl lg:text-[66px]`}
+                  sm:text-5xl lg:text-[48px] xl:text-[66px]`}
               >
                 {product.productName}
               </h1>
@@ -423,7 +443,7 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
                 <h2
                   className={`${khInterferenceLightFont.className}
                     mt-2 text-xl leading-tight text-black/65
-                    sm:text-2xl lg:text-[16px] lg:uppercase`}
+                    sm:text-2xl lg:text-[14px] lg:uppercase xl:text-[16px]`}
                 >
                   {product.productName2}
                 </h2>
@@ -472,9 +492,8 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
           <section className="space-y-2 px-1 md:px-0">
             
             <p className={`${khInterferenceLightFont.className} text-[13px] 
-            leading-relaxed text-black/65 lg:max-w-[400px] 
-            lg:text-[14px] 
-            lg:leading-[1.18] lg:uppercase`}>
+            leading-relaxed text-black/65 lg:max-w-[400px]
+            lg:text-[12px] lg:leading-[1.18] lg:uppercase xl:text-[14px]`}>
               {product.description}
             </p>
           </section>
@@ -487,8 +506,8 @@ const InfoProduct = ({ product, variantsData }: InfoProductProps) => {
               
             </h3>
             <p className={`${khInterferenceLightFont.className} text-[13px] 
-            leading-relaxed text-black/65 whitespace-pre-line 
-            lg:text-[14px] lg:leading-[1.45] lg:uppercase`}>
+            leading-relaxed text-black/65 whitespace-pre-line
+            lg:text-[12px] lg:leading-[1.45] lg:uppercase xl:text-[14px]`}>
               {specsToShow}
             </p>
           </section>
